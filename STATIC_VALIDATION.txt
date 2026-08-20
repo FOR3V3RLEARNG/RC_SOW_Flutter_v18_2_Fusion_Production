@@ -1,0 +1,26 @@
+YAML parse: pubspec.yaml PASS
+YAML parse: .github/workflows/flutter-green-gate.yml PASS
+YAML parse: analysis_options.yaml PASS
+Shell syntax: scripts/patch_android.sh PASS
+Relative imports: 23 Dart files PASS
+Feature: Admin role+privilege guard PASS
+Feature: All-parish role guard PASS
+Feature: Role request survives sign-in PASS
+Feature: Scope saves to backend PASS
+Feature: Beneficiary Print Out PASS
+Feature: Roof rise PASS
+Feature: Ridge height PASS
+Feature: Messages open PASS
+Feature: Message read sync PASS
+Feature: New Control PASS
+Feature: Completion PASS
+Feature: Payment PASS
+Feature: Live Tracker PASS
+Feature: Settings PASS
+APK + AAB Green Gate workflow PASS
+Secret scan: no GitHub PAT PASS
+Secret scan: no Gemini key PASS
+Secret scan: no Supabase secret PASS
+Secret scan: no private key PASS
+No .env / Firebase Admin service-account file PASS
+Supabase migration mirror: 2 files PASS
