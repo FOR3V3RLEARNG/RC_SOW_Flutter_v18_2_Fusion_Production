@@ -1,0 +1,207 @@
+name: RC SOW GitHub Production Factory
+
+on:
+  workflow_dispatch:
+    inputs:
+      build_profile:
+        description: Build profile
+        required: true
+        default: production
+        type: choice
+        options:
+          - production
+          - verify-only
+  push:
+    branches:
+      - main
+      - 'fusion/**'
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: write
+
+concurrency:
+  group: rc-sow-factory-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  FLUTTER_VERSION: '3.44.7'
+  APP_NAME: RC SOW
+  PACKAGE_ID: org.jamaicaredcross.rc_sow_flutter
+  OAUTH_CALLBACK: org.jamaicaredcross.rcsowflutter://login-callback
+
+jobs:
+  factory:
+    name: Repair, verify, test, build and package
+    runs-on: ubuntu-latest
+    timeout-minutes: 55
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: stable
+          cache: true
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.13'
+
+      - name: Factory workspace
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p factory_output logs
+          printf 'RC SOW GitHub Production Factory\n' > factory_output/BUILD_INFO.txt
+          printf 'run_id=%s\nrun_number=%s\nsha=%s\nref=%s\nflutter=%s\n' \
+            "${GITHUB_RUN_ID}" "${GITHUB_RUN_NUMBER}" "${GITHUB_SHA}" "${GITHUB_REF_NAME}" "${FLUTTER_VERSION}" \
+            >> factory_output/BUILD_INFO.txt
+
+      - name: Auto-repair canonical Dart formatting
+        if: github.event_name != 'pull_request'
+        shell: bash
+        run: |
+          set -euo pipefail
+          dart format .
+          git diff --check
+          if git diff --quiet; then
+            echo 'No Dart formatting repair required.'
+          else
+            git config user.name 'github-actions[bot]'
+            git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+            git add -u
+            git commit -m 'chore(ci): apply canonical Dart formatting'
+            git push origin "HEAD:${GITHUB_REF_NAME}"
+          fi
+
+      - name: Strict formatting verification
+        shell: bash
+        run: |
+          set -euo pipefail
+          dart format --output=none --set-exit-if-changed .
+          git diff --check
+
+      - name: Flutter doctor
+        shell: bash
+        run: |
+          set -euo pipefail
+          flutter doctor -v | tee logs/flutter-doctor.txt
+
+      - name: Bootstrap Android platform
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ ! -d android ]; then
+            flutter create . \
+              --platforms=android \
+              --org org.jamaicaredcross \
+              --project-name rc_sow_flutter \
+              --empty
+          fi
+          chmod +x scripts/patch_android.sh
+          ./scripts/patch_android.sh
+
+      - name: Resolve dependencies
+        shell: bash
+        run: |
+          set -euo pipefail
+          flutter pub get
+          flutter pub deps --style=compact | tee logs/dependency-graph.txt
+          flutter pub outdated | tee logs/dependency-outdated.txt || true
+
+      - name: Verify app identity and OAuth callback
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -q 'org.jamaicaredcross.rcsowflutter' lib/core/supabase_config.dart
+          grep -q 'oauthRedirectUri' scripts/patch_android.sh
+          grep -q 'android:scheme="org.jamaicaredcross.rcsowflutter"' android/app/src/main/AndroidManifest.xml
+          grep -q 'android:host="login-callback"' android/app/src/main/AndroidManifest.xml
+          grep -R -q 'org.jamaicaredcross.rc_sow_flutter' android || {
+            echo 'Expected Android package identity was not found.' >&2
+            exit 1
+          }
+
+      - name: Generate launcher icon
+        run: dart run flutter_launcher_icons
+
+      - name: Generate native splash
+        run: dart run flutter_native_splash:create
+
+      - name: Post-generation formatting verification
+        run: dart format --output=none --set-exit-if-changed .
+
+      - name: Analyze
+        shell: bash
+        run: |
+          set -euo pipefail
+          flutter analyze | tee logs/flutter-analyze.txt
+
+      - name: Unit and widget tests with coverage
+        shell: bash
+        run: |
+          set -euo pipefail
+          flutter test --coverage | tee logs/flutter-test.txt
+
+      - name: Export/source contract checks
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 scripts/ci/verify_production_contracts.py | tee logs/production-contracts.txt
+
+      - name: Build universal release APK
+        if: github.event_name != 'pull_request' && (github.event_name != 'workflow_dispatch' || inputs.build_profile == 'production')
+        run: flutter build apk --release
+
+      - name: Build split release APKs
+        if: github.event_name != 'pull_request' && (github.event_name != 'workflow_dispatch' || inputs.build_profile == 'production')
+        run: flutter build apk --release --split-per-abi
+
+      - name: Build release AAB
+        if: github.event_name != 'pull_request' && (github.event_name != 'workflow_dispatch' || inputs.build_profile == 'production')
+        run: flutter build appbundle --release
+
+      - name: Package production outputs
+        if: github.event_name != 'pull_request' && (github.event_name != 'workflow_dispatch' || inputs.build_profile == 'production')
+        shell: bash
+        run: |
+          set -euo pipefail
+          chmod +x scripts/ci/package_factory_outputs.sh
+          scripts/ci/package_factory_outputs.sh
+
+      - name: Verify package checksums
+        if: github.event_name != 'pull_request' && (github.event_name != 'workflow_dispatch' || inputs.build_profile == 'production')
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd factory_output
+          sha256sum -c SHA256SUMS.txt
+
+      - name: Upload production factory artifacts
+        if: github.event_name != 'pull_request' && (github.event_name != 'workflow_dispatch' || inputs.build_profile == 'production')
+        uses: actions/upload-artifact@v6
+        with:
+          name: rc-sow-production-factory-${{ github.run_number }}
+          path: factory_output/
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Upload validation logs
+        if: always()
+        uses: actions/upload-artifact@v6
+        with:
+          name: rc-sow-validation-${{ github.run_number }}
+          path: |
+            logs/
+            coverage/
+          if-no-files-found: warn
+          retention-days: 14
