@@ -43,8 +43,8 @@ abstract final class RcNavigator {
       settings: RouteSettings(name: name),
       transitionDuration: RcMotion.medium,
       reverseTransitionDuration: RcMotion.quick,
-      pageBuilder: (_, animation, __) => page,
-      transitionsBuilder: (_, animation, __, child) {
+      pageBuilder: (_, _, _) => page,
+      transitionsBuilder: (_, animation, _, child) {
         final curved = CurvedAnimation(
           parent: animation,
           curve: RcMotion.expressiveCurve,
