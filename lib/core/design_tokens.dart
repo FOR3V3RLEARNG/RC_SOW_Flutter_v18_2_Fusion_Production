@@ -54,21 +54,26 @@ ThemeData buildRcTheme({
   Brightness brightness = Brightness.light,
 }) {
   final dark = brightness == Brightness.dark;
-  final scheme = ColorScheme.fromSeed(
-    seedColor: RcColors.brand,
-    brightness: brightness,
-  ).copyWith(
-    primary: dark ? const Color(0xFFFFB3B8) : RcColors.brand,
-    onPrimary: dark ? const Color(0xFF680014) : Colors.white,
-    secondary: dark ? const Color(0xFFADC6FF) : RcColors.blue,
-    error: dark ? const Color(0xFFFFB4AB) : RcColors.danger,
-    surface: dark ? const Color(0xFF15191F) : RcColors.surface,
-    surfaceContainerLowest: dark ? const Color(0xFF101317) : RcColors.surface,
-    surfaceContainerLow: dark ? const Color(0xFF181C22) : RcColors.surface2,
-    surfaceContainer: dark ? const Color(0xFF1D2229) : const Color(0xFFF1F4F8),
-    outline: dark ? const Color(0xFF8B919A) : RcColors.lineStrong,
-    outlineVariant: dark ? const Color(0xFF3F454D) : RcColors.line,
-  );
+  final scheme =
+      ColorScheme.fromSeed(
+        seedColor: RcColors.brand,
+        brightness: brightness,
+      ).copyWith(
+        primary: dark ? const Color(0xFFFFB3B8) : RcColors.brand,
+        onPrimary: dark ? const Color(0xFF680014) : Colors.white,
+        secondary: dark ? const Color(0xFFADC6FF) : RcColors.blue,
+        error: dark ? const Color(0xFFFFB4AB) : RcColors.danger,
+        surface: dark ? const Color(0xFF15191F) : RcColors.surface,
+        surfaceContainerLowest: dark
+            ? const Color(0xFF101317)
+            : RcColors.surface,
+        surfaceContainerLow: dark ? const Color(0xFF181C22) : RcColors.surface2,
+        surfaceContainer: dark
+            ? const Color(0xFF1D2229)
+            : const Color(0xFFF1F4F8),
+        outline: dark ? const Color(0xFF8B919A) : RcColors.lineStrong,
+        outlineVariant: dark ? const Color(0xFF3F454D) : RcColors.line,
+      );
 
   final border = highContrast
       ? (dark ? Colors.white : RcColors.ink)
@@ -79,7 +84,9 @@ ThemeData buildRcTheme({
     brightness: brightness,
     colorScheme: scheme,
     scaffoldBackgroundColor: dark ? const Color(0xFF0F1216) : RcColors.bg,
-    visualDensity: compactDensity ? VisualDensity.compact : VisualDensity.standard,
+    visualDensity: compactDensity
+        ? VisualDensity.compact
+        : VisualDensity.standard,
   );
 
   return base.copyWith(

@@ -62,7 +62,8 @@ class AppState extends ChangeNotifier {
             ? 'Session synchronized ($reason)'
             : 'Signed out ($reason)';
       } catch (error) {
-        lastAuthDiagnostic = 'Session sync failed ($reason): ${error.runtimeType}';
+        lastAuthDiagnostic =
+            'Session sync failed ($reason): ${error.runtimeType}';
         if (!signedIn) profile = null;
       } finally {
         _authSyncInFlight = false;
@@ -84,13 +85,17 @@ class AppState extends ChangeNotifier {
     }
     try {
       final user = Supabase.instance.client.auth.currentUser;
-      await Supabase.instance.client.rpc('request_role_assignment', params: {
-        'p_requested_role': role,
-        'p_requested_parish': parish,
-        'p_full_name': user?.userMetadata?['full_name'] ??
-            user?.email?.split('@').first ??
-            'RC SOW user',
-      });
+      await Supabase.instance.client.rpc(
+        'request_role_assignment',
+        params: {
+          'p_requested_role': role,
+          'p_requested_parish': parish,
+          'p_full_name':
+              user?.userMetadata?['full_name'] ??
+              user?.email?.split('@').first ??
+              'RC SOW user',
+        },
+      );
       await prefs.remove('pendingRequestedRole');
       await prefs.remove('pendingRequestedParish');
       profile = await repository.currentProfile();
@@ -159,8 +164,8 @@ class AppState extends ChangeNotifier {
   }
 
   ThemeMode _themeModeFromString(String? value) => switch (value) {
-        'light' => ThemeMode.light,
-        'dark' => ThemeMode.dark,
-        _ => ThemeMode.system,
-      };
+    'light' => ThemeMode.light,
+    'dark' => ThemeMode.dark,
+    _ => ThemeMode.system,
+  };
 }

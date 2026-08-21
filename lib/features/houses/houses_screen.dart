@@ -24,7 +24,9 @@ class _HousesScreenState extends State<HousesScreen> {
   }
 
   Future<void> _refresh() async {
-    setState(() => future = widget.state.repository.houses(widget.state.profile!));
+    setState(
+      () => future = widget.state.repository.houses(widget.state.profile!),
+    );
     await future;
   }
 
@@ -86,7 +88,8 @@ class _HousesScreenState extends State<HousesScreen> {
                     'Could not load houses. Check connectivity and pull to refresh.',
                   ),
                 ),
-              if (snap.connectionState != ConnectionState.waiting && filtered.isEmpty)
+              if (snap.connectionState != ConnectionState.waiting &&
+                  filtered.isEmpty)
                 const RcExpressiveSurface(
                   child: Text('No active houses are visible for this account.'),
                 ),
@@ -172,12 +175,11 @@ class _HousesScreenState extends State<HousesScreen> {
     Navigator.of(context).push(
       PageRouteBuilder<void>(
         settings: RouteSettings(name: '/houses/${house.code}'),
-        transitionDuration:
-            widget.state.reduceMotion ? Duration.zero : RcMotion.medium,
-        pageBuilder: (_, animation, __) => HouseCommandScreen(
-          state: widget.state,
-          house: house,
-        ),
+        transitionDuration: widget.state.reduceMotion
+            ? Duration.zero
+            : RcMotion.medium,
+        pageBuilder: (_, animation, __) =>
+            HouseCommandScreen(state: widget.state, house: house),
         transitionsBuilder: (_, animation, __, child) => FadeTransition(
           opacity: animation,
           child: SlideTransition(
@@ -211,7 +213,9 @@ class HouseCommandScreen extends StatelessWidget {
         future: state.repository.productionRecords(state.profile!),
         builder: (context, snap) {
           final records = (snap.data ?? const <ProductionRecord>[])
-              .where((r) => r.houseCode.toLowerCase() == house.code.toLowerCase())
+              .where(
+                (r) => r.houseCode.toLowerCase() == house.code.toLowerCase(),
+              )
               .toList();
           final open = records.where((r) => !r.isClosed).length;
           final attention = records.where((r) => r.needsAttention).length;
@@ -252,7 +256,9 @@ class HouseCommandScreen extends StatelessWidget {
                             ),
                             RcStatusPill(
                               label: '$attention ATTENTION',
-                              color: attention > 0 ? RcColors.warning : RcColors.success,
+                              color: attention > 0
+                                  ? RcColors.warning
+                                  : RcColors.success,
                             ),
                           ],
                         ),
@@ -295,8 +301,16 @@ class HouseCommandScreen extends StatelessWidget {
               const SizedBox(height: 18),
               Row(
                 children: [
-                  Expanded(child: Text('Evidence & activity', style: theme.textTheme.titleLarge)),
-                  Text('${records.length} records', style: theme.textTheme.labelMedium),
+                  Expanded(
+                    child: Text(
+                      'Evidence & activity',
+                      style: theme.textTheme.titleLarge,
+                    ),
+                  ),
+                  Text(
+                    '${records.length} records',
+                    style: theme.textTheme.labelMedium,
+                  ),
                 ],
               ),
               const SizedBox(height: 9),
@@ -309,7 +323,9 @@ class HouseCommandScreen extends StatelessWidget {
                 )
               else if (records.isEmpty)
                 const RcExpressiveSurface(
-                  child: Text('No production records are linked to this house yet.'),
+                  child: Text(
+                    'No production records are linked to this house yet.',
+                  ),
                 )
               else
                 ...records.map(
@@ -332,13 +348,20 @@ class HouseCommandScreen extends StatelessWidget {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(r.title, style: theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w900)),
+                                Text(
+                                  r.title,
+                                  style: theme.textTheme.titleSmall?.copyWith(
+                                    fontWeight: FontWeight.w900,
+                                  ),
+                                ),
                                 const SizedBox(height: 2),
                                 Text(
                                   r.summary.isEmpty ? r.eventType : r.summary,
                                   maxLines: 2,
                                   overflow: TextOverflow.ellipsis,
-                                  style: theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.onSurfaceVariant),
+                                  style: theme.textTheme.bodySmall?.copyWith(
+                                    color: theme.colorScheme.onSurfaceVariant,
+                                  ),
                                 ),
                               ],
                             ),
@@ -348,8 +371,8 @@ class HouseCommandScreen extends StatelessWidget {
                             color: r.needsAttention
                                 ? RcColors.warning
                                 : r.isClosed
-                                    ? RcColors.success
-                                    : theme.colorScheme.secondary,
+                                ? RcColors.success
+                                : theme.colorScheme.secondary,
                           ),
                         ],
                       ),
@@ -371,11 +394,21 @@ class _HousePipeline extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    bool hasAny(Set<String> types) => records.any((r) => types.contains(r.eventType));
+    bool hasAny(Set<String> types) =>
+        records.any((r) => types.contains(r.eventType));
     final steps = [
       ('Scope', hasAny({'scope'})),
       ('Plan', hasAny({'controlData', 'workPlan', 'documentChecklist'})),
-      ('Delivery', hasAny({'siteVisit', 'dailyLog', 'materialRequest', 'consumables', 'inventory'})),
+      (
+        'Delivery',
+        hasAny({
+          'siteVisit',
+          'dailyLog',
+          'materialRequest',
+          'consumables',
+          'inventory',
+        }),
+      ),
       ('Quality', hasAny({'monitoring'})),
       ('Complete', hasAny({'notice'})),
       ('Payment', hasAny({'payment'})),
@@ -396,7 +429,9 @@ class _HousePipeline extends StatelessWidget {
               child: Row(
                 children: [
                   Icon(
-                    steps[i].$2 ? Icons.check_circle : Icons.radio_button_unchecked,
+                    steps[i].$2
+                        ? Icons.check_circle
+                        : Icons.radio_button_unchecked,
                     size: 17,
                     color: steps[i].$2
                         ? theme.colorScheme.primary

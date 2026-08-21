@@ -86,7 +86,9 @@ class AppShell extends StatelessWidget {
               icon: const Icon(Icons.group_outlined),
               label: const Text('Users online'),
               backgroundColor: Theme.of(context).colorScheme.tertiaryContainer,
-              foregroundColor: Theme.of(context).colorScheme.onTertiaryContainer,
+              foregroundColor: Theme.of(
+                context,
+              ).colorScheme.onTertiaryContainer,
             )
           : null,
     );
@@ -122,8 +124,8 @@ class _ApprovalGate extends StatelessWidget {
                     'Account approval required',
                     textAlign: TextAlign.center,
                     style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                          fontWeight: FontWeight.w900,
-                        ),
+                      fontWeight: FontWeight.w900,
+                    ),
                   ),
                   const SizedBox(height: 8),
                   const Text(
@@ -337,7 +339,9 @@ class RcHeader extends StatelessWidget {
                   IconButton(
                     tooltip: 'Messages',
                     onPressed: () => RcNavigator.messages(context, state),
-                    icon: const Badge(child: Icon(Icons.notifications_outlined)),
+                    icon: const Badge(
+                      child: Icon(Icons.notifications_outlined),
+                    ),
                   ),
                   IconButton(
                     tooltip: 'Settings',
@@ -349,7 +353,11 @@ class RcHeader extends StatelessWidget {
                       tooltip: 'More field actions',
                       onSelected: (value) {
                         if (value == 'map') {
-                          RcNavigator.liveTracker(context, state, mapFirst: true);
+                          RcNavigator.liveTracker(
+                            context,
+                            state,
+                            mapFirst: true,
+                          );
                         } else if (value == 'tracker') {
                           RcNavigator.liveTracker(context, state);
                         } else if (value == 'users') {
@@ -358,8 +366,14 @@ class RcHeader extends StatelessWidget {
                       },
                       itemBuilder: (_) => const [
                         PopupMenuItem(value: 'map', child: Text('Field map')),
-                        PopupMenuItem(value: 'tracker', child: Text('Live Tracker')),
-                        PopupMenuItem(value: 'users', child: Text('Users online')),
+                        PopupMenuItem(
+                          value: 'tracker',
+                          child: Text('Live Tracker'),
+                        ),
+                        PopupMenuItem(
+                          value: 'users',
+                          child: Text('Users online'),
+                        ),
                       ],
                     ),
                 ],
@@ -422,7 +436,8 @@ class MoreScreen extends StatelessWidget {
         const RcPageHeading(
           eyebrow: 'Workspace',
           title: 'More',
-          subtitle: 'Secondary tools stay discoverable without overcrowding field navigation.',
+          subtitle:
+              'Secondary tools stay discoverable without overcrowding field navigation.',
         ),
         const SizedBox(height: 18),
         RcResponsiveGrid(
@@ -436,17 +451,23 @@ class MoreScreen extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Icon(a.icon, color: Theme.of(context).colorScheme.primary),
+                      Icon(
+                        a.icon,
+                        color: Theme.of(context).colorScheme.primary,
+                      ),
                       const Spacer(),
-                      Text(a.title, style: Theme.of(context).textTheme.titleMedium),
+                      Text(
+                        a.title,
+                        style: Theme.of(context).textTheme.titleMedium,
+                      ),
                       const SizedBox(height: 3),
                       Text(
                         a.subtitle,
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                         style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                              color: Theme.of(context).colorScheme.onSurfaceVariant,
-                            ),
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
+                        ),
                       ),
                     ],
                   ),

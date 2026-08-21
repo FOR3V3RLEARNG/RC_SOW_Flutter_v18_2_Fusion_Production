@@ -65,7 +65,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
               RcPageHeading(
                 eyebrow: 'Production command',
                 title:
-                    'Good ${DateTime.now().hour < 12 ? 'morning' : DateTime.now().hour < 18 ? 'afternoon' : 'evening'}, ${p.fullName?.isNotEmpty == true ? p.fullName! : p.role}',
+                    'Good ${DateTime.now().hour < 12
+                        ? 'morning'
+                        : DateTime.now().hour < 18
+                        ? 'afternoon'
+                        : 'evening'}, ${p.fullName?.isNotEmpty == true ? p.fullName! : p.role}',
                 subtitle:
                     'Move each house from scope through controlled delivery, completion and payment with one visible chain of evidence.',
                 trailing: snap.connectionState == ConnectionState.waiting
@@ -136,7 +140,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
               Row(
                 children: [
                   Expanded(
-                    child: Text('Recent houses', style: theme.textTheme.titleLarge),
+                    child: Text(
+                      'Recent houses',
+                      style: theme.textTheme.titleLarge,
+                    ),
                   ),
                   TextButton(
                     onPressed: () => widget.state.selectTab(3),
@@ -158,7 +165,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   child: Text('No active houses are visible for this account.'),
                 )
               else
-                ...data.houses.take(5).map(
+                ...data.houses
+                    .take(5)
+                    .map(
                       (h) => Padding(
                         padding: const EdgeInsets.only(bottom: 9),
                         child: _HouseRow(
@@ -442,7 +451,11 @@ class _PipelineOverview extends StatelessWidget {
 }
 
 class _PipelineStep extends StatelessWidget {
-  const _PipelineStep({required this.label, required this.count, required this.icon});
+  const _PipelineStep({
+    required this.label,
+    required this.count,
+    required this.icon,
+  });
   final String label;
   final int count;
   final IconData icon;
@@ -546,9 +559,9 @@ class _DashboardData {
   });
 
   const _DashboardData.empty()
-      : houses = const [],
-        messages = const [],
-        records = const [];
+    : houses = const [],
+      messages = const [],
+      records = const [];
 
   final List<HouseRecord> houses;
   final List<MessageRecord> messages;

@@ -44,7 +44,9 @@ class SettingsScreen extends StatelessWidget {
               SwitchListTile(
                 secondary: const Icon(Icons.density_medium_outlined),
                 title: const Text('Compact field density'),
-                subtitle: const Text('Reduce spacing in dense operational views'),
+                subtitle: const Text(
+                  'Reduce spacing in dense operational views',
+                ),
                 value: state.compactDensity,
                 onChanged: (v) => state.setSetting('compactDensity', v),
               ),
@@ -58,7 +60,9 @@ class SettingsScreen extends StatelessWidget {
               SwitchListTile(
                 secondary: const Icon(Icons.motion_photos_off_outlined),
                 title: const Text('Reduced motion'),
-                subtitle: const Text('Remove non-essential container transitions'),
+                subtitle: const Text(
+                  'Remove non-essential container transitions',
+                ),
                 value: state.reduceMotion,
                 onChanged: (v) => state.setSetting('reduceMotion', v),
               ),
@@ -72,7 +76,9 @@ class SettingsScreen extends StatelessWidget {
               const ListTile(
                 leading: Icon(Icons.text_fields_outlined),
                 title: Text('System text scaling'),
-                subtitle: Text('RC SOW respects the device accessibility text size.'),
+                subtitle: Text(
+                  'RC SOW respects the device accessibility text size.',
+                ),
               ),
             ],
           ),
@@ -89,7 +95,9 @@ class SettingsScreen extends StatelessWidget {
               SwitchListTile(
                 secondary: const Icon(Icons.straighten_outlined),
                 title: const Text('Snap geometry'),
-                subtitle: const Text('Keep wall and ridge placement aligned where practical'),
+                subtitle: const Text(
+                  'Keep wall and ridge placement aligned where practical',
+                ),
                 value: state.snapDrawing,
                 onChanged: (v) => state.setSetting('snapDrawing', v),
               ),
@@ -110,7 +118,9 @@ class SettingsScreen extends StatelessWidget {
               ListTile(
                 leading: const Icon(Icons.location_on_outlined),
                 title: const Text('House location behavior'),
-                subtitle: const Text('Open saved house coordinates in the configured map provider.'),
+                subtitle: const Text(
+                  'Open saved house coordinates in the configured map provider.',
+                ),
                 trailing: const Icon(Icons.info_outline),
                 onTap: () => _info(
                   context,
@@ -121,7 +131,9 @@ class SettingsScreen extends StatelessWidget {
               ListTile(
                 leading: const Icon(Icons.my_location_outlined),
                 title: const Text('Live Tracker'),
-                subtitle: const Text('Tracker resources remain role/parish scoped.'),
+                subtitle: const Text(
+                  'Tracker resources remain role/parish scoped.',
+                ),
                 trailing: const Icon(Icons.verified_user_outlined),
                 onTap: () => _info(
                   context,
@@ -138,20 +150,26 @@ class SettingsScreen extends StatelessWidget {
               SwitchListTile(
                 secondary: const Icon(Icons.cloud_off_outlined),
                 title: const Text('Offline-aware mode'),
-                subtitle: const Text('Prefer local-safe screens and explicit retry states during weak connectivity'),
+                subtitle: const Text(
+                  'Prefer local-safe screens and explicit retry states during weak connectivity',
+                ),
                 value: state.offlineMode,
                 onChanged: (v) => state.setSetting('offlineMode', v),
               ),
               ListTile(
                 leading: const Icon(Icons.sync_outlined),
                 title: const Text('Refresh account & permissions'),
-                subtitle: const Text('Re-read the signed-in RC SOW profile from Supabase'),
+                subtitle: const Text(
+                  'Re-read the signed-in RC SOW profile from Supabase',
+                ),
                 trailing: const Icon(Icons.refresh_rounded),
                 onTap: () async {
                   await state.refreshProfile();
                   if (context.mounted) {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Account and permissions refreshed.')),
+                      const SnackBar(
+                        content: Text('Account and permissions refreshed.'),
+                      ),
                     );
                   }
                 },
@@ -165,13 +183,21 @@ class SettingsScreen extends StatelessWidget {
             children: [
               ListTile(
                 leading: const Icon(Icons.account_circle_outlined),
-                title: Text(state.profile?.fullName ?? state.profile?.email ?? 'Signed-in user'),
-                subtitle: Text('${state.profile?.role ?? ''} • ${state.profile?.parish ?? ''}'),
+                title: Text(
+                  state.profile?.fullName ??
+                      state.profile?.email ??
+                      'Signed-in user',
+                ),
+                subtitle: Text(
+                  '${state.profile?.role ?? ''} • ${state.profile?.parish ?? ''}',
+                ),
               ),
               const ListTile(
                 leading: Icon(Icons.key_off_outlined),
                 title: Text('Credential storage'),
-                subtitle: Text('RC SOW never stores passwords or auth tokens in SharedPreferences.'),
+                subtitle: Text(
+                  'RC SOW never stores passwords or auth tokens in SharedPreferences.',
+                ),
               ),
               ListTile(
                 leading: const Icon(Icons.logout, color: RcColors.danger),
@@ -187,7 +213,9 @@ class SettingsScreen extends StatelessWidget {
               ListTile(
                 leading: const Icon(Icons.health_and_safety_outlined),
                 title: const Text('Session callback status'),
-                subtitle: Text(state.lastAuthDiagnostic ?? 'No callback diagnostic yet'),
+                subtitle: Text(
+                  state.lastAuthDiagnostic ?? 'No callback diagnostic yet',
+                ),
                 trailing: const Icon(Icons.chevron_right),
                 onTap: () => _diagnostics(context),
               ),
@@ -206,12 +234,16 @@ class SettingsScreen extends StatelessWidget {
               const ListTile(
                 leading: Icon(Icons.home_repair_service_outlined),
                 title: Text('RC SOW'),
-                subtitle: Text('Flutter v18.2 • Fusion production management edition'),
+                subtitle: Text(
+                  'Flutter v18.2 • Fusion production management edition',
+                ),
               ),
               ListTile(
                 leading: const Icon(Icons.accessibility_new_outlined),
                 title: const Text('Interaction principles'),
-                subtitle: const Text('Orientation, accessibility and predictable return paths remain mandatory.'),
+                subtitle: const Text(
+                  'Orientation, accessibility and predictable return paths remain mandatory.',
+                ),
                 onTap: () => _info(
                   context,
                   'Interaction principles',
@@ -226,10 +258,10 @@ class SettingsScreen extends StatelessWidget {
   }
 
   static String _themeModeLabel(ThemeMode mode) => switch (mode) {
-        ThemeMode.system => 'Use device setting',
-        ThemeMode.light => 'Light',
-        ThemeMode.dark => 'Dark',
-      };
+    ThemeMode.system => 'Use device setting',
+    ThemeMode.light => 'Light',
+    ThemeMode.dark => 'Dark',
+  };
 
   Future<void> _themeMode(BuildContext context) async {
     final selected = await showModalBottomSheet<ThemeMode>(
@@ -248,7 +280,10 @@ class SettingsScreen extends StatelessWidget {
                   }),
                   title: Text(_themeModeLabel(mode)),
                   trailing: state.themeMode == mode
-                      ? Icon(Icons.check, color: Theme.of(ctx).colorScheme.primary)
+                      ? Icon(
+                          Icons.check,
+                          color: Theme.of(ctx).colorScheme.primary,
+                        )
                       : null,
                   onTap: () => Navigator.pop(ctx, mode),
                 ),
@@ -269,13 +304,19 @@ class SettingsScreen extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             const ListTile(
-              title: Text('Measurement Units', style: TextStyle(fontWeight: FontWeight.w900)),
+              title: Text(
+                'Measurement Units',
+                style: TextStyle(fontWeight: FontWeight.w900),
+              ),
             ),
             for (final unit in const ['Feet', 'Metric'])
               ListTile(
                 title: Text(unit),
                 trailing: state.measurementUnit == unit
-                    ? Icon(Icons.check, color: Theme.of(ctx).colorScheme.primary)
+                    ? Icon(
+                        Icons.check,
+                        color: Theme.of(ctx).colorScheme.primary,
+                      )
                     : null,
                 onTap: () => Navigator.pop(ctx, unit),
               ),
@@ -287,14 +328,14 @@ class SettingsScreen extends StatelessWidget {
   }
 
   Future<void> _diagnostics(BuildContext context) => _info(
-        context,
-        'Diagnostics',
-        'Session: ${state.signedIn ? 'signed in' : 'signed out'}\n'
+    context,
+    'Diagnostics',
+    'Session: ${state.signedIn ? 'signed in' : 'signed out'}\n'
         'Profile: ${state.profile?.role ?? 'not loaded'} / ${state.profile?.parish ?? '—'}\n'
         'Callback: ${RcAuthSupport.oauthRedirectUri}\n'
         'Last auth diagnostic: ${state.lastAuthDiagnostic ?? 'none'}\n\n'
         'No password, access token, refresh token or secret is shown here.',
-      );
+  );
 
   Future<void> _info(BuildContext context, String title, String body) =>
       showModalBottomSheet<void>(
@@ -324,10 +365,10 @@ class _Group extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => RcExpressiveSurface(
-        shape: shape,
-        padding: EdgeInsets.zero,
-        child: Column(children: children),
-      );
+    shape: shape,
+    padding: EdgeInsets.zero,
+    child: Column(children: children),
+  );
 }
 
 class SectionLabel extends StatelessWidget {
@@ -336,14 +377,14 @@ class SectionLabel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Padding(
-        padding: const EdgeInsets.fromLTRB(4, 4, 4, 8),
-        child: Text(
-          text.toUpperCase(),
-          style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                fontWeight: FontWeight.w900,
-                letterSpacing: 1.15,
-                color: Theme.of(context).colorScheme.onSurfaceVariant,
-              ),
-        ),
-      );
+    padding: const EdgeInsets.fromLTRB(4, 4, 4, 8),
+    child: Text(
+      text.toUpperCase(),
+      style: Theme.of(context).textTheme.labelSmall?.copyWith(
+        fontWeight: FontWeight.w900,
+        letterSpacing: 1.15,
+        color: Theme.of(context).colorScheme.onSurfaceVariant,
+      ),
+    ),
+  );
 }

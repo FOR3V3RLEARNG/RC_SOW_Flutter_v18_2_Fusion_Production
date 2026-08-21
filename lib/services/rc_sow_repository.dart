@@ -14,7 +14,11 @@ class RcSowRepository {
   Future<UserProfile?> currentProfile() async {
     final id = user?.id;
     if (id == null) return null;
-    final row = await client.from('profiles').select().eq('user_id', id).maybeSingle();
+    final row = await client
+        .from('profiles')
+        .select()
+        .eq('user_id', id)
+        .maybeSingle();
     if (row == null) return null;
     return UserProfile.fromMap(Map<String, dynamic>.from(row));
   }
@@ -41,11 +45,19 @@ class RcSowRepository {
         .order('created_at', ascending: false)
         .limit(100);
     return rows
-        .map((e) => MessageRecord.fromEvent(Map<String, dynamic>.from(e), profile.email))
+        .map(
+          (e) => MessageRecord.fromEvent(
+            Map<String, dynamic>.from(e),
+            profile.email,
+          ),
+        )
         .toList();
   }
 
-  Future<void> markMessageRead(MessageRecord message, UserProfile profile) async {
+  Future<void> markMessageRead(
+    MessageRecord message,
+    UserProfile profile,
+  ) async {
     final row = await client
         .from('app_events')
         .select()
@@ -54,19 +66,23 @@ class RcSowRepository {
         .maybeSingle();
     if (row == null) return;
     final item = Map<String, dynamic>.from(row['item'] as Map? ?? const {});
-    final readBy = (item['readBy'] as List?)?.map((e) => '$e').toSet() ?? <String>{};
+    final readBy =
+        (item['readBy'] as List?)?.map((e) => '$e').toSet() ?? <String>{};
     readBy.add(profile.email);
     item['readBy'] = readBy.toList();
-    await client.rpc('upsert_app_event', params: {
-      'p_event': {
-        'event_type': 'message',
-        'item_id': message.id,
-        'parish': row['parish'],
-        'house_code': row['house_code'],
-        'recipients': row['recipients'] ?? [],
-        'item': item,
+    await client.rpc(
+      'upsert_app_event',
+      params: {
+        'p_event': {
+          'event_type': 'message',
+          'item_id': message.id,
+          'parish': row['parish'],
+          'house_code': row['house_code'],
+          'recipients': row['recipients'] ?? [],
+          'item': item,
+        },
       },
-    });
+    );
   }
 
   Future<void> sendMessage({
@@ -76,20 +92,24 @@ class RcSowRepository {
     String? parish,
   }) async {
     final id = 'msg-${DateTime.now().microsecondsSinceEpoch}';
-    await client.rpc('upsert_app_event', params: {
-      'p_event': {
-        'event_type': 'message',
-        'item_id': id,
-        'parish': parish ?? (profile.canViewAllParishes ? null : profile.parish),
-        'recipients': [],
-        'item': {
-          'subject': subject,
-          'body': body,
-          'senderName': profile.fullName ?? profile.email,
-          'readBy': [profile.email],
+    await client.rpc(
+      'upsert_app_event',
+      params: {
+        'p_event': {
+          'event_type': 'message',
+          'item_id': id,
+          'parish':
+              parish ?? (profile.canViewAllParishes ? null : profile.parish),
+          'recipients': [],
+          'item': {
+            'subject': subject,
+            'body': body,
+            'senderName': profile.fullName ?? profile.email,
+            'readBy': [profile.email],
+          },
         },
       },
-    });
+    );
   }
 
   Future<List<Map<String, dynamic>>> activeUsers() async {
@@ -107,11 +127,17 @@ class RcSowRepository {
   }
 
   Future<void> approveRegistration(String userId) async {
-    await client.rpc('approve_registration_request', params: {'p_user_id': userId});
+    await client.rpc(
+      'approve_registration_request',
+      params: {'p_user_id': userId},
+    );
   }
 
   Future<void> rejectRegistration(String userId) async {
-    await client.rpc('reject_registration_request', params: {'p_user_id': userId});
+    await client.rpc(
+      'reject_registration_request',
+      params: {'p_user_id': userId},
+    );
   }
 
   Future<List<Map<String, dynamic>>> liveTrackers() async {
@@ -167,22 +193,25 @@ class RcSowRepository {
     required Map<String, dynamic> item,
   }) async {
     final id = '$eventType-${DateTime.now().microsecondsSinceEpoch}';
-    await client.rpc('upsert_app_event', params: {
-      'p_event': {
-        'event_type': eventType,
-        'item_id': id,
-        'parish': parish,
-        'house_code': houseCode,
-        'recipients': [],
-        'item': item,
+    await client.rpc(
+      'upsert_app_event',
+      params: {
+        'p_event': {
+          'event_type': eventType,
+          'item_id': id,
+          'parish': parish,
+          'house_code': houseCode,
+          'recipients': [],
+          'item': item,
+        },
       },
-    });
+    );
   }
 
   String debugSummary(UserProfile? profile) => jsonEncode({
-        'connected': user != null,
-        'role': profile?.role,
-        'parish': profile?.parish,
-        'adminVisible': profile?.canViewAdmin,
-      });
+    'connected': user != null,
+    'role': profile?.role,
+    'parish': profile?.parish,
+    'adminVisible': profile?.canViewAdmin,
+  });
 }

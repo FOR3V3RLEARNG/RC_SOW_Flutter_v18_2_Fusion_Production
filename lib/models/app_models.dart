@@ -19,20 +19,27 @@ class UserProfile {
 
   bool get isAdmin => role == 'Admin';
   bool get canViewAllParishes =>
-      const {'Admin', 'Regional Supervisor', 'Construction Specialist', 'Technical Admin'}.contains(role) &&
+      const {
+        'Admin',
+        'Regional Supervisor',
+        'Construction Specialist',
+        'Technical Admin',
+      }.contains(role) &&
       privileges['viewAllParishes'] == true;
   bool get canViewAdmin => isAdmin && privileges['viewAdmin'] == true;
   bool get canApproveScope => privileges['approveScope'] == true;
 
   factory UserProfile.fromMap(Map<String, dynamic> map) => UserProfile(
-        userId: '${map['user_id'] ?? ''}',
-        email: '${map['email'] ?? ''}',
-        role: '${map['role'] ?? ''}',
-        parish: '${map['parish'] ?? ''}',
-        approved: map['approved'] == true,
-        privileges: Map<String, dynamic>.from(map['privileges'] as Map? ?? const {}),
-        fullName: map['full_name'] as String?,
-      );
+    userId: '${map['user_id'] ?? ''}',
+    email: '${map['email'] ?? ''}',
+    role: '${map['role'] ?? ''}',
+    parish: '${map['parish'] ?? ''}',
+    approved: map['approved'] == true,
+    privileges: Map<String, dynamic>.from(
+      map['privileges'] as Map? ?? const {},
+    ),
+    fullName: map['full_name'] as String?,
+  );
 }
 
 class HouseRecord {
@@ -56,11 +63,14 @@ class HouseRecord {
     final item = Map<String, dynamic>.from(row['item'] as Map? ?? const {});
     return HouseRecord(
       code: '${row['house_code'] ?? item['houseCode'] ?? item['code'] ?? '—'}',
-      beneficiary: '${item['beneficiary'] ?? item['beneficiaryName'] ?? 'Beneficiary'}',
+      beneficiary:
+          '${item['beneficiary'] ?? item['beneficiaryName'] ?? 'Beneficiary'}',
       parish: '${row['parish'] ?? item['parish'] ?? 'Unknown'}',
       cluster: '${item['cluster'] ?? ''}',
       stage: '${item['stage'] ?? item['status'] ?? 'In progress'}',
-      progress: ((item['progress'] as num?)?.round() ?? 0).clamp(0, 100).toInt(),
+      progress: ((item['progress'] as num?)?.round() ?? 0)
+          .clamp(0, 100)
+          .toInt(),
     );
   }
 }
@@ -84,13 +94,15 @@ class MessageRecord {
 
   factory MessageRecord.fromEvent(Map<String, dynamic> row, String email) {
     final item = Map<String, dynamic>.from(row['item'] as Map? ?? const {});
-    final readBy = (item['readBy'] as List?)?.map((e) => '$e').toSet() ?? <String>{};
+    final readBy =
+        (item['readBy'] as List?)?.map((e) => '$e').toSet() ?? <String>{};
     return MessageRecord(
       id: '${row['item_id'] ?? row['id']}',
       sender: '${item['senderName'] ?? row['created_by_email'] ?? 'RC SOW'}',
       subject: '${item['subject'] ?? item['title'] ?? 'Message'}',
       body: '${item['body'] ?? item['message'] ?? ''}',
-      createdAt: DateTime.tryParse('${row['created_at'] ?? ''}') ?? DateTime.now(),
+      createdAt:
+          DateTime.tryParse('${row['created_at'] ?? ''}') ?? DateTime.now(),
       unread: !readBy.contains(email),
     );
   }
@@ -112,7 +124,8 @@ class RoofMeasurements {
   double get ridgeRiseFt => widthFt / 2 * pitchRisePer12 / 12;
   double get ridgeHeightFt => wallHeightFt + ridgeRiseFt;
   double get halfSpanFt => widthFt / 2;
-  double get rafterLengthFt => (halfSpanFt * halfSpanFt + ridgeRiseFt * ridgeRiseFt).sqrt();
+  double get rafterLengthFt =>
+      (halfSpanFt * halfSpanFt + ridgeRiseFt * ridgeRiseFt).sqrt();
 }
 
 extension _NumSqrt on double {
@@ -149,19 +162,11 @@ class ProductionRecord {
   final DateTime updatedAt;
   final Map<String, dynamic> item;
 
-  bool get isClosed => const {
-        'Completed',
-        'Approved',
-        'Paid',
-        'Closed',
-      }.contains(status);
+  bool get isClosed =>
+      const {'Completed', 'Approved', 'Paid', 'Closed'}.contains(status);
 
-  bool get needsAttention => const {
-        'Rejected',
-        'Blocked',
-        'Overdue',
-        'Critical',
-      }.contains(status);
+  bool get needsAttention =>
+      const {'Rejected', 'Blocked', 'Overdue', 'Critical'}.contains(status);
 
   factory ProductionRecord.fromEvent(Map<String, dynamic> row) {
     final item = Map<String, dynamic>.from(row['item'] as Map? ?? const {});
@@ -173,8 +178,12 @@ class ProductionRecord {
       parish: '${row['parish'] ?? item['parish'] ?? ''}',
       status: '${item['status'] ?? 'Open'}',
       title: '${item['title'] ?? _productionTitle(eventType)}',
-      summary: '${item['summary'] ?? item['note'] ?? item['description'] ?? ''}',
-      updatedAt: DateTime.tryParse('${row['updated_at'] ?? row['created_at'] ?? ''}') ??
+      summary:
+          '${item['summary'] ?? item['note'] ?? item['description'] ?? ''}',
+      updatedAt:
+          DateTime.tryParse(
+            '${row['updated_at'] ?? row['created_at'] ?? ''}',
+          ) ??
           DateTime.now(),
       item: item,
     );
@@ -182,17 +191,17 @@ class ProductionRecord {
 }
 
 String _productionTitle(String eventType) => switch (eventType) {
-      'scope' => 'Scope of Work',
-      'controlData' => 'Control of Work',
-      'workPlan' => 'Work Plan',
-      'monitoring' => 'Monitoring Checklist',
-      'siteVisit' => 'Site Visit',
-      'dailyLog' => 'Daily Site Log',
-      'documentChecklist' => 'Document Checklist',
-      'materialRequest' => 'Material Request',
-      'consumables' => 'Consumables Form',
-      'inventory' => 'Inventory Tracker',
-      'notice' => 'Notice of Completion',
-      'payment' => 'Payment Submission',
-      _ => eventType.isEmpty ? 'Production Record' : eventType,
-    };
+  'scope' => 'Scope of Work',
+  'controlData' => 'Control of Work',
+  'workPlan' => 'Work Plan',
+  'monitoring' => 'Monitoring Checklist',
+  'siteVisit' => 'Site Visit',
+  'dailyLog' => 'Daily Site Log',
+  'documentChecklist' => 'Document Checklist',
+  'materialRequest' => 'Material Request',
+  'consumables' => 'Consumables Form',
+  'inventory' => 'Inventory Tracker',
+  'notice' => 'Notice of Completion',
+  'payment' => 'Payment Submission',
+  _ => eventType.isEmpty ? 'Production Record' : eventType,
+};

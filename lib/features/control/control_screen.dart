@@ -18,16 +18,76 @@ class _ControlScreenState extends State<ControlScreen> {
   String phase = 'All';
 
   static const modules = <_ControlModule>[
-    _ControlModule('Work Plan', 'workPlan', 'Plan sequence, owners and dates', Icons.calendar_view_week_outlined, 'Plan'),
-    _ControlModule('Document Checklist', 'documentChecklist', 'Keep required evidence visible', Icons.task_alt_outlined, 'Plan'),
-    _ControlModule('Monitoring Checklist', 'monitoring', 'Quality, safety and progress checks', Icons.fact_check_outlined, 'Quality'),
-    _ControlModule('Site Visits', 'siteVisit', 'Record inspection visits and findings', Icons.location_on_outlined, 'Delivery'),
-    _ControlModule('Daily Site Log', 'dailyLog', 'Daily work, weather and constraints', Icons.menu_book_outlined, 'Delivery'),
-    _ControlModule('Material Request', 'materialRequest', 'Controlled material request and approval', Icons.inventory_2_outlined, 'Delivery'),
-    _ControlModule('Consumables Form', 'consumables', 'Track consumable field items', Icons.handyman_outlined, 'Delivery'),
-    _ControlModule('Inventory Tracker', 'inventory', 'Issued, on-site and remaining stock', Icons.warehouse_outlined, 'Delivery'),
-    _ControlModule('Notice of Completion', 'notice', 'Submit completion evidence for review', Icons.verified_outlined, 'Close-out'),
-    _ControlModule('Payment Submission', 'payment', 'Submit the payment package after completion', Icons.payments_outlined, 'Finance'),
+    _ControlModule(
+      'Work Plan',
+      'workPlan',
+      'Plan sequence, owners and dates',
+      Icons.calendar_view_week_outlined,
+      'Plan',
+    ),
+    _ControlModule(
+      'Document Checklist',
+      'documentChecklist',
+      'Keep required evidence visible',
+      Icons.task_alt_outlined,
+      'Plan',
+    ),
+    _ControlModule(
+      'Monitoring Checklist',
+      'monitoring',
+      'Quality, safety and progress checks',
+      Icons.fact_check_outlined,
+      'Quality',
+    ),
+    _ControlModule(
+      'Site Visits',
+      'siteVisit',
+      'Record inspection visits and findings',
+      Icons.location_on_outlined,
+      'Delivery',
+    ),
+    _ControlModule(
+      'Daily Site Log',
+      'dailyLog',
+      'Daily work, weather and constraints',
+      Icons.menu_book_outlined,
+      'Delivery',
+    ),
+    _ControlModule(
+      'Material Request',
+      'materialRequest',
+      'Controlled material request and approval',
+      Icons.inventory_2_outlined,
+      'Delivery',
+    ),
+    _ControlModule(
+      'Consumables Form',
+      'consumables',
+      'Track consumable field items',
+      Icons.handyman_outlined,
+      'Delivery',
+    ),
+    _ControlModule(
+      'Inventory Tracker',
+      'inventory',
+      'Issued, on-site and remaining stock',
+      Icons.warehouse_outlined,
+      'Delivery',
+    ),
+    _ControlModule(
+      'Notice of Completion',
+      'notice',
+      'Submit completion evidence for review',
+      Icons.verified_outlined,
+      'Close-out',
+    ),
+    _ControlModule(
+      'Payment Submission',
+      'payment',
+      'Submit the payment package after completion',
+      Icons.payments_outlined,
+      'Finance',
+    ),
   ];
 
   @override
@@ -90,7 +150,12 @@ class _ControlScreenState extends State<ControlScreen> {
               const SizedBox(height: 18),
               Row(
                 children: [
-                  Expanded(child: Text('Workflow modules', style: theme.textTheme.titleLarge)),
+                  Expanded(
+                    child: Text(
+                      'Workflow modules',
+                      style: theme.textTheme.titleLarge,
+                    ),
+                  ),
                   if (snap.connectionState == ConnectionState.waiting)
                     const SizedBox(
                       width: 22,
@@ -105,8 +170,8 @@ class _ControlScreenState extends State<ControlScreen> {
                   final columns = constraints.maxWidth >= 900
                       ? 3
                       : constraints.maxWidth >= 560
-                          ? 2
-                          : 1;
+                      ? 2
+                      : 1;
                   return GridView.builder(
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
@@ -174,12 +239,11 @@ class _ControlScreenState extends State<ControlScreen> {
         .push(
           PageRouteBuilder<void>(
             settings: RouteSettings(name: '/control/${module.eventType}'),
-            transitionDuration:
-                widget.state.reduceMotion ? Duration.zero : RcMotion.medium,
-            pageBuilder: (_, animation, __) => _ProductionModuleScreen(
-              state: widget.state,
-              module: module,
-            ),
+            transitionDuration: widget.state.reduceMotion
+                ? Duration.zero
+                : RcMotion.medium,
+            pageBuilder: (_, animation, __) =>
+                _ProductionModuleScreen(state: widget.state, module: module),
             transitionsBuilder: (_, animation, __, child) =>
                 FadeTransition(opacity: animation, child: child),
           ),
@@ -229,17 +293,20 @@ class _ControlScreenState extends State<ControlScreen> {
                   DropdownButtonFormField<String>(
                     initialValue: status,
                     decoration: const InputDecoration(labelText: 'Status'),
-                    items: const [
-                      'Draft',
-                      'Open',
-                      'Submitted',
-                      'In Review',
-                      'Approved',
-                      'Completed',
-                      'Blocked',
-                    ]
-                        .map((x) => DropdownMenuItem(value: x, child: Text(x)))
-                        .toList(),
+                    items:
+                        const [
+                              'Draft',
+                              'Open',
+                              'Submitted',
+                              'In Review',
+                              'Approved',
+                              'Completed',
+                              'Blocked',
+                            ]
+                            .map(
+                              (x) => DropdownMenuItem(value: x, child: Text(x)),
+                            )
+                            .toList(),
                     onChanged: busy ? null : (v) => status = v!,
                   ),
                   const SizedBox(height: 10),
@@ -252,7 +319,9 @@ class _ControlScreenState extends State<ControlScreen> {
                     const SizedBox(height: 10),
                     Text(
                       validation!,
-                      style: TextStyle(color: Theme.of(context).colorScheme.error),
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.error,
+                      ),
                     ),
                   ],
                 ],
@@ -268,9 +337,11 @@ class _ControlScreenState extends State<ControlScreen> {
               onPressed: busy
                   ? null
                   : () async {
-                      if (house.text.trim().isEmpty || parish.text.trim().isEmpty) {
+                      if (house.text.trim().isEmpty ||
+                          parish.text.trim().isEmpty) {
                         setDialogState(
-                          () => validation = 'House Code and Parish are required.',
+                          () => validation =
+                              'House Code and Parish are required.',
                         );
                         return;
                       }
@@ -296,7 +367,8 @@ class _ControlScreenState extends State<ControlScreen> {
                       } catch (_) {
                         setDialogState(() {
                           busy = false;
-                          validation = 'Could not save this record. Check connectivity and try again.';
+                          validation =
+                              'Could not save this record. Check connectivity and try again.';
                         });
                       }
                     },
@@ -374,7 +446,9 @@ class _ControlHero extends StatelessWidget {
             children: [
               Text(
                 'Controlled delivery chain',
-                style: theme.textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w900),
+                style: theme.textTheme.headlineSmall?.copyWith(
+                  fontWeight: FontWeight.w900,
+                ),
               ),
               const SizedBox(height: 6),
               Text(
@@ -402,7 +476,14 @@ class _PhaseRail extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const phases = ['All', 'Plan', 'Delivery', 'Quality', 'Close-out', 'Finance'];
+    const phases = [
+      'All',
+      'Plan',
+      'Delivery',
+      'Quality',
+      'Close-out',
+      'Finance',
+    ];
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
       child: SegmentedButton<String>(
@@ -419,7 +500,11 @@ class _PhaseRail extends StatelessWidget {
 }
 
 class _ModuleTile extends StatelessWidget {
-  const _ModuleTile({required this.module, required this.count, required this.onTap});
+  const _ModuleTile({
+    required this.module,
+    required this.count,
+    required this.onTap,
+  });
   final _ControlModule module;
   final int count;
   final VoidCallback onTap;
@@ -454,7 +539,9 @@ class _ModuleTile extends StatelessWidget {
             ),
             child: Icon(
               module.icon,
-              color: closeOut ? theme.colorScheme.primary : theme.colorScheme.secondary,
+              color: closeOut
+                  ? theme.colorScheme.primary
+                  : theme.colorScheme.secondary,
             ),
           ),
           const SizedBox(width: 12),
@@ -463,13 +550,20 @@ class _ModuleTile extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(module.title, style: theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w900)),
+                Text(
+                  module.title,
+                  style: theme.textTheme.titleSmall?.copyWith(
+                    fontWeight: FontWeight.w900,
+                  ),
+                ),
                 const SizedBox(height: 3),
                 Text(
                   module.subtitle,
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
-                  style: theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.onSurfaceVariant),
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: theme.colorScheme.onSurfaceVariant,
+                  ),
                 ),
               ],
             ),
@@ -514,8 +608,12 @@ class _RecentActivity extends StatelessWidget {
                   .map(
                     (r) => ListTile(
                       leading: Icon(
-                        r.needsAttention ? Icons.warning_amber_rounded : Icons.history_rounded,
-                        color: r.needsAttention ? RcColors.warning : theme.colorScheme.primary,
+                        r.needsAttention
+                            ? Icons.warning_amber_rounded
+                            : Icons.history_rounded,
+                        color: r.needsAttention
+                            ? RcColors.warning
+                            : theme.colorScheme.primary,
                       ),
                       title: Text(
                         '${r.houseCode} • ${r.title}',
@@ -544,7 +642,8 @@ class _ProductionModuleScreen extends StatefulWidget {
   final _ControlModule module;
 
   @override
-  State<_ProductionModuleScreen> createState() => _ProductionModuleScreenState();
+  State<_ProductionModuleScreen> createState() =>
+      _ProductionModuleScreenState();
 }
 
 class _ProductionModuleScreenState extends State<_ProductionModuleScreen> {
@@ -557,8 +656,12 @@ class _ProductionModuleScreenState extends State<_ProductionModuleScreen> {
   }
 
   Future<List<ProductionRecord>> _load() async {
-    final records = await widget.state.repository.productionRecords(widget.state.profile!);
-    return records.where((r) => r.eventType == widget.module.eventType).toList();
+    final records = await widget.state.repository.productionRecords(
+      widget.state.profile!,
+    );
+    return records
+        .where((r) => r.eventType == widget.module.eventType)
+        .toList();
   }
 
   Future<void> _refresh() async {
@@ -587,18 +690,33 @@ class _ProductionModuleScreenState extends State<_ProductionModuleScreen> {
               children: [
                 RcExpressiveSurface(
                   shape: RcSurfaceShape.hero,
-                  tone: theme.colorScheme.secondaryContainer.withValues(alpha: .35),
+                  tone: theme.colorScheme.secondaryContainer.withValues(
+                    alpha: .35,
+                  ),
                   child: Row(
                     children: [
-                      Icon(widget.module.icon, size: 34, color: theme.colorScheme.secondary),
+                      Icon(
+                        widget.module.icon,
+                        size: 34,
+                        color: theme.colorScheme.secondary,
+                      ),
                       const SizedBox(width: 14),
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(widget.module.phase.toUpperCase(), style: theme.textTheme.labelSmall?.copyWith(fontWeight: FontWeight.w900, letterSpacing: 1.1)),
+                            Text(
+                              widget.module.phase.toUpperCase(),
+                              style: theme.textTheme.labelSmall?.copyWith(
+                                fontWeight: FontWeight.w900,
+                                letterSpacing: 1.1,
+                              ),
+                            ),
                             const SizedBox(height: 3),
-                            Text(widget.module.subtitle, style: theme.textTheme.bodyMedium),
+                            Text(
+                              widget.module.subtitle,
+                              style: theme.textTheme.bodyMedium,
+                            ),
                           ],
                         ),
                       ),
@@ -608,14 +726,26 @@ class _ProductionModuleScreenState extends State<_ProductionModuleScreen> {
                 const SizedBox(height: 16),
                 Row(
                   children: [
-                    Expanded(child: Text('${records.length} records', style: theme.textTheme.titleLarge)),
+                    Expanded(
+                      child: Text(
+                        '${records.length} records',
+                        style: theme.textTheme.titleLarge,
+                      ),
+                    ),
                     if (snap.connectionState == ConnectionState.waiting)
-                      const SizedBox(width: 22, height: 22, child: CircularProgressIndicator(strokeWidth: 2.4)),
+                      const SizedBox(
+                        width: 22,
+                        height: 22,
+                        child: CircularProgressIndicator(strokeWidth: 2.4),
+                      ),
                   ],
                 ),
                 const SizedBox(height: 9),
-                if (records.isEmpty && snap.connectionState != ConnectionState.waiting)
-                  const RcExpressiveSurface(child: Text('No records in this module yet.')),
+                if (records.isEmpty &&
+                    snap.connectionState != ConnectionState.waiting)
+                  const RcExpressiveSurface(
+                    child: Text('No records in this module yet.'),
+                  ),
                 ...records.map(
                   (r) => Padding(
                     padding: const EdgeInsets.only(bottom: 9),
@@ -628,15 +758,23 @@ class _ProductionModuleScreenState extends State<_ProductionModuleScreen> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text('${r.houseCode} • ${r.parish}', style: theme.textTheme.titleMedium),
+                                Text(
+                                  '${r.houseCode} • ${r.parish}',
+                                  style: theme.textTheme.titleMedium,
+                                ),
                                 if (r.summary.isNotEmpty) ...[
                                   const SizedBox(height: 5),
-                                  Text(r.summary, style: theme.textTheme.bodyMedium),
+                                  Text(
+                                    r.summary,
+                                    style: theme.textTheme.bodyMedium,
+                                  ),
                                 ],
                                 const SizedBox(height: 8),
                                 Text(
                                   _formatDate(r.updatedAt),
-                                  style: theme.textTheme.labelSmall?.copyWith(color: theme.colorScheme.onSurfaceVariant),
+                                  style: theme.textTheme.labelSmall?.copyWith(
+                                    color: theme.colorScheme.onSurfaceVariant,
+                                  ),
                                 ),
                               ],
                             ),
@@ -647,8 +785,8 @@ class _ProductionModuleScreenState extends State<_ProductionModuleScreen> {
                             color: r.needsAttention
                                 ? RcColors.warning
                                 : r.isClosed
-                                    ? RcColors.success
-                                    : theme.colorScheme.primary,
+                                ? RcColors.success
+                                : theme.colorScheme.primary,
                           ),
                         ],
                       ),
@@ -658,7 +796,9 @@ class _ProductionModuleScreenState extends State<_ProductionModuleScreen> {
                 if (snap.hasError)
                   RcExpressiveSurface(
                     tone: theme.colorScheme.errorContainer,
-                    child: const Text('Could not load this module. Check connectivity and retry.'),
+                    child: const Text(
+                      'Could not load this module. Check connectivity and retry.',
+                    ),
                   ),
               ],
             );
@@ -671,10 +811,14 @@ class _ProductionModuleScreenState extends State<_ProductionModuleScreen> {
   Future<void> _add() async {
     final house = TextEditingController();
     final parish = TextEditingController(
-      text: widget.state.profile!.canViewAllParishes ? '' : widget.state.profile!.parish,
+      text: widget.state.profile!.canViewAllParishes
+          ? ''
+          : widget.state.profile!.parish,
     );
     final note = TextEditingController();
-    var status = widget.module.eventType == 'notice' || widget.module.eventType == 'payment'
+    var status =
+        widget.module.eventType == 'notice' ||
+            widget.module.eventType == 'payment'
         ? 'Submitted'
         : 'Open';
     final saved = await showModalBottomSheet<bool>(
@@ -693,27 +837,55 @@ class _ProductionModuleScreenState extends State<_ProductionModuleScreen> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Text('Add ${widget.module.title}', style: Theme.of(ctx).textTheme.titleLarge),
+              Text(
+                'Add ${widget.module.title}',
+                style: Theme.of(ctx).textTheme.titleLarge,
+              ),
               const SizedBox(height: 14),
-              TextField(controller: house, decoration: const InputDecoration(labelText: 'House Code')),
+              TextField(
+                controller: house,
+                decoration: const InputDecoration(labelText: 'House Code'),
+              ),
               const SizedBox(height: 10),
-              TextField(controller: parish, decoration: const InputDecoration(labelText: 'Parish')),
+              TextField(
+                controller: parish,
+                decoration: const InputDecoration(labelText: 'Parish'),
+              ),
               const SizedBox(height: 10),
               DropdownButtonFormField<String>(
                 initialValue: status,
                 decoration: const InputDecoration(labelText: 'Status'),
-                items: const ['Open', 'Draft', 'Submitted', 'In Review', 'Approved', 'Completed', 'Blocked']
-                    .map((x) => DropdownMenuItem(value: x, child: Text(x)))
-                    .toList(),
+                items:
+                    const [
+                          'Open',
+                          'Draft',
+                          'Submitted',
+                          'In Review',
+                          'Approved',
+                          'Completed',
+                          'Blocked',
+                        ]
+                        .map((x) => DropdownMenuItem(value: x, child: Text(x)))
+                        .toList(),
                 onChanged: (v) => status = v!,
               ),
               const SizedBox(height: 10),
-              TextField(controller: note, maxLines: 4, decoration: const InputDecoration(labelText: 'Field note / evidence summary')),
+              TextField(
+                controller: note,
+                maxLines: 4,
+                decoration: const InputDecoration(
+                  labelText: 'Field note / evidence summary',
+                ),
+              ),
               const SizedBox(height: 16),
               FilledButton.icon(
                 onPressed: () async {
                   if (house.text.trim().isEmpty || parish.text.trim().isEmpty) {
-                    ScaffoldMessenger.of(ctx).showSnackBar(const SnackBar(content: Text('House Code and Parish are required.')));
+                    ScaffoldMessenger.of(ctx).showSnackBar(
+                      const SnackBar(
+                        content: Text('House Code and Parish are required.'),
+                      ),
+                    );
                     return;
                   }
                   try {
@@ -734,7 +906,11 @@ class _ProductionModuleScreenState extends State<_ProductionModuleScreen> {
                   } catch (_) {
                     if (ctx.mounted) {
                       ScaffoldMessenger.of(ctx).showSnackBar(
-                        const SnackBar(content: Text('Could not save. Check connectivity and try again.')),
+                        const SnackBar(
+                          content: Text(
+                            'Could not save. Check connectivity and try again.',
+                          ),
+                        ),
                       );
                     }
                   }
@@ -760,7 +936,13 @@ class _ProductionModuleScreenState extends State<_ProductionModuleScreen> {
 }
 
 class _ControlModule {
-  const _ControlModule(this.title, this.eventType, this.subtitle, this.icon, this.phase);
+  const _ControlModule(
+    this.title,
+    this.eventType,
+    this.subtitle,
+    this.icon,
+    this.phase,
+  );
   final String title;
   final String eventType;
   final String subtitle;
