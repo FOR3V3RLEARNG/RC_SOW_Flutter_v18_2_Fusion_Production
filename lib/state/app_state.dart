@@ -1,4 +1,6 @@
-import 'package:flutter/foundation.dart';
+import 'dart:async';
+
+import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -13,6 +15,7 @@ class AppState extends ChangeNotifier {
 
   UserProfile? profile;
   bool loading = true;
+  ThemeMode themeMode = ThemeMode.system;
   bool highContrast = false;
   RcDesignStyle designStyle = RcDesignStyle.materialExpressive;
   bool reduceMotion = false;
@@ -22,14 +25,17 @@ class AppState extends ChangeNotifier {
   String measurementUnit = 'Feet';
   int selectedTab = 0;
 
+  Future<void>? _authSync;
+
   bool get signedIn => Supabase.instance.client.auth.currentSession != null;
 
   Future<void> bootstrap() async {
     final prefs = await SharedPreferences.getInstance();
+    themeMode = _themeModeFromString(prefs.getString('themeMode'));
     highContrast = prefs.getBool('highContrast') ?? false;
     final style = prefs.getString('designStyle');
     designStyle = RcDesignStyle.values.firstWhere(
-      (e) => e.name == style,
+      (value) => value.name == style,
       orElse: () => RcDesignStyle.materialExpressive,
     );
     reduceMotion = prefs.getBool('reduceMotion') ?? false;
@@ -37,25 +43,63 @@ class AppState extends ChangeNotifier {
     snapDrawing = prefs.getBool('snapDrawing') ?? true;
     showGrid = prefs.getBool('showGrid') ?? true;
     measurementUnit = prefs.getString('measurementUnit') ?? 'Feet';
-    await refreshProfile();
+    await synchronizeAuthSession(reason: 'bootstrap');
     loading = false;
     notifyListeners();
   }
 
-  Future<void> refreshProfile() async {
-    profile = await repository.currentProfile();
-    await _submitPendingRoleRequestIfNeeded();
+  Future<void> refreshProfile() =>
+      synchronizeAuthSession(reason: 'manual-refresh');
+
+  Future<void> synchronizeAuthSession({required String reason}) {
+    final running = _authSync;
+    if (running != null) {
+      return running;
+    }
+    final next = _performAuthSync();
+    _authSync = next;
+    return next.whenComplete(() {
+      if (identical(_authSync, next)) {
+        _authSync = null;
+      }
+    });
+  }
+
+  Future<void> _performAuthSync() async {
+    if (!signedIn) {
+      profile = null;
+      notifyListeners();
+      return;
+    }
+
+    try {
+      profile = await repository.currentProfile();
+      await _handlePendingRoleRequest();
+      await repository.touchPresence();
+    } catch (_) {
+      // Authentication/profile reads are retriable. Preserve the current
+      // session and let the UI expose refresh instead of forcing sign-out.
+    }
     notifyListeners();
   }
 
-  Future<void> _submitPendingRoleRequestIfNeeded() async {
-    if (!signedIn || profile == null || profile!.approved) return;
+  Future<void> _handlePendingRoleRequest() async {
     final prefs = await SharedPreferences.getInstance();
+    if (profile?.approved == true) {
+      await prefs.remove('pendingRequestedRole');
+      await prefs.remove('pendingRequestedParish');
+      return;
+    }
+    if (!signedIn || profile == null) {
+      return;
+    }
+
     final role = prefs.getString('pendingRequestedRole');
     final parish = prefs.getString('pendingRequestedParish');
     if (role == null || role.isEmpty || parish == null || parish.isEmpty) {
       return;
     }
+
     try {
       final user = Supabase.instance.client.auth.currentUser;
       await Supabase.instance.client.rpc(
@@ -73,18 +117,22 @@ class AppState extends ChangeNotifier {
       await prefs.remove('pendingRequestedParish');
       profile = await repository.currentProfile();
     } catch (_) {
-      // Keep the staged request so a later profile refresh can retry safely.
+      // Keep the staged request so the next sync can retry it safely.
     }
   }
 
   void selectTab(int value) {
-    selectedTab = value;
+    selectedTab = value.clamp(0, 4).toInt();
     notifyListeners();
   }
 
   Future<void> setSetting(String key, Object value) async {
     final prefs = await SharedPreferences.getInstance();
     switch (key) {
+      case 'themeMode':
+        themeMode = value as ThemeMode;
+        await prefs.setString(key, themeMode.name);
+        break;
       case 'designStyle':
         designStyle = value as RcDesignStyle;
         await prefs.setString(key, designStyle.name);
@@ -113,7 +161,15 @@ class AppState extends ChangeNotifier {
         measurementUnit = value as String;
         await prefs.setString(key, measurementUnit);
         break;
+      default:
+        throw ArgumentError.value(key, 'key', 'Unknown RC SOW setting');
     }
     notifyListeners();
   }
+
+  ThemeMode _themeModeFromString(String? value) => switch (value) {
+        'light' => ThemeMode.light,
+        'dark' => ThemeMode.dark,
+        _ => ThemeMode.system,
+      };
 }

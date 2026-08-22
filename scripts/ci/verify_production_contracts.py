@@ -9,70 +9,127 @@ ROOT = Path(__file__).resolve().parents[2]
 LIB = ROOT / "lib"
 
 
-def read(path: Path) -> str:
-    return path.read_text(encoding="utf-8", errors="ignore") if path.is_file() else ""
+def read(path: str) -> str:
+    target = ROOT / path
+    return target.read_text(encoding="utf-8", errors="ignore") if target.is_file() else ""
 
 
 def contains(path: str, needle: str) -> bool:
-    return needle in read(ROOT / path)
+    return needle in read(path)
 
 
-def dart_sources() -> list[Path]:
-    return sorted(LIB.rglob("*.dart")) if LIB.is_dir() else []
-
-
-sources = dart_sources()
-lib_text = "\n".join(read(path) for path in sources)
-
-# Material 3 can legitimately be declared in a theme module rather than app.dart.
-# Require an actual ThemeData configuration with useMaterial3: true somewhere in
-# production Dart source, and require MaterialApp to consume the RC theme builder.
-material3_enabled = bool(
-    re.search(r"ThemeData\s*\([\s\S]{0,6000}?useMaterial3\s*:\s*true", lib_text)
+lib_text = "\n".join(
+    path.read_text(encoding="utf-8", errors="ignore")
+    for path in sorted(LIB.rglob("*.dart"))
 )
-material_theme_wired = (
-    contains("lib/app.dart", "MaterialApp(")
-    and contains("lib/app.dart", "buildRcTheme(")
+
+material3_enabled = bool(
+    re.search(r"ThemeData\s*\([\s\S]{0,8000}?useMaterial3\s*:\s*true", lib_text)
 )
 
 checks: list[tuple[str, bool]] = [
-    ("Material 3 is enabled", material3_enabled and material_theme_wired),
-    ("Supabase configuration exists", (ROOT / "lib/core/supabase_config.dart").is_file()),
     (
-        "OAuth callback scheme is canonical",
-        contains("lib/core/supabase_config.dart", "org.jamaicaredcross.rcsowflutter"),
+        "Material 3 theme is wired",
+        material3_enabled
+        and contains("lib/app.dart", "MaterialApp(")
+        and contains("lib/app.dart", "buildRcTheme("),
     ),
-    ("Android patch script exists", (ROOT / "scripts/patch_android.sh").is_file()),
+    (
+        "Light/dark/system appearance is wired",
+        contains("lib/app.dart", "themeMode: state.themeMode")
+        and contains("lib/app.dart", "darkTheme:")
+        and contains("lib/state/app_state.dart", "ThemeMode themeMode"),
+    ),
+    (
+        "OAuth callback is centralized",
+        contains("lib/core/supabase_config.dart", "org.jamaicaredcross.rcsowflutter")
+        and contains("lib/features/auth/login_screen.dart", "SupabaseConfig.oauthRedirectUri"),
+    ),
+    (
+        "Message drawer is interactive",
+        contains("lib/features/messages/messages_screen.dart", "_detailView")
+        and contains("lib/features/messages/messages_screen.dart", "_replyFromDrawer"),
+    ),
+    (
+        "Online users are really online",
+        contains("lib/services/rc_sow_repository.dart", ".where((record) => record.online)"),
+    ),
+    (
+        "Online user can open direct message",
+        contains("lib/features/users/active_users_screen.dart", "composeTo: user.email"),
+    ),
+    (
+        "Gmail UI is connected",
+        (ROOT / "lib/features/messages/gmail_screen.dart").is_file()
+        and contains("lib/features/settings/settings_screen.dart", "GmailScreen(state: state)"),
+    ),
+    (
+        "File Picker v12 save contract is satisfied",
+        contains("lib/services/document_service.dart", "mimeType: template.mimeType")
+        and contains("lib/services/document_service.dart", "mimeType: mimeType"),
+    ),
+    (
+        "Excel Plus save API is used",
+        contains("lib/services/document_service.dart", "package:excel_plus/excel_plus.dart")
+        and contains("lib/services/document_service.dart", "excel.save()"),
+    ),
+    (
+        "Control modules create real records",
+        all(
+            event_type in read("lib/features/control/control_screen.dart")
+            for event_type in (
+                "workPlan",
+                "monitoring",
+                "siteVisit",
+                "dailyLog",
+                "documentChecklist",
+                "materialRequest",
+                "consumables",
+                "inventory",
+                "notice",
+                "payment",
+            )
+        )
+        and "preserved as a dedicated Control of Works submodule" not in read(
+            "lib/features/control/control_screen.dart"
+        ),
+    ),
+    (
+        "Production PDF and Excel exports are wired",
+        contains("lib/features/control/control_screen.dart", "productionXlsx")
+        and contains("lib/features/control/control_screen.dart", "productionPdf"),
+    ),
+    (
+        "Scope parish selector and Shelter Assessment lookup are wired",
+        contains("lib/features/scope/scope_screen.dart", "RcPolicy.parishes")
+        and contains("lib/features/scope/scope_screen.dart", "_BeneficiaryLookup")
+        and contains("lib/features/scope/scope_screen.dart", "beneficiaries("),
+    ),
+    (
+        "Scope digital signature and PDF/Excel export are wired",
+        contains("lib/features/scope/scope_screen.dart", "SignaturePad")
+        and contains("lib/features/scope/scope_screen.dart", "scopeXlsx")
+        and contains("lib/features/scope/scope_screen.dart", "MemoryImage"),
+    ),
+    (
+        "Only Green Gate mutates formatting",
+        "git push origin" in read(".github/workflows/flutter-green-gate.yml")
+        and "git push origin" not in read(".github/workflows/rc-sow-production-factory.yml"),
+    ),
     (
         "Unit tests exist",
         (ROOT / "test").is_dir() and any((ROOT / "test").rglob("*_test.dart")),
     ),
-    ("Integration-test source exists", (ROOT / "integration_test").is_dir()),
 ]
-
-# Capability checks intentionally avoid coupling the factory to one widget name.
-for label, terms in [
-    ("Messaging capability", ("message", "Message")),
-    ("Settings capability", ("Settings", "settings")),
-    ("Scope capability", ("Scope", "scope")),
-    ("Control-of-Works capability", ("Control", "control")),
-    ("House/beneficiary capability", ("House", "Beneficiary")),
-]:
-    checks.append((label, any(term in lib_text for term in terms)))
 
 failed = [label for label, ok in checks if not ok]
 for label, ok in checks:
     print(f"{'PASS' if ok else 'FAIL'}  {label}")
 
-if not material3_enabled:
-    print("INFO  No ThemeData(... useMaterial3: true ...) declaration was found in lib/.")
-elif not material_theme_wired:
-    print("INFO  Material 3 exists, but lib/app.dart does not wire buildRcTheme into MaterialApp.")
-
 if failed:
-    print("\nProduction contract failures:")
-    for item in failed:
-        print(f" - {item}")
+    print("\nFusion production contract failures:")
+    for label in failed:
+        print(f" - {label}")
     sys.exit(1)
 
-print("\nAll production contract checks passed.")
+print("\nAll RC SOW v18.3.1 Fusion production contracts passed.")

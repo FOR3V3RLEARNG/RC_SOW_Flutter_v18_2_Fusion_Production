@@ -4,10 +4,12 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../core/design_tokens.dart';
 import '../../core/rc_policy.dart';
+import '../../core/supabase_config.dart';
 import '../../state/app_state.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key, required this.state});
+
   final AppState state;
 
   @override
@@ -22,10 +24,17 @@ class _LoginScreenState extends State<LoginScreen> {
   bool busy = false;
   String? error;
 
-  static const roles = RcPolicy.roles;
-  static const parishes = RcPolicy.parishes;
+  @override
+  void dispose() {
+    email.dispose();
+    password.dispose();
+    super.dispose();
+  }
 
   Future<void> signIn() async {
+    if (busy) {
+      return;
+    }
     setState(() {
       busy = true;
       error = null;
@@ -36,27 +45,48 @@ class _LoginScreenState extends State<LoginScreen> {
         email: email.text.trim(),
         password: password.text,
       );
-      await widget.state.refreshProfile();
+      await widget.state.synchronizeAuthSession(reason: 'password-sign-in');
     } catch (e) {
-      setState(() => error = '$e');
+      if (mounted) {
+        setState(() => error = _friendlyError(e));
+      }
     } finally {
-      if (mounted) setState(() => busy = false);
+      if (mounted) {
+        setState(() => busy = false);
+      }
     }
   }
 
   Future<void> google() async {
-    await _stageRoleRequest();
-    await Supabase.instance.client.auth.signInWithOAuth(
-      OAuthProvider.google,
-      redirectTo: 'org.jamaicaredcross.rcsowflutter://login-callback',
-      authScreenLaunchMode: LaunchMode.externalApplication,
-      scopes:
-          'openid email profile https://www.googleapis.com/auth/gmail.readonly https://www.googleapis.com/auth/gmail.send',
-      queryParams: {
-        'prompt': 'select_account consent',
-        'access_type': 'offline',
-      },
-    );
+    if (busy) {
+      return;
+    }
+    setState(() {
+      busy = true;
+      error = null;
+    });
+    try {
+      await _stageRoleRequest();
+      await Supabase.instance.client.auth.signInWithOAuth(
+        OAuthProvider.google,
+        redirectTo: SupabaseConfig.oauthRedirectUri,
+        authScreenLaunchMode: LaunchMode.externalApplication,
+        scopes:
+            'openid email profile https://www.googleapis.com/auth/gmail.readonly https://www.googleapis.com/auth/gmail.send',
+        queryParams: const {
+          'prompt': 'select_account consent',
+          'access_type': 'offline',
+        },
+      );
+    } catch (e) {
+      if (mounted) {
+        setState(() => error = _friendlyError(e));
+      }
+    } finally {
+      if (mounted) {
+        setState(() => busy = false);
+      }
+    }
   }
 
   Future<void> _stageRoleRequest() async {
@@ -66,6 +96,9 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Future<void> requestRole() async {
+    if (busy) {
+      return;
+    }
     setState(() {
       busy = true;
       error = null;
@@ -77,14 +110,14 @@ class _LoginScreenState extends State<LoginScreen> {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
               content: Text(
-                'Role/parish selection saved. Sign in to submit it for Admin approval.',
+                'Role and parish saved. Sign in to submit them for Admin approval.',
               ),
             ),
           );
         }
         return;
       }
-      await widget.state.refreshProfile();
+      await widget.state.synchronizeAuthSession(reason: 'role-request');
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
@@ -93,10 +126,25 @@ class _LoginScreenState extends State<LoginScreen> {
         );
       }
     } catch (e) {
-      if (mounted) setState(() => error = '$e');
+      if (mounted) {
+        setState(() => error = _friendlyError(e));
+      }
     } finally {
-      if (mounted) setState(() => busy = false);
+      if (mounted) {
+        setState(() => busy = false);
+      }
     }
+  }
+
+  String _friendlyError(Object errorValue) {
+    final message = '$errorValue';
+    if (message.toLowerCase().contains('invalid login credentials')) {
+      return 'Email or password is incorrect.';
+    }
+    if (message.toLowerCase().contains('network')) {
+      return 'Could not reach RC SOW. Check connectivity and try again.';
+    }
+    return message;
   }
 
   @override
@@ -125,14 +173,10 @@ class _LoginScreenState extends State<LoginScreen> {
                       color: RcColors.brand,
                     ),
                   ),
-                  const Text(
+                  Text(
                     'Premium Field Operations',
                     textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w800,
-                      color: RcColors.ink,
-                    ),
+                    style: Theme.of(context).textTheme.titleMedium,
                   ),
                   const SizedBox(height: 28),
                   Card(
@@ -149,43 +193,42 @@ class _LoginScreenState extends State<LoginScreen> {
                             ),
                           ),
                           const SizedBox(height: 8),
-                          const Text(
-                            'Approved users retain their assigned role. New or pending users request a role and parish for administrator approval.',
-                            style: TextStyle(color: RcColors.text),
+                          Text(
+                            'Approved users keep their assigned access. New or pending users request a role and parish for administrator approval.',
+                            style: TextStyle(
+                              color: Theme.of(context).colorScheme.onSurfaceVariant,
+                            ),
                           ),
                           const SizedBox(height: 18),
                           TextField(
                             controller: email,
                             keyboardType: TextInputType.emailAddress,
                             autofillHints: const [AutofillHints.email],
-                            decoration: const InputDecoration(
-                              labelText: 'Email',
-                            ),
+                            decoration: const InputDecoration(labelText: 'Email'),
                           ),
                           const SizedBox(height: 12),
                           TextField(
                             controller: password,
                             obscureText: true,
                             autofillHints: const [AutofillHints.password],
-                            decoration: const InputDecoration(
-                              labelText: 'Password',
-                            ),
+                            decoration: const InputDecoration(labelText: 'Password'),
                           ),
                           const SizedBox(height: 12),
                           DropdownButtonFormField<String>(
                             initialValue: role,
-                            decoration: const InputDecoration(
-                              labelText: 'Requested role',
-                            ),
-                            items: roles
+                            decoration:
+                                const InputDecoration(labelText: 'Requested role'),
+                            items: RcPolicy.roles
                                 .map(
-                                  (x) => DropdownMenuItem(
-                                    value: x,
-                                    child: Text(x),
+                                  (value) => DropdownMenuItem(
+                                    value: value,
+                                    child: Text(value),
                                   ),
                                 )
                                 .toList(),
-                            onChanged: (x) => setState(() => role = x!),
+                            onChanged: busy
+                                ? null
+                                : (value) => setState(() => role = value!),
                           ),
                           const SizedBox(height: 12),
                           DropdownButtonFormField<String>(
@@ -193,24 +236,25 @@ class _LoginScreenState extends State<LoginScreen> {
                             decoration: const InputDecoration(
                               labelText: 'Requested parish',
                             ),
-                            items: parishes
+                            items: RcPolicy.parishes
                                 .map(
-                                  (x) => DropdownMenuItem(
-                                    value: x,
-                                    child: Text(x),
+                                  (value) => DropdownMenuItem(
+                                    value: value,
+                                    child: Text(value),
                                   ),
                                 )
                                 .toList(),
-                            onChanged: (x) => setState(() => parish = x!),
+                            onChanged: busy
+                                ? null
+                                : (value) => setState(() => parish = value!),
                           ),
-                          if (error != null)
-                            Padding(
-                              padding: const EdgeInsets.only(top: 12),
-                              child: Text(
-                                error!,
-                                style: const TextStyle(color: RcColors.danger),
-                              ),
+                          if (error != null) ...[
+                            const SizedBox(height: 12),
+                            Text(
+                              error!,
+                              style: const TextStyle(color: RcColors.danger),
                             ),
+                          ],
                           const SizedBox(height: 18),
                           FilledButton.icon(
                             onPressed: busy ? null : signIn,

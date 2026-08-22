@@ -14,14 +14,14 @@ permissions:
   contents: write
 
 concurrency:
-  group: rc-sow-${{ github.workflow }}-${{ github.ref }}
+  group: rc-sow-green-gate-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
   android:
     name: Auto-repair, verify, test and build Android
     runs-on: ubuntu-latest
-    timeout-minutes: 40
+    timeout-minutes: 45
 
     steps:
       - name: Checkout
@@ -36,13 +36,15 @@ jobs:
           channel: stable
           cache: true
 
+      - name: Resolve dependencies early
+        run: flutter pub get
+
       - name: Auto-repair Dart formatting
         if: github.event_name != 'pull_request'
         id: repair_format
         shell: bash
         run: |
           set -euo pipefail
-
           dart format .
           git diff --check
 
@@ -53,13 +55,8 @@ jobs:
           fi
 
           echo "changed=true" >> "$GITHUB_OUTPUT"
-          echo "Canonical formatting changed tracked source files. Committing repair."
-
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-
-          # At this point only the formatter has run. -u stages modifications
-          # to tracked files without adding generated Android/build output.
           git add -u
           git commit -m "chore(ci): apply canonical Dart formatting"
           git push origin "HEAD:${GITHUB_REF_NAME}"
@@ -88,7 +85,7 @@ jobs:
           chmod +x scripts/patch_android.sh
           ./scripts/patch_android.sh
 
-      - name: Resolve dependencies
+      - name: Refresh dependencies after Android bootstrap
         run: flutter pub get
 
       - name: Dependency compatibility graph
@@ -118,28 +115,34 @@ jobs:
       - name: Unit and widget tests
         run: flutter test
 
+      - name: Fusion production contract checks
+        run: python3 scripts/ci/verify_production_contracts.py
+
       - name: Build release APK
+        if: github.event_name != 'pull_request'
         run: flutter build apk --release
 
       - name: Build release AAB
+        if: github.event_name != 'pull_request'
         run: flutter build appbundle --release
 
       - name: Verify release artifacts
+        if: github.event_name != 'pull_request'
         shell: bash
         run: |
           set -euo pipefail
           APK=build/app/outputs/flutter-apk/app-release.apk
           AAB=build/app/outputs/bundle/release/app-release.aab
-
           test -s "$APK"
           test -s "$AAB"
           sha256sum "$APK" "$AAB" | tee release-sha256.txt
           ls -lh "$APK" "$AAB"
 
       - name: Upload APK, AAB and checksums
+        if: github.event_name != 'pull_request'
         uses: actions/upload-artifact@v6
         with:
-          name: rc-sow-v18-2-production-${{ github.run_number }}
+          name: rc-sow-v18-3-1-production-${{ github.run_number }}
           path: |
             build/app/outputs/flutter-apk/app-release.apk
             build/app/outputs/bundle/release/app-release.aab

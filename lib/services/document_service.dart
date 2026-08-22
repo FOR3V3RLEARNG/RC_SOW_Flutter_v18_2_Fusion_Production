@@ -1,4 +1,5 @@
 import 'dart:typed_data';
+
 import 'package:cross_file/cross_file.dart';
 import 'package:excel_plus/excel_plus.dart';
 import 'package:file_picker/file_picker.dart';
@@ -7,6 +8,7 @@ import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:share_plus/share_plus.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+
 import '../models/app_models.dart';
 
 class RcTemplateDefinition {
@@ -18,6 +20,7 @@ class RcTemplateDefinition {
     required this.mimeType,
     required this.eventType,
   });
+
   final String key;
   final String title;
   final String assetPath;
@@ -84,9 +87,12 @@ abstract final class RcTemplates {
       eventType: 'payment',
     ),
   ];
+
   static RcTemplateDefinition? forEventType(String eventType) {
-    for (final t in all) {
-      if (t.eventType == eventType) return t;
+    for (final template in all) {
+      if (template.eventType == eventType) {
+        return template;
+      }
     }
     if (const {
       'siteVisit',
@@ -95,15 +101,18 @@ abstract final class RcTemplates {
       'materialRequest',
       'consumables',
       'inventory',
-    }.contains(eventType))
-      return all.firstWhere((e) => e.key == 'controlData');
+    }.contains(eventType)) {
+      return all.firstWhere((template) => template.key == 'controlData');
+    }
     return null;
   }
 }
 
 class RcDocumentService {
   RcDocumentService(this.client);
+
   final SupabaseClient client;
+
   Future<Uint8List> templateBytes(RcTemplateDefinition template) async {
     try {
       final row = await client
@@ -113,19 +122,26 @@ class RcDocumentService {
           .eq('active', true)
           .maybeSingle();
       final path = row?['storage_path'] as String?;
-      if (path != null && path.isNotEmpty)
+      if (path != null && path.isNotEmpty) {
         return client.storage.from('document-templates').download(path);
-    } catch (_) {}
+      }
+    } catch (_) {
+      // The bundled original remains available offline and before a remote
+      // template has been provisioned.
+    }
     final data = await rootBundle.load(template.assetPath);
     return data.buffer.asUint8List(data.offsetInBytes, data.lengthInBytes);
   }
 
-  Future<Uri?> saveTemplate(RcTemplateDefinition template) async =>
-      FilePicker.saveFile(
-        dialogTitle: 'Save ${template.title} template',
-        fileName: template.fileName,
-        bytes: await templateBytes(template),
-      );
+  Future<Uri?> saveTemplate(RcTemplateDefinition template) async {
+    return FilePicker.saveFile(
+      dialogTitle: 'Save ${template.title} template',
+      fileName: template.fileName,
+      bytes: await templateBytes(template),
+      mimeType: template.mimeType,
+    );
+  }
+
   Future<void> shareTemplate(RcTemplateDefinition template) async {
     final bytes = await templateBytes(template);
     await shareBytes(
@@ -140,19 +156,22 @@ class RcDocumentService {
     required RcTemplateDefinition template,
     required UserProfile profile,
   }) async {
-    if (!profile.canManageTemplates)
+    if (!profile.canManageTemplates) {
       throw StateError('Template management privilege required.');
+    }
     final picked = await FilePicker.pickFile(
       type: FileType.custom,
-      allowedExtensions: [template.fileName.split('.').last],
+      allowedExtensions: [template.fileName.split('.').last.toLowerCase()],
     );
-    if (picked == null) return;
+    if (picked == null) {
+      return;
+    }
     final bytes = await picked.readAsBytes();
+    final extension = picked.extension?.toLowerCase() ??
+        template.fileName.split('.').last.toLowerCase();
     final storagePath =
-        '${template.key}/${DateTime.now().millisecondsSinceEpoch}.${template.fileName.split('.').last}';
-    await client.storage
-        .from('document-templates')
-        .uploadBinary(
+        '${template.key}/${DateTime.now().millisecondsSinceEpoch}.$extension';
+    await client.storage.from('document-templates').uploadBinary(
           storagePath,
           bytes,
           fileOptions: FileOptions(
@@ -168,6 +187,7 @@ class RcDocumentService {
       'storage_path': storagePath,
       'active': true,
       'updated_by': profile.userId,
+      'updated_at': DateTime.now().toUtc().toIso8601String(),
     });
   }
 
@@ -183,20 +203,61 @@ class RcDocumentService {
       TextCellValue('Summary'),
       TextCellValue('Updated'),
     ]);
-    for (final r in records) {
+    for (final record in records) {
       sheet.appendRow([
-        TextCellValue(r.houseCode),
-        TextCellValue(r.parish),
-        TextCellValue(r.eventType),
-        TextCellValue(r.status),
-        TextCellValue(r.title),
-        TextCellValue(r.summary),
-        TextCellValue(r.updatedAt.toLocal().toIso8601String()),
+        TextCellValue(record.houseCode),
+        TextCellValue(record.parish),
+        TextCellValue(record.eventType),
+        TextCellValue(record.status),
+        TextCellValue(record.title),
+        TextCellValue(record.summary),
+        TextCellValue(record.updatedAt.toLocal().toIso8601String()),
       ]);
     }
-    final encoded = excel.encode();
-    if (encoded == null) throw StateError('Could not generate Excel export.');
-    return Uint8List.fromList(encoded);
+    final bytes = excel.save();
+    if (bytes == null) {
+      throw StateError('Could not generate Excel export.');
+    }
+    return Uint8List.fromList(bytes);
+  }
+
+  Future<Uint8List> scopeXlsx({
+    required String houseCode,
+    required String beneficiary,
+    required String parish,
+    required String cluster,
+    required String roofType,
+    required RoofMeasurements measurements,
+  }) async {
+    final excel = Excel.createExcel();
+    final sheet = excel[excel.getDefaultSheet() ?? 'Sheet1'];
+    sheet.appendRow([
+      TextCellValue('RC SOW Scope of Work'),
+      TextCellValue('Value'),
+    ]);
+    final rows = <(String, String)>[
+      ('House Code', houseCode),
+      ('Beneficiary', beneficiary),
+      ('Parish', parish),
+      ('Cluster', cluster),
+      ('Roof Type', roofType),
+      ('Building Width (ft)', measurements.widthFt.toStringAsFixed(2)),
+      ('Building Length (ft)', measurements.lengthFt.toStringAsFixed(2)),
+      ('Wall Height (ft)', measurements.wallHeightFt.toStringAsFixed(2)),
+      ('Pitch Rise / 12', measurements.pitchRisePer12.toStringAsFixed(2)),
+      ('Wall Plate to Ridge Rise (ft)', measurements.ridgeRiseFt.toStringAsFixed(2)),
+      ('Ridge Height from Ground (ft)', measurements.ridgeHeightFt.toStringAsFixed(2)),
+      ('Rafter Length (ft)', measurements.rafterLengthFt.toStringAsFixed(2)),
+      ('Roof Area (sq ft)', measurements.roofAreaSqFt.toStringAsFixed(2)),
+    ];
+    for (final row in rows) {
+      sheet.appendRow([TextCellValue(row.$1), TextCellValue(row.$2)]);
+    }
+    final bytes = excel.save();
+    if (bytes == null) {
+      throw StateError('Could not generate Scope Excel export.');
+    }
+    return Uint8List.fromList(bytes);
   }
 
   Future<Uint8List> productionPdf(List<ProductionRecord> records) async {
@@ -204,6 +265,7 @@ class RcDocumentService {
     pdf.addPage(
       pw.MultiPage(
         pageFormat: PdfPageFormat.a4.landscape,
+        margin: const pw.EdgeInsets.all(24),
         build: (_) => [
           pw.Text(
             'RC SOW — Production Export',
@@ -222,14 +284,14 @@ class RcDocumentService {
             ],
             data: records
                 .map(
-                  (r) => [
-                    r.houseCode,
-                    r.parish,
-                    r.eventType,
-                    r.status,
-                    r.title,
-                    r.summary,
-                    r.updatedAt.toLocal().toString(),
+                  (record) => [
+                    record.houseCode,
+                    record.parish,
+                    record.eventType,
+                    record.status,
+                    record.title,
+                    record.summary,
+                    record.updatedAt.toLocal().toString(),
                   ],
                 )
                 .toList(),
@@ -242,18 +304,32 @@ class RcDocumentService {
     return pdf.save();
   }
 
+  Future<Uri?> saveBytes({
+    required Uint8List bytes,
+    required String fileName,
+    required String mimeType,
+  }) {
+    return FilePicker.saveFile(
+      fileName: fileName,
+      bytes: bytes,
+      mimeType: mimeType,
+    );
+  }
+
   Future<void> shareBytes({
     required Uint8List bytes,
     required String fileName,
     required String mimeType,
     String? subject,
     String? text,
-  }) async => SharePlus.instance.share(
-    ShareParams(
-      subject: subject,
-      text: text,
-      files: [XFile.fromData(bytes, mimeType: mimeType)],
-      fileNameOverrides: [fileName],
-    ),
-  );
+  }) async {
+    await SharePlus.instance.share(
+      ShareParams(
+        subject: subject,
+        text: text,
+        files: [XFile.fromData(bytes, mimeType: mimeType)],
+        fileNameOverrides: [fileName],
+      ),
+    );
+  }
 }

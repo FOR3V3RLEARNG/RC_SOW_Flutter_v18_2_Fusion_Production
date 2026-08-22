@@ -28,15 +28,15 @@ class _RcSowAppState extends State<RcSowApp> {
     state = AppState(RcSowRepository(Supabase.instance.client));
     state.addListener(_redraw);
     state.bootstrap();
-    authSubscription = Supabase.instance.client.auth.onAuthStateChange.listen((
-      _,
-    ) {
-      state.refreshProfile();
-    });
+    authSubscription = Supabase.instance.client.auth.onAuthStateChange.listen(
+      (event) => state.synchronizeAuthSession(reason: event.event.name),
+    );
   }
 
   void _redraw() {
-    if (mounted) setState(() {});
+    if (mounted) {
+      setState(() {});
+    }
   }
 
   @override
@@ -51,9 +51,16 @@ class _RcSowAppState extends State<RcSowApp> {
     return MaterialApp(
       title: 'RC SOW',
       debugShowCheckedModeBanner: false,
+      themeMode: state.themeMode,
       theme: buildRcTheme(
         highContrast: state.highContrast,
         designStyle: state.designStyle,
+        brightness: Brightness.light,
+      ),
+      darkTheme: buildRcTheme(
+        highContrast: state.highContrast,
+        designStyle: state.designStyle,
+        brightness: Brightness.dark,
       ),
       home: !splashDone
           ? PremiumSplash(
@@ -61,10 +68,12 @@ class _RcSowAppState extends State<RcSowApp> {
               reduceMotion: state.reduceMotion,
             )
           : state.loading
-          ? const Scaffold(body: Center(child: CircularProgressIndicator()))
-          : Supabase.instance.client.auth.currentSession == null
-          ? LoginScreen(state: state)
-          : AppShell(state: state),
+              ? const Scaffold(
+                  body: Center(child: CircularProgressIndicator()),
+                )
+              : Supabase.instance.client.auth.currentSession == null
+                  ? LoginScreen(state: state)
+                  : AppShell(state: state),
     );
   }
 }

@@ -10,6 +10,7 @@ import '../control/control_screen.dart';
 import '../dashboard/dashboard_screen.dart';
 import '../houses/houses_screen.dart';
 import '../live/live_tracker_screen.dart';
+import '../messages/gmail_screen.dart';
 import '../messages/messages_screen.dart';
 import '../scope/scope_screen.dart';
 import '../settings/settings_screen.dart';
@@ -17,6 +18,7 @@ import '../users/active_users_screen.dart';
 
 class AppShell extends StatefulWidget {
   const AppShell({super.key, required this.state});
+
   final AppState state;
 
   @override
@@ -25,6 +27,7 @@ class AppShell extends StatefulWidget {
 
 class _AppShellState extends State<AppShell> {
   final scaffoldKey = GlobalKey<ScaffoldState>();
+
   AppState get state => widget.state;
 
   @override
@@ -51,10 +54,7 @@ class _AppShellState extends State<AppShell> {
                   profile?.active == false
                       ? 'Account suspended'
                       : 'Account approval required',
-                  style: const TextStyle(
-                    fontSize: 22,
-                    fontWeight: FontWeight.w900,
-                  ),
+                  style: Theme.of(context).textTheme.titleLarge,
                 ),
                 const SizedBox(height: 8),
                 Text(
@@ -79,7 +79,7 @@ class _AppShellState extends State<AppShell> {
       );
     }
 
-    final pages = [
+    final pages = <Widget>[
       DashboardScreen(state: state),
       ScopeScreen(state: state),
       ControlScreen(state: state),
@@ -198,7 +198,11 @@ class _AppShellState extends State<AppShell> {
 }
 
 class RcHeader extends StatelessWidget {
-  const RcHeader({super.key, required this.state, required this.onMessages});
+  const RcHeader({
+    super.key,
+    required this.state,
+    required this.onMessages,
+  });
 
   final AppState state;
   final VoidCallback onMessages;
@@ -206,13 +210,16 @@ class RcHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final profile = state.profile!;
+    final theme = Theme.of(context);
     return ClipRect(
       child: BackdropFilter(
         filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
         child: Container(
-          decoration: const BoxDecoration(
-            color: Color(0xF4FFFFFF),
-            border: Border(bottom: BorderSide(color: RcColors.line)),
+          decoration: BoxDecoration(
+            color: theme.colorScheme.surface.withValues(alpha: .94),
+            border: Border(
+              bottom: BorderSide(color: theme.colorScheme.outlineVariant),
+            ),
           ),
           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
           child: Row(
@@ -241,10 +248,9 @@ class RcHeader extends StatelessWidget {
                     Text(
                       '${profile.role} • ${profile.parish}',
                       overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                        fontSize: 11,
+                      style: theme.textTheme.bodySmall?.copyWith(
                         fontWeight: FontWeight.w700,
-                        color: RcColors.muted,
+                        color: theme.colorScheme.onSurfaceVariant,
                       ),
                     ),
                   ],
@@ -258,9 +264,11 @@ class RcHeader extends StatelessWidget {
               IconButton(
                 tooltip: 'Field map',
                 onPressed: () => Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (_) =>
-                        LiveTrackerScreen(state: state, showMapFirst: true),
+                  MaterialPageRoute<void>(
+                    builder: (_) => LiveTrackerScreen(
+                      state: state,
+                      showMapFirst: true,
+                    ),
                   ),
                 ),
                 icon: const Icon(Icons.map_outlined),
@@ -273,7 +281,7 @@ class RcHeader extends StatelessWidget {
               IconButton(
                 tooltip: 'Settings',
                 onPressed: () => Navigator.of(context).push(
-                  MaterialPageRoute(
+                  MaterialPageRoute<void>(
                     builder: (_) => SettingsScreen(state: state),
                   ),
                 ),
@@ -289,6 +297,7 @@ class RcHeader extends StatelessWidget {
 
 class MoreScreen extends StatelessWidget {
   const MoreScreen({super.key, required this.state});
+
   final AppState state;
 
   @override
@@ -301,7 +310,21 @@ class MoreScreen extends StatelessWidget {
         trailing: const Icon(Icons.chevron_right),
         onTap: () => Navigator.push(
           context,
-          MaterialPageRoute(builder: (_) => MessagesScreen(state: state)),
+          MaterialPageRoute<void>(
+            builder: (_) => MessagesScreen(state: state),
+          ),
+        ),
+      ),
+      ListTile(
+        leading: const Icon(Icons.mail_outline),
+        title: const Text('Gmail'),
+        subtitle: const Text('Read and send Google mail without leaving RC SOW'),
+        trailing: const Icon(Icons.chevron_right),
+        onTap: () => Navigator.push(
+          context,
+          MaterialPageRoute<void>(
+            builder: (_) => GmailScreen(state: state),
+          ),
         ),
       ),
       ListTile(
@@ -310,16 +333,20 @@ class MoreScreen extends StatelessWidget {
         trailing: const Icon(Icons.chevron_right),
         onTap: () => Navigator.push(
           context,
-          MaterialPageRoute(builder: (_) => LiveTrackerScreen(state: state)),
+          MaterialPageRoute<void>(
+            builder: (_) => LiveTrackerScreen(state: state),
+          ),
         ),
       ),
       ListTile(
         leading: const Icon(Icons.group_outlined),
-        title: const Text('Active Users'),
+        title: const Text('Users online'),
         trailing: const Icon(Icons.chevron_right),
         onTap: () => Navigator.push(
           context,
-          MaterialPageRoute(builder: (_) => ActiveUsersScreen(state: state)),
+          MaterialPageRoute<void>(
+            builder: (_) => ActiveUsersScreen(state: state),
+          ),
         ),
       ),
       ListTile(
@@ -328,7 +355,9 @@ class MoreScreen extends StatelessWidget {
         trailing: const Icon(Icons.chevron_right),
         onTap: () => Navigator.push(
           context,
-          MaterialPageRoute(builder: (_) => SettingsScreen(state: state)),
+          MaterialPageRoute<void>(
+            builder: (_) => SettingsScreen(state: state),
+          ),
         ),
       ),
     ];
@@ -340,7 +369,9 @@ class MoreScreen extends StatelessWidget {
           trailing: const Icon(Icons.chevron_right),
           onTap: () => Navigator.push(
             context,
-            MaterialPageRoute(builder: (_) => AdminScreen(state: state)),
+            MaterialPageRoute<void>(
+              builder: (_) => AdminScreen(state: state),
+            ),
           ),
         ),
       );
@@ -348,10 +379,7 @@ class MoreScreen extends StatelessWidget {
     return ListView(
       padding: const EdgeInsets.all(16),
       children: [
-        const Text(
-          'More',
-          style: TextStyle(fontSize: 25, fontWeight: FontWeight.w900),
-        ),
+        Text('More', style: Theme.of(context).textTheme.headlineMedium),
         const SizedBox(height: 12),
         Card(child: Column(children: items)),
         const SizedBox(height: 16),

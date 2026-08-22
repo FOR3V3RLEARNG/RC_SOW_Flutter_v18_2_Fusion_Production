@@ -1,26 +1,36 @@
 import 'dart:convert';
+
 import 'package:supabase_flutter/supabase_flutter.dart';
+
 import '../models/app_models.dart';
 
 class RcSowRepository {
   RcSowRepository(this.client);
+
   final SupabaseClient client;
+
   User? get user => client.auth.currentUser;
 
   Future<UserProfile?> currentProfile() async {
     final id = user?.id;
-    if (id == null) return null;
+    if (id == null) {
+      return null;
+    }
     final row = await client
         .from('profiles')
         .select()
         .eq('user_id', id)
         .maybeSingle();
-    if (row == null) return null;
+    if (row == null) {
+      return null;
+    }
     return UserProfile.fromMap(Map<String, dynamic>.from(row));
   }
 
   Future<void> touchPresence({bool active = true}) async {
-    if (user == null) return;
+    if (user == null) {
+      return;
+    }
     await client.rpc(
       'touch_presence',
       params: {'p_active': active, 'p_push_token': ''},
@@ -29,8 +39,9 @@ class RcSowRepository {
 
   Future<List<HouseRecord>> houses(UserProfile profile) async {
     var query = client.from('app_events').select().eq('event_type', 'house');
-    if (!profile.canViewAllParishes && profile.parish.isNotEmpty)
+    if (!profile.canViewAllParishes && profile.parish.isNotEmpty) {
       query = query.eq('parish', profile.parish);
+    }
     final rows = await query.order('updated_at', ascending: false);
     final byCode = <String, HouseRecord>{};
     for (final raw in rows) {
@@ -49,8 +60,8 @@ class RcSowRepository {
         .limit(150);
     return rows
         .map(
-          (e) => MessageRecord.fromEvent(
-            Map<String, dynamic>.from(e),
+          (raw) => MessageRecord.fromEvent(
+            Map<String, dynamic>.from(raw),
             profile.email,
           ),
         )
@@ -67,11 +78,14 @@ class RcSowRepository {
         .eq('event_type', 'message')
         .eq('item_id', message.id)
         .maybeSingle();
-    if (row == null) return;
+    if (row == null) {
+      return;
+    }
     final raw = Map<String, dynamic>.from(row);
     final item = Map<String, dynamic>.from(raw['item'] as Map? ?? const {});
     final readBy =
-        (item['readBy'] as List?)?.map((e) => '$e').toSet() ?? <String>{};
+        (item['readBy'] as List?)?.map((value) => '$value').toSet() ??
+            <String>{};
     readBy.add(profile.email);
     item['readBy'] = readBy.toList();
     await _upsertEvent(
@@ -80,7 +94,7 @@ class RcSowRepository {
       parish: raw['parish'] as String?,
       houseCode: raw['house_code'] as String?,
       recipients: (raw['recipients'] as List? ?? const [])
-          .map((e) => '$e')
+          .map((value) => '$value')
           .toList(),
       item: item,
     );
@@ -95,8 +109,9 @@ class RcSowRepository {
     String? replyTo,
     String? threadId,
   }) async {
-    if (recipients.isEmpty)
+    if (recipients.isEmpty) {
       throw ArgumentError('At least one message recipient is required.');
+    }
     final id = 'msg-${DateTime.now().microsecondsSinceEpoch}';
     await _upsertEvent(
       type: 'message',
@@ -120,8 +135,11 @@ class RcSowRepository {
     final result = await client.rpc('list_active_users');
     return (result as List? ?? const [])
         .map(
-          (e) => ActiveUserRecord.fromMap(Map<String, dynamic>.from(e as Map)),
+          (raw) => ActiveUserRecord.fromMap(
+            Map<String, dynamic>.from(raw as Map),
+          ),
         )
+        .where((record) => record.online)
         .toList();
   }
 
@@ -129,7 +147,9 @@ class RcSowRepository {
     final result = await client.rpc('list_managed_users');
     return (result as List? ?? const [])
         .map(
-          (e) => ManagedUserRecord.fromMap(Map<String, dynamic>.from(e as Map)),
+          (raw) => ManagedUserRecord.fromMap(
+            Map<String, dynamic>.from(raw as Map),
+          ),
         )
         .toList();
   }
@@ -156,14 +176,23 @@ class RcSowRepository {
   Future<List<Map<String, dynamic>>> registrationRequests() async {
     final result = await client.rpc('list_registration_requests');
     return (result as List? ?? const [])
-        .map((e) => Map<String, dynamic>.from(e as Map))
+        .map((raw) => Map<String, dynamic>.from(raw as Map))
         .toList();
   }
 
-  Future<void> approveRegistration(String userId) async =>
-      client.rpc('approve_registration_request', params: {'p_user_id': userId});
-  Future<void> rejectRegistration(String userId) async =>
-      client.rpc('reject_registration_request', params: {'p_user_id': userId});
+  Future<void> approveRegistration(String userId) async {
+    await client.rpc(
+      'approve_registration_request',
+      params: {'p_user_id': userId},
+    );
+  }
+
+  Future<void> rejectRegistration(String userId) async {
+    await client.rpc(
+      'reject_registration_request',
+      params: {'p_user_id': userId},
+    );
+  }
 
   Future<List<BeneficiaryRecord>> beneficiaries({
     String query = '',
@@ -175,7 +204,9 @@ class RcSowRepository {
     );
     return (result as List? ?? const [])
         .map(
-          (e) => BeneficiaryRecord.fromMap(Map<String, dynamic>.from(e as Map)),
+          (raw) => BeneficiaryRecord.fromMap(
+            Map<String, dynamic>.from(raw as Map),
+          ),
         )
         .toList();
   }
@@ -186,13 +217,18 @@ class RcSowRepository {
         .select()
         .eq('house_code', houseCode.trim().toUpperCase())
         .maybeSingle();
-    return row == null
-        ? null
-        : BeneficiaryRecord.fromMap(Map<String, dynamic>.from(row));
+    if (row == null) {
+      return null;
+    }
+    return BeneficiaryRecord.fromMap(Map<String, dynamic>.from(row));
   }
 
-  Future<int> bulkUpsertBeneficiaries(List<Map<String, dynamic>> rows) async {
-    if (rows.isEmpty) return 0;
+  Future<int> bulkUpsertBeneficiaries(
+    List<Map<String, dynamic>> rows,
+  ) async {
+    if (rows.isEmpty) {
+      return 0;
+    }
     final result = await client.rpc(
       'upsert_beneficiary_directory',
       params: {'p_rows': rows},
@@ -206,21 +242,27 @@ class RcSowRepository {
         .select()
         .eq('enabled', true)
         .order('parish');
-    return rows.map((e) => Map<String, dynamic>.from(e)).toList();
+    return rows.map((raw) => Map<String, dynamic>.from(raw)).toList();
   }
 
-  Future<List<Map<String, dynamic>>> houseLocations(UserProfile profile) async {
+  Future<List<Map<String, dynamic>>> houseLocations(
+    UserProfile profile,
+  ) async {
     var query = client.from('house_locations').select();
-    if (!profile.canViewAllParishes && profile.parish.isNotEmpty)
+    if (!profile.canViewAllParishes && profile.parish.isNotEmpty) {
       query = query.eq('parish', profile.parish);
+    }
     final rows = await query.order('house_code');
-    return rows.map((e) => Map<String, dynamic>.from(e)).toList();
+    return rows.map((raw) => Map<String, dynamic>.from(raw)).toList();
   }
 
-  Future<List<ProductionRecord>> productionRecords(UserProfile profile) async {
+  Future<List<ProductionRecord>> productionRecords(
+    UserProfile profile,
+  ) async {
     var query = client.from('app_events').select();
-    if (!profile.canViewAllParishes && profile.parish.isNotEmpty)
+    if (!profile.canViewAllParishes && profile.parish.isNotEmpty) {
       query = query.eq('parish', profile.parish);
+    }
     final rows = await query.order('updated_at', ascending: false).limit(500);
     const types = {
       'scope',
@@ -237,7 +279,7 @@ class RcSowRepository {
       'payment',
     };
     return rows
-        .map((e) => Map<String, dynamic>.from(e))
+        .map((raw) => Map<String, dynamic>.from(raw))
         .where((row) => types.contains('${row['event_type'] ?? ''}'))
         .map(ProductionRecord.fromEvent)
         .toList();
@@ -301,10 +343,10 @@ class RcSowRepository {
   }
 
   String debugSummary(UserProfile? profile) => jsonEncode({
-    'connected': user != null,
-    'role': profile?.role,
-    'parish': profile?.parish,
-    'adminVisible': profile?.canViewAdmin,
-    'allParishes': profile?.canViewAllParishes,
-  });
+        'connected': user != null,
+        'role': profile?.role,
+        'parish': profile?.parish,
+        'adminVisible': profile?.canViewAdmin,
+        'allParishes': profile?.canViewAllParishes,
+      });
 }

@@ -20,7 +20,7 @@ on:
       - main
 
 permissions:
-  contents: write
+  contents: read
 
 concurrency:
   group: rc-sow-factory-${{ github.ref }}
@@ -34,7 +34,7 @@ env:
 
 jobs:
   factory:
-    name: Repair, verify, test, build and package
+    name: Verify, test, build and package
     runs-on: ubuntu-latest
     timeout-minutes: 55
 
@@ -66,35 +66,21 @@ jobs:
             "${GITHUB_RUN_ID}" "${GITHUB_RUN_NUMBER}" "${GITHUB_SHA}" "${GITHUB_REF_NAME}" "${FLUTTER_VERSION}" \
             >> factory_output/BUILD_INFO.txt
 
-      - name: Auto-repair canonical Dart formatting
-        if: github.event_name != 'pull_request'
-        shell: bash
-        run: |
-          set -euo pipefail
-          dart format .
-          git diff --check
-          if git diff --quiet; then
-            echo 'No Dart formatting repair required.'
-          else
-            git config user.name 'github-actions[bot]'
-            git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-            git add -u
-            git commit -m 'chore(ci): apply canonical Dart formatting'
-            git push origin "HEAD:${GITHUB_REF_NAME}"
-          fi
+      - name: Resolve dependencies early
+        run: flutter pub get
 
-      - name: Strict formatting verification
+      - name: Canonical source formatting (local runner only)
         shell: bash
         run: |
           set -euo pipefail
-          dart format --output=none --set-exit-if-changed .
+          # Format only this isolated runner. The Green Gate is the sole workflow
+          # allowed to commit formatting repairs, preventing cross-workflow races.
+          dart format .
           git diff --check
 
       - name: Flutter doctor
         shell: bash
-        run: |
-          set -euo pipefail
-          flutter doctor -v | tee logs/flutter-doctor.txt
+        run: flutter doctor -v | tee logs/flutter-doctor.txt
 
       - name: Bootstrap Android platform
         shell: bash
@@ -142,21 +128,15 @@ jobs:
 
       - name: Analyze
         shell: bash
-        run: |
-          set -euo pipefail
-          flutter analyze | tee logs/flutter-analyze.txt
+        run: flutter analyze | tee logs/flutter-analyze.txt
 
       - name: Unit and widget tests with coverage
         shell: bash
-        run: |
-          set -euo pipefail
-          flutter test --coverage | tee logs/flutter-test.txt
+        run: flutter test --coverage | tee logs/flutter-test.txt
 
       - name: Export/source contract checks
         shell: bash
-        run: |
-          set -euo pipefail
-          python3 scripts/ci/verify_production_contracts.py | tee logs/production-contracts.txt
+        run: python3 scripts/ci/verify_production_contracts.py | tee logs/production-contracts.txt
 
       - name: Build universal release APK
         if: github.event_name != 'pull_request' && (github.event_name != 'workflow_dispatch' || inputs.build_profile == 'production')
@@ -190,7 +170,7 @@ jobs:
         if: github.event_name != 'pull_request' && (github.event_name != 'workflow_dispatch' || inputs.build_profile == 'production')
         uses: actions/upload-artifact@v6
         with:
-          name: rc-sow-production-factory-${{ github.run_number }}
+          name: rc-sow-v18-3-1-production-factory-${{ github.run_number }}
           path: factory_output/
           if-no-files-found: error
           retention-days: 30
@@ -199,7 +179,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v6
         with:
-          name: rc-sow-validation-${{ github.run_number }}
+          name: rc-sow-v18-3-1-validation-${{ github.run_number }}
           path: |
             logs/
             coverage/

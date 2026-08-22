@@ -21,6 +21,7 @@ class _AdminScreenState extends State<AdminScreen>
   late final RcDocumentService docs;
   late Future<List<Map<String, dynamic>>> requests;
   late Future<List<ManagedUserRecord>> users;
+  bool actionBusy = false;
 
   @override
   void initState() {
@@ -105,11 +106,19 @@ class _AdminScreenState extends State<AdminScreen>
                       '${r['requested_parish'] ?? 'Parish pending'}',
                     ),
                     trailing: PopupMenuButton<String>(
-                      onSelected: (action) =>
-                          _approval(action, '${r['user_id']}'),
+                      onSelected: (action) => _approval(
+                        action,
+                        '${r['user_id']}',
+                      ),
                       itemBuilder: (_) => const [
-                        PopupMenuItem(value: 'approve', child: Text('Approve')),
-                        PopupMenuItem(value: 'reject', child: Text('Reject')),
+                        PopupMenuItem(
+                          value: 'approve',
+                          child: Text('Approve'),
+                        ),
+                        PopupMenuItem(
+                          value: 'reject',
+                          child: Text('Reject'),
+                        ),
                       ],
                     ),
                   ),
@@ -123,12 +132,16 @@ class _AdminScreenState extends State<AdminScreen>
   }
 
   Future<void> _approval(String action, String userId) async {
-    if (action == 'approve') {
-      await widget.state.repository.approveRegistration(userId);
-    } else {
-      await widget.state.repository.rejectRegistration(userId);
-    }
-    _refresh();
+    await _runAdminAction(
+      action == 'approve' ? 'Account approved.' : 'Account rejected.',
+      () async {
+        if (action == 'approve') {
+          await widget.state.repository.approveRegistration(userId);
+        } else {
+          await widget.state.repository.rejectRegistration(userId);
+        }
+      },
+    );
   }
 
   Widget _users() {
@@ -160,9 +173,8 @@ class _AdminScreenState extends State<AdminScreen>
                 (u) => Card(
                   child: ListTile(
                     leading: CircleAvatar(
-                      backgroundColor: u.active
-                          ? RcColors.successSoft
-                          : RcColors.dangerSoft,
+                      backgroundColor:
+                          u.active ? RcColors.successSoft : RcColors.dangerSoft,
                       child: Icon(
                         u.active ? Icons.person : Icons.block,
                         color: u.active ? RcColors.success : RcColors.danger,
@@ -205,16 +217,21 @@ class _AdminScreenState extends State<AdminScreen>
     );
   }
 
-  Future<void> _quickAccess(String action, ManagedUserRecord user) async {
+  Future<void> _quickAccess(
+    String action,
+    ManagedUserRecord user,
+  ) async {
     if (action == 'edit') {
       await _editUser(user);
       return;
     }
-    await widget.state.repository.manageUserAccess(
-      userId: user.userId,
-      action: action,
+    await _runAdminAction(
+      '${user.displayName}: $action completed.',
+      () => widget.state.repository.manageUserAccess(
+        userId: user.userId,
+        action: action,
+      ),
     );
-    _refresh();
   }
 
   Future<void> _editUser(ManagedUserRecord user) async {
@@ -250,18 +267,20 @@ class _AdminScreenState extends State<AdminScreen>
                   initialValue: role,
                   decoration: const InputDecoration(labelText: 'Role'),
                   items: RcPolicy.roles
-                      .map((x) => DropdownMenuItem(value: x, child: Text(x)))
+                      .map(
+                        (x) => DropdownMenuItem(value: x, child: Text(x)),
+                      )
                       .toList(),
                   onChanged: (v) => setSheet(() => role = v!),
                 ),
                 const SizedBox(height: 10),
                 DropdownButtonFormField<String>(
                   initialValue: parish,
-                  decoration: const InputDecoration(
-                    labelText: 'Primary parish',
-                  ),
+                  decoration: const InputDecoration(labelText: 'Primary parish'),
                   items: RcPolicy.parishes
-                      .map((x) => DropdownMenuItem(value: x, child: Text(x)))
+                      .map(
+                        (x) => DropdownMenuItem(value: x, child: Text(x)),
+                      )
                       .toList(),
                   onChanged: (v) => setSheet(() => parish = v!),
                 ),
@@ -274,20 +293,30 @@ class _AdminScreenState extends State<AdminScreen>
                   (entry) => SwitchListTile(
                     title: Text(entry.value),
                     value: privileges[entry.key] == true,
-                    onChanged: (v) => setSheet(() => privileges[entry.key] = v),
+                    onChanged: (v) => setSheet(
+                      () => privileges[entry.key] = v,
+                    ),
                   ),
                 ),
                 const SizedBox(height: 10),
                 FilledButton.icon(
                   onPressed: () async {
-                    await widget.state.repository.manageUserAccess(
-                      userId: user.userId,
-                      action: 'update',
-                      role: role,
-                      parish: parish,
-                      privileges: privileges,
-                    );
-                    if (ctx.mounted) Navigator.pop(ctx, true);
+                    try {
+                      await widget.state.repository.manageUserAccess(
+                        userId: user.userId,
+                        action: 'update',
+                        role: role,
+                        parish: parish,
+                        privileges: privileges,
+                      );
+                      if (ctx.mounted) Navigator.pop(ctx, true);
+                    } catch (e) {
+                      if (ctx.mounted) {
+                        ScaffoldMessenger.of(ctx).showSnackBar(
+                          SnackBar(content: Text('Access update failed: $e')),
+                        );
+                      }
+                    }
                   },
                   icon: const Icon(Icons.save),
                   label: const Text('Save access'),
@@ -299,6 +328,31 @@ class _AdminScreenState extends State<AdminScreen>
       ),
     );
     if (saved == true) _refresh();
+  }
+
+  Future<void> _runAdminAction(
+    String successMessage,
+    Future<void> Function() action,
+  ) async {
+    if (actionBusy) return;
+    setState(() => actionBusy = true);
+    try {
+      await action();
+      _refresh();
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(successMessage)),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Admin action failed: $e')),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => actionBusy = false);
+    }
   }
 
   Widget _styleTemplates() {
@@ -352,7 +406,10 @@ class _AdminScreenState extends State<AdminScreen>
                     value: 'save',
                     child: Text('Download template'),
                   ),
-                  PopupMenuItem(value: 'share', child: Text('Share / email')),
+                  PopupMenuItem(
+                    value: 'share',
+                    child: Text('Share / email'),
+                  ),
                   PopupMenuItem(
                     value: 'replace',
                     child: Text('Replace template'),
@@ -386,9 +443,9 @@ class _AdminScreenState extends State<AdminScreen>
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('Template action failed: $e')));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Template action failed: $e')),
+        );
       }
     }
   }
