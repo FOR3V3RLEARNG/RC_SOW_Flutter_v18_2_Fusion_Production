@@ -85,7 +85,7 @@ class RcSowRepository {
     final item = Map<String, dynamic>.from(raw['item'] as Map? ?? const {});
     final readBy =
         (item['readBy'] as List?)?.map((value) => '$value').toSet() ??
-            <String>{};
+        <String>{};
     readBy.add(profile.email);
     item['readBy'] = readBy.toList();
     await _upsertEvent(
@@ -135,9 +135,8 @@ class RcSowRepository {
     final result = await client.rpc('list_active_users');
     return (result as List? ?? const [])
         .map(
-          (raw) => ActiveUserRecord.fromMap(
-            Map<String, dynamic>.from(raw as Map),
-          ),
+          (raw) =>
+              ActiveUserRecord.fromMap(Map<String, dynamic>.from(raw as Map)),
         )
         .where((record) => record.online)
         .toList();
@@ -147,9 +146,8 @@ class RcSowRepository {
     final result = await client.rpc('list_managed_users');
     return (result as List? ?? const [])
         .map(
-          (raw) => ManagedUserRecord.fromMap(
-            Map<String, dynamic>.from(raw as Map),
-          ),
+          (raw) =>
+              ManagedUserRecord.fromMap(Map<String, dynamic>.from(raw as Map)),
         )
         .toList();
   }
@@ -204,9 +202,8 @@ class RcSowRepository {
     );
     return (result as List? ?? const [])
         .map(
-          (raw) => BeneficiaryRecord.fromMap(
-            Map<String, dynamic>.from(raw as Map),
-          ),
+          (raw) =>
+              BeneficiaryRecord.fromMap(Map<String, dynamic>.from(raw as Map)),
         )
         .toList();
   }
@@ -223,9 +220,7 @@ class RcSowRepository {
     return BeneficiaryRecord.fromMap(Map<String, dynamic>.from(row));
   }
 
-  Future<int> bulkUpsertBeneficiaries(
-    List<Map<String, dynamic>> rows,
-  ) async {
+  Future<int> bulkUpsertBeneficiaries(List<Map<String, dynamic>> rows) async {
     if (rows.isEmpty) {
       return 0;
     }
@@ -245,9 +240,7 @@ class RcSowRepository {
     return rows.map((raw) => Map<String, dynamic>.from(raw)).toList();
   }
 
-  Future<List<Map<String, dynamic>>> houseLocations(
-    UserProfile profile,
-  ) async {
+  Future<List<Map<String, dynamic>>> houseLocations(UserProfile profile) async {
     var query = client.from('house_locations').select();
     if (!profile.canViewAllParishes && profile.parish.isNotEmpty) {
       query = query.eq('parish', profile.parish);
@@ -256,9 +249,7 @@ class RcSowRepository {
     return rows.map((raw) => Map<String, dynamic>.from(raw)).toList();
   }
 
-  Future<List<ProductionRecord>> productionRecords(
-    UserProfile profile,
-  ) async {
+  Future<List<ProductionRecord>> productionRecords(UserProfile profile) async {
     var query = client.from('app_events').select();
     if (!profile.canViewAllParishes && profile.parish.isNotEmpty) {
       query = query.eq('parish', profile.parish);
@@ -343,10 +334,10 @@ class RcSowRepository {
   }
 
   String debugSummary(UserProfile? profile) => jsonEncode({
-        'connected': user != null,
-        'role': profile?.role,
-        'parish': profile?.parish,
-        'adminVisible': profile?.canViewAdmin,
-        'allParishes': profile?.canViewAllParishes,
-      });
+    'connected': user != null,
+    'role': profile?.role,
+    'parish': profile?.parish,
+    'adminVisible': profile?.canViewAdmin,
+    'allParishes': profile?.canViewAllParishes,
+  });
 }

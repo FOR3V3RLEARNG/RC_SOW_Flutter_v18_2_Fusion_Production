@@ -167,11 +167,14 @@ class RcDocumentService {
       return;
     }
     final bytes = await picked.readAsBytes();
-    final extension = picked.extension?.toLowerCase() ??
+    final extension =
+        picked.extension?.toLowerCase() ??
         template.fileName.split('.').last.toLowerCase();
     final storagePath =
         '${template.key}/${DateTime.now().millisecondsSinceEpoch}.$extension';
-    await client.storage.from('document-templates').uploadBinary(
+    await client.storage
+        .from('document-templates')
+        .uploadBinary(
           storagePath,
           bytes,
           fileOptions: FileOptions(
@@ -245,8 +248,14 @@ class RcDocumentService {
       ('Building Length (ft)', measurements.lengthFt.toStringAsFixed(2)),
       ('Wall Height (ft)', measurements.wallHeightFt.toStringAsFixed(2)),
       ('Pitch Rise / 12', measurements.pitchRisePer12.toStringAsFixed(2)),
-      ('Wall Plate to Ridge Rise (ft)', measurements.ridgeRiseFt.toStringAsFixed(2)),
-      ('Ridge Height from Ground (ft)', measurements.ridgeHeightFt.toStringAsFixed(2)),
+      (
+        'Wall Plate to Ridge Rise (ft)',
+        measurements.ridgeRiseFt.toStringAsFixed(2),
+      ),
+      (
+        'Ridge Height from Ground (ft)',
+        measurements.ridgeHeightFt.toStringAsFixed(2),
+      ),
       ('Rafter Length (ft)', measurements.rafterLengthFt.toStringAsFixed(2)),
       ('Roof Area (sq ft)', measurements.roofAreaSqFt.toStringAsFixed(2)),
     ];

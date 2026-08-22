@@ -24,31 +24,26 @@ abstract final class RcColors {
   static const dangerSoft = Color(0xFFFEF3F2);
 }
 
-enum RcDesignStyle {
-  materialExpressive,
-  foruiMinimal,
-  shadcnSaas,
-  fieldDense,
-}
+enum RcDesignStyle { materialExpressive, foruiMinimal, shadcnSaas, fieldDense }
 
 extension RcDesignStyleX on RcDesignStyle {
   String get label => switch (this) {
-        RcDesignStyle.materialExpressive => 'Material 3 Expressive',
-        RcDesignStyle.foruiMinimal => 'Forui-inspired Minimal',
-        RcDesignStyle.shadcnSaas => 'Shadcn-inspired SaaS',
-        RcDesignStyle.fieldDense => 'Field Dense',
-      };
+    RcDesignStyle.materialExpressive => 'Material 3 Expressive',
+    RcDesignStyle.foruiMinimal => 'Forui-inspired Minimal',
+    RcDesignStyle.shadcnSaas => 'Shadcn-inspired SaaS',
+    RcDesignStyle.fieldDense => 'Field Dense',
+  };
 
   String get description => switch (this) {
-        RcDesignStyle.materialExpressive =>
-          'Expressive Material shapes, connected controls and stronger hierarchy.',
-        RcDesignStyle.foruiMinimal =>
-          'Quiet surfaces, generous whitespace and restrained utility controls.',
-        RcDesignStyle.shadcnSaas =>
-          'Crisp SaaS density, subtle borders and compact command surfaces.',
-        RcDesignStyle.fieldDense =>
-          'Maximum field information density while preserving touch targets.',
-      };
+    RcDesignStyle.materialExpressive =>
+      'Expressive Material shapes, connected controls and stronger hierarchy.',
+    RcDesignStyle.foruiMinimal =>
+      'Quiet surfaces, generous whitespace and restrained utility controls.',
+    RcDesignStyle.shadcnSaas =>
+      'Crisp SaaS density, subtle borders and compact command surfaces.',
+    RcDesignStyle.fieldDense =>
+      'Maximum field information density while preserving touch targets.',
+  };
 }
 
 abstract final class RcRadius {
@@ -64,24 +59,26 @@ ThemeData buildRcTheme({
   Brightness brightness = Brightness.light,
 }) {
   final dark = brightness == Brightness.dark;
-  final scheme = ColorScheme.fromSeed(
-    seedColor: RcColors.brand,
-    brightness: brightness,
-  ).copyWith(
-    primary: dark ? const Color(0xFFFFB3B8) : RcColors.brand,
-    onPrimary: dark ? const Color(0xFF680014) : Colors.white,
-    secondary: dark ? const Color(0xFFADC6FF) : RcColors.blue,
-    error: dark ? const Color(0xFFFFB4AB) : RcColors.danger,
-    surface: dark ? const Color(0xFF15191F) : RcColors.surface,
-    surfaceContainerLowest:
-        dark ? const Color(0xFF101317) : RcColors.surface,
-    surfaceContainerLow:
-        dark ? const Color(0xFF181C22) : RcColors.surface2,
-    surfaceContainer:
-        dark ? const Color(0xFF1D2229) : const Color(0xFFF1F4F8),
-    outline: dark ? const Color(0xFF8B919A) : RcColors.lineStrong,
-    outlineVariant: dark ? const Color(0xFF3F454D) : RcColors.line,
-  );
+  final scheme =
+      ColorScheme.fromSeed(
+        seedColor: RcColors.brand,
+        brightness: brightness,
+      ).copyWith(
+        primary: dark ? const Color(0xFFFFB3B8) : RcColors.brand,
+        onPrimary: dark ? const Color(0xFF680014) : Colors.white,
+        secondary: dark ? const Color(0xFFADC6FF) : RcColors.blue,
+        error: dark ? const Color(0xFFFFB4AB) : RcColors.danger,
+        surface: dark ? const Color(0xFF15191F) : RcColors.surface,
+        surfaceContainerLowest: dark
+            ? const Color(0xFF101317)
+            : RcColors.surface,
+        surfaceContainerLow: dark ? const Color(0xFF181C22) : RcColors.surface2,
+        surfaceContainer: dark
+            ? const Color(0xFF1D2229)
+            : const Color(0xFFF1F4F8),
+        outline: dark ? const Color(0xFF8B919A) : RcColors.lineStrong,
+        outlineVariant: dark ? const Color(0xFF3F454D) : RcColors.line,
+      );
 
   final radius = switch (designStyle) {
     RcDesignStyle.materialExpressive => RcRadius.lg,

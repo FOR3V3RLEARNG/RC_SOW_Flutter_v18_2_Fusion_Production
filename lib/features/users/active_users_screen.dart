@@ -23,7 +23,8 @@ class _ActiveUsersScreenState extends State<ActiveUsersScreen> {
     future = _load();
   }
 
-  Future<List<ActiveUserRecord>> _load() => widget.state.repository.activeUsers();
+  Future<List<ActiveUserRecord>> _load() =>
+      widget.state.repository.activeUsers();
 
   Future<void> _refresh() async {
     final next = _load();
@@ -57,7 +58,9 @@ class _ActiveUsersScreenState extends State<ActiveUsersScreen> {
                       padding: const EdgeInsets.all(16),
                       child: Column(
                         children: [
-                          Text('Could not load online users: ${snapshot.error}'),
+                          Text(
+                            'Could not load online users: ${snapshot.error}',
+                          ),
                           const SizedBox(height: 8),
                           OutlinedButton(
                             onPressed: _refresh,
@@ -72,7 +75,9 @@ class _ActiveUsersScreenState extends State<ActiveUsersScreen> {
                     users.isEmpty)
                   const Padding(
                     padding: EdgeInsets.all(30),
-                    child: Center(child: Text('No other approved users are online.')),
+                    child: Center(
+                      child: Text('No other approved users are online.'),
+                    ),
                   ),
                 ...users.map(
                   (user) => Card(
@@ -110,7 +115,10 @@ class _ActiveUsersScreenState extends State<ActiveUsersScreen> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Text(user.displayName, style: Theme.of(context).textTheme.titleLarge),
+              Text(
+                user.displayName,
+                style: Theme.of(context).textTheme.titleLarge,
+              ),
               Text('${user.role} • ${user.parish}'),
               const SizedBox(height: 14),
               FilledButton.icon(
@@ -196,7 +204,8 @@ class _ActiveUsersPopupState extends State<ActiveUsersPopup> {
                         OutlinedButton(
                           onPressed: () {
                             setState(
-                              () => future = widget.state.repository.activeUsers(),
+                              () => future = widget.state.repository
+                                  .activeUsers(),
                             );
                           },
                           child: const Text('Retry'),
@@ -223,10 +232,7 @@ class _ActiveUsersPopupState extends State<ActiveUsersPopup> {
                         return ListTile(
                           leading: const CircleAvatar(
                             backgroundColor: RcColors.successSoft,
-                            child: Icon(
-                              Icons.person,
-                              color: RcColors.success,
-                            ),
+                            child: Icon(Icons.person, color: RcColors.success),
                           ),
                           title: Text(
                             user.displayName,
@@ -253,10 +259,8 @@ class _ActiveUsersPopupState extends State<ActiveUsersPopup> {
     Future.microtask(
       () => navigator.push(
         MaterialPageRoute<void>(
-          builder: (_) => MessagesScreen(
-            state: widget.state,
-            composeTo: user.email,
-          ),
+          builder: (_) =>
+              MessagesScreen(state: widget.state, composeTo: user.email),
         ),
       ),
     );

@@ -265,16 +265,16 @@ class SettingsScreen extends StatelessWidget {
   }
 
   static String _themeModeLabel(ThemeMode mode) => switch (mode) {
-        ThemeMode.system => 'System',
-        ThemeMode.light => 'Light',
-        ThemeMode.dark => 'Dark',
-      };
+    ThemeMode.system => 'System',
+    ThemeMode.light => 'Light',
+    ThemeMode.dark => 'Dark',
+  };
 
   static IconData _themeModeIcon(ThemeMode mode) => switch (mode) {
-        ThemeMode.system => Icons.brightness_auto_outlined,
-        ThemeMode.light => Icons.light_mode_outlined,
-        ThemeMode.dark => Icons.dark_mode_outlined,
-      };
+    ThemeMode.system => Icons.brightness_auto_outlined,
+    ThemeMode.light => Icons.light_mode_outlined,
+    ThemeMode.dark => Icons.dark_mode_outlined,
+  };
 }
 
 class SectionLabel extends StatelessWidget {

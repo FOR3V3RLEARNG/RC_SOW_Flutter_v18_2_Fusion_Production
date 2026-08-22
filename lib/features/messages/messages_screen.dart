@@ -143,10 +143,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
     await _showMessageDetail(
       context,
       message: message,
-      onReply: () => _compose(
-        prefill: message.senderEmail,
-        replyTo: message,
-      ),
+      onReply: () => _compose(prefill: message.senderEmail, replyTo: message),
     );
     if (mounted) {
       await _refresh();
@@ -255,7 +252,9 @@ class _MessageDrawerPanelState extends State<MessageDrawerPanel> {
                         padding: EdgeInsets.all(28),
                         child: Center(child: Text('No messages yet.')),
                       ),
-                    ...messages.take(30).map(
+                    ...messages
+                        .take(30)
+                        .map(
                           (message) => ListTile(
                             leading: Icon(
                               message.unread
@@ -341,7 +340,10 @@ class _MessageDrawerPanelState extends State<MessageDrawerPanel> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                Text(message.sender, style: Theme.of(context).textTheme.titleMedium),
+                Text(
+                  message.sender,
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
                 const SizedBox(height: 4),
                 Text(message.senderEmail),
                 const Divider(height: 24),
@@ -430,9 +432,15 @@ Future<void> _showMessageDetail(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Text(message.subject, style: Theme.of(sheetContext).textTheme.titleLarge),
+            Text(
+              message.subject,
+              style: Theme.of(sheetContext).textTheme.titleLarge,
+            ),
             const SizedBox(height: 4),
-            Text(message.sender, style: const TextStyle(fontWeight: FontWeight.w800)),
+            Text(
+              message.sender,
+              style: const TextStyle(fontWeight: FontWeight.w800),
+            ),
             const Divider(height: 24),
             ConstrainedBox(
               constraints: BoxConstraints(

@@ -44,18 +44,17 @@ class GmailService {
   bool get connected => providerToken?.isNotEmpty == true;
 
   Map<String, String> get _headers => {
-        'Authorization': 'Bearer $providerToken',
-        'Accept': 'application/json',
-      };
+    'Authorization': 'Bearer $providerToken',
+    'Accept': 'application/json',
+  };
 
   Future<List<GmailMessageSummary>> inbox({int maxResults = 25}) async {
     _requireConnection();
     final response = await http.get(
-      Uri.https(
-        'gmail.googleapis.com',
-        '/gmail/v1/users/me/messages',
-        {'labelIds': 'INBOX', 'maxResults': '$maxResults'},
-      ),
+      Uri.https('gmail.googleapis.com', '/gmail/v1/users/me/messages', {
+        'labelIds': 'INBOX',
+        'maxResults': '$maxResults',
+      }),
       headers: _headers,
     );
     _ensureOk(response);
@@ -76,16 +75,16 @@ class GmailService {
   Future<GmailMessageDetail> message(String id) async {
     _requireConnection();
     final response = await http.get(
-      Uri.https(
-        'gmail.googleapis.com',
-        '/gmail/v1/users/me/messages/$id',
-        {'format': 'full'},
-      ),
+      Uri.https('gmail.googleapis.com', '/gmail/v1/users/me/messages/$id', {
+        'format': 'full',
+      }),
       headers: _headers,
     );
     _ensureOk(response);
     final json = jsonDecode(response.body) as Map<String, dynamic>;
-    final payload = Map<String, dynamic>.from(json['payload'] as Map? ?? const {});
+    final payload = Map<String, dynamic>.from(
+      json['payload'] as Map? ?? const {},
+    );
     final metadata = _metadataFromPayload(id, json, payload);
     final body = _extractBody(payload).trim();
     return GmailMessageDetail(
@@ -118,19 +117,17 @@ class GmailService {
 
   Future<GmailMessageSummary> _metadata(String id) async {
     final response = await http.get(
-      Uri.https(
-        'gmail.googleapis.com',
-        '/gmail/v1/users/me/messages/$id',
-        {
-          'format': 'metadata',
-          'metadataHeaders': ['Subject', 'From', 'Date'],
-        },
-      ),
+      Uri.https('gmail.googleapis.com', '/gmail/v1/users/me/messages/$id', {
+        'format': 'metadata',
+        'metadataHeaders': ['Subject', 'From', 'Date'],
+      }),
       headers: _headers,
     );
     _ensureOk(response);
     final json = jsonDecode(response.body) as Map<String, dynamic>;
-    final payload = Map<String, dynamic>.from(json['payload'] as Map? ?? const {});
+    final payload = Map<String, dynamic>.from(
+      json['payload'] as Map? ?? const {},
+    );
     return _metadataFromPayload(id, json, payload);
   }
 

@@ -8,7 +8,10 @@ import 'package:rc_sow_flutter/services/document_service.dart';
 void main() {
   test('all Jamaican parishes are available', () {
     expect(RcPolicy.parishes.length, 14);
-    expect(RcPolicy.parishes, containsAll(['Hanover', 'Kingston', 'St. Thomas']));
+    expect(
+      RcPolicy.parishes,
+      containsAll(['Hanover', 'Kingston', 'St. Thomas']),
+    );
   });
 
   test('theme builder supports light and dark design profiles', () {

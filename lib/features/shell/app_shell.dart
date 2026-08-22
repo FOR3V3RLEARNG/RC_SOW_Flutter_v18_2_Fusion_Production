@@ -198,11 +198,7 @@ class _AppShellState extends State<AppShell> {
 }
 
 class RcHeader extends StatelessWidget {
-  const RcHeader({
-    super.key,
-    required this.state,
-    required this.onMessages,
-  });
+  const RcHeader({super.key, required this.state, required this.onMessages});
 
   final AppState state;
   final VoidCallback onMessages;
@@ -265,10 +261,8 @@ class RcHeader extends StatelessWidget {
                 tooltip: 'Field map',
                 onPressed: () => Navigator.of(context).push(
                   MaterialPageRoute<void>(
-                    builder: (_) => LiveTrackerScreen(
-                      state: state,
-                      showMapFirst: true,
-                    ),
+                    builder: (_) =>
+                        LiveTrackerScreen(state: state, showMapFirst: true),
                   ),
                 ),
                 icon: const Icon(Icons.map_outlined),
@@ -310,21 +304,19 @@ class MoreScreen extends StatelessWidget {
         trailing: const Icon(Icons.chevron_right),
         onTap: () => Navigator.push(
           context,
-          MaterialPageRoute<void>(
-            builder: (_) => MessagesScreen(state: state),
-          ),
+          MaterialPageRoute<void>(builder: (_) => MessagesScreen(state: state)),
         ),
       ),
       ListTile(
         leading: const Icon(Icons.mail_outline),
         title: const Text('Gmail'),
-        subtitle: const Text('Read and send Google mail without leaving RC SOW'),
+        subtitle: const Text(
+          'Read and send Google mail without leaving RC SOW',
+        ),
         trailing: const Icon(Icons.chevron_right),
         onTap: () => Navigator.push(
           context,
-          MaterialPageRoute<void>(
-            builder: (_) => GmailScreen(state: state),
-          ),
+          MaterialPageRoute<void>(builder: (_) => GmailScreen(state: state)),
         ),
       ),
       ListTile(
@@ -355,9 +347,7 @@ class MoreScreen extends StatelessWidget {
         trailing: const Icon(Icons.chevron_right),
         onTap: () => Navigator.push(
           context,
-          MaterialPageRoute<void>(
-            builder: (_) => SettingsScreen(state: state),
-          ),
+          MaterialPageRoute<void>(builder: (_) => SettingsScreen(state: state)),
         ),
       ),
     ];
@@ -369,9 +359,7 @@ class MoreScreen extends StatelessWidget {
           trailing: const Icon(Icons.chevron_right),
           onTap: () => Navigator.push(
             context,
-            MaterialPageRoute<void>(
-              builder: (_) => AdminScreen(state: state),
-            ),
+            MaterialPageRoute<void>(builder: (_) => AdminScreen(state: state)),
           ),
         ),
       );

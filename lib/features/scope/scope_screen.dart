@@ -61,12 +61,12 @@ class _ScopeScreenState extends State<ScopeScreen>
   }
 
   RoofMeasurements get measurements => RoofMeasurements(
-        widthFt: width,
-        lengthFt: length,
-        wallHeightFt: wallHeight,
-        pitchRisePer12: pitch,
-        overhangFt: overhang,
-      );
+    widthFt: width,
+    lengthFt: length,
+    wallHeightFt: wallHeight,
+    pitchRisePer12: pitch,
+    overhangFt: overhang,
+  );
 
   List<String> get allowedParishes {
     final profile = widget.state.profile!;
@@ -117,12 +117,7 @@ class _ScopeScreenState extends State<ScopeScreen>
         Expanded(
           child: TabBarView(
             controller: tabs,
-            children: [
-              _houseInfo(),
-              _roofDrawing(),
-              _printout(),
-              _files(),
-            ],
+            children: [_houseInfo(), _roofDrawing(), _printout(), _files()],
           ),
         ),
       ],
@@ -167,10 +162,8 @@ class _ScopeScreenState extends State<ScopeScreen>
                   decoration: const InputDecoration(labelText: 'Parish'),
                   items: allowedParishes
                       .map(
-                        (value) => DropdownMenuItem(
-                          value: value,
-                          child: Text(value),
-                        ),
+                        (value) =>
+                            DropdownMenuItem(value: value, child: Text(value)),
                       )
                       .toList(),
                   onChanged: (value) => setState(() => parish = value!),
@@ -179,14 +172,18 @@ class _ScopeScreenState extends State<ScopeScreen>
                 TextFormField(
                   key: ValueKey('cluster-$cluster'),
                   initialValue: cluster,
-                  decoration: const InputDecoration(labelText: 'Cluster / Community'),
+                  decoration: const InputDecoration(
+                    labelText: 'Cluster / Community',
+                  ),
                   onChanged: (value) => cluster = value,
                 ),
                 const SizedBox(height: 12),
                 TextFormField(
                   key: ValueKey('gps-$gps'),
                   initialValue: gps,
-                  decoration: const InputDecoration(labelText: 'GPS Coordinates'),
+                  decoration: const InputDecoration(
+                    labelText: 'GPS Coordinates',
+                  ),
                   onChanged: (value) => gps = value,
                 ),
               ],
@@ -219,9 +216,7 @@ class _ScopeScreenState extends State<ScopeScreen>
       context: context,
       isScrollControlled: true,
       showDragHandle: true,
-      builder: (sheetContext) => _BeneficiaryLookup(
-        state: widget.state,
-      ),
+      builder: (sheetContext) => _BeneficiaryLookup(state: widget.state),
     );
     if (selected == null || !mounted) {
       return;
@@ -236,9 +231,9 @@ class _ScopeScreenState extends State<ScopeScreen>
       gps = selected.gps.isNotEmpty
           ? selected.gps
           : [selected.latitude, selected.longitude]
-              .whereType<double>()
-              .map((value) => value.toStringAsFixed(6))
-              .join(', ');
+                .whereType<double>()
+                .map((value) => value.toStringAsFixed(6))
+                .join(', ');
     });
   }
 
@@ -284,9 +279,11 @@ class _ScopeScreenState extends State<ScopeScreen>
           'source': 'RC SOW v18.3.1 Fusion',
         },
       );
-      _toast(status == 'Draft'
-          ? 'Scope draft saved to RC SOW.'
-          : 'Scope submitted for approval.');
+      _toast(
+        status == 'Draft'
+            ? 'Scope draft saved to RC SOW.'
+            : 'Scope submitted for approval.',
+      );
     } catch (e) {
       _toast('Scope could not be saved: $e');
     } finally {
@@ -316,10 +313,8 @@ class _ScopeScreenState extends State<ScopeScreen>
                   decoration: const InputDecoration(labelText: 'Roof type'),
                   items: const ['Gable', 'Hip', 'Shed', 'Intersecting']
                       .map(
-                        (value) => DropdownMenuItem(
-                          value: value,
-                          child: Text(value),
-                        ),
+                        (value) =>
+                            DropdownMenuItem(value: value, child: Text(value)),
                       )
                       .toList(),
                   onChanged: (value) => setState(() => roofType = value!),
@@ -343,9 +338,21 @@ class _ScopeScreenState extends State<ScopeScreen>
                       length = value;
                       _syncWallDimensions();
                     }),
-                    _measureField('Wall height', wallHeight, (value) => wallHeight = value),
-                    _measureField('Pitch rise / 12', pitch, (value) => pitch = value),
-                    _measureField('Overhang', overhang, (value) => overhang = value),
+                    _measureField(
+                      'Wall height',
+                      wallHeight,
+                      (value) => wallHeight = value,
+                    ),
+                    _measureField(
+                      'Pitch rise / 12',
+                      pitch,
+                      (value) => pitch = value,
+                    ),
+                    _measureField(
+                      'Overhang',
+                      overhang,
+                      (value) => overhang = value,
+                    ),
                   ],
                 ),
                 const SizedBox(height: 16),
@@ -374,11 +381,16 @@ class _ScopeScreenState extends State<ScopeScreen>
                       children: [
                         Expanded(
                           child: TextFormField(
-                            key: ValueKey('${segment.label}-${segment.lengthFt}'),
+                            key: ValueKey(
+                              '${segment.label}-${segment.lengthFt}',
+                            ),
                             initialValue: segment.lengthFt.toStringAsFixed(2),
-                            keyboardType:
-                                const TextInputType.numberWithOptions(decimal: true),
-                            decoration: InputDecoration(labelText: '${segment.label} (ft)'),
+                            keyboardType: const TextInputType.numberWithOptions(
+                              decimal: true,
+                            ),
+                            decoration: InputDecoration(
+                              labelText: '${segment.label} (ft)',
+                            ),
                             onChanged: (value) {
                               final number = double.tryParse(value);
                               if (number != null && number > 0) {
@@ -395,7 +407,10 @@ class _ScopeScreenState extends State<ScopeScreen>
                         FilterChip(
                           selected: segment.hasDrain,
                           label: const Text('Drain'),
-                          avatar: const Icon(Icons.water_drop_outlined, size: 18),
+                          avatar: const Icon(
+                            Icons.water_drop_outlined,
+                            size: 18,
+                          ),
                           onSelected: (selected) {
                             setState(() {
                               wallSegments[index] = RoofWallSegment(
@@ -646,7 +661,10 @@ class _ScopeScreenState extends State<ScopeScreen>
         children: [
           SizedBox(
             width: 140,
-            child: Text(key, style: const TextStyle(fontWeight: FontWeight.w800)),
+            child: Text(
+              key,
+              style: const TextStyle(fontWeight: FontWeight.w800),
+            ),
           ),
           Expanded(child: Text(value)),
         ],
@@ -665,7 +683,10 @@ class _ScopeScreenState extends State<ScopeScreen>
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                Text('Scope Files', style: Theme.of(context).textTheme.titleLarge),
+                Text(
+                  'Scope Files',
+                  style: Theme.of(context).textTheme.titleLarge,
+                ),
                 const SizedBox(height: 8),
                 const Text(
                   'Use the approved SOW workbook, export the current scope, or share a PDF without leaving RC SOW.',
@@ -805,16 +826,24 @@ class _ScopeScreenState extends State<ScopeScreen>
           pw.Text('GPS: ${gps.isEmpty ? '—' : gps}'),
           pw.SizedBox(height: 12),
           pw.Text('Roof type: $roofType'),
-          pw.Text('Building width: ${measurements.widthFt.toStringAsFixed(2)} ft'),
-          pw.Text('Building length: ${measurements.lengthFt.toStringAsFixed(2)} ft'),
-          pw.Text('Wall height: ${measurements.wallHeightFt.toStringAsFixed(2)} ft'),
+          pw.Text(
+            'Building width: ${measurements.widthFt.toStringAsFixed(2)} ft',
+          ),
+          pw.Text(
+            'Building length: ${measurements.lengthFt.toStringAsFixed(2)} ft',
+          ),
+          pw.Text(
+            'Wall height: ${measurements.wallHeightFt.toStringAsFixed(2)} ft',
+          ),
           pw.Text(
             'Wall plate to ridge rise: ${measurements.ridgeRiseFt.toStringAsFixed(2)} ft',
           ),
           pw.Text(
             'Ridge height from ground: ${measurements.ridgeHeightFt.toStringAsFixed(2)} ft',
           ),
-          pw.Text('Rafter length: ${measurements.rafterLengthFt.toStringAsFixed(2)} ft'),
+          pw.Text(
+            'Rafter length: ${measurements.rafterLengthFt.toStringAsFixed(2)} ft',
+          ),
           pw.SizedBox(height: 16),
           pw.Text(
             'Standard roof layout to be received',
@@ -839,11 +868,7 @@ class _ScopeScreenState extends State<ScopeScreen>
             'Site Supervisor',
             'Regional Supervisor',
             'Construction Specialist',
-          ]) ...[
-            pw.SizedBox(height: 20),
-            pw.Divider(),
-            pw.Text(label),
-          ],
+          ]) ...[pw.SizedBox(height: 20), pw.Divider(), pw.Text(label)],
         ],
       ),
     );
@@ -868,7 +893,9 @@ class _ScopeScreenState extends State<ScopeScreen>
     if (!mounted) {
       return;
     }
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(message)));
   }
 }
 
@@ -942,17 +969,22 @@ class _BeneficiaryLookupState extends State<_BeneficiaryLookup> {
                 child: FutureBuilder<List<BeneficiaryRecord>>(
                   future: future,
                   builder: (context, snapshot) {
-                    final records = snapshot.data ?? const <BeneficiaryRecord>[];
+                    final records =
+                        snapshot.data ?? const <BeneficiaryRecord>[];
                     if (snapshot.connectionState == ConnectionState.waiting) {
                       return const Center(child: CircularProgressIndicator());
                     }
                     if (snapshot.hasError) {
                       return Center(
-                        child: Text('Could not search Shelter Assessment: ${snapshot.error}'),
+                        child: Text(
+                          'Could not search Shelter Assessment: ${snapshot.error}',
+                        ),
                       );
                     }
                     if (records.isEmpty) {
-                      return const Center(child: Text('No matching beneficiary records.'));
+                      return const Center(
+                        child: Text('No matching beneficiary records.'),
+                      );
                     }
                     return ListView.builder(
                       itemCount: records.length,
@@ -964,7 +996,9 @@ class _BeneficiaryLookupState extends State<_BeneficiaryLookup> {
                             '${record.houseCode} • ${record.name}',
                             style: const TextStyle(fontWeight: FontWeight.w800),
                           ),
-                          subtitle: Text('${record.parish} • ${record.cluster}'),
+                          subtitle: Text(
+                            '${record.parish} • ${record.cluster}',
+                          ),
                           trailing: const Icon(Icons.chevron_right),
                           onTap: () => Navigator.pop(context, record),
                         );
@@ -1164,9 +1198,21 @@ class RoofPainter extends CustomPainter {
         );
       }
     }
-    canvas.drawLine(Offset(right + 16, wallTop), Offset(right + 16, ridgeY), dimension);
-    canvas.drawLine(Offset(right + 10, wallTop), Offset(right + 22, wallTop), dimension);
-    canvas.drawLine(Offset(right + 10, ridgeY), Offset(right + 22, ridgeY), dimension);
+    canvas.drawLine(
+      Offset(right + 16, wallTop),
+      Offset(right + 16, ridgeY),
+      dimension,
+    );
+    canvas.drawLine(
+      Offset(right + 10, wallTop),
+      Offset(right + 22, wallTop),
+      dimension,
+    );
+    canvas.drawLine(
+      Offset(right + 10, ridgeY),
+      Offset(right + 22, ridgeY),
+      dimension,
+    );
     final riseText = TextPainter(
       text: TextSpan(
         text: 'Rise ${measurements.ridgeRiseFt.toStringAsFixed(2)} ft',
@@ -1185,11 +1231,7 @@ class RoofPainter extends CustomPainter {
     final widthText = TextPainter(
       text: TextSpan(
         text: '${measurements.widthFt.toStringAsFixed(1)} ft',
-        style: TextStyle(
-          color: ink,
-          fontSize: 11,
-          fontWeight: FontWeight.w800,
-        ),
+        style: TextStyle(color: ink, fontSize: 11, fontWeight: FontWeight.w800),
       ),
       textDirection: TextDirection.ltr,
     )..layout();
@@ -1224,7 +1266,9 @@ class RoofPlanPainter extends CustomPainter {
       ..strokeWidth = 2
       ..style = PaintingStyle.stroke;
     canvas.drawRect(rect, line);
-    if (roofType == 'Gable' || roofType == 'Hip' || roofType == 'Intersecting') {
+    if (roofType == 'Gable' ||
+        roofType == 'Hip' ||
+        roofType == 'Intersecting') {
       canvas.drawLine(
         Offset(rect.center.dx, rect.top),
         Offset(rect.center.dx, rect.bottom),
@@ -1232,10 +1276,26 @@ class RoofPlanPainter extends CustomPainter {
       );
     }
     if (roofType == 'Hip') {
-      canvas.drawLine(rect.topLeft, Offset(rect.center.dx, rect.center.dy), line);
-      canvas.drawLine(rect.topRight, Offset(rect.center.dx, rect.center.dy), line);
-      canvas.drawLine(rect.bottomLeft, Offset(rect.center.dx, rect.center.dy), line);
-      canvas.drawLine(rect.bottomRight, Offset(rect.center.dx, rect.center.dy), line);
+      canvas.drawLine(
+        rect.topLeft,
+        Offset(rect.center.dx, rect.center.dy),
+        line,
+      );
+      canvas.drawLine(
+        rect.topRight,
+        Offset(rect.center.dx, rect.center.dy),
+        line,
+      );
+      canvas.drawLine(
+        rect.bottomLeft,
+        Offset(rect.center.dx, rect.center.dy),
+        line,
+      );
+      canvas.drawLine(
+        rect.bottomRight,
+        Offset(rect.center.dx, rect.center.dy),
+        line,
+      );
     }
     final drain = Paint()
       ..color = RcColors.blue

@@ -68,12 +68,10 @@ class _RcSowAppState extends State<RcSowApp> {
               reduceMotion: state.reduceMotion,
             )
           : state.loading
-              ? const Scaffold(
-                  body: Center(child: CircularProgressIndicator()),
-                )
-              : Supabase.instance.client.auth.currentSession == null
-                  ? LoginScreen(state: state)
-                  : AppShell(state: state),
+          ? const Scaffold(body: Center(child: CircularProgressIndicator()))
+          : Supabase.instance.client.auth.currentSession == null
+          ? LoginScreen(state: state)
+          : AppShell(state: state),
     );
   }
 }

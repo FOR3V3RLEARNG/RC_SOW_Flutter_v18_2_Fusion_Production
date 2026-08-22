@@ -168,8 +168,8 @@ class AppState extends ChangeNotifier {
   }
 
   ThemeMode _themeModeFromString(String? value) => switch (value) {
-        'light' => ThemeMode.light,
-        'dark' => ThemeMode.dark,
-        _ => ThemeMode.system,
-      };
+    'light' => ThemeMode.light,
+    'dark' => ThemeMode.dark,
+    _ => ThemeMode.system,
+  };
 }

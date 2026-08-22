@@ -109,7 +109,9 @@ class _GmailScreenState extends State<GmailScreen> {
                           messages.isEmpty)
                         const Padding(
                           padding: EdgeInsets.all(32),
-                          child: Center(child: Text('No inbox messages returned.')),
+                          child: Center(
+                            child: Text('No inbox messages returned.'),
+                          ),
                         ),
                       ...messages.map(
                         (message) => Card(
@@ -244,7 +246,10 @@ class _GmailScreenState extends State<GmailScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                Text('Compose Gmail', style: Theme.of(context).textTheme.titleLarge),
+                Text(
+                  'Compose Gmail',
+                  style: Theme.of(context).textTheme.titleLarge,
+                ),
                 const SizedBox(height: 12),
                 TextField(
                   controller: toController,
@@ -267,7 +272,9 @@ class _GmailScreenState extends State<GmailScreen> {
                   const SizedBox(height: 10),
                   Text(
                     error!,
-                    style: TextStyle(color: Theme.of(context).colorScheme.error),
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.error,
+                    ),
                   ),
                 ],
                 const SizedBox(height: 14),
@@ -279,7 +286,8 @@ class _GmailScreenState extends State<GmailScreen> {
                               subjectController.text.trim().isEmpty ||
                               bodyController.text.trim().isEmpty) {
                             setSheetState(
-                              () => error = 'To, subject and message are required.',
+                              () => error =
+                                  'To, subject and message are required.',
                             );
                             return;
                           }
@@ -316,9 +324,9 @@ class _GmailScreenState extends State<GmailScreen> {
     subjectController.dispose();
     bodyController.dispose();
     if (sent == true && mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Gmail sent.')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Gmail sent.')));
     }
   }
 

@@ -196,7 +196,9 @@ class _LoginScreenState extends State<LoginScreen> {
                           Text(
                             'Approved users keep their assigned access. New or pending users request a role and parish for administrator approval.',
                             style: TextStyle(
-                              color: Theme.of(context).colorScheme.onSurfaceVariant,
+                              color: Theme.of(
+                                context,
+                              ).colorScheme.onSurfaceVariant,
                             ),
                           ),
                           const SizedBox(height: 18),
@@ -204,20 +206,25 @@ class _LoginScreenState extends State<LoginScreen> {
                             controller: email,
                             keyboardType: TextInputType.emailAddress,
                             autofillHints: const [AutofillHints.email],
-                            decoration: const InputDecoration(labelText: 'Email'),
+                            decoration: const InputDecoration(
+                              labelText: 'Email',
+                            ),
                           ),
                           const SizedBox(height: 12),
                           TextField(
                             controller: password,
                             obscureText: true,
                             autofillHints: const [AutofillHints.password],
-                            decoration: const InputDecoration(labelText: 'Password'),
+                            decoration: const InputDecoration(
+                              labelText: 'Password',
+                            ),
                           ),
                           const SizedBox(height: 12),
                           DropdownButtonFormField<String>(
                             initialValue: role,
-                            decoration:
-                                const InputDecoration(labelText: 'Requested role'),
+                            decoration: const InputDecoration(
+                              labelText: 'Requested role',
+                            ),
                             items: RcPolicy.roles
                                 .map(
                                   (value) => DropdownMenuItem(
