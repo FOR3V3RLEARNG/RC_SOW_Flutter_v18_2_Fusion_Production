@@ -113,20 +113,23 @@ class RcSowRepository {
       throw ArgumentError('At least one message recipient is required.');
     }
     final id = 'msg-${DateTime.now().microsecondsSinceEpoch}';
+    final item = <String, dynamic>{
+      'subject': subject,
+      'body': body,
+      'senderName': profile.fullName ?? profile.email,
+      'fromEmail': profile.email,
+      'readBy': [profile.email],
+      'threadId': threadId ?? replyTo ?? id,
+    };
+    if (replyTo != null) {
+      item['replyTo'] = replyTo;
+    }
     await _upsertEvent(
       type: 'message',
       itemId: id,
       parish: parish ?? (profile.canViewAllParishes ? null : profile.parish),
       recipients: recipients,
-      item: {
-        'subject': subject,
-        'body': body,
-        'senderName': profile.fullName ?? profile.email,
-        'fromEmail': profile.email,
-        'readBy': [profile.email],
-        'threadId': threadId ?? replyTo ?? id,
-        if (replyTo != null) 'replyTo': replyTo,
-      },
+      item: item,
     );
   }
 

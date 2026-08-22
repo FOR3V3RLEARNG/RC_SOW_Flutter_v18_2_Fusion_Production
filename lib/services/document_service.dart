@@ -1,6 +1,3 @@
-import 'dart:typed_data';
-
-import 'package:cross_file/cross_file.dart';
 import 'package:excel_plus/excel_plus.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/services.dart';
@@ -167,9 +164,9 @@ class RcDocumentService {
       return;
     }
     final bytes = await picked.readAsBytes();
-    final extension =
-        picked.extension?.toLowerCase() ??
-        template.fileName.split('.').last.toLowerCase();
+    final extension = picked.name.contains('.')
+        ? picked.name.split('.').last.toLowerCase()
+        : template.fileName.split('.').last.toLowerCase();
     final storagePath =
         '${template.key}/${DateTime.now().millisecondsSinceEpoch}.$extension';
     await client.storage

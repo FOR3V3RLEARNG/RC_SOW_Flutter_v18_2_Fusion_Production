@@ -53,6 +53,13 @@ abstract final class RcRadius {
   static const xl = 30.0;
 }
 
+abstract final class RcMotion {
+  static const quick = Duration(milliseconds: 160);
+  static const medium = Duration(milliseconds: 280);
+  static const slow = Duration(milliseconds: 480);
+  static const expressiveCurve = Curves.easeOutCubic;
+}
+
 ThemeData buildRcTheme({
   bool highContrast = false,
   RcDesignStyle designStyle = RcDesignStyle.materialExpressive,
