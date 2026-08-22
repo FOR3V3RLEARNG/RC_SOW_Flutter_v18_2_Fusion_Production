@@ -198,11 +198,7 @@ class _AppShellState extends State<AppShell> {
 }
 
 class RcHeader extends StatelessWidget {
-  const RcHeader({
-    super.key,
-    required this.state,
-    required this.onMessages,
-  });
+  const RcHeader({super.key, required this.state, required this.onMessages});
 
   final AppState state;
   final VoidCallback onMessages;
@@ -263,10 +259,8 @@ class RcHeader extends StatelessWidget {
                 tooltip: 'Field map',
                 onPressed: () => Navigator.of(context).push(
                   MaterialPageRoute(
-                    builder: (_) => LiveTrackerScreen(
-                      state: state,
-                      showMapFirst: true,
-                    ),
+                    builder: (_) =>
+                        LiveTrackerScreen(state: state, showMapFirst: true),
                   ),
                 ),
                 icon: const Icon(Icons.map_outlined),

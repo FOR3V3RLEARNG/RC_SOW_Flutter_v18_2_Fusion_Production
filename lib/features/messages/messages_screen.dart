@@ -86,8 +86,9 @@ class _MessagesScreenState extends State<MessagesScreen> {
                   (m) => Card(
                     child: ListTile(
                       leading: CircleAvatar(
-                        backgroundColor:
-                            m.unread ? RcColors.brandSoft : RcColors.surface2,
+                        backgroundColor: m.unread
+                            ? RcColors.brandSoft
+                            : RcColors.surface2,
                         child: Icon(
                           m.unread
                               ? Icons.mark_email_unread_outlined
@@ -98,8 +99,9 @@ class _MessagesScreenState extends State<MessagesScreen> {
                       title: Text(
                         m.sender,
                         style: TextStyle(
-                          fontWeight:
-                              m.unread ? FontWeight.w900 : FontWeight.w700,
+                          fontWeight: m.unread
+                              ? FontWeight.w900
+                              : FontWeight.w700,
                         ),
                       ),
                       subtitle: Text(
@@ -297,7 +299,9 @@ class MessageDrawerPanel extends StatelessWidget {
                       children: [
                         if (snap.connectionState == ConnectionState.waiting)
                           const LinearProgressIndicator(),
-                        ...messages.take(20).map(
+                        ...messages
+                            .take(20)
+                            .map(
                               (m) => ListTile(
                                 leading: Icon(
                                   m.unread
@@ -320,9 +324,8 @@ class MessageDrawerPanel extends StatelessWidget {
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                      builder: (_) => MessagesScreen(
-                                        state: state,
-                                      ),
+                                      builder: (_) =>
+                                          MessagesScreen(state: state),
                                     ),
                                   );
                                 },

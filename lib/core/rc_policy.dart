@@ -1,13 +1,29 @@
 abstract final class RcPolicy {
   static const parishes = <String>[
-    'Hanover','Westmoreland','St. James','Trelawny','St. Elizabeth','St. Ann',
-    'Clarendon','Manchester','St. Catherine','Kingston','St. Andrew','St. Mary',
-    'Portland','St. Thomas',
+    'Hanover',
+    'Westmoreland',
+    'St. James',
+    'Trelawny',
+    'St. Elizabeth',
+    'St. Ann',
+    'Clarendon',
+    'Manchester',
+    'St. Catherine',
+    'Kingston',
+    'St. Andrew',
+    'St. Mary',
+    'Portland',
+    'St. Thomas',
   ];
 
   static const roles = <String>[
-    'Site Supervisor','Regional Supervisor','Construction Specialist',
-    'Construction Engineer','Community Admin','Technical Admin','Admin',
+    'Site Supervisor',
+    'Regional Supervisor',
+    'Construction Specialist',
+    'Construction Engineer',
+    'Community Admin',
+    'Technical Admin',
+    'Admin',
   ];
 
   static const privilegeLabels = <String, String>{

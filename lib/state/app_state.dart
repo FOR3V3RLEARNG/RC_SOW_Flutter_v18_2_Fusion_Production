@@ -28,7 +28,10 @@ class AppState extends ChangeNotifier {
     final prefs = await SharedPreferences.getInstance();
     highContrast = prefs.getBool('highContrast') ?? false;
     final style = prefs.getString('designStyle');
-    designStyle = RcDesignStyle.values.firstWhere((e) => e.name == style, orElse: () => RcDesignStyle.materialExpressive);
+    designStyle = RcDesignStyle.values.firstWhere(
+      (e) => e.name == style,
+      orElse: () => RcDesignStyle.materialExpressive,
+    );
     reduceMotion = prefs.getBool('reduceMotion') ?? false;
     haptics = prefs.getBool('haptics') ?? true;
     snapDrawing = prefs.getBool('snapDrawing') ?? true;
@@ -50,21 +53,22 @@ class AppState extends ChangeNotifier {
     final prefs = await SharedPreferences.getInstance();
     final role = prefs.getString('pendingRequestedRole');
     final parish = prefs.getString('pendingRequestedParish');
-    if (role == null ||
-        role.isEmpty ||
-        parish == null ||
-        parish.isEmpty) {
+    if (role == null || role.isEmpty || parish == null || parish.isEmpty) {
       return;
     }
     try {
       final user = Supabase.instance.client.auth.currentUser;
-      await Supabase.instance.client.rpc('request_role_assignment', params: {
-        'p_requested_role': role,
-        'p_requested_parish': parish,
-        'p_full_name': user?.userMetadata?['full_name'] ??
-            user?.email?.split('@').first ??
-            'RC SOW user',
-      });
+      await Supabase.instance.client.rpc(
+        'request_role_assignment',
+        params: {
+          'p_requested_role': role,
+          'p_requested_parish': parish,
+          'p_full_name':
+              user?.userMetadata?['full_name'] ??
+              user?.email?.split('@').first ??
+              'RC SOW user',
+        },
+      );
       await prefs.remove('pendingRequestedRole');
       await prefs.remove('pendingRequestedParish');
       profile = await repository.currentProfile();

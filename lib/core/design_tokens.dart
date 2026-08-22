@@ -42,17 +42,21 @@ abstract final class RcRadius {
   static const xl = 30.0;
 }
 
-ThemeData buildRcTheme({bool highContrast = false, RcDesignStyle designStyle = RcDesignStyle.materialExpressive}) {
-  final scheme = ColorScheme.fromSeed(
-    seedColor: RcColors.brand,
-    brightness: Brightness.light,
-    surface: RcColors.surface,
-  ).copyWith(
-    primary: RcColors.brand,
-    onPrimary: Colors.white,
-    secondary: RcColors.blue,
-    error: RcColors.danger,
-  );
+ThemeData buildRcTheme({
+  bool highContrast = false,
+  RcDesignStyle designStyle = RcDesignStyle.materialExpressive,
+}) {
+  final scheme =
+      ColorScheme.fromSeed(
+        seedColor: RcColors.brand,
+        brightness: Brightness.light,
+        surface: RcColors.surface,
+      ).copyWith(
+        primary: RcColors.brand,
+        onPrimary: Colors.white,
+        secondary: RcColors.blue,
+        error: RcColors.danger,
+      );
 
   final border = highContrast ? RcColors.ink : RcColors.lineStrong;
   final radius = switch (designStyle) {
@@ -67,7 +71,9 @@ ThemeData buildRcTheme({bool highContrast = false, RcDesignStyle designStyle = R
     colorScheme: scheme,
     scaffoldBackgroundColor: RcColors.bg,
     fontFamily: null,
-    visualDensity: designStyle == RcDesignStyle.fieldDense ? VisualDensity.compact : VisualDensity.standard,
+    visualDensity: designStyle == RcDesignStyle.fieldDense
+        ? VisualDensity.compact
+        : VisualDensity.standard,
     appBarTheme: const AppBarTheme(
       backgroundColor: RcColors.surface,
       foregroundColor: RcColors.ink,
@@ -99,7 +105,9 @@ ThemeData buildRcTheme({bool highContrast = false, RcDesignStyle designStyle = R
     filledButtonTheme: FilledButtonThemeData(
       style: FilledButton.styleFrom(
         minimumSize: const Size(48, 48),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(RcRadius.sm)),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(RcRadius.sm),
+        ),
         textStyle: const TextStyle(fontWeight: FontWeight.w800),
       ),
     ),

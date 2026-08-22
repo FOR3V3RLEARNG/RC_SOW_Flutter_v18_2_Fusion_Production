@@ -26,7 +26,10 @@ class _LoginScreenState extends State<LoginScreen> {
   static const parishes = RcPolicy.parishes;
 
   Future<void> signIn() async {
-    setState(() { busy = true; error = null; });
+    setState(() {
+      busy = true;
+      error = null;
+    });
     try {
       await _stageRoleRequest();
       await Supabase.instance.client.auth.signInWithPassword(
@@ -47,8 +50,12 @@ class _LoginScreenState extends State<LoginScreen> {
       OAuthProvider.google,
       redirectTo: 'org.jamaicaredcross.rcsowflutter://login-callback',
       authScreenLaunchMode: LaunchMode.externalApplication,
-      scopes: 'openid email profile https://www.googleapis.com/auth/gmail.readonly https://www.googleapis.com/auth/gmail.send',
-      queryParams: {'prompt': 'select_account consent', 'access_type': 'offline'},
+      scopes:
+          'openid email profile https://www.googleapis.com/auth/gmail.readonly https://www.googleapis.com/auth/gmail.send',
+      queryParams: {
+        'prompt': 'select_account consent',
+        'access_type': 'offline',
+      },
     );
   }
 
@@ -59,13 +66,20 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Future<void> requestRole() async {
-    setState(() { busy = true; error = null; });
+    setState(() {
+      busy = true;
+      error = null;
+    });
     try {
       await _stageRoleRequest();
       if (Supabase.instance.client.auth.currentUser == null) {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Role/parish selection saved. Sign in to submit it for Admin approval.')),
+            const SnackBar(
+              content: Text(
+                'Role/parish selection saved. Sign in to submit it for Admin approval.',
+              ),
+            ),
           );
         }
         return;
@@ -73,7 +87,9 @@ class _LoginScreenState extends State<LoginScreen> {
       await widget.state.refreshProfile();
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Role/parish request submitted for Admin approval.')),
+          const SnackBar(
+            content: Text('Role/parish request submitted for Admin approval.'),
+          ),
         );
       }
     } catch (e) {
@@ -82,7 +98,6 @@ class _LoginScreenState extends State<LoginScreen> {
       if (mounted) setState(() => busy = false);
     }
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -95,10 +110,30 @@ class _LoginScreenState extends State<LoginScreen> {
               constraints: const BoxConstraints(maxWidth: 520),
               child: Column(
                 children: [
-                  Image.asset('assets/brand/rc_sow_house_icon.png', width: 94, height: 94),
+                  Image.asset(
+                    'assets/brand/rc_sow_house_icon.png',
+                    width: 94,
+                    height: 94,
+                  ),
                   const SizedBox(height: 14),
-                  const Text('RC SOW', textAlign: TextAlign.center, style: TextStyle(fontSize: 34, fontWeight: FontWeight.w900, color: RcColors.brand)),
-                  const Text('Premium Field Operations', textAlign: TextAlign.center, style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: RcColors.ink)),
+                  const Text(
+                    'RC SOW',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 34,
+                      fontWeight: FontWeight.w900,
+                      color: RcColors.brand,
+                    ),
+                  ),
+                  const Text(
+                    'Premium Field Operations',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w800,
+                      color: RcColors.ink,
+                    ),
+                  ),
                   const SizedBox(height: 28),
                   Card(
                     child: Padding(
@@ -106,24 +141,98 @@ class _LoginScreenState extends State<LoginScreen> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
-                          const Text('Secure account access', style: TextStyle(fontSize: 22, fontWeight: FontWeight.w900)),
+                          const Text(
+                            'Secure account access',
+                            style: TextStyle(
+                              fontSize: 22,
+                              fontWeight: FontWeight.w900,
+                            ),
+                          ),
                           const SizedBox(height: 8),
-                          const Text('Approved users retain their assigned role. New or pending users request a role and parish for administrator approval.', style: TextStyle(color: RcColors.text)),
+                          const Text(
+                            'Approved users retain their assigned role. New or pending users request a role and parish for administrator approval.',
+                            style: TextStyle(color: RcColors.text),
+                          ),
                           const SizedBox(height: 18),
-                          TextField(controller: email, keyboardType: TextInputType.emailAddress, autofillHints: const [AutofillHints.email], decoration: const InputDecoration(labelText: 'Email')),
+                          TextField(
+                            controller: email,
+                            keyboardType: TextInputType.emailAddress,
+                            autofillHints: const [AutofillHints.email],
+                            decoration: const InputDecoration(
+                              labelText: 'Email',
+                            ),
+                          ),
                           const SizedBox(height: 12),
-                          TextField(controller: password, obscureText: true, autofillHints: const [AutofillHints.password], decoration: const InputDecoration(labelText: 'Password')),
+                          TextField(
+                            controller: password,
+                            obscureText: true,
+                            autofillHints: const [AutofillHints.password],
+                            decoration: const InputDecoration(
+                              labelText: 'Password',
+                            ),
+                          ),
                           const SizedBox(height: 12),
-                          DropdownButtonFormField<String>(initialValue: role, decoration: const InputDecoration(labelText: 'Requested role'), items: roles.map((x) => DropdownMenuItem(value: x, child: Text(x))).toList(), onChanged: (x) => setState(() => role = x!)),
+                          DropdownButtonFormField<String>(
+                            initialValue: role,
+                            decoration: const InputDecoration(
+                              labelText: 'Requested role',
+                            ),
+                            items: roles
+                                .map(
+                                  (x) => DropdownMenuItem(
+                                    value: x,
+                                    child: Text(x),
+                                  ),
+                                )
+                                .toList(),
+                            onChanged: (x) => setState(() => role = x!),
+                          ),
                           const SizedBox(height: 12),
-                          DropdownButtonFormField<String>(initialValue: parish, decoration: const InputDecoration(labelText: 'Requested parish'), items: parishes.map((x) => DropdownMenuItem(value: x, child: Text(x))).toList(), onChanged: (x) => setState(() => parish = x!)),
-                          if (error != null) Padding(padding: const EdgeInsets.only(top: 12), child: Text(error!, style: const TextStyle(color: RcColors.danger))),
+                          DropdownButtonFormField<String>(
+                            initialValue: parish,
+                            decoration: const InputDecoration(
+                              labelText: 'Requested parish',
+                            ),
+                            items: parishes
+                                .map(
+                                  (x) => DropdownMenuItem(
+                                    value: x,
+                                    child: Text(x),
+                                  ),
+                                )
+                                .toList(),
+                            onChanged: (x) => setState(() => parish = x!),
+                          ),
+                          if (error != null)
+                            Padding(
+                              padding: const EdgeInsets.only(top: 12),
+                              child: Text(
+                                error!,
+                                style: const TextStyle(color: RcColors.danger),
+                              ),
+                            ),
                           const SizedBox(height: 18),
-                          FilledButton.icon(onPressed: busy ? null : signIn, icon: const Icon(Icons.shield_outlined), label: Text(busy ? 'Please wait…' : 'Sign in securely')),
+                          FilledButton.icon(
+                            onPressed: busy ? null : signIn,
+                            icon: const Icon(Icons.shield_outlined),
+                            label: Text(
+                              busy ? 'Please wait…' : 'Sign in securely',
+                            ),
+                          ),
                           const SizedBox(height: 10),
-                          OutlinedButton.icon(onPressed: busy ? null : google, icon: const Text('G', style: TextStyle(fontWeight: FontWeight.w900)), label: const Text('Continue with Google')),
+                          OutlinedButton.icon(
+                            onPressed: busy ? null : google,
+                            icon: const Text(
+                              'G',
+                              style: TextStyle(fontWeight: FontWeight.w900),
+                            ),
+                            label: const Text('Continue with Google'),
+                          ),
                           const SizedBox(height: 10),
-                          TextButton(onPressed: busy ? null : requestRole, child: const Text('Request role / parish approval')),
+                          TextButton(
+                            onPressed: busy ? null : requestRole,
+                            child: const Text('Request role / parish approval'),
+                          ),
                         ],
                       ),
                     ),

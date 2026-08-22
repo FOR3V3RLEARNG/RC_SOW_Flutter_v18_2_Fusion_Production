@@ -49,10 +49,8 @@ class ActiveUsersScreen extends StatelessWidget {
                       onPressed: () => Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (_) => MessagesScreen(
-                            state: state,
-                            composeTo: u.email,
-                          ),
+                          builder: (_) =>
+                              MessagesScreen(state: state, composeTo: u.email),
                         ),
                       ),
                       icon: const Icon(Icons.chat_bubble_outline),
@@ -104,10 +102,8 @@ class ActiveUsersScreen extends StatelessWidget {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (_) => MessagesScreen(
-                        state: state,
-                        composeTo: user.email,
-                      ),
+                      builder: (_) =>
+                          MessagesScreen(state: state, composeTo: user.email),
                     ),
                   );
                 },
