@@ -2,9 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-import '../../core/auth_support.dart';
 import '../../core/design_tokens.dart';
-import '../../core/rc_components.dart';
+import '../../core/rc_policy.dart';
 import '../../state/app_state.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -23,77 +22,34 @@ class _LoginScreenState extends State<LoginScreen> {
   bool busy = false;
   String? error;
 
-  static const roles = [
-    'Site Supervisor',
-    'Regional Supervisor',
-    'Construction Specialist',
-    'Community Admin',
-    'Technical Admin',
-  ];
-  static const parishes = [
-    'Hanover',
-    'Westmoreland',
-    'St. James',
-    'Trelawny',
-    'St. Elizabeth',
-    'St. Ann',
-    'Clarendon',
-    'Manchester',
-    'St. Catherine',
-    'Kingston',
-    'St. Andrew',
-    'St. Mary',
-    'Portland',
-    'St. Thomas',
-  ];
-
-  @override
-  void dispose() {
-    email.dispose();
-    password.dispose();
-    super.dispose();
-  }
+  static const roles = RcPolicy.roles;
+  static const parishes = RcPolicy.parishes;
 
   Future<void> signIn() async {
-    setState(() {
-      busy = true;
-      error = null;
-    });
+    setState(() { busy = true; error = null; });
     try {
       await _stageRoleRequest();
       await Supabase.instance.client.auth.signInWithPassword(
         email: email.text.trim(),
         password: password.text,
       );
-      // onAuthStateChange is the single session-return/callback coordinator.
+      await widget.state.refreshProfile();
     } catch (e) {
-      if (mounted) setState(() => error = RcAuthSupport.friendlyMessage(e));
+      setState(() => error = '$e');
     } finally {
       if (mounted) setState(() => busy = false);
     }
   }
 
   Future<void> google() async {
-    setState(() {
-      busy = true;
-      error = null;
-    });
-    try {
-      await _stageRoleRequest();
-      final launched = await Supabase.instance.client.auth.signInWithOAuth(
-        OAuthProvider.google,
-        redirectTo: RcAuthSupport.oauthRedirectUri,
-        authScreenLaunchMode: LaunchMode.externalApplication,
-        queryParams: const {'prompt': 'select_account'},
-      );
-      if (!launched && mounted) {
-        setState(() => error = 'Google sign-in could not be opened.');
-      }
-    } catch (e) {
-      if (mounted) setState(() => error = RcAuthSupport.friendlyMessage(e));
-    } finally {
-      if (mounted) setState(() => busy = false);
-    }
+    await _stageRoleRequest();
+    await Supabase.instance.client.auth.signInWithOAuth(
+      OAuthProvider.google,
+      redirectTo: 'org.jamaicaredcross.rcsowflutter://login-callback',
+      authScreenLaunchMode: LaunchMode.externalApplication,
+      scopes: 'openid email profile https://www.googleapis.com/auth/gmail.readonly https://www.googleapis.com/auth/gmail.send',
+      queryParams: {'prompt': 'select_account consent', 'access_type': 'offline'},
+    );
   }
 
   Future<void> _stageRoleRequest() async {
@@ -103,20 +59,13 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Future<void> requestRole() async {
-    setState(() {
-      busy = true;
-      error = null;
-    });
+    setState(() { busy = true; error = null; });
     try {
       await _stageRoleRequest();
       if (Supabase.instance.client.auth.currentUser == null) {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text(
-                'Role and parish saved. Sign in to submit the request for approval.',
-              ),
-            ),
+            const SnackBar(content: Text('Role/parish selection saved. Sign in to submit it for Admin approval.')),
           );
         }
         return;
@@ -124,188 +73,57 @@ class _LoginScreenState extends State<LoginScreen> {
       await widget.state.refreshProfile();
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text(
-              'Role and parish request submitted for Admin approval.',
-            ),
-          ),
+          const SnackBar(content: Text('Role/parish request submitted for Admin approval.')),
         );
       }
     } catch (e) {
-      if (mounted) setState(() => error = RcAuthSupport.friendlyMessage(e));
+      if (mounted) setState(() => error = '$e');
     } finally {
       if (mounted) setState(() => busy = false);
     }
   }
 
+
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
     return Scaffold(
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
-            padding: const EdgeInsets.all(RcSpace.xl),
+            padding: const EdgeInsets.all(20),
             child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 560),
+              constraints: const BoxConstraints(maxWidth: 520),
               child: Column(
                 children: [
-                  RcExpressiveSurface(
-                    shape: RcSurfaceShape.hero,
-                    padding: const EdgeInsets.all(16),
-                    tone: theme.colorScheme.primaryContainer.withValues(
-                      alpha: .5,
-                    ),
-                    child: Image.asset(
-                      'assets/brand/rc_sow_house_icon.png',
-                      width: 88,
-                      height: 88,
-                    ),
-                  ),
-                  const SizedBox(height: 18),
-                  Text(
-                    'RC SOW',
-                    textAlign: TextAlign.center,
-                    style: theme.textTheme.displaySmall?.copyWith(
-                      color: theme.colorScheme.primary,
-                    ),
-                  ),
-                  Text(
-                    'Controlled shelter production',
-                    textAlign: TextAlign.center,
-                    style: theme.textTheme.titleMedium,
-                  ),
+                  Image.asset('assets/brand/rc_sow_house_icon.png', width: 94, height: 94),
+                  const SizedBox(height: 14),
+                  const Text('RC SOW', textAlign: TextAlign.center, style: TextStyle(fontSize: 34, fontWeight: FontWeight.w900, color: RcColors.brand)),
+                  const Text('Premium Field Operations', textAlign: TextAlign.center, style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: RcColors.ink)),
                   const SizedBox(height: 28),
-                  RcExpressiveSurface(
-                    shape: RcSurfaceShape.offset,
-                    padding: const EdgeInsets.all(22),
-                    child: AutofillGroup(
+                  Card(
+                    child: Padding(
+                      padding: const EdgeInsets.all(22),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
-                          Text(
-                            'Secure field access',
-                            style: theme.textTheme.headlineSmall?.copyWith(
-                              fontWeight: FontWeight.w900,
-                            ),
-                          ),
-                          const SizedBox(height: 7),
-                          Text(
-                            'Approved users keep their assigned access. New users can stage a role and parish request before signing in.',
-                            style: theme.textTheme.bodyMedium?.copyWith(
-                              color: theme.colorScheme.onSurfaceVariant,
-                            ),
-                          ),
-                          const SizedBox(height: 20),
-                          TextField(
-                            controller: email,
-                            keyboardType: TextInputType.emailAddress,
-                            textInputAction: TextInputAction.next,
-                            autofillHints: const [AutofillHints.email],
-                            decoration: const InputDecoration(
-                              labelText: 'Email',
-                              prefixIcon: Icon(Icons.mail_outline),
-                            ),
-                          ),
-                          const SizedBox(height: 12),
-                          TextField(
-                            controller: password,
-                            obscureText: true,
-                            onSubmitted: (_) => busy ? null : signIn(),
-                            autofillHints: const [AutofillHints.password],
-                            decoration: const InputDecoration(
-                              labelText: 'Password',
-                              prefixIcon: Icon(Icons.lock_outline),
-                            ),
-                          ),
-                          const SizedBox(height: 12),
-                          DropdownButtonFormField<String>(
-                            initialValue: role,
-                            decoration: const InputDecoration(
-                              labelText: 'Requested role',
-                            ),
-                            items: roles
-                                .map(
-                                  (x) => DropdownMenuItem(
-                                    value: x,
-                                    child: Text(x),
-                                  ),
-                                )
-                                .toList(),
-                            onChanged: busy
-                                ? null
-                                : (x) => setState(() => role = x!),
-                          ),
-                          const SizedBox(height: 12),
-                          DropdownButtonFormField<String>(
-                            initialValue: parish,
-                            decoration: const InputDecoration(
-                              labelText: 'Requested parish',
-                            ),
-                            items: parishes
-                                .map(
-                                  (x) => DropdownMenuItem(
-                                    value: x,
-                                    child: Text(x),
-                                  ),
-                                )
-                                .toList(),
-                            onChanged: busy
-                                ? null
-                                : (x) => setState(() => parish = x!),
-                          ),
-                          if (error != null) ...[
-                            const SizedBox(height: 12),
-                            RcExpressiveSurface(
-                              shape: RcSurfaceShape.pill,
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 14,
-                                vertical: 10,
-                              ),
-                              tone: theme.colorScheme.errorContainer,
-                              child: Row(
-                                children: [
-                                  Icon(
-                                    Icons.error_outline,
-                                    color: theme.colorScheme.error,
-                                  ),
-                                  const SizedBox(width: 9),
-                                  Expanded(
-                                    child: Text(
-                                      error!,
-                                      style: TextStyle(
-                                        color:
-                                            theme.colorScheme.onErrorContainer,
-                                        fontWeight: FontWeight.w700,
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
+                          const Text('Secure account access', style: TextStyle(fontSize: 22, fontWeight: FontWeight.w900)),
+                          const SizedBox(height: 8),
+                          const Text('Approved users retain their assigned role. New or pending users request a role and parish for administrator approval.', style: TextStyle(color: RcColors.text)),
                           const SizedBox(height: 18),
-                          FilledButton.icon(
-                            onPressed: busy ? null : signIn,
-                            icon: const Icon(Icons.shield_outlined),
-                            label: Text(
-                              busy ? 'Please wait…' : 'Sign in securely',
-                            ),
-                          ),
+                          TextField(controller: email, keyboardType: TextInputType.emailAddress, autofillHints: const [AutofillHints.email], decoration: const InputDecoration(labelText: 'Email')),
+                          const SizedBox(height: 12),
+                          TextField(controller: password, obscureText: true, autofillHints: const [AutofillHints.password], decoration: const InputDecoration(labelText: 'Password')),
+                          const SizedBox(height: 12),
+                          DropdownButtonFormField<String>(initialValue: role, decoration: const InputDecoration(labelText: 'Requested role'), items: roles.map((x) => DropdownMenuItem(value: x, child: Text(x))).toList(), onChanged: (x) => setState(() => role = x!)),
+                          const SizedBox(height: 12),
+                          DropdownButtonFormField<String>(initialValue: parish, decoration: const InputDecoration(labelText: 'Requested parish'), items: parishes.map((x) => DropdownMenuItem(value: x, child: Text(x))).toList(), onChanged: (x) => setState(() => parish = x!)),
+                          if (error != null) Padding(padding: const EdgeInsets.only(top: 12), child: Text(error!, style: const TextStyle(color: RcColors.danger))),
+                          const SizedBox(height: 18),
+                          FilledButton.icon(onPressed: busy ? null : signIn, icon: const Icon(Icons.shield_outlined), label: Text(busy ? 'Please wait…' : 'Sign in securely')),
                           const SizedBox(height: 10),
-                          OutlinedButton.icon(
-                            onPressed: busy ? null : google,
-                            icon: const Text(
-                              'G',
-                              style: TextStyle(fontWeight: FontWeight.w900),
-                            ),
-                            label: const Text('Continue with Google'),
-                          ),
-                          const SizedBox(height: 6),
-                          TextButton(
-                            onPressed: busy ? null : requestRole,
-                            child: const Text('Request role / parish approval'),
-                          ),
+                          OutlinedButton.icon(onPressed: busy ? null : google, icon: const Text('G', style: TextStyle(fontWeight: FontWeight.w900)), label: const Text('Continue with Google')),
+                          const SizedBox(height: 10),
+                          TextButton(onPressed: busy ? null : requestRole, child: const Text('Request role / parish approval')),
                         ],
                       ),
                     ),

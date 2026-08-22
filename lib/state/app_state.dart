@@ -1,8 +1,8 @@
-import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import '../core/design_tokens.dart';
 import '../models/app_models.dart';
 import '../services/rc_sow_repository.dart';
 
@@ -14,87 +14,57 @@ class AppState extends ChangeNotifier {
   UserProfile? profile;
   bool loading = true;
   bool highContrast = false;
+  RcDesignStyle designStyle = RcDesignStyle.materialExpressive;
   bool reduceMotion = false;
   bool haptics = true;
   bool snapDrawing = true;
   bool showGrid = true;
-  bool offlineMode = false;
-  bool compactDensity = false;
   String measurementUnit = 'Feet';
-  ThemeMode themeMode = ThemeMode.system;
   int selectedTab = 0;
-  String? lastAuthDiagnostic;
-
-  bool _authSyncInFlight = false;
-  bool _authSyncQueued = false;
 
   bool get signedIn => Supabase.instance.client.auth.currentSession != null;
 
   Future<void> bootstrap() async {
     final prefs = await SharedPreferences.getInstance();
     highContrast = prefs.getBool('highContrast') ?? false;
+    final style = prefs.getString('designStyle');
+    designStyle = RcDesignStyle.values.firstWhere((e) => e.name == style, orElse: () => RcDesignStyle.materialExpressive);
     reduceMotion = prefs.getBool('reduceMotion') ?? false;
     haptics = prefs.getBool('haptics') ?? true;
     snapDrawing = prefs.getBool('snapDrawing') ?? true;
     showGrid = prefs.getBool('showGrid') ?? true;
-    offlineMode = prefs.getBool('offlineMode') ?? false;
-    compactDensity = prefs.getBool('compactDensity') ?? false;
     measurementUnit = prefs.getString('measurementUnit') ?? 'Feet';
-    themeMode = _themeModeFromString(prefs.getString('themeMode'));
-    await synchronizeAuthSession(reason: 'bootstrap');
+    await refreshProfile();
     loading = false;
     notifyListeners();
   }
 
-  Future<void> synchronizeAuthSession({String reason = 'auth-event'}) async {
-    if (_authSyncInFlight) {
-      _authSyncQueued = true;
-      return;
-    }
-    do {
-      _authSyncQueued = false;
-      _authSyncInFlight = true;
-      try {
-        profile = await repository.currentProfile();
-        await _submitPendingRoleRequestIfNeeded();
-        lastAuthDiagnostic = signedIn
-            ? 'Session synchronized ($reason)'
-            : 'Signed out ($reason)';
-      } catch (error) {
-        lastAuthDiagnostic =
-            'Session sync failed ($reason): ${error.runtimeType}';
-        if (!signedIn) profile = null;
-      } finally {
-        _authSyncInFlight = false;
-        notifyListeners();
-      }
-    } while (_authSyncQueued);
+  Future<void> refreshProfile() async {
+    profile = await repository.currentProfile();
+    await _submitPendingRoleRequestIfNeeded();
+    notifyListeners();
   }
-
-  Future<void> refreshProfile() =>
-      synchronizeAuthSession(reason: 'manual-refresh');
 
   Future<void> _submitPendingRoleRequestIfNeeded() async {
     if (!signedIn || profile == null || profile!.approved) return;
     final prefs = await SharedPreferences.getInstance();
     final role = prefs.getString('pendingRequestedRole');
     final parish = prefs.getString('pendingRequestedParish');
-    if (role == null || role.isEmpty || parish == null || parish.isEmpty) {
+    if (role == null ||
+        role.isEmpty ||
+        parish == null ||
+        parish.isEmpty) {
       return;
     }
     try {
       final user = Supabase.instance.client.auth.currentUser;
-      await Supabase.instance.client.rpc(
-        'request_role_assignment',
-        params: {
-          'p_requested_role': role,
-          'p_requested_parish': parish,
-          'p_full_name':
-              user?.userMetadata?['full_name'] ??
-              user?.email?.split('@').first ??
-              'RC SOW user',
-        },
-      );
+      await Supabase.instance.client.rpc('request_role_assignment', params: {
+        'p_requested_role': role,
+        'p_requested_parish': parish,
+        'p_full_name': user?.userMetadata?['full_name'] ??
+            user?.email?.split('@').first ??
+            'RC SOW user',
+      });
       await prefs.remove('pendingRequestedRole');
       await prefs.remove('pendingRequestedParish');
       profile = await repository.currentProfile();
@@ -104,24 +74,17 @@ class AppState extends ChangeNotifier {
   }
 
   void selectTab(int value) {
-    if (value < 0 || value > 4 || selectedTab == value) return;
     selectedTab = value;
-    feedback();
     notifyListeners();
-  }
-
-  Future<void> feedback({bool strong = false}) async {
-    if (!haptics) return;
-    if (strong) {
-      await HapticFeedback.mediumImpact();
-    } else {
-      await HapticFeedback.selectionClick();
-    }
   }
 
   Future<void> setSetting(String key, Object value) async {
     final prefs = await SharedPreferences.getInstance();
     switch (key) {
+      case 'designStyle':
+        designStyle = value as RcDesignStyle;
+        await prefs.setString(key, designStyle.name);
+        break;
       case 'highContrast':
         highContrast = value as bool;
         await prefs.setBool(key, highContrast);
@@ -142,29 +105,11 @@ class AppState extends ChangeNotifier {
         showGrid = value as bool;
         await prefs.setBool(key, showGrid);
         break;
-      case 'offlineMode':
-        offlineMode = value as bool;
-        await prefs.setBool(key, offlineMode);
-        break;
-      case 'compactDensity':
-        compactDensity = value as bool;
-        await prefs.setBool(key, compactDensity);
-        break;
       case 'measurementUnit':
         measurementUnit = value as String;
         await prefs.setString(key, measurementUnit);
         break;
-      case 'themeMode':
-        themeMode = value as ThemeMode;
-        await prefs.setString(key, themeMode.name);
-        break;
     }
     notifyListeners();
   }
-
-  ThemeMode _themeModeFromString(String? value) => switch (value) {
-    'light' => ThemeMode.light,
-    'dark' => ThemeMode.dark,
-    _ => ThemeMode.system,
-  };
 }

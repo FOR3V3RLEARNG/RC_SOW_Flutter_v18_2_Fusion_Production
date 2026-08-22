@@ -1,0 +1,36 @@
+RC SOW v18.3 Fusion Production Source Candidate
+
+Version: 18.3.0+183
+Package/application name shown to users: RC SOW
+Android identity remains: org.jamaicaredcross.rc_sow_flutter
+Mobile OAuth callback: org.jamaicaredcross.rcsowflutter://login-callback
+
+Included v18.3 source work:
+- interactive messages and replies
+- message drawer
+- users-online vertical popup and direct messaging
+- admin user access controls and privilege editor
+- 14-parish policy + Construction Engineer role option
+- selectable Design DNA styles
+- Flame animated roof-repair splash source
+- bundled Work Plan/SOW/Control/Monitoring/Completion/Payment templates
+- document template service, Excel/PDF/share service layer
+- Gmail service layer + Google Gmail scopes
+- beneficiary directory model/migration support
+- corrected v18.3 event-upsert client contract
+- Supabase migration source for user management/templates/beneficiary directory
+
+Validation completed in this packaging environment:
+PASS Dart delimiter/import structural scan
+PASS pubspec.yaml parse
+PASS analysis_options.yaml parse
+
+NOT RUN IN THIS PACKAGING ENVIRONMENT:
+- dart format
+- flutter pub get
+- flutter analyze
+- flutter test
+- flutter build apk --release
+- flutter build appbundle --release
+
+Run the GitHub Green Gate before treating v18.3 as release-certified.

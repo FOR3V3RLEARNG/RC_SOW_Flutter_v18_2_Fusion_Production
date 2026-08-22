@@ -24,172 +24,84 @@ abstract final class RcColors {
   static const dangerSoft = Color(0xFFFEF3F2);
 }
 
+enum RcDesignStyle { materialExpressive, foruiMinimal, shadcnSaas, fieldDense }
+
+extension RcDesignStyleX on RcDesignStyle {
+  String get label => switch (this) {
+    RcDesignStyle.materialExpressive => 'Material 3 Expressive',
+    RcDesignStyle.foruiMinimal => 'Forui-inspired Minimal',
+    RcDesignStyle.shadcnSaas => 'Shadcn-inspired SaaS',
+    RcDesignStyle.fieldDense => 'Field Dense',
+  };
+}
+
 abstract final class RcRadius {
   static const sm = 12.0;
   static const md = 18.0;
   static const lg = 24.0;
   static const xl = 30.0;
-  static const hero = 36.0;
 }
 
-abstract final class RcSpace {
-  static const xs = 4.0;
-  static const sm = 8.0;
-  static const md = 12.0;
-  static const lg = 16.0;
-  static const xl = 24.0;
-  static const xxl = 32.0;
-}
-
-abstract final class RcMotion {
-  static const quick = Duration(milliseconds: 160);
-  static const medium = Duration(milliseconds: 280);
-  static const deliberate = Duration(milliseconds: 420);
-  static const expressiveCurve = Curves.easeOutCubic;
-}
-
-ThemeData buildRcTheme({
-  bool highContrast = false,
-  bool compactDensity = false,
-  Brightness brightness = Brightness.light,
-}) {
-  final dark = brightness == Brightness.dark;
-  final scheme =
-      ColorScheme.fromSeed(
-        seedColor: RcColors.brand,
-        brightness: brightness,
-      ).copyWith(
-        primary: dark ? const Color(0xFFFFB3B8) : RcColors.brand,
-        onPrimary: dark ? const Color(0xFF680014) : Colors.white,
-        secondary: dark ? const Color(0xFFADC6FF) : RcColors.blue,
-        error: dark ? const Color(0xFFFFB4AB) : RcColors.danger,
-        surface: dark ? const Color(0xFF15191F) : RcColors.surface,
-        surfaceContainerLowest: dark
-            ? const Color(0xFF101317)
-            : RcColors.surface,
-        surfaceContainerLow: dark ? const Color(0xFF181C22) : RcColors.surface2,
-        surfaceContainer: dark
-            ? const Color(0xFF1D2229)
-            : const Color(0xFFF1F4F8),
-        outline: dark ? const Color(0xFF8B919A) : RcColors.lineStrong,
-        outlineVariant: dark ? const Color(0xFF3F454D) : RcColors.line,
-      );
-
-  final border = highContrast
-      ? (dark ? Colors.white : RcColors.ink)
-      : scheme.outlineVariant;
-
-  final base = ThemeData(
-    useMaterial3: true,
-    brightness: brightness,
-    colorScheme: scheme,
-    scaffoldBackgroundColor: dark ? const Color(0xFF0F1216) : RcColors.bg,
-    visualDensity: compactDensity
-        ? VisualDensity.compact
-        : VisualDensity.standard,
+ThemeData buildRcTheme({bool highContrast = false, RcDesignStyle designStyle = RcDesignStyle.materialExpressive}) {
+  final scheme = ColorScheme.fromSeed(
+    seedColor: RcColors.brand,
+    brightness: Brightness.light,
+    surface: RcColors.surface,
+  ).copyWith(
+    primary: RcColors.brand,
+    onPrimary: Colors.white,
+    secondary: RcColors.blue,
+    error: RcColors.danger,
   );
 
-  return base.copyWith(
-    textTheme: base.textTheme.copyWith(
-      displaySmall: base.textTheme.displaySmall?.copyWith(
-        fontWeight: FontWeight.w900,
-        letterSpacing: -1.2,
-      ),
-      headlineMedium: base.textTheme.headlineMedium?.copyWith(
-        fontWeight: FontWeight.w900,
-        letterSpacing: -0.7,
-      ),
-      titleLarge: base.textTheme.titleLarge?.copyWith(
-        fontWeight: FontWeight.w900,
-        letterSpacing: -0.35,
-      ),
-      titleMedium: base.textTheme.titleMedium?.copyWith(
-        fontWeight: FontWeight.w800,
-      ),
-      labelLarge: base.textTheme.labelLarge?.copyWith(
-        fontWeight: FontWeight.w800,
-      ),
-    ),
-    appBarTheme: AppBarTheme(
-      backgroundColor: Colors.transparent,
-      foregroundColor: scheme.onSurface,
+  final border = highContrast ? RcColors.ink : RcColors.lineStrong;
+  final radius = switch (designStyle) {
+    RcDesignStyle.materialExpressive => RcRadius.lg,
+    RcDesignStyle.foruiMinimal => 16.0,
+    RcDesignStyle.shadcnSaas => 10.0,
+    RcDesignStyle.fieldDense => 8.0,
+  };
+
+  return ThemeData(
+    useMaterial3: true,
+    colorScheme: scheme,
+    scaffoldBackgroundColor: RcColors.bg,
+    fontFamily: null,
+    visualDensity: designStyle == RcDesignStyle.fieldDense ? VisualDensity.compact : VisualDensity.standard,
+    appBarTheme: const AppBarTheme(
+      backgroundColor: RcColors.surface,
+      foregroundColor: RcColors.ink,
       elevation: 0,
-      scrolledUnderElevation: 0,
-      centerTitle: false,
+      scrolledUnderElevation: 1,
     ),
     inputDecorationTheme: InputDecorationTheme(
       filled: true,
-      fillColor: scheme.surfaceContainerLow,
+      fillColor: RcColors.surface2,
       border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(RcRadius.md),
+        borderRadius: BorderRadius.circular(RcRadius.sm),
         borderSide: BorderSide(color: border),
       ),
       enabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(RcRadius.md),
+        borderRadius: BorderRadius.circular(RcRadius.sm),
         borderSide: BorderSide(color: border),
       ),
-      focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(RcRadius.md),
-        borderSide: BorderSide(color: scheme.primary, width: 2),
-      ),
-      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 15),
+      contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
     ),
     cardTheme: CardThemeData(
-      color: scheme.surface,
+      color: RcColors.surface,
       elevation: 0,
       margin: EdgeInsets.zero,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(RcRadius.lg),
-        side: BorderSide(color: border),
+        borderRadius: BorderRadius.circular(radius),
+        side: BorderSide(color: highContrast ? RcColors.ink : RcColors.line),
       ),
-    ),
-    navigationBarTheme: NavigationBarThemeData(
-      height: 72,
-      elevation: 0,
-      backgroundColor: Colors.transparent,
-      indicatorColor: scheme.primaryContainer,
-      labelTextStyle: WidgetStateProperty.resolveWith((states) {
-        return TextStyle(
-          fontSize: 11,
-          fontWeight: states.contains(WidgetState.selected)
-              ? FontWeight.w900
-              : FontWeight.w700,
-        );
-      }),
-    ),
-    navigationRailTheme: NavigationRailThemeData(
-      elevation: 0,
-      backgroundColor: Colors.transparent,
-      indicatorColor: scheme.primaryContainer,
-      useIndicator: true,
-      selectedLabelTextStyle: const TextStyle(fontWeight: FontWeight.w900),
     ),
     filledButtonTheme: FilledButtonThemeData(
       style: FilledButton.styleFrom(
-        minimumSize: const Size(48, 50),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(RcRadius.md),
-        ),
-        textStyle: const TextStyle(fontWeight: FontWeight.w900),
-      ),
-    ),
-    outlinedButtonTheme: OutlinedButtonThemeData(
-      style: OutlinedButton.styleFrom(
-        minimumSize: const Size(48, 50),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(RcRadius.md),
-        ),
-        side: BorderSide(color: border),
+        minimumSize: const Size(48, 48),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(RcRadius.sm)),
         textStyle: const TextStyle(fontWeight: FontWeight.w800),
       ),
     ),
-    chipTheme: base.chipTheme.copyWith(
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(RcRadius.sm),
-      ),
-      side: BorderSide(color: border),
-      labelStyle: const TextStyle(fontWeight: FontWeight.w800),
-    ),
-    dividerTheme: DividerThemeData(color: scheme.outlineVariant),
   );
 }
