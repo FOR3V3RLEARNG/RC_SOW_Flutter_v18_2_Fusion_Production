@@ -1,6 +1,6 @@
 import 'dart:typed_data';
 import 'package:cross_file/cross_file.dart';
-import 'package:excel/excel.dart';
+import 'package:excel_plus/excel_plus.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/services.dart';
 import 'package:pdf/pdf.dart';
