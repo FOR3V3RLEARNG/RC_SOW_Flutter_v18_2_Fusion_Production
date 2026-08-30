@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+
+<html class="h-full" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>RC SOW - Operational Map View</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;700;800;900&amp;family=Inter:wght@400;500;600&amp;family=JetBrains+Mono:wght@500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "info": "#0288D1",
+                      "success": "#2E7D32",
+                      "inverse-surface": "#3e2c2a",
+                      "secondary": "#005faf",
+                      "on-primary-fixed-variant": "#930010",
+                      "surface-bright": "#fff8f7",
+                      "primary-fixed": "#ffdad6",
+                      "error-container": "#ffdad6",
+                      "tertiary-container": "#00799c",
+                      "on-secondary": "#ffffff",
+                      "warning": "#FFA000",
+                      "on-surface": "#271816",
+                      "surface-tint": "#ba1a20",
+                      "surface-container-highest": "#f9dcd9",
+                      "error": "#C62828",
+                      "brand-strong": "#B71C1C",
+                      "surface-dim": "#f1d3d0",
+                      "surface-variant": "#f9dcd9",
+                      "on-background": "#271816",
+                      "inverse-primary": "#ffb3ac",
+                      "brand-soft": "#FFEBEE",
+                      "on-tertiary-fixed-variant": "#004d65",
+                      "surface-l2": "#F0F3F5",
+                      "on-tertiary-container": "#e9f7ff",
+                      "on-error": "#ffffff",
+                      "secondary-fixed-dim": "#a5c8ff",
+                      "brand-red": "#D32F2F",
+                      "on-tertiary": "#ffffff",
+                      "outline": "#8f6f6c",
+                      "surface": "#fff8f7",
+                      "secondary-container": "#54a0fe",
+                      "surface-container": "#ffe9e7",
+                      "primary-fixed-dim": "#ffb3ac",
+                      "on-surface-variant": "#5b403d",
+                      "on-primary-fixed": "#410003",
+                      "tertiary-fixed-dim": "#7bd1f8",
+                      "surface-container-lowest": "#ffffff",
+                      "outline-variant": "#e4beba",
+                      "on-primary-container": "#fff2f0",
+                      "primary": "#af101a",
+                      "surface-container-high": "#ffe2de",
+                      "canvas-l0": "#F5F7F9",
+                      "background": "#fff8f7",
+                      "on-secondary-fixed": "#001c3a",
+                      "inverse-on-surface": "#ffedeb",
+                      "on-error-container": "#93000a",
+                      "primary-container": "#d32f2f",
+                      "on-tertiary-fixed": "#001f2a",
+                      "surface-container-low": "#fff0ef",
+                      "on-secondary-fixed-variant": "#004786",
+                      "surface-l1": "#FFFFFF",
+                      "tertiary-fixed": "#bee9ff",
+                      "on-secondary-container": "#003567",
+                      "tertiary": "#005f7b",
+                      "secondary-fixed": "#d4e3ff",
+                      "on-primary": "#ffffff"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "base": "4px",
+                      "md": "16px",
+                      "lg": "24px",
+                      "xs": "8px",
+                      "gutter-phone": "16px",
+                      "target-min": "48px",
+                      "sm": "12px",
+                      "gutter-tablet": "24px",
+                      "xl": "32px"
+              },
+              "fontFamily": {
+                      "label-md": [
+                              "JetBrains Mono"
+                      ],
+                      "body-md": [
+                              "Inter"
+                      ],
+                      "body-lg": [
+                              "Inter"
+                      ],
+                      "hero-title": [
+                              "Hanken Grotesk"
+                      ],
+                      "hero-title-mobile": [
+                              "Hanken Grotesk"
+                      ],
+                      "section-title": [
+                              "Hanken Grotesk"
+                      ],
+                      "headline-lg": [
+                              "Hanken Grotesk"
+                      ],
+                      "headline-md": [
+                              "Hanken Grotesk"
+                      ],
+                      "metadata": [
+                              "Inter"
+                      ]
+              },
+              "fontSize": {
+                      "label-md": [
+                              "13px",
+                              {
+                                      "lineHeight": "16px",
+                                      "fontWeight": "500"
+                              }
+                      ],
+                      "body-md": [
+                              "15px",
+                              {
+                                      "lineHeight": "22px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "body-lg": [
+                              "17px",
+                              {
+                                      "lineHeight": "26px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "hero-title": [
+                              "32px",
+                              {
+                                      "lineHeight": "36px",
+                                      "letterSpacing": "-0.02em",
+                                      "fontWeight": "900"
+                              }
+                      ],
+                      "hero-title-mobile": [
+                              "28px",
+                              {
+                                      "lineHeight": "32px",
+                                      "fontWeight": "900"
+                              }
+                      ],
+                      "section-title": [
+                              "18px",
+                              {
+                                      "lineHeight": "24px",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "headline-lg": [
+                              "24px",
+                              {
+                                      "lineHeight": "32px",
+                                      "fontWeight": "800"
+                              }
+                      ],
+                      "headline-md": [
+                              "20px",
+                              {
+                                      "lineHeight": "28px",
+                                      "fontWeight": "750"
+                              }
+                      ],
+                      "metadata": [
+                              "12px",
+                              {
+                                      "lineHeight": "16px",
+                                      "fontWeight": "500"
+                              }
+                      ]
+              }
+      },
+          },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .material-symbols-outlined.fill {
+            font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+</head>
+<body class="bg-canvas-l0 text-on-surface h-full flex flex-col font-body-md overflow-hidden antialiased">
+<!-- TopAppBar -->
+<header class="fixed top-0 w-full z-50 flex justify-between items-center px-gutter-phone h-14 bg-surface dark:bg-on-background bg-surface-container-low dark:bg-inverse-surface shadow-sm">
+<button aria-label="Menu" class="w-target-min h-target-min flex items-center justify-center text-on-surface-variant hover:bg-brand-soft transition-colors active:scale-95 duration-150 rounded-full">
+<span class="material-symbols-outlined">language</span>
+</button>
+<div class="flex flex-col items-center">
+<h1 class="font-hero-title-mobile text-hero-title-mobile text-brand-red dark:text-primary-fixed leading-none">RC SOW</h1>
+<span class="font-metadata text-metadata text-on-surface-variant">St. Elizabeth • Thornton</span>
+</div>
+<button aria-label="Profile" class="w-target-min h-target-min flex items-center justify-center text-on-surface-variant hover:bg-brand-soft transition-colors active:scale-95 duration-150 rounded-full">
+<span class="material-symbols-outlined">account_circle</span>
+</button>
+</header>
+<!-- Main Content Area -->
+<main class="flex-1 relative pt-14 pb-[72px]">
+<!-- Map Canvas (Placeholder) -->
+<div class="absolute inset-0 w-full h-full bg-surface-l2" data-alt="A highly detailed top-down view of a modern, clean digital map interface showing a coastal region with distinct parish boundaries. The map uses a light, neutral color palette (whites, pale grays, and soft blues) consistent with a humanitarian command system. There are bright red circular markers indicating specific house coordinates, creating strong contrast against the light map surface. The overall aesthetic is professional, crisp, and high-tech, yet grounded and humane, reflecting a 'Humanitarian Precision' style." data-location="Coastal Parish Region" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBs00dipwHtTgau8d_IUZLkh5gdDwksINumDse1LWAQfUSOdAKUEfuHiRIz_CFGSh-XsEM1iChTJCSqF9vWHAGNt_3KnH-I4gKTi2qiRFe-_omvL0vDSbOloZOiA5gFk5Y7hgwkcxxBP9fO94Fd56uBtZt2A8BRpiiLYxnWrMsdkRWv8f_jAYcpsxicXYxdDhgBEDrup6w1oQ07D23hl4I3_mq51-b01yGus_fiAj4wZq0xu2zgCEtn9g')">
+<!-- Map Markers (Simulated) -->
+<div class="absolute top-[30%] left-[40%] flex flex-col items-center group cursor-pointer">
+<span class="material-symbols-outlined fill text-brand-red text-[32px] drop-shadow-md">location_on</span>
+</div>
+<div class="absolute top-[45%] left-[60%] flex flex-col items-center group cursor-pointer">
+<span class="material-symbols-outlined fill text-brand-red text-[32px] drop-shadow-md">location_on</span>
+<!-- Mini Info Card (Active State) -->
+<div class="absolute bottom-full mb-2 bg-surface rounded-[16px] p-sm shadow-lg border border-outline-variant min-w-[180px] z-10 flex flex-col gap-xs">
+<div class="flex justify-between items-start">
+<span class="font-label-md text-label-md text-on-surface bg-surface-container px-2 py-1 rounded-md">H12</span>
+<button class="text-on-surface-variant"><span class="material-symbols-outlined text-[16px]">close</span></button>
+</div>
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-warning"></span>
+<span class="font-metadata text-metadata text-on-surface-variant">Active Repair • Thornton</span>
+</div>
+<button class="mt-1 text-primary font-label-md text-label-md text-left hover:underline">View Details</button><button class="mt-2 w-full bg-primary text-on-primary font-label-md text-label-md py-2 rounded-md flex items-center justify-center gap-xs hover:bg-brand-strong transition-colors"><span class="material-symbols-outlined text-[18px]">directions</span>Get Directions</button>
+</div>
+</div>
+<div class="absolute top-[60%] left-[25%] flex flex-col items-center group cursor-pointer">
+<span class="material-symbols-outlined fill text-brand-red text-[32px] drop-shadow-md">location_on</span>
+</div><div class="absolute top-[70%] left-[50%] flex flex-col items-center group cursor-pointer"><span class="material-symbols-outlined fill text-brand-red text-[32px] drop-shadow-md">location_on</span><div class="absolute bottom-full mb-2 bg-surface rounded-[16px] p-sm shadow-lg border border-outline-variant min-w-[120px] opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"><span class="font-label-md text-label-md text-on-surface">H09 (Bath)</span></div></div><div class="absolute top-[50%] left-[35%] flex flex-col items-center group cursor-pointer"><span class="material-symbols-outlined fill text-brand-red text-[32px] drop-shadow-md">location_on</span><div class="absolute bottom-full mb-2 bg-surface rounded-[16px] p-sm shadow-lg border border-outline-variant min-w-[120px] opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"><span class="font-label-md text-label-md text-on-surface">H24 (Lacovia)</span></div></div>
+</div>
+<!-- Top Overlay: Search & Filter -->
+<div class="absolute top-md left-gutter-phone right-gutter-phone z-20 flex gap-xs">
+<div class="flex-1 bg-surface rounded-[16px] shadow-sm flex items-center px-md h-target-min border border-outline-variant/30 focus-within:border-primary focus-within:ring-1 focus-within:ring-primary transition-all">
+<span class="material-symbols-outlined text-on-surface-variant mr-sm">search</span>
+<input class="w-full bg-transparent border-none focus:ring-0 text-body-md font-body-md text-on-surface placeholder:text-on-surface-variant/70 p-0" placeholder="Search H-Code in Hanover Clusters..." type="text"/>
+</div>
+<button class="bg-surface w-target-min h-target-min rounded-[16px] shadow-sm flex items-center justify-center text-on-surface-variant border border-outline-variant/30 hover:bg-surface-container-low transition-colors">
+<span class="material-symbols-outlined">filter_list</span>
+</button>
+</div><div class="absolute top-24 right-gutter-phone z-20 flex flex-col gap-xs"><button class="bg-surface w-10 h-10 rounded-lg shadow-md flex items-center justify-center text-on-surface-variant border border-outline-variant/30 hover:bg-surface-container-low"><span class="material-symbols-outlined">add</span></button><button class="bg-surface w-10 h-10 rounded-lg shadow-md flex items-center justify-center text-on-surface-variant border border-outline-variant/30 hover:bg-surface-container-low"><span class="material-symbols-outlined">remove</span></button><button class="bg-surface w-10 h-10 rounded-lg shadow-md flex items-center justify-center text-on-surface-variant border border-outline-variant/30 mt-2 hover:bg-surface-container-low"><span class="material-symbols-outlined">explore</span></button></div>
+<!-- Admin Options FAB -->
+<button class="absolute bottom-[88px] right-gutter-phone z-20 bg-brand-red text-on-primary h-target-min px-md rounded-full shadow-lg flex items-center gap-xs font-label-md text-label-md hover:bg-brand-strong transition-colors active:scale-95" onclick="document.getElementById('admin-sheet').classList.remove('translate-y-full')">
+<span class="material-symbols-outlined text-[20px]">tune</span>
+            Admin Options
+        </button>
+</main>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-2 py-3 bg-surface dark:bg-on-background bg-surface dark:bg-on-background shadow-lg md:hidden">
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline-variant hover:bg-brand-soft dark:hover:bg-surface-container-highest transition-all active:scale-90 duration-200 w-16 h-12 rounded-lg" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-label-md text-[10px] mt-1">Dashboard</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline-variant hover:bg-brand-soft dark:hover:bg-surface-container-highest transition-all active:scale-90 duration-200 w-16 h-12 rounded-lg" href="#">
+<span class="material-symbols-outlined">gps_fixed</span>
+<span class="font-label-md text-[10px] mt-1">Scope</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline-variant hover:bg-brand-soft dark:hover:bg-surface-container-highest transition-all active:scale-90 duration-200 w-16 h-12 rounded-lg" href="#">
+<span class="material-symbols-outlined">tune</span>
+<span class="font-label-md text-[10px] mt-1">Control</span>
+</a>
+<a class="flex flex-col items-center justify-center bg-primary-container dark:bg-brand-strong text-on-primary-container dark:text-on-primary rounded-full px-4 py-1 hover:bg-brand-soft dark:hover:bg-surface-container-highest transition-all active:scale-90 duration-200 w-16 h-12" href="#">
+<span class="material-symbols-outlined fill">home</span>
+<span class="font-label-md text-[10px] mt-1">Houses</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline-variant hover:bg-brand-soft dark:hover:bg-surface-container-highest transition-all active:scale-90 duration-200 w-16 h-12 rounded-lg" href="#">
+<span class="material-symbols-outlined">more_horiz</span>
+<span class="font-label-md text-[10px] mt-1">More</span>
+</a>
+</nav>
+<!-- Admin Bottom Sheet -->
+<div class="fixed inset-0 z-[60] flex items-end justify-center pointer-events-none translate-y-full transition-transform duration-300 ease-in-out" id="admin-sheet">
+<!-- Backdrop -->
+<div class="absolute inset-0 bg-on-surface/40 pointer-events-auto opacity-0 transition-opacity" onclick="document.getElementById('admin-sheet').classList.add('translate-y-full')"></div>
+<!-- Sheet Content -->
+<div class="bg-surface w-full max-w-md rounded-t-[24px] shadow-lg pointer-events-auto flex flex-col max-h-[707px]">
+<!-- Handle -->
+<div class="w-full flex justify-center py-sm" onclick="document.getElementById('admin-sheet').classList.add('translate-y-full')">
+<div class="w-12 h-1 bg-outline-variant rounded-full"></div>
+</div>
+<div class="px-md pb-xl overflow-y-auto">
+<h2 class="font-section-title text-section-title text-on-surface mb-lg">Map Customization</h2>
+<!-- Toggles -->
+<div class="flex flex-col gap-md mb-lg">
+<label class="flex items-center justify-between cursor-pointer group">
+<span class="font-body-md text-body-md text-on-surface">Satellite View</span>
+<div class="relative">
+<input class="sr-only peer" type="checkbox"/>
+<div class="w-11 h-6 bg-surface-container-highest peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-brand-red"></div>
+</div>
+</label>
+<label class="flex items-center justify-between cursor-pointer group">
+<span class="font-body-md text-body-md text-on-surface">Show Cluster Boundaries</span>
+<div class="relative">
+<input checked="" class="sr-only peer" type="checkbox"/>
+<div class="w-11 h-6 bg-surface-container-highest peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-brand-red"></div>
+</div>
+</label>
+<label class="flex items-center justify-between cursor-pointer group">
+<span class="font-body-md text-body-md text-on-surface">Show Terrain</span>
+<div class="relative">
+<input class="sr-only peer" type="checkbox"/>
+<div class="w-11 h-6 bg-surface-container-highest peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-brand-red"></div>
+</div>
+</label>
+<label class="flex items-center justify-between cursor-pointer group">
+<span class="font-body-md text-body-md text-on-surface">High Contrast Mode</span>
+<div class="relative">
+<input class="sr-only peer" type="checkbox"/>
+<div class="w-11 h-6 bg-surface-container-highest peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-brand-red"></div>
+</div>
+</label>
+<label class="flex items-center justify-between cursor-pointer group"><span class="font-body-md text-body-md text-on-surface">House vs Parish Inventory</span><div class="relative flex items-center bg-surface-container-highest rounded-full p-1 w-32"><div class="flex-1 text-center text-[10px] font-bold z-10">HOUSE</div><div class="flex-1 text-center text-[10px] font-bold z-10">PARISH</div><div class="absolute left-1 w-[60px] h-6 bg-brand-red rounded-full transition-transform"></div><input class="sr-only" type="checkbox"/></div></label></div>
+<!-- Slider -->
+<div class="mb-lg">
+<label class="flex flex-col gap-xs mb-2">
+<span class="font-body-md text-body-md text-on-surface">Marker Density</span>
+<input class="w-full h-2 bg-surface-container-highest rounded-lg appearance-none cursor-pointer accent-brand-red" max="100" min="1" type="range" value="85"/>
+</label>
+<div class="flex justify-between text-metadata font-metadata text-on-surface-variant">
+<span class="">Low</span>
+<span class="">High</span>
+</div>
+</div>
+<!-- Dropdown -->
+<div>
+<label class="flex flex-col gap-xs">
+<span class="font-body-md text-body-md text-on-surface">Color Map by:</span>
+<select class="w-full bg-surface border border-outline-variant rounded-[16px] px-md py-sm font-body-md text-body-md text-on-surface focus:border-brand-red focus:ring-1 focus:ring-brand-red outline-none appearance-none"><option selected="">Thornton</option><option>Status</option><option>Team</option><option>Priority</option></select>
+</label>
+</div>
+</div>
+</div>
+</div>
+</body></html>

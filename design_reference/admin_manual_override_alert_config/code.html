@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Admin Alert Configuration - Inventory Overrides</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;700;800;900&amp;family=Inter:wght@400;500&amp;family=JetBrains+Mono:wght@500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-primary-fixed": "#410003",
+                        "outline": "#8f6f6c",
+                        "on-secondary-fixed": "#001c3a",
+                        "surface-container-low": "#fff0ef",
+                        "secondary-container": "#54a0fe",
+                        "brand-red": "#D32F2F",
+                        "surface": "#fff8f7",
+                        "surface-variant": "#f9dcd9",
+                        "on-surface-variant": "#5b403d",
+                        "on-tertiary-fixed-variant": "#004d65",
+                        "error-container": "#ffdad6",
+                        "surface-container-high": "#ffe2de",
+                        "secondary": "#005faf",
+                        "surface-container": "#ffe9e7",
+                        "surface-l2": "#F0F3F5",
+                        "inverse-primary": "#ffb3ac",
+                        "success": "#2E7D32",
+                        "surface-bright": "#fff8f7",
+                        "surface-container-lowest": "#ffffff",
+                        "tertiary": "#005f7b",
+                        "on-tertiary": "#ffffff",
+                        "on-tertiary-container": "#e9f7ff",
+                        "on-error": "#ffffff",
+                        "primary": "#af101a",
+                        "brand-strong": "#B71C1C",
+                        "warning": "#FFA000",
+                        "on-primary": "#ffffff",
+                        "primary-container": "#d32f2f",
+                        "tertiary-fixed": "#bee9ff",
+                        "surface-container-highest": "#f9dcd9",
+                        "canvas-l0": "#F5F7F9",
+                        "on-secondary-fixed-variant": "#004786",
+                        "secondary-fixed-dim": "#a5c8ff",
+                        "surface-dim": "#f1d3d0",
+                        "on-tertiary-fixed": "#001f2a",
+                        "on-surface": "#271816",
+                        "on-primary-fixed-variant": "#930010",
+                        "on-primary-container": "#fff2f0",
+                        "surface-tint": "#ba1a20",
+                        "outline-variant": "#e4beba",
+                        "primary-fixed-dim": "#ffb3ac",
+                        "inverse-surface": "#3e2c2a",
+                        "surface-l1": "#FFFFFF",
+                        "error": "#C62828",
+                        "background": "#fff8f7",
+                        "info": "#0288D1",
+                        "brand-soft": "#FFEBEE",
+                        "on-secondary-container": "#003567",
+                        "primary-fixed": "#ffdad6",
+                        "on-background": "#271816",
+                        "on-secondary": "#ffffff",
+                        "tertiary-fixed-dim": "#7bd1f8",
+                        "on-error-container": "#93000a",
+                        "tertiary-container": "#00799c",
+                        "inverse-on-surface": "#ffedeb",
+                        "secondary-fixed": "#d4e3ff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "target-min": "48px",
+                        "xl": "32px",
+                        "gutter-tablet": "24px",
+                        "gutter-phone": "16px",
+                        "lg": "24px",
+                        "base": "4px",
+                        "sm": "12px",
+                        "md": "16px",
+                        "xs": "8px"
+                    },
+                    "fontFamily": {
+                        "headline-lg": ["Hanken Grotesk"],
+                        "body-md": ["Inter"],
+                        "hero-title": ["Hanken Grotesk"],
+                        "section-title": ["Hanken Grotesk"],
+                        "metadata": ["Inter"],
+                        "headline-md": ["Hanken Grotesk"],
+                        "hero-title-mobile": ["Hanken Grotesk"],
+                        "body-lg": ["Inter"],
+                        "label-md": ["JetBrains Mono"]
+                    },
+                    "fontSize": {
+                        "headline-lg": ["24px", { "lineHeight": "32px", "fontWeight": "800" }],
+                        "body-md": ["15px", { "lineHeight": "22px", "fontWeight": "400" }],
+                        "hero-title": ["32px", { "lineHeight": "36px", "letterSpacing": "-0.02em", "fontWeight": "900" }],
+                        "section-title": ["18px", { "lineHeight": "24px", "fontWeight": "700" }],
+                        "metadata": ["12px", { "lineHeight": "16px", "fontWeight": "500" }],
+                        "headline-md": ["20px", { "lineHeight": "28px", "fontWeight": "750" }],
+                        "hero-title-mobile": ["28px", { "lineHeight": "32px", "fontWeight": "900" }],
+                        "body-lg": ["17px", { "lineHeight": "26px", "fontWeight": "400" }],
+                        "label-md": ["13px", { "lineHeight": "16px", "fontWeight": "500" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .shadow-l1 { box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); }
+    </style>
+</head>
+<body class="bg-canvas-l0 text-on-surface font-body-md min-h-screen flex flex-col md:flex-row">
+<!-- Desktop Side Nav -->
+<nav class="hidden md:flex flex-col py-lg z-40 bg-surface-container-low dark:bg-surface-dim border-r border-outline-variant dark:border-outline docked left-0 h-screen w-64">
+<div class="px-lg pb-md mb-md border-b border-outline-variant">
+<h1 class="font-headline-sm text-headline-sm font-extrabold text-on-surface">HQ COMMAND</h1>
+<p class="font-metadata text-metadata text-on-surface-variant">Global Operations</p>
+</div>
+<div class="flex flex-col gap-sm flex-1">
+<a class="flex items-center gap-md px-lg py-sm w-full transition-all text-on-surface-variant dark:text-surface-variant hover:bg-surface-container-high hover:translate-x-1 transition-transform duration-200" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">dashboard</span>
+<span class="font-section-title text-section-title">Dashboard</span>
+</a>
+<a class="flex items-center gap-md px-lg py-sm w-full transition-all text-on-surface-variant dark:text-surface-variant hover:bg-surface-container-high hover:translate-x-1 transition-transform duration-200" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">payments</span>
+<span class="font-section-title text-section-title">Finance</span>
+</a>
+<a class="flex items-center gap-md px-lg py-sm w-full transition-all text-on-surface-variant dark:text-surface-variant hover:bg-surface-container-high hover:translate-x-1 transition-transform duration-200" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">assignment_ind</span>
+<span class="font-section-title text-section-title">Attendance</span>
+</a>
+<a class="flex items-center gap-md px-lg py-sm w-full transition-all text-on-surface-variant dark:text-surface-variant hover:bg-surface-container-high hover:translate-x-1 transition-transform duration-200" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">inventory_2</span>
+<span class="font-section-title text-section-title">Logistics</span>
+</a>
+<a class="flex items-center gap-md px-lg py-sm w-full transition-all bg-brand-soft dark:bg-primary-container text-brand-strong dark:text-on-primary-container font-bold border-r-4 border-primary hover:translate-x-1 transition-transform duration-200" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">history_edu</span>
+<span class="font-section-title text-section-title">Audit Logs</span>
+</a>
+</div>
+<div class="flex flex-col gap-sm mt-auto border-t border-outline-variant pt-md">
+<a class="flex items-center gap-md px-lg py-sm w-full transition-all text-on-surface-variant dark:text-surface-variant hover:bg-surface-container-high hover:translate-x-1 transition-transform duration-200" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">settings</span>
+<span class="font-section-title text-section-title">Settings</span>
+</a>
+<a class="flex items-center gap-md px-lg py-sm w-full transition-all text-on-surface-variant dark:text-surface-variant hover:bg-surface-container-high hover:translate-x-1 transition-transform duration-200" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">help</span>
+<span class="font-section-title text-section-title">Support</span>
+</a>
+</div>
+</nav>
+<!-- Main Content -->
+<main class="flex-1 flex flex-col h-screen overflow-hidden">
+<!-- Mobile Top Nav -->
+<header class="md:hidden flex justify-between items-center w-full px-gutter-phone h-16 z-50 bg-surface-container-lowest border-b border-outline-variant">
+<div class="font-headline-md text-headline-md font-black text-brand-strong">HUMANITARIAN COMMAND</div>
+<div class="flex gap-md">
+<span class="material-symbols-outlined text-primary cursor-pointer active:opacity-80">notifications</span>
+</div>
+</header>
+<div class="flex-1 overflow-y-auto p-gutter-phone md:p-gutter-tablet">
+<!-- Hero / Header -->
+<div class="mb-xl flex flex-col md:flex-row justify-between items-start md:items-center gap-md">
+<div>
+<h2 class="font-hero-title-mobile md:font-hero-title text-hero-title-mobile md:text-hero-title text-on-surface">Manual Override Alerts</h2>
+<p class="font-body-lg text-body-lg text-on-surface-variant mt-base">Configure triggers and rules for inventory adjustments.</p>
+</div>
+<div class="flex gap-sm">
+<button class="bg-surface-l1 border border-outline-variant text-on-surface px-md h-target-min rounded flex items-center gap-xs font-section-title text-section-title">
+<span class="material-symbols-outlined">cancel</span> Cancel
+                    </button>
+<button class="bg-primary text-on-primary px-lg h-target-min rounded flex items-center gap-xs font-section-title text-section-title shadow-l1 hover:bg-brand-strong transition-colors">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">save</span> Save Rules
+                    </button>
+</div>
+</div>
+<!-- Bento Grid Layout -->
+<div class="grid grid-cols-1 md:grid-cols-12 gap-lg">
+<!-- Trigger Rules Card -->
+<div class="md:col-span-8 bg-surface-l1 rounded-lg p-lg shadow-l1 border border-surface-variant">
+<div class="flex items-center gap-sm mb-md pb-xs border-b border-surface-variant">
+<span class="material-symbols-outlined text-primary">warning</span>
+<h3 class="font-section-title text-section-title">Alert Triggers</h3>
+</div>
+<div class="space-y-lg">
+<div class="flex flex-col gap-xs">
+<label class="font-metadata text-metadata text-on-surface-variant uppercase tracking-wider">Volume Threshold</label>
+<div class="flex items-center gap-sm">
+<span class="font-body-md text-body-md">Notify when manual override exceeds</span>
+<input class="w-24 h-12 rounded border-outline-variant focus:border-primary focus:ring-primary text-center font-label-md text-label-md" type="number" value="10"/>
+<span class="font-body-md text-body-md">units.</span>
+</div>
+</div>
+<div class="flex flex-col gap-xs">
+<label class="font-metadata text-metadata text-on-surface-variant uppercase tracking-wider">Conflict Resolution</label>
+<label class="flex items-center gap-sm cursor-pointer mt-base">
+<input checked="" class="w-5 h-5 rounded border-outline-variant text-primary focus:ring-primary" type="checkbox"/>
+<span class="font-body-md text-body-md">Require Admin approval for overrides above threshold.</span>
+</label>
+</div>
+</div>
+</div>
+<!-- Channels Card -->
+<div class="md:col-span-4 bg-surface-l1 rounded-lg p-lg shadow-l1 border border-surface-variant flex flex-col">
+<div class="flex items-center gap-sm mb-md pb-xs border-b border-surface-variant">
+<span class="material-symbols-outlined text-info">campaign</span>
+<h3 class="font-section-title text-section-title">Channels</h3>
+</div>
+<div class="space-y-md flex-1">
+<div>
+<label class="font-metadata text-metadata text-on-surface-variant uppercase tracking-wider mb-xs block">Recipients</label>
+<select class="w-full h-12 rounded border-outline-variant focus:border-primary focus:ring-primary font-body-md text-body-md bg-surface-bright">
+<option>Regional Supervisor &amp; Admins</option>
+<option>Admins Only</option>
+<option>Site Manager</option>
+</select>
+</div>
+<div>
+<label class="font-metadata text-metadata text-on-surface-variant uppercase tracking-wider mb-xs block">Methods</label>
+<div class="flex flex-col gap-sm mt-base">
+<label class="flex items-center gap-sm cursor-pointer">
+<input checked="" class="w-5 h-5 rounded border-outline-variant text-primary focus:ring-primary" type="checkbox"/>
+<span class="font-body-md text-body-md">In-App Notification</span>
+</label>
+<label class="flex items-center gap-sm cursor-pointer">
+<input checked="" class="w-5 h-5 rounded border-outline-variant text-primary focus:ring-primary" type="checkbox"/>
+<span class="font-body-md text-body-md">Email Alert</span>
+</label>
+</div>
+</div>
+</div>
+</div>
+<!-- Sync Settings Card -->
+<div class="md:col-span-12 bg-surface-l1 rounded-lg p-lg shadow-l1 border border-surface-variant flex items-center justify-between">
+<div class="flex items-center gap-md">
+<div class="w-12 h-12 rounded-full bg-surface-container flex items-center justify-center text-primary">
+<span class="material-symbols-outlined">sync_alt</span>
+</div>
+<div>
+<h3 class="font-section-title text-section-title">Source System Sync</h3>
+<p class="font-body-md text-body-md text-on-surface-variant">Auto-reconcile manual changes with master Excel sheet.</p>
+</div>
+</div>
+<!-- Toggle Switch -->
+<label class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer" type="checkbox" value=""/>
+<div class="w-14 h-7 bg-outline-variant peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary-fixed rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[4px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-success"></div>
+</label>
+</div>
+<!-- Log Card -->
+<div class="md:col-span-12 bg-surface-l1 rounded-lg shadow-l1 border border-surface-variant overflow-hidden">
+<div class="p-lg border-b border-surface-variant flex justify-between items-center bg-canvas-l0">
+<div class="flex items-center gap-sm">
+<span class="material-symbols-outlined text-on-surface-variant">history</span>
+<h3 class="font-section-title text-section-title">Recent Overrides</h3>
+</div>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="border-b border-surface-variant bg-surface-bright">
+<th class="p-md font-metadata text-metadata text-on-surface-variant uppercase tracking-wider">Timestamp</th>
+<th class="p-md font-metadata text-metadata text-on-surface-variant uppercase tracking-wider">User</th>
+<th class="p-md font-metadata text-metadata text-on-surface-variant uppercase tracking-wider">Item</th>
+<th class="p-md font-metadata text-metadata text-on-surface-variant uppercase tracking-wider">Change</th>
+<th class="p-md font-metadata text-metadata text-on-surface-variant uppercase tracking-wider text-right">Action</th>
+</tr>
+</thead>
+<tbody>
+<tr class="border-b border-surface-variant hover:bg-surface-container-lowest transition-colors">
+<td class="p-md font-label-md text-label-md text-on-surface-variant">2023-10-27 14:32</td>
+<td class="p-md font-body-md text-body-md">Sarah Jenkins</td>
+<td class="p-md font-body-md text-body-md font-medium">Water Filters (M)</td>
+<td class="p-md font-body-md text-body-md text-error font-bold">-15 (Override)</td>
+<td class="p-md text-right">
+<button class="text-secondary font-section-title text-section-title hover:underline">Undo</button>
+</td>
+</tr>
+<tr class="border-b border-surface-variant hover:bg-surface-container-lowest transition-colors">
+<td class="p-md font-label-md text-label-md text-on-surface-variant">2023-10-27 10:15</td>
+<td class="p-md font-body-md text-body-md">Marcus Thorne</td>
+<td class="p-md font-body-md text-body-md font-medium">Tents (Family)</td>
+<td class="p-md font-body-md text-body-md text-success font-bold">+5 (Correction)</td>
+<td class="p-md text-right">
+<button class="text-secondary font-section-title text-section-title hover:underline">Undo</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</div>
+</main>
+</body></html>

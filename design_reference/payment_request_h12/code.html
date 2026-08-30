@@ -1,0 +1,338 @@
+<!DOCTYPE html><html class="light" lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Payment Request - H12</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;700;800;900&amp;family=Inter:wght@400;500&amp;family=JetBrains+Mono:wght@500&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@100..900&amp;family=Inter:wght@100..900&amp;family=JetBrains+Mono:wght@100..900&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "secondary": "#005faf",
+                        "on-primary": "#ffffff",
+                        "on-secondary-fixed": "#001c3a",
+                        "primary-container": "#d32f2f",
+                        "on-secondary": "#ffffff",
+                        "surface-l2": "#F0F3F5",
+                        "inverse-on-surface": "#ffedeb",
+                        "primary-fixed-dim": "#ffb3ac",
+                        "outline": "#8f6f6c",
+                        "on-primary-container": "#fff2f0",
+                        "surface-tint": "#ba1a20",
+                        "secondary-fixed-dim": "#a5c8ff",
+                        "surface": "#fff8f7",
+                        "on-primary-fixed": "#410003",
+                        "inverse-primary": "#ffb3ac",
+                        "on-tertiary": "#ffffff",
+                        "on-secondary-container": "#003567",
+                        "on-background": "#271816",
+                        "surface-variant": "#f9dcd9",
+                        "on-primary-fixed-variant": "#930010",
+                        "surface-dim": "#f1d3d0",
+                        "on-tertiary-container": "#e9f7ff",
+                        "surface-container-low": "#fff0ef",
+                        "surface-container": "#ffe9e7",
+                        "error": "#C62828",
+                        "on-surface-variant": "#5b403d",
+                        "surface-bright": "#fff8f7",
+                        "brand-strong": "#B71C1C",
+                        "surface-container-lowest": "#ffffff",
+                        "brand-red": "#D32F2F",
+                        "warning": "#FFA000",
+                        "success": "#2E7D32",
+                        "surface-l1": "#FFFFFF",
+                        "on-tertiary-fixed-variant": "#004d65",
+                        "surface-container-highest": "#f9dcd9",
+                        "tertiary-container": "#00799c",
+                        "secondary-fixed": "#d4e3ff",
+                        "tertiary-fixed": "#bee9ff",
+                        "primary": "#af101a",
+                        "on-error": "#ffffff",
+                        "inverse-surface": "#3e2c2a",
+                        "surface-container-high": "#ffe2de",
+                        "secondary-container": "#54a0fe",
+                        "brand-soft": "#FFEBEE",
+                        "on-tertiary-fixed": "#001f2a",
+                        "background": "#fff8f7",
+                        "on-error-container": "#93000a",
+                        "error-container": "#ffdad6",
+                        "tertiary-fixed-dim": "#7bd1f8",
+                        "on-surface": "#271816",
+                        "primary-fixed": "#ffdad6",
+                        "tertiary": "#005f7b",
+                        "on-secondary-fixed-variant": "#004786",
+                        "outline-variant": "#e4beba",
+                        "canvas-l0": "#F5F7F9",
+                        "info": "#0288D1"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "gutter-phone": "16px",
+                        "lg": "24px",
+                        "sm": "12px",
+                        "base": "4px",
+                        "target-min": "48px",
+                        "xl": "32px",
+                        "md": "16px",
+                        "xs": "8px",
+                        "gutter-tablet": "24px"
+                    },
+                    "fontFamily": {
+                        "label-md": ["JetBrains Mono"],
+                        "body-lg": ["Inter"],
+                        "headline-md": ["Hanken Grotesk"],
+                        "hero-title": ["Hanken Grotesk"],
+                        "section-title": ["Hanken Grotesk"],
+                        "headline-lg": ["Hanken Grotesk"],
+                        "hero-title-mobile": ["Hanken Grotesk"],
+                        "metadata": ["Inter"],
+                        "body-md": ["Inter"]
+                    },
+                    "fontSize": {
+                        "label-md": ["13px", { "lineHeight": "16px", "fontWeight": "500" }],
+                        "body-lg": ["17px", { "lineHeight": "26px", "fontWeight": "400" }],
+                        "headline-md": ["20px", { "lineHeight": "28px", "fontWeight": "750" }],
+                        "hero-title": ["32px", { "lineHeight": "36px", "letterSpacing": "-0.02em", "fontWeight": "900" }],
+                        "section-title": ["18px", { "lineHeight": "24px", "fontWeight": "700" }],
+                        "headline-lg": ["24px", { "lineHeight": "32px", "fontWeight": "800" }],
+                        "hero-title-mobile": ["28px", { "lineHeight": "32px", "fontWeight": "900" }],
+                        "metadata": ["12px", { "lineHeight": "16px", "fontWeight": "500" }],
+                        "body-md": ["15px", { "lineHeight": "22px", "fontWeight": "400" }]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .material-symbols-outlined.filled {
+            font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+</head>
+<body class="bg-canvas-l0 text-on-surface font-body-md antialiased pb-24 selection:bg-brand-soft selection:text-brand-strong">
+<!-- TopAppBar JSON Component -->
+<header class="w-full sticky top-0 z-50 bg-surface shadow-sm flex items-center justify-between px-md w-full h-target-min border-b border-surface-variant">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary cursor-pointer hover:bg-surface-container-low p-2 rounded-full active:scale-95 transition-transform duration-200" data-icon="roofing">roofing</span>
+<h1 class="font-headline-md text-headline-md font-black text-primary">H12 | Operational</h1>
+</div>
+<span class="material-symbols-outlined text-on-surface-variant cursor-pointer hover:bg-surface-container-low p-2 rounded-full active:scale-95 transition-transform duration-200" data-icon="cloud_sync">cloud_sync</span>
+</header>
+<main class="px-gutter-phone py-lg space-y-lg max-w-2xl mx-auto">
+<!-- Header Section -->
+<section class="space-y-sm">
+<div class="flex items-center justify-between">
+<h2 class="font-hero-title-mobile text-hero-title-mobile text-on-surface">Payment Request</h2>
+<div class="bg-brand-soft px-3 py-1 rounded-full border border-outline-variant">
+<span class="font-label-md text-label-md text-brand-strong">H12</span>
+</div>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant">
+                This document summarizes the approved work plan, project execution details, and payout structure for Project Hurricane Melissa Roof Repairs.
+            </p>
+</section>
+<!-- Project Information Card -->
+<section class="bg-surface-l1 rounded-xl shadow-sm border border-outline-variant p-md space-y-md relative overflow-hidden">
+<!-- Top accent line -->
+<div class="absolute top-0 left-0 w-full h-1 bg-brand-red"></div>
+<h3 class="font-section-title text-section-title text-on-surface flex items-center gap-2">
+<span class="material-symbols-outlined filled text-primary text-xl">folder_open</span>
+                Project Information
+            </h3>
+<div class="grid grid-cols-2 gap-y-sm gap-x-4">
+<div class="flex flex-col">
+<span class="font-metadata text-metadata text-on-surface-variant uppercase tracking-wider">Project Name</span>
+<span class="font-body-md text-body-md text-on-surface font-medium truncate">Hurricane Melissa Roof Repair</span>
+</div>
+<div class="flex flex-col">
+<span class="font-metadata text-metadata text-on-surface-variant uppercase tracking-wider">Supervisor</span>
+<span class="font-body-md text-body-md text-on-surface font-medium">Beverly Page</span>
+</div>
+<div class="flex flex-col">
+<span class="font-metadata text-metadata text-on-surface-variant uppercase tracking-wider">Parish</span>
+<span class="font-body-md text-body-md text-on-surface font-medium">St. Elizabeth</span>
+</div>
+<div class="flex flex-col">
+<span class="font-metadata text-metadata text-on-surface-variant uppercase tracking-wider">Pay Period</span>
+<span class="font-label-md text-label-md text-on-surface font-medium bg-surface-l2 w-fit px-2 py-0.5 rounded">.2026</span>
+</div>
+<div class="flex flex-col">
+<span class="font-metadata text-metadata text-on-surface-variant uppercase tracking-wider">Cluster</span>
+<span class="font-body-md text-body-md text-on-surface font-medium">Thornton</span>
+</div>
+<div class="flex flex-col">
+<span class="font-metadata text-metadata text-on-surface-variant uppercase tracking-wider">Roof Size</span>
+<span class="font-label-md text-label-md text-on-surface font-medium bg-surface-l2 w-fit px-2 py-0.5 rounded">0 sq.</span>
+</div>
+<div class="flex flex-col">
+<span class="font-metadata text-metadata text-on-surface-variant uppercase tracking-wider">House No.</span>
+<span class="font-label-md text-label-md text-on-surface font-medium bg-surface-l2 w-fit px-2 py-0.5 rounded">ELTH31</span>
+</div>
+<div class="flex flex-col">
+<span class="font-metadata text-metadata text-on-surface-variant uppercase tracking-wider">Rate/Square</span>
+<span class="font-label-md text-label-md text-on-surface font-medium bg-surface-l2 w-fit px-2 py-0.5 rounded">$ 23,000.00</span>
+</div>
+<div class="flex flex-col col-span-2 mt-2 pt-2 border-t border-surface-variant">
+<span class="font-metadata text-metadata text-on-surface-variant uppercase tracking-wider">Demolition Rate</span>
+<span class="font-label-md text-label-md text-on-surface font-medium bg-surface-l2 w-fit px-2 py-0.5 rounded">$ .000.00</span>
+</div>
+</div>
+</section>
+<!-- Financial & Payout Summary Card -->
+<section class="bg-surface-l1 rounded-xl shadow-sm border border-outline-variant overflow-hidden">
+<div class="bg-surface-l2 px-md py-sm border-b border-outline-variant flex items-center justify-between">
+<h3 class="font-section-title text-section-title text-on-surface flex items-center gap-2">
+<span class="material-symbols-outlined filled text-primary text-xl">payments</span>
+                    Financial Summary
+                </h3>
+</div>
+<div class="p-md space-y-sm">
+<div class="flex justify-between items-center py-1">
+<span class="font-body-md text-body-md text-on-surface-variant">Roofing Amount</span>
+<span class="font-label-md text-label-md text-on-surface">$ .000.00</span>
+</div>
+<div class="flex justify-between items-center py-1 border-t border-surface-variant border-dashed">
+<span class="font-body-md text-body-md text-on-surface-variant">Demolition Cost</span>
+<span class="font-label-md text-label-md text-on-surface">$ .000.00</span>
+</div>
+<div class="flex justify-between items-start py-1 border-t border-surface-variant border-dashed">
+<span class="font-body-md text-body-md text-on-surface-variant max-w-[70%]">Additional Work <br><span class="text-xs text-outline">(Framing extension to beam level)</span></span>
+<span class="font-label-md text-label-md text-on-surface mt-1">$ .000.00</span>
+</div>
+</div>
+<div class="bg-brand-soft px-md py-sm border-t border-brand-red border-opacity-30 flex justify-between items-center">
+<span class="font-section-title text-section-title text-brand-strong">Total Labour Cost</span>
+<span class="font-label-md text-label-md text-brand-strong text-lg">$ .000.00</span>
+</div>
+</section>
+<!-- Team Allocation Breakdown -->
+<section class="bg-surface-l1 rounded-xl shadow-sm border border-outline-variant p-md space-y-md">
+<h3 class="font-section-title text-section-title text-on-surface flex items-center gap-2">
+<span class="material-symbols-outlined filled text-primary text-xl">pie_chart</span>
+                Team Allocation Breakdown
+            </h3>
+<div class="space-y-sm">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 rounded-full bg-surface-l2 border border-outline-variant flex items-center justify-center flex-shrink-0">
+<span class="font-label-md text-label-md text-on-surface font-bold">46%</span>
+</div>
+<div class="flex-grow">
+<div class="h-2 w-full bg-surface-variant rounded-full overflow-hidden">
+<div class="h-full bg-primary w-[46%] rounded-full"></div>
+</div>
+</div>
+<span class="font-label-md text-label-md text-on-surface min-w-[60px] text-right">$ 0.00</span>
+</div>
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 rounded-full bg-surface-l2 border border-outline-variant flex items-center justify-center flex-shrink-0">
+<span class="font-label-md text-label-md text-on-surface font-bold">31%</span>
+</div>
+<div class="flex-grow">
+<div class="h-2 w-full bg-surface-variant rounded-full overflow-hidden">
+<div class="h-full bg-secondary w-[31%] rounded-full"></div>
+</div>
+</div>
+<span class="font-label-md text-label-md text-on-surface min-w-[60px] text-right">$ 0.00</span>
+</div>
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 rounded-full bg-surface-l2 border border-outline-variant flex items-center justify-center flex-shrink-0">
+<span class="font-label-md text-label-md text-on-surface font-bold">23%</span>
+</div>
+<div class="flex-grow">
+<div class="h-2 w-full bg-surface-variant rounded-full overflow-hidden">
+<div class="h-full bg-tertiary w-[23%] rounded-full"></div>
+</div>
+</div>
+<span class="font-label-md text-label-md text-on-surface min-w-[60px] text-right">$ 0.00</span>
+</div>
+</div>
+</section>
+<!-- Approval Section -->
+<section class="bg-surface-l1 rounded-xl shadow-sm border border-outline-variant p-md space-y-md">
+<h3 class="font-section-title text-section-title text-on-surface flex items-center gap-2">
+<span class="material-symbols-outlined filled text-primary text-xl">verified_user</span>
+                Approval
+            </h3>
+<div class="space-y-4">
+<div class="border-b border-surface-variant pb-2">
+<span class="font-metadata text-metadata text-on-surface-variant uppercase tracking-wider block mb-1">Site Supervisor</span>
+<div class="flex justify-between items-end">
+<span class="font-body-md text-body-md text-on-surface font-medium">Beverly Page</span>
+<div class="w-32 border-b-2 border-outline border-dashed"></div>
+</div>
+</div>
+<div class="border-b border-surface-variant pb-2">
+<span class="font-metadata text-metadata text-on-surface-variant uppercase tracking-wider block mb-1">Regional Supervisor</span>
+<div class="flex justify-between items-end">
+<span class="font-body-md text-body-md text-on-surface font-medium">Odane Livingston</span>
+<div class="w-32 border-b-2 border-outline border-dashed"></div>
+</div>
+</div>
+<div class="pb-2">
+<span class="font-metadata text-metadata text-on-surface-variant uppercase tracking-wider block mb-1 flex justify-between">Construction Specialist <span class="text-outline lowercase">(Optional)</span></span>
+<div class="flex justify-between items-end">
+<span class="font-body-md text-body-md text-on-surface-variant italic">Pending...</span>
+<div class="w-32 border-b-2 border-outline border-dashed"></div>
+</div>
+</div>
+</div>
+</section>
+<!-- Submit Button & Footer text -->
+<section class="space-y-md mt-xl">
+<button class="w-full h-target-min bg-brand-red text-on-primary font-section-title text-section-title uppercase rounded-lg shadow-sm active:scale-95 transition-transform duration-200 flex items-center justify-center gap-2">
+<span class="material-symbols-outlined filled">send</span>
+                Submit Request
+            </button>
+<div class="bg-surface-variant p-sm rounded-lg border border-outline-variant flex gap-sm items-start">
+<span class="material-symbols-outlined text-on-surface-variant text-lg shrink-0 mt-0.5">info</span>
+<p class="font-metadata text-metadata text-on-surface-variant leading-relaxed">
+                    This document is respectfully submitted for review, approval, record keeping, and payable processing related to completed roofing operations under project (Hurricane Melissa Roof Repair).
+                </p>
+</div>
+</section>
+<!-- Original Document Image Reference (Hidden visually but included for reference per instructions) -->
+<div class="hidden">
+<img class="hidden" data-alt="A screenshot of a mobile phone displaying a document titled Payment Request. The document is a form filled with project details, financial summaries, and signature lines, formatted in a standard corporate style with black text on a white background." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDHyEv_jjhzh4wBJ7V2bNjpnh4KwcXD8Xd0OfBx9zQaiShOdiIQdM7hA_rWq0XEl9DAkNrhqAHl-lg7gtD44zyhVJrOnLSt1XrBRkFS2F49WavcZsfUtGjbOzrrGrDxv1eAa_-UhmsymCx-5Zk1aLZuvgDEja8bPvvvQKqfFmOJRMbmgX2w3a9QCkaKwLz8SFXX0EIoBw7krIhnDS8yBbJyCiCpwPPs5oAGQZAiWIXPRmtnLOYvbe5rNjb6SI53T7S6-zg">
+</div>
+</main>
+<!-- BottomNavBar JSON Component -->
+<nav class="fixed bottom-0 w-full z-50 bg-surface border-t border-outline-variant flex justify-around items-center px-sm pb-safe h-16 shadow-none">
+<!-- Dashboard (Inactive) -->
+<div class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1 hover:bg-surface-container-highest cursor-pointer active:scale-95 transition-transform duration-150 rounded-xl">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span class="font-label-md text-[10px] mt-0.5">Dashboard</span>
+</div>
+<!-- Scope (Inactive) -->
+<div class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1 hover:bg-surface-container-highest cursor-pointer active:scale-95 transition-transform duration-150 rounded-xl">
+<span class="material-symbols-outlined" data-icon="architecture">architecture</span>
+<span class="font-label-md text-[10px] mt-0.5">Scope</span>
+</div>
+<!-- Control (Active for Payment Request/Operations) -->
+<div class="flex flex-col items-center justify-center bg-primary-container text-on-primary-container px-4 py-1 rounded-xl active:scale-95 transition-transform duration-150 shadow-sm cursor-pointer">
+<span class="material-symbols-outlined filled" data-icon="settings_remote">settings_remote</span>
+<span class="font-label-md text-[10px] mt-0.5 font-bold">Control</span>
+</div>
+<!-- Houses (Inactive) -->
+<div class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1 hover:bg-surface-container-highest cursor-pointer active:scale-95 transition-transform duration-150 rounded-xl">
+<span class="material-symbols-outlined" data-icon="home_work">home_work</span>
+<span class="font-label-md text-[10px] mt-0.5">Houses</span>
+</div>
+<!-- More (Inactive) -->
+<div class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1 hover:bg-surface-container-highest cursor-pointer active:scale-95 transition-transform duration-150 rounded-xl">
+<span class="material-symbols-outlined" data-icon="more_horiz">more_horiz</span>
+<span class="font-label-md text-[10px] mt-0.5">More</span>
+</div>
+</nav>
+</body></html>

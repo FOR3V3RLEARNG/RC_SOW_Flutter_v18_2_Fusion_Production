@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>RC SOW - Team Briefing & Live Stream</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@100..900&family=Inter:wght@100..900&family=JetBrains+Mono:wght@100..900&display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "on-secondary": "#ffffff",
+                      "secondary-fixed-dim": "#a5c8ff",
+                      "outline": "#8f6f6c",
+                      "primary-fixed": "#ffdad6",
+                      "tertiary-fixed-dim": "#7bd1f8",
+                      "info": "#0288D1",
+                      "secondary-fixed": "#d4e3ff",
+                      "on-secondary-container": "#003567",
+                      "brand-red": "#D32F2F",
+                      "surface-bright": "#fff8f7",
+                      "surface-l1": "#FFFFFF",
+                      "surface-container-lowest": "#ffffff",
+                      "on-tertiary-fixed-variant": "#004d65",
+                      "inverse-surface": "#3e2c2a",
+                      "outline-variant": "#e4beba",
+                      "on-secondary-fixed": "#001c3a",
+                      "surface-container-high": "#ffe2de",
+                      "secondary-container": "#54a0fe",
+                      "brand-strong": "#B71C1C",
+                      "warning": "#FFA000",
+                      "primary-fixed-dim": "#ffb3ac",
+                      "surface-variant": "#f9dcd9",
+                      "on-error": "#ffffff",
+                      "canvas-l0": "#F5F7F9",
+                      "on-tertiary": "#ffffff",
+                      "on-error-container": "#93000a",
+                      "error": "#C62828",
+                      "success": "#2E7D32",
+                      "error-container": "#ffdad6",
+                      "tertiary-fixed": "#bee9ff",
+                      "on-surface": "#271816",
+                      "primary": "#af101a",
+                      "background": "#fff8f7",
+                      "on-background": "#271816",
+                      "brand-soft": "#FFEBEE",
+                      "on-surface-variant": "#5b403d",
+                      "inverse-on-surface": "#ffedeb",
+                      "on-tertiary-fixed": "#001f2a",
+                      "surface": "#fff8f7",
+                      "surface-dim": "#f1d3d0",
+                      "surface-container-highest": "#f9dcd9",
+                      "on-primary": "#ffffff",
+                      "surface-tint": "#ba1a20",
+                      "secondary": "#005faf",
+                      "tertiary": "#005f7b",
+                      "on-primary-container": "#fff2f0",
+                      "on-primary-fixed-variant": "#930010",
+                      "on-primary-fixed": "#410003",
+                      "primary-container": "#d32f2f",
+                      "surface-container": "#ffe9e7",
+                      "tertiary-container": "#00799c",
+                      "on-secondary-fixed-variant": "#004786",
+                      "inverse-primary": "#ffb3ac",
+                      "surface-l2": "#F0F3F5",
+                      "on-tertiary-container": "#e9f7ff",
+                      "surface-container-low": "#fff0ef"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "base": "4px",
+                      "xs": "8px",
+                      "gutter-phone": "16px",
+                      "sm": "12px",
+                      "md": "16px",
+                      "lg": "24px",
+                      "xl": "32px",
+                      "target-min": "48px",
+                      "gutter-tablet": "24px"
+              },
+              "fontFamily": {
+                      "headline-md": ["Hanken Grotesk"],
+                      "hero-title": ["Hanken Grotesk"],
+                      "headline-lg": ["Hanken Grotesk"],
+                      "hero-title-mobile": ["Hanken Grotesk"],
+                      "body-lg": ["Inter"],
+                      "label-md": ["JetBrains Mono"],
+                      "body-md": ["Inter"],
+                      "section-title": ["Hanken Grotesk"],
+                      "metadata": ["Inter"]
+              },
+              "fontSize": {
+                      "headline-md": ["20px", {"lineHeight": "28px", "fontWeight": "750"}],
+                      "hero-title": ["32px", {"lineHeight": "36px", "letterSpacing": "-0.02em", "fontWeight": "900"}],
+                      "headline-lg": ["24px", {"lineHeight": "32px", "fontWeight": "800"}],
+                      "hero-title-mobile": ["28px", {"lineHeight": "32px", "fontWeight": "900"}],
+                      "body-lg": ["17px", {"lineHeight": "26px", "fontWeight": "400"}],
+                      "label-md": ["13px", {"lineHeight": "16px", "fontWeight": "500"}],
+                      "body-md": ["15px", {"lineHeight": "22px", "fontWeight": "400"}],
+                      "section-title": ["18px", {"lineHeight": "24px", "fontWeight": "700"}],
+                      "metadata": ["12px", {"lineHeight": "16px", "fontWeight": "500"}]
+              }
+            }
+          }
+        }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .icon-fill {
+            font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        @keyframes pulse-red {
+            0% { box-shadow: 0 0 0 0 rgba(211, 47, 47, 0.7); }
+            70% { box-shadow: 0 0 0 6px rgba(211, 47, 47, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(211, 47, 47, 0); }
+        }
+        .live-pulse {
+            animation: pulse-red 2s infinite;
+        }
+        /* Custom scrollbar for chat */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-canvas-l0 text-on-surface h-screen flex flex-col overflow-hidden">
+<!-- TopAppBar -->
+<header class="fixed top-0 w-full z-50 flex justify-between items-center px-gutter-phone h-14 bg-surface shadow-sm docked full-width bg-surface-container-low">
+<button class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-brand-soft transition-colors active:scale-95 duration-150 text-primary">
+<span class="material-symbols-outlined">language</span>
+</button>
+<h1 class="font-hero-title-mobile text-hero-title-mobile text-brand-red">RC SOW</h1>
+<button class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-brand-soft transition-colors active:scale-95 duration-150 text-primary">
+<span class="material-symbols-outlined">account_circle</span>
+</button>
+</header>
+<!-- Main Content Area -->
+<main class="flex-1 overflow-y-auto mt-14 mb-[72px] flex flex-col">
+<!-- Video Stream Hero -->
+<section class="relative w-full aspect-video bg-inverse-surface">
+<div class="absolute inset-0 bg-cover bg-center opacity-90" data-alt="A wide-angle, high-definition view of a residential roof under construction in a tropical environment. Exposed timber trusses and framing are visible against a bright, clear blue sky. A construction worker in a high-visibility yellow vest and hard hat is partially visible on the right, inspecting a joint. The lighting is harsh midday sun, casting strong structural shadows. The overall mood is active, industrial, and focused on progress." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAEQvJFWRVpJ-y-z_lUsBWhAd7ebAAuG2SIRzcvl3Cbi6Q2A5zlpppyKDUVnN_mVgHtxnZ2zRUf-JsZH5ivW-afM98p85lN0_8VwMLmUUwKZLtZ-ZRcOCAe19B51DM_j2drab6LTWKxh1Ql9fMeu5hc_zguMs4bwV9cmSAYe1p-H7M-k3Me4JG3RfeQhGNyKdl4dQd1GyxNM_DCx_jPfpyY2BGsP5ks5UBWGvHwzh1jzFStFrrfKmqUIA')"></div>
+<!-- Overlays -->
+<div class="absolute top-0 left-0 w-full p-4 flex justify-between items-start bg-gradient-to-b from-black/60 to-transparent">
+<div class="flex items-center gap-2">
+<div class="bg-brand-red text-on-primary font-label-md text-label-md px-2 py-1 rounded-sm flex items-center gap-1 live-pulse">
+<div class="w-2 h-2 bg-on-primary rounded-full"></div>
+                        LIVE
+                    </div>
+<span class="text-on-primary font-metadata text-metadata bg-black/40 px-2 py-1 rounded-sm backdrop-blur-sm">00:42:15</span>
+</div>
+<div class="flex items-center gap-2">
+<button class="w-8 h-8 rounded-full bg-black/40 backdrop-blur-sm flex items-center justify-center text-on-primary hover:bg-black/60 transition-colors">
+<span class="material-symbols-outlined text-[20px]">signal_cellular_4_bar</span>
+</button>
+</div>
+</div>
+<!-- Bottom Video Info -->
+<div class="absolute bottom-0 left-0 w-full p-4 bg-gradient-to-t from-black/80 to-transparent flex justify-between items-end">
+<div>
+<h2 class="font-headline-md text-headline-md text-on-primary shadow-black">H12 - Roof Framing</h2>
+<p class="font-body-md text-body-md text-surface-container-high shadow-black">St. Elizabeth • Thornton Cluster</p>
+</div>
+<button class="w-10 h-10 rounded-full bg-black/40 backdrop-blur-sm flex items-center justify-center text-on-primary hover:bg-black/60 transition-colors">
+<span class="material-symbols-outlined">fullscreen</span>
+</button>
+</div>
+</section>
+<!-- Meeting Controls & Action -->
+<section class="bg-surface-l1 px-gutter-phone py-sm shadow-sm z-10">
+<div class="flex justify-between items-center mb-sm">
+<!-- Controls -->
+<div class="flex gap-xs">
+<button class="w-target-min h-target-min rounded-full bg-surface-l2 flex items-center justify-center text-on-surface hover:bg-surface-variant transition-colors">
+<span class="material-symbols-outlined">mic</span>
+</button>
+<button class="w-target-min h-target-min rounded-full bg-surface-l2 flex items-center justify-center text-on-surface hover:bg-surface-variant transition-colors">
+<span class="material-symbols-outlined">videocam</span>
+</button>
+<button class="w-target-min h-target-min rounded-full bg-surface-l2 flex items-center justify-center text-on-surface hover:bg-surface-variant transition-colors hidden sm:flex">
+<span class="material-symbols-outlined">screen_share</span>
+</button>
+<button class="w-target-min h-target-min rounded-full bg-error text-on-error flex items-center justify-center hover:bg-brand-strong transition-colors shadow-sm">
+<span class="material-symbols-outlined">call_end</span>
+</button>
+</div>
+<!-- Action -->
+<button class="h-target-min px-md rounded-lg bg-primary-container text-on-primary-container font-label-md text-label-md flex items-center gap-xs hover:bg-brand-red hover:text-on-primary transition-colors active:scale-95 duration-150">
+<span class="material-symbols-outlined text-[18px]">photo_camera</span>
+                    REQ PHOTO
+                </button>
+</div>
+<!-- Participants Strip -->
+<div class="border-t border-outline-variant pt-xs flex gap-md overflow-x-auto no-scrollbar items-center pb-xs">
+<div class="flex items-center gap-xs flex-shrink-0">
+<div class="relative w-8 h-8 rounded-full overflow-hidden border border-outline">
+<img class="w-full h-full object-cover" data-alt="Close up headshot of a professional field engineer in his 40s wearing a white hard hat and safety glasses. He has a serious, focused expression. The background is slightly blurred showing an outdoor construction site. Bright, natural lighting." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBzIQ4-U4cWtZPaV1I4QqeCCEzHc_2-sc3jGND0hlzuDsWLrr_wuWRKsknf7qN5pGPaDYDVIFpEi6epJlGR8ZZ-Aw2yUG5QdYtPBdOh3FGFM56FD4HRO8u10X7cqczafI-azjiy8BBSeA3DTk-2Cahbj_b4MK_bf3L-ZmlfWZeMIkQIMX9xgSdCgeb5n1nQV83ZCfBn9rpgpREzt93deSuwpqJo5aMKBiV1paGJP-6vlx5CbFlgtKAqJA"/>
+</div>
+<div>
+<p class="font-metadata text-metadata text-on-surface leading-tight">J. Marcus</p>
+<p class="font-metadata text-[10px] text-on-surface-variant leading-tight">Supervisor</p>
+</div>
+</div>
+<div class="flex items-center gap-xs flex-shrink-0">
+<div class="relative w-8 h-8 rounded-full overflow-hidden border border-outline">
+<img class="w-full h-full object-cover" data-alt="Close up headshot of a female carpenter in her 30s with protective ear muffs around her neck. She is smiling slightly. Background shows a wooden structure under bright sunlight. The image is high contrast and clear." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBPJj_hQmiyo_GyKMi9DtAO3hbUd_C8ujo70Rmh8vn7Ks9XoyohARo9P9wB2h-56VTmZy1PnUGa3DEBksJLIeUtUJo52wf134ZsaWPoih2tvY5eGDiA7otxmeFjAMFnTbE-Fh_j9B5laBGVvP7HLhyn9C-oVT2nyl9HrPFiEjTjrsbozr_xSfV6oT0_b07xNlhyGRmLy-dg7_mt5s_kuonzsam3QrvYjNA65w4FVUDhO2dZLBios9XrWg"/>
+</div>
+<div>
+<p class="font-metadata text-metadata text-on-surface leading-tight">S. Miller</p>
+<p class="font-metadata text-[10px] text-on-surface-variant leading-tight">Carpenter</p>
+</div>
+</div>
+<div class="flex items-center gap-xs flex-shrink-0 opacity-60">
+<div class="w-8 h-8 rounded-full bg-surface-variant flex items-center justify-center">
+<span class="material-symbols-outlined text-[16px] text-on-surface-variant">person_add</span>
+</div>
+<p class="font-metadata text-metadata text-on-surface-variant">Add</p>
+</div>
+</div>
+</section>
+<!-- Chat / Coordination Feed -->
+<section class="flex-1 bg-canvas-l0 p-gutter-phone flex flex-col overflow-hidden">
+<h3 class="font-section-title text-section-title text-on-surface mb-xs flex items-center gap-xs">
+<span class="material-symbols-outlined text-[20px] text-primary">forum</span>
+                Live Coordination
+            </h3>
+<div class="flex-1 overflow-y-auto no-scrollbar flex flex-col gap-sm pb-4">
+<!-- Message -->
+<div class="flex gap-xs">
+<div class="w-6 h-6 rounded-full bg-secondary-container flex items-center justify-center flex-shrink-0 mt-1">
+<span class="font-label-md text-[10px] text-on-secondary-container">CM</span>
+</div>
+<div class="bg-surface-l1 p-3 rounded-lg rounded-tl-none shadow-sm flex-1">
+<div class="flex justify-between items-baseline mb-1">
+<span class="font-metadata text-metadata font-bold text-on-surface">Cmd Center</span>
+<span class="font-metadata text-[10px] text-on-surface-variant">10:42 AM</span>
+</div>
+<p class="font-body-md text-body-md text-on-surface">Can you pan the camera left? We need to verify the truss alignment on the north gable.</p>
+</div>
+</div>
+<!-- Message (Self) -->
+<div class="flex gap-xs flex-row-reverse">
+<div class="bg-primary-container p-3 rounded-lg rounded-tr-none shadow-sm max-w-[85%]">
+<div class="flex justify-between items-baseline mb-1 gap-4">
+<span class="font-metadata text-metadata font-bold text-on-primary-container">You (H12)</span>
+<span class="font-metadata text-[10px] text-on-primary-container opacity-80">10:43 AM</span>
+</div>
+<p class="font-body-md text-body-md text-on-primary-container">Panning now. The wind bracing is secured. Requesting high-res photo capture to document.</p>
+</div>
+</div>
+<!-- System Notice -->
+<div class="flex justify-center my-2">
+<span class="bg-surface-variant px-3 py-1 rounded-full font-metadata text-[10px] text-on-surface-variant flex items-center gap-1">
+<span class="material-symbols-outlined text-[12px]">photo_camera</span>
+                        High-res evidence photo requested
+                    </span>
+</div>
+</div>
+<!-- Chat Input Area -->
+<div class="pt-sm border-t border-outline-variant/30 flex gap-xs items-center">
+<div class="flex-1 relative">
+<input class="w-full h-target-min bg-surface-l1 border border-outline-variant rounded-xl pl-4 pr-10 font-body-md text-body-md text-on-surface placeholder:text-on-surface-variant focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-shadow" placeholder="Type technical observation..." type="text"/>
+<button class="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined">attach_file</span>
+</button>
+</div>
+<button class="w-target-min h-target-min rounded-xl bg-primary text-on-primary flex items-center justify-center hover:bg-brand-strong transition-colors flex-shrink-0">
+<span class="material-symbols-outlined icon-fill">send</span>
+</button>
+</div>
+</section>
+</main>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-2 py-3 bg-surface border-t border-outline-variant docked full-width shadow-lg">
+<button class="flex flex-col items-center justify-center text-on-surface-variant hover:bg-brand-soft transition-all active:scale-90 duration-200 w-16 h-12 rounded-lg">
+<span class="material-symbols-outlined mb-1">dashboard</span>
+<span class="font-label-md text-[10px]">Dashboard</span>
+</button>
+<button class="flex flex-col items-center justify-center text-on-surface-variant hover:bg-brand-soft transition-all active:scale-90 duration-200 w-16 h-12 rounded-lg">
+<span class="material-symbols-outlined mb-1">gps_fixed</span>
+<span class="font-label-md text-[10px]">Scope</span>
+</button>
+<button class="flex flex-col items-center justify-center text-on-surface-variant hover:bg-brand-soft transition-all active:scale-90 duration-200 w-16 h-12 rounded-lg">
+<span class="material-symbols-outlined mb-1">tune</span>
+<span class="font-label-md text-[10px]">Control</span>
+</button>
+<!-- Active State: Houses (Matching H12 context) -->
+<button class="flex flex-col items-center justify-center bg-primary-container text-on-primary-container rounded-full px-4 py-1 active:scale-90 duration-200 shadow-sm">
+<span class="material-symbols-outlined icon-fill mb-1">home</span>
+<span class="font-label-md text-[10px] font-bold">Houses</span>
+</button>
+<button class="flex flex-col items-center justify-center text-on-surface-variant hover:bg-brand-soft transition-all active:scale-90 duration-200 w-16 h-12 rounded-lg">
+<span class="material-symbols-outlined mb-1">more_horiz</span>
+<span class="font-label-md text-[10px]">More</span>
+</button>
+</nav>
+</body></html>

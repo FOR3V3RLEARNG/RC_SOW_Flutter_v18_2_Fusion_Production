@@ -1,0 +1,355 @@
+<!DOCTYPE html><html class="light" lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Payment Submission - RC SOW</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;700;800;900&amp;family=Inter:wght@400;500;600&amp;family=JetBrains+Mono:wght@500&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "outline": "#8f6f6c",
+                      "surface-container-low": "#fff0ef",
+                      "on-tertiary": "#ffffff",
+                      "canvas-l0": "#F5F7F9",
+                      "primary-container": "#d32f2f",
+                      "error": "#C62828",
+                      "on-tertiary-container": "#e9f7ff",
+                      "secondary-fixed-dim": "#a5c8ff",
+                      "on-primary-fixed-variant": "#930010",
+                      "surface-bright": "#fff8f7",
+                      "on-error": "#ffffff",
+                      "tertiary": "#005f7b",
+                      "surface-l2": "#F0F3F5",
+                      "surface-variant": "#f9dcd9",
+                      "on-primary-fixed": "#410003",
+                      "primary-fixed": "#ffdad6",
+                      "on-surface-variant": "#5b403d",
+                      "on-primary-container": "#fff2f0",
+                      "secondary-container": "#54a0fe",
+                      "surface-dim": "#f1d3d0",
+                      "on-secondary-fixed": "#001c3a",
+                      "surface-container": "#ffe9e7",
+                      "surface-l1": "#FFFFFF",
+                      "primary": "#af101a",
+                      "background": "#fff8f7",
+                      "inverse-on-surface": "#ffedeb",
+                      "on-primary": "#ffffff",
+                      "primary-fixed-dim": "#ffb3ac",
+                      "success": "#2E7D32",
+                      "surface": "#fff8f7",
+                      "on-tertiary-fixed": "#001f2a",
+                      "on-tertiary-fixed-variant": "#004d65",
+                      "brand-soft": "#FFEBEE",
+                      "surface-tint": "#ba1a20",
+                      "surface-container-lowest": "#ffffff",
+                      "brand-red": "#D32F2F",
+                      "tertiary-fixed": "#bee9ff",
+                      "error-container": "#ffdad6",
+                      "on-surface": "#271816",
+                      "on-secondary-container": "#003567",
+                      "on-background": "#271816",
+                      "tertiary-container": "#00799c",
+                      "on-secondary": "#ffffff",
+                      "inverse-surface": "#3e2c2a",
+                      "brand-strong": "#B71C1C",
+                      "surface-container-highest": "#f9dcd9",
+                      "secondary": "#005faf",
+                      "warning": "#FFA000",
+                      "outline-variant": "#e4beba",
+                      "inverse-primary": "#ffb3ac",
+                      "on-secondary-fixed-variant": "#004786",
+                      "tertiary-fixed-dim": "#7bd1f8",
+                      "info": "#0288D1",
+                      "surface-container-high": "#ffe2de",
+                      "on-error-container": "#93000a",
+                      "secondary-fixed": "#d4e3ff"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "lg": "24px",
+                      "xs": "8px",
+                      "md": "16px",
+                      "base": "4px",
+                      "gutter-tablet": "24px",
+                      "xl": "32px",
+                      "target-min": "48px",
+                      "gutter-phone": "16px",
+                      "sm": "12px"
+              },
+              "fontFamily": {
+                      "hero-title-mobile": ["Hanken Grotesk"],
+                      "label-md": ["JetBrains Mono"],
+                      "metadata": ["Inter"],
+                      "section-title": ["Hanken Grotesk"],
+                      "headline-lg": ["Hanken Grotesk"],
+                      "headline-md": ["Hanken Grotesk"],
+                      "body-lg": ["Inter"],
+                      "hero-title": ["Hanken Grotesk"],
+                      "body-md": ["Inter"]
+              },
+              "fontSize": {
+                      "hero-title-mobile": ["28px", {"lineHeight": "32px", "fontWeight": "900"}],
+                      "label-md": ["13px", {"lineHeight": "16px", "fontWeight": "500"}],
+                      "metadata": ["12px", {"lineHeight": "16px", "fontWeight": "500"}],
+                      "section-title": ["18px", {"lineHeight": "24px", "fontWeight": "700"}],
+                      "headline-lg": ["24px", {"lineHeight": "32px", "fontWeight": "800"}],
+                      "headline-md": ["20px", {"lineHeight": "28px", "fontWeight": "750"}],
+                      "body-lg": ["17px", {"lineHeight": "26px", "fontWeight": "400"}],
+                      "hero-title": ["32px", {"lineHeight": "36px", "letterSpacing": "-0.02em", "fontWeight": "900"}],
+                      "body-md": ["15px", {"lineHeight": "22px", "fontWeight": "400"}]
+              }
+            }
+          }
+        }
+    </script>
+<style>
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        .fill-icon { font-variation-settings: 'FILL' 1; }
+        
+        /* Subtle shadow for L1 Surfaces */
+        .shadow-l1 { box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03); }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-canvas-l0 text-on-background min-h-screen pb-24 md:pb-8 flex flex-col font-body-md text-body-md">
+<!-- TopAppBar -->
+<header class="bg-surface text-primary flex justify-between items-center px-gutter-phone h-16 w-full docked full-width top-0 sticky z-40">
+<div class="flex items-center gap-xs">
+<button class="w-target-min h-target-min flex items-center justify-center rounded-full hover:bg-surface-container-low transition-colors text-on-surface">
+<span class="material-symbols-outlined" data-icon="arrow_back">arrow_back</span>
+</button>
+<div class="flex flex-col justify-center">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-brand-red fill-icon" data-icon="home_work">home_work</span>
+<h1 class="text-headline-md font-headline-md font-black text-brand-red">RC SOW</h1>
+<span class="text-outline-variant">|</span>
+<span class="text-headline-md font-headline-md font-bold text-on-surface">H2</span>
+</div>
+</div>
+</div>
+<div class="flex items-center gap-2">
+<div class="hidden md:flex items-center text-metadata font-metadata text-on-surface-variant bg-surface-l2 px-2 py-1 rounded-full gap-1">
+<span class="material-symbols-outlined text-[16px] text-success fill-icon" data-icon="cloud_done">cloud_done</span>
+                Sync
+            </div>
+<button class="w-target-min h-target-min flex items-center justify-center rounded-full hover:bg-surface-container-low transition-colors text-on-surface">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+</button>
+</div>
+</header><div class="bg-surface-container-high border-b border-outline-variant px-gutter-phone py-2 flex items-center gap-2">
+<span class="material-symbols-outlined text-info" data-icon="info">info</span>
+<span class="text-body-md font-medium text-on-surface">Payment release initiated - Pending final finance approval.</span>
+</div>
+<!-- Main Canvas Content -->
+<main class="flex-grow flex flex-col md:max-w-[1200px] md:mx-auto w-full p-gutter-phone md:p-gutter-tablet gap-md">
+<!-- Page Title & Phase Indicator -->
+<div class="flex flex-col md:flex-row justify-between items-start md:items-end gap-md mb-xs">
+<div>
+<div class="inline-flex items-center gap-xs px-2 py-1 bg-surface-container-high rounded-full mb-2">
+<span class="w-2 h-2 rounded-full bg-brand-red"></span>
+<span class="text-metadata font-metadata text-on-surface-variant uppercase tracking-wider">Phase Gate 5: Finance</span>
+</div>
+<h2 class="text-hero-title-mobile md:text-hero-title font-hero-title-mobile md:font-hero-title text-on-surface">Payment Submission</h2>
+</div>
+<!-- Quick Actions / Status -->
+<div class="flex gap-2">
+<button class="h-target-min px-4 border border-outline-variant rounded-lg flex items-center justify-center gap-xs text-on-surface font-label-md text-label-md hover:bg-surface-container-low transition-colors bg-surface-l1 shadow-l1">
+<span class="material-symbols-outlined" data-icon="print">print</span>
+                    Print Summary
+                 </button>
+</div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-12 gap-md md:gap-lg">
+<!-- Left Column: Context & Evidence (7 cols on desktop) -->
+<div class="flex flex-col gap-md md:col-span-7">
+<!-- Project Information Card -->
+<section class="bg-surface-l1 rounded-xl p-md md:p-lg shadow-l1 flex flex-col gap-md">
+<h3 class="text-section-title font-section-title text-on-surface flex items-center gap-2">
+<span class="material-symbols-outlined text-tertiary" data-icon="info">info</span>
+                        Project Information
+                    </h3>
+<div class="grid grid-cols-2 md:grid-cols-4 gap-sm">
+<div class="flex flex-col">
+<span class="text-metadata font-metadata text-on-surface-variant mb-1">House Code</span>
+<span class="text-label-md font-label-md text-on-surface bg-surface-container px-2 py-1 rounded inline-block w-fit">H2</span>
+</div>
+<div class="flex flex-col col-span-2 md:col-span-1">
+<span class="text-metadata font-metadata text-on-surface-variant mb-1">Beneficiary</span>
+<span class="text-body-md font-body-md text-on-surface font-medium">Maria Garcia</span>
+</div>
+<div class="flex flex-col">
+<span class="text-metadata font-metadata text-on-surface-variant mb-1">Parish</span>
+<span class="text-body-md font-body-md text-on-surface">St. Andrew</span>
+</div>
+<div class="flex flex-col">
+<span class="text-metadata font-metadata text-on-surface-variant mb-1">Cluster</span>
+<span class="text-body-md font-body-md text-on-surface">North-East</span>
+</div>
+</div>
+</section>
+<!-- Evidence & Readiness Verification -->
+<section class="bg-surface-l1 rounded-xl p-md md:p-lg shadow-l1 flex flex-col gap-md">
+<h3 class="text-section-title font-section-title text-on-surface flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-secondary" data-icon="fact_check">fact_check</span>
+                            Readiness Verification
+                        </div>
+<span class="text-label-md font-label-md bg-brand-soft text-brand-strong px-2 py-1 rounded-full">3/3 Verified</span>
+</h3>
+<div class="flex flex-col gap-xs">
+<!-- Evidence Item 1 -->
+<div class="flex items-center justify-between p-3 rounded-lg border border-outline-variant bg-canvas-l0 hover:bg-surface-container-low transition-colors">
+<div class="flex items-center gap-sm">
+<span class="material-symbols-outlined text-success fill-icon" data-icon="check_circle">check_circle</span>
+<div class="flex flex-col">
+<span class="text-body-md font-body-md font-medium text-on-surface">Notice of Completion</span>
+<span class="text-metadata font-metadata text-on-surface-variant">Submitted via App</span>
+</div>
+</div>
+<button class="text-primary font-label-md text-label-md hover:underline p-2">View</button>
+</div>
+<!-- Evidence Item 2 -->
+<div class="flex items-center justify-between p-3 rounded-lg border border-outline-variant bg-canvas-l0 hover:bg-surface-container-low transition-colors">
+<div class="flex items-center gap-sm">
+<span class="material-symbols-outlined text-success fill-icon" data-icon="check_circle">check_circle</span>
+<div class="flex flex-col">
+<span class="text-body-md font-body-md font-medium text-on-surface">Signed Certificate</span>
+<span class="text-metadata font-metadata text-on-surface-variant">Digital Signature Available</span>
+</div>
+</div>
+<button class="text-primary font-label-md text-label-md hover:underline p-2">View PDF</button>
+</div>
+<!-- Evidence Item 3 -->
+<div class="flex items-center justify-between p-3 rounded-lg border border-outline-variant bg-canvas-l0 hover:bg-surface-container-low transition-colors">
+<div class="flex items-center gap-sm">
+<span class="material-symbols-outlined text-success fill-icon" data-icon="check_circle">check_circle</span>
+<div class="flex flex-col">
+<span class="text-body-md font-body-md font-medium text-on-surface">Final Inspection Photo</span>
+<span class="text-metadata font-metadata text-on-surface-variant">Captured &amp; Geotagged</span>
+</div>
+</div>
+<div class="w-12 h-12 rounded border border-outline-variant overflow-hidden flex-shrink-0" data-alt="A detailed, clear photograph of a newly constructed wooden house roof in a bright, sunny tropical setting. The materials look fresh and professionally installed. The image is a close-up highlighting the quality of the work, fitting the humanitarian operational context." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuChJy7jqt8cqsd6qmnpKUV3pgOjTAuolXf6zKQRA58z6Pi0P57PId0O6Y_CXJ-_P5rMfWwXQ2hzZxO9cVe0lFLI3Cg7znjloAxeR3LKvqCZYKIUrrxNT03wmUxYVeQ-5SQLa5_LSvyky90ubKYHnaWHYimZK9hqDL5_nsD0dVr5DIlntxNIzMtbaY4rowoX7AUmtmBqLALanXXzzivxPHcirg08PdhgsWryxeZPxXRkkbtnSjScYhFG_A')"></div>
+</div>
+</div>
+</section>
+<!-- Approval Chain -->
+<section class="bg-surface-l1 rounded-xl p-md md:p-lg shadow-l1 flex flex-col gap-md">
+<h3 class="text-section-title font-section-title text-on-surface flex items-center gap-2">
+<span class="material-symbols-outlined text-tertiary" data-icon="verified_user">verified_user</span>
+                        Approval Chain
+                    </h3>
+<div class="relative pl-6 flex flex-col gap-lg before:content-[''] before:absolute before:left-2.5 before:top-2 before:bottom-2 before:w-[2px] before:bg-outline-variant">
+<!-- Step 1 -->
+<div class="relative flex flex-col">
+<div class="absolute -left-[29px] top-0 w-5 h-5 rounded-full bg-success flex items-center justify-center border-4 border-surface-l1 z-10">
+<span class="material-symbols-outlined text-[12px] text-on-primary fill-icon" data-icon="check">check</span>
+</div>
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-1">
+<div>
+<h4 class="text-body-md font-body-md font-semibold text-on-surface">Site Supervisor</h4>
+<p class="text-metadata font-metadata text-on-surface-variant">John Doe - Oct 12, 09:45 AM</p>
+</div>
+<span class="text-label-md font-label-md text-success bg-surface-container-lowest border border-success px-2 py-1 rounded inline-block w-fit">Verified</span>
+</div>
+</div>
+<!-- Step 2 -->
+<div class="relative flex flex-col">
+<div class="absolute -left-[29px] top-0 w-5 h-5 rounded-full bg-surface-variant flex items-center justify-center border-4 border-surface-l1 z-10">
+<div class="w-2 h-2 rounded-full bg-on-surface-variant"></div>
+</div>
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-1">
+<div>
+<h4 class="text-body-md font-body-md font-semibold text-on-surface">Finance Officer</h4>
+<p class="text-metadata font-metadata text-on-surface-variant">Pending Review</p>
+</div>
+<span class="text-label-md font-label-md text-on-surface bg-warning/20 border border-warning px-2 py-1 rounded inline-block w-fit">In Review</span>
+</div>
+</div>
+</div>
+</section>
+</div>
+<!-- Right Column: Financial Summary (5 cols on desktop) -->
+<div class="flex flex-col gap-md md:col-span-5">
+<section class="bg-surface-l1 rounded-xl p-md md:p-lg shadow-l1 flex flex-col gap-md border-t-4 border-brand-red sticky top-24">
+<h3 class="text-section-title font-section-title text-on-surface flex items-center gap-2">
+<span class="material-symbols-outlined text-brand-red" data-icon="receipt_long">receipt_long</span>
+                        Financial Summary
+                    </h3>
+<div class="flex flex-col gap-3">
+<div class="flex justify-between items-center py-2 border-b border-outline-variant/30">
+<span class="text-body-md font-body-md text-on-surface-variant">Roof Size</span>
+<span class="text-body-md font-body-md font-medium text-on-surface text-right">450 sq ft</span>
+</div>
+<div class="flex justify-between items-center py-2 border-b border-outline-variant/30">
+<span class="text-body-md font-body-md text-on-surface-variant">Standard Rate</span>
+<span class="text-body-md font-body-md font-medium text-on-surface text-right">$12.50 / sq ft</span>
+</div>
+<div class="flex justify-between items-center py-2 border-b border-outline-variant/30">
+<span class="text-body-md font-body-md font-semibold text-on-surface">Base Payment</span>
+<span class="text-body-md font-body-md font-semibold text-on-surface text-right">$5,625.00</span>
+</div>
+<div class="flex justify-between items-center py-2 border-b border-outline-variant/30 text-tertiary">
+<span class="text-body-md font-body-md">Additional Work</span>
+<span class="text-body-md font-body-md font-medium text-right">+$0.00</span>
+</div>
+<div class="flex justify-between items-center pt-2 pb-1">
+<span class="text-section-title font-section-title text-on-surface">Total Gross</span>
+<span class="text-section-title font-section-title text-on-surface text-right">$5,625.00</span>
+</div>
+</div>
+<!-- Team Allocation Breakdown (46/31/23) -->
+<div class="bg-surface-l2 p-sm rounded-lg flex flex-col gap-xs mt-2 border border-outline-variant/50">
+<h4 class="text-label-md font-label-md text-on-surface-variant uppercase tracking-wider mb-1">Team Allocation (46/31/23)</h4>
+<div class="flex justify-between items-center text-metadata font-metadata">
+<span class="text-on-surface">Skilled Labor (46%)</span>
+<span class="text-on-surface font-medium">-$2,587.50</span>
+</div>
+<div class="flex justify-between items-center text-metadata font-metadata">
+<span class="text-on-surface">General Labor (31%)</span>
+<span class="text-on-surface font-medium">-$1,743.75</span>
+</div>
+<div class="flex justify-between items-center text-metadata font-metadata">
+<span class="text-on-surface">Logistics/Support (23%)</span>
+<span class="text-on-surface font-medium">-$1,293.75</span>
+</div>
+</div>
+<div class="bg-surface-container-high p-md rounded-lg mt-2 flex justify-between items-center border border-outline-variant">
+<div class="flex flex-col">
+<span class="text-label-md font-label-md text-on-surface-variant uppercase tracking-wider">Final Net Payable</span>
+<span class="text-metadata font-metadata text-on-surface-variant">To Prime Contractor</span>
+</div>
+<span class="text-headline-lg font-headline-lg font-bold text-brand-strong">$5,625.00</span>
+</div>
+<!-- Primary Actions -->
+<div class="flex flex-col gap-sm mt-4">
+<button class="w-full h-target-min bg-surface-variant text-on-surface-variant font-label-md text-label-md rounded-lg uppercase tracking-wider transition-colors flex items-center justify-center gap-2 cursor-not-allowed" disabled="">
+<span class="material-symbols-outlined" data-icon="pending">pending</span>
+Release Initiated
+</button>
+<button class="w-full h-target-min bg-surface-l1 border border-outline-variant hover:bg-surface-container-low text-on-surface font-label-md text-label-md rounded-lg uppercase tracking-wider transition-colors flex items-center justify-center">
+                            Save for Review
+                        </button>
+</div>
+</section>
+</div>
+</div>
+</main>
+<!-- BottomNavBar (Hidden on md and up, only show if not suppressed by strict workflow rule. Assuming this is a detailed workflow step, we suppress it as per JSON instruction "hide the shell to prioritize the Canvas", but since JSON provided it, we include it based on "Destination" rule. Actually, instructions say: "Automatic Suppression: You MUST exclude the navigation shell if the page intent is: Linear/Transactional... Task-Focused: Any sub-page featuring a 'Close' or 'Back' action". This page has a Back button in header. Therefore, BOTTOM NAV IS SUPPRESSED.) -->
+<!-- Suppressed BottomNavBar to prioritize canvas in task flow -->
+
+
+</body></html>

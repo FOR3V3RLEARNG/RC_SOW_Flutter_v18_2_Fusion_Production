@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Logistics: Transfer Proposal Review</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "tertiary": "#005f7b",
+                        "surface-tint": "#ba1a20",
+                        "warning": "#FFA000",
+                        "surface-l1": "#FFFFFF",
+                        "outline-variant": "#e4beba",
+                        "error-container": "#ffdad6",
+                        "on-error-container": "#93000a",
+                        "info": "#0288D1",
+                        "on-background": "#271816",
+                        "surface-container-highest": "#f9dcd9",
+                        "brand-red": "#D32F2F",
+                        "surface-l2": "#F0F3F5",
+                        "inverse-on-surface": "#ffedeb",
+                        "canvas-l0": "#F5F7F9",
+                        "background": "#fff8f7",
+                        "surface-bright": "#fff8f7",
+                        "on-tertiary-fixed": "#001f2a",
+                        "primary-container": "#d32f2f",
+                        "surface": "#fff8f7",
+                        "on-tertiary": "#ffffff",
+                        "surface-container-lowest": "#ffffff",
+                        "on-primary-fixed-variant": "#930010",
+                        "secondary-container": "#54a0fe",
+                        "on-secondary": "#ffffff",
+                        "brand-soft": "#FFEBEE",
+                        "secondary-fixed-dim": "#a5c8ff",
+                        "surface-container-low": "#fff0ef",
+                        "on-tertiary-fixed-variant": "#004d65",
+                        "outline": "#8f6f6c",
+                        "surface-container": "#ffe9e7",
+                        "on-primary-container": "#fff2f0",
+                        "tertiary-container": "#00799c",
+                        "on-secondary-container": "#003567",
+                        "on-secondary-fixed": "#001c3a",
+                        "on-tertiary-container": "#e9f7ff",
+                        "error": "#C62828",
+                        "tertiary-fixed": "#bee9ff",
+                        "surface-container-high": "#ffe2de",
+                        "primary": "#af101a",
+                        "on-surface": "#271816",
+                        "on-primary-fixed": "#410003",
+                        "brand-strong": "#B71C1C",
+                        "primary-fixed": "#ffdad6",
+                        "tertiary-fixed-dim": "#7bd1f8",
+                        "inverse-surface": "#3e2c2a",
+                        "on-error": "#ffffff",
+                        "on-secondary-fixed-variant": "#004786",
+                        "primary-fixed-dim": "#ffb3ac",
+                        "surface-variant": "#f9dcd9",
+                        "inverse-primary": "#ffb3ac",
+                        "secondary": "#005faf",
+                        "on-surface-variant": "#5b403d",
+                        "on-primary": "#ffffff",
+                        "surface-dim": "#f1d3d0",
+                        "success": "#2E7D32",
+                        "secondary-fixed": "#d4e3ff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "base": "4px",
+                        "md": "16px",
+                        "gutter-tablet": "24px",
+                        "target-min": "48px",
+                        "gutter-phone": "16px",
+                        "xs": "8px",
+                        "lg": "24px",
+                        "xl": "32px",
+                        "sm": "12px"
+                    },
+                    "fontFamily": {
+                        "hero-title-mobile": ["Hanken Grotesk"],
+                        "metadata": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "headline-md": ["Hanken Grotesk"],
+                        "label-md": ["JetBrains Mono"],
+                        "headline-lg": ["Hanken Grotesk"],
+                        "body-md": ["Inter"],
+                        "hero-title": ["Hanken Grotesk"],
+                        "section-title": ["Hanken Grotesk"]
+                    },
+                    "fontSize": {
+                        "hero-title-mobile": ["28px", { "lineHeight": "32px", "fontWeight": "900" }],
+                        "metadata": ["12px", { "lineHeight": "16px", "fontWeight": "500" }],
+                        "body-lg": ["17px", { "lineHeight": "26px", "fontWeight": "400" }],
+                        "headline-md": ["20px", { "lineHeight": "28px", "fontWeight": "750" }],
+                        "label-md": ["13px", { "lineHeight": "16px", "fontWeight": "500" }],
+                        "headline-lg": ["24px", { "lineHeight": "32px", "fontWeight": "800" }],
+                        "body-md": ["15px", { "lineHeight": "22px", "fontWeight": "400" }],
+                        "hero-title": ["32px", { "lineHeight": "36px", "letterSpacing": "-0.02em", "fontWeight": "900" }],
+                        "section-title": ["18px", { "lineHeight": "24px", "fontWeight": "700" }]
+                    }
+                }
+            }
+        }
+    </script>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@700;800;900&amp;family=Inter:wght@400;500&amp;family=JetBrains+Mono:wght@500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-canvas-l0 text-on-surface font-body-md min-h-screen flex flex-col pb-[80px]">
+<!-- TopAppBar -->
+<header class="bg-surface dark:bg-surface-dim text-primary dark:text-primary-fixed-dim docked full-width top-0 shadow-sm sticky z-50 flex justify-between items-center w-full px-gutter-phone md:px-gutter-tablet h-target-min">
+<div class="flex items-center gap-xs">
+<span class="material-symbols-outlined" data-icon="roofing">roofing</span>
+<h1 class="font-headline-md text-headline-md">RC SOW Operations</h1>
+</div>
+<div class="flex items-center gap-sm">
+<span class="material-symbols-outlined text-success" data-icon="cloud_sync" title="Synced">cloud_sync</span>
+<div class="w-8 h-8 rounded-full bg-surface-variant overflow-hidden">
+<img class="object-cover w-full h-full" data-alt="A small, professional portrait photo of a construction site supervisor wearing a hardhat. The image is brightly lit, suitable for an avatar in a light-themed app interface." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBPH2E91P-4UxDv9hQmGI9b73wKnJbDAbXJQgAe-m6uHLyrFuJ1RDpCD4HNkrHdKVMyVBy19IYQnpVRN46_GhUAJmZtA0VR2iP8Fldc5Gnfm35RbICjHFu8TuFsstuQlEQ9SiC-nYd00r5J3MXC0N8kpr2Dg50AcwxLNzKBqygOpIJ-0PZjCouEtm2ST2quk-pvDNPeT8TVRBlCJLJkWWFSTb31U8JTMi3U6EZBUP5zfwX4QE6klLDbEA"/>
+</div>
+</div>
+</header>
+<main class="flex-1 px-gutter-phone py-md flex flex-col gap-lg max-w-2xl mx-auto w-full">
+<!-- Screen Title -->
+<div>
+<h2 class="font-hero-title-mobile text-hero-title-mobile text-on-surface mb-xs">Transfer Proposal Review</h2>
+<p class="font-body-md text-body-md text-on-surface-variant">Review incoming logistics transfers for your site.</p>
+</div>
+<!-- High-priority Alert Card (Incoming Proposal) -->
+<div class="bg-surface-container-low rounded-xl p-md border-l-4 border-warning shadow-[0_4px_16px_rgba(0,0,0,0.05)] flex flex-col gap-md">
+<div class="flex justify-between items-start">
+<div class="flex items-center gap-xs text-warning">
+<span class="material-symbols-outlined" data-icon="warning">warning</span>
+<span class="font-label-md text-label-md uppercase tracking-wider">Action Required</span>
+</div>
+<span class="font-metadata text-metadata text-on-surface-variant">ID: TRN-8842</span>
+</div>
+<h3 class="font-headline-lg text-headline-lg text-on-surface leading-tight">
+                Incoming Transfer: 10x Ridge Beams
+            </h3>
+<div class="grid grid-cols-2 gap-sm bg-surface rounded-lg p-sm mt-xs">
+<div>
+<p class="font-metadata text-metadata text-on-surface-variant">From</p>
+<p class="font-body-md text-body-md font-medium">Hanover Central</p>
+</div>
+<div>
+<p class="font-metadata text-metadata text-on-surface-variant">To</p>
+<p class="font-body-md text-body-md font-medium">Thornton Site</p>
+</div>
+</div>
+<!-- Transfer Details -->
+<div class="flex flex-col gap-sm">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-xs">
+<span class="material-symbols-outlined text-on-surface-variant" data-icon="local_shipping">local_shipping</span>
+<span class="font-body-md text-body-md">Est. Arrival:</span>
+</div>
+<span class="font-body-md text-body-md font-medium">Today, 14:00</span>
+</div>
+<div class="flex items-center justify-between bg-error-container text-on-error-container p-sm rounded-lg">
+<div class="flex items-center gap-xs">
+<span class="material-symbols-outlined" data-icon="inventory">inventory</span>
+<span class="font-body-md text-body-md">Dest. Health (Thornton):</span>
+</div>
+<div class="text-right">
+<span class="font-body-md text-body-md font-bold block">Critical (2 left)</span>
+<span class="font-metadata text-metadata block opacity-80">Needs 12</span>
+</div>
+</div>
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-xs text-on-surface-variant">
+<span class="material-symbols-outlined" data-icon="warehouse">warehouse</span>
+<span class="font-body-md text-body-md">Source (Hanover):</span>
+</div>
+<span class="font-body-md text-body-md">Surplus (45 available)</span>
+</div>
+</div>
+<!-- Interactive Buttons -->
+<div class="flex flex-col gap-sm mt-sm">
+<button class="bg-brand-red hover:bg-brand-strong text-on-primary w-full h-target-min rounded-lg font-label-md text-label-md uppercase tracking-wider transition-colors flex items-center justify-center gap-xs">
+<span class="material-symbols-outlined" data-icon="check_circle">check_circle</span>
+                    Accept Transfer
+                </button>
+<div class="grid grid-cols-2 gap-sm">
+<button class="bg-surface-variant hover:bg-surface-container-high text-on-surface-variant h-target-min rounded-lg font-label-md text-label-md transition-colors flex items-center justify-center gap-xs border border-outline-variant">
+<span class="material-symbols-outlined" data-icon="schedule">schedule</span>
+                        Reschedule
+                    </button>
+<button class="bg-surface-variant hover:bg-surface-container-high text-on-surface-variant h-target-min rounded-lg font-label-md text-label-md transition-colors flex items-center justify-center gap-xs border border-outline-variant">
+<span class="material-symbols-outlined" data-icon="cancel">cancel</span>
+                        Decline
+                    </button>
+</div>
+</div>
+</div>
+<!-- Recent Transfers -->
+<div class="flex flex-col gap-sm">
+<h3 class="font-section-title text-section-title text-on-surface">Recent Transfers</h3>
+<div class="bg-surface-l1 rounded-xl shadow-[0_2px_8px_rgba(0,0,0,0.02)] divide-y divide-outline-variant">
+<!-- Item 1 -->
+<div class="p-sm flex justify-between items-center hover:bg-surface-l2 transition-colors">
+<div class="flex items-center gap-md">
+<div class="bg-surface-variant text-on-surface-variant p-xs rounded-full">
+<span class="material-symbols-outlined text-[20px]" data-icon="done_all">done_all</span>
+</div>
+<div>
+<p class="font-body-md text-body-md font-medium text-on-surface">5x Framing Packs</p>
+<p class="font-metadata text-metadata text-on-surface-variant">Arrived Yesterday, 16:30</p>
+</div>
+</div>
+<span class="font-label-md text-label-md text-success">Completed</span>
+</div>
+<!-- Item 2 -->
+<div class="p-sm flex justify-between items-center hover:bg-surface-l2 transition-colors">
+<div class="flex items-center gap-md">
+<div class="bg-surface-variant text-on-surface-variant p-xs rounded-full">
+<span class="material-symbols-outlined text-[20px]" data-icon="done_all">done_all</span>
+</div>
+<div>
+<p class="font-body-md text-body-md font-medium text-on-surface">2 Pallets Roofing</p>
+<p class="font-metadata text-metadata text-on-surface-variant">Arrived Oct 12, 09:15</p>
+</div>
+</div>
+<span class="font-label-md text-label-md text-success">Completed</span>
+</div>
+</div>
+</div>
+</main>
+<!-- BottomNavBar -->
+<nav class="lg:hidden fixed bottom-0 w-full flex justify-around items-center px-4 py-2 pb-safe bg-surface dark:bg-surface-dim border-t border-outline-variant shadow-lg z-50">
+<a class="flex flex-col items-center justify-center text-on-surface-variant hover:bg-surface-variant p-2 rounded-xl min-w-[64px]" href="#">
+<span class="material-symbols-outlined mb-1" data-icon="analytics">analytics</span>
+<span class="font-label-md-mobile text-label-md-mobile text-[11px]">Dashboard</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant hover:bg-surface-variant p-2 rounded-xl min-w-[64px]" href="#">
+<span class="material-symbols-outlined mb-1" data-icon="alt_route">alt_route</span>
+<span class="font-label-md-mobile text-label-md-mobile text-[11px]">Lifecycle</span>
+</a>
+<a class="flex flex-col items-center justify-center bg-primary-container text-on-primary-container rounded-xl px-4 py-1 scale-95 transition-transform duration-150 min-w-[64px]" href="#">
+<span class="material-symbols-outlined mb-1" data-icon="warehouse" style="font-variation-settings: 'FILL' 1;">warehouse</span>
+<span class="font-label-md-mobile text-label-md-mobile text-[11px] font-bold">Inventory</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant hover:bg-surface-variant p-2 rounded-xl min-w-[64px]" href="#">
+<span class="material-symbols-outlined mb-1" data-icon="badge">badge</span>
+<span class="font-label-md-mobile text-label-md-mobile text-[11px]">Teams</span>
+</a>
+</nav>
+</body></html>

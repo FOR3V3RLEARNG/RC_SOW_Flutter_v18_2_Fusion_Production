@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Admin: Schedule Configuration</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;700;800;900&amp;family=Inter:wght@400;500&amp;family=JetBrains+Mono:wght@500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "brand-soft": "#FFEBEE",
+                      "inverse-on-surface": "#ffedeb",
+                      "surface-container-lowest": "#ffffff",
+                      "outline-variant": "#e4beba",
+                      "outline": "#8f6f6c",
+                      "primary-container": "#d32f2f",
+                      "inverse-surface": "#3e2c2a",
+                      "brand-strong": "#B71C1C",
+                      "on-primary-container": "#fff2f0",
+                      "error": "#C62828",
+                      "info": "#0288D1",
+                      "primary": "#af101a",
+                      "secondary-container": "#54a0fe",
+                      "surface-tint": "#ba1a20",
+                      "surface": "#fff8f7",
+                      "on-surface": "#271816",
+                      "surface-container": "#ffe9e7",
+                      "surface-bright": "#fff8f7",
+                      "tertiary-fixed": "#bee9ff",
+                      "on-primary": "#ffffff",
+                      "primary-fixed-dim": "#ffb3ac",
+                      "tertiary-container": "#00799c",
+                      "tertiary": "#005f7b",
+                      "on-tertiary-fixed-variant": "#004d65",
+                      "on-secondary-container": "#003567",
+                      "surface-dim": "#f1d3d0",
+                      "on-primary-fixed": "#410003",
+                      "on-background": "#271816",
+                      "on-error": "#ffffff",
+                      "tertiary-fixed-dim": "#7bd1f8",
+                      "brand-red": "#D32F2F",
+                      "surface-l2": "#F0F3F5",
+                      "on-tertiary": "#ffffff",
+                      "secondary-fixed": "#d4e3ff",
+                      "surface-container-low": "#fff0ef",
+                      "secondary": "#005faf",
+                      "on-secondary-fixed": "#001c3a",
+                      "on-tertiary-fixed": "#001f2a",
+                      "surface-variant": "#f9dcd9",
+                      "surface-l1": "#FFFFFF",
+                      "on-secondary": "#ffffff",
+                      "canvas-l0": "#F5F7F9",
+                      "on-primary-fixed-variant": "#930010",
+                      "on-secondary-fixed-variant": "#004786",
+                      "primary-fixed": "#ffdad6",
+                      "on-error-container": "#93000a",
+                      "on-tertiary-container": "#e9f7ff",
+                      "success": "#2E7D32",
+                      "on-surface-variant": "#5b403d",
+                      "secondary-fixed-dim": "#a5c8ff",
+                      "inverse-primary": "#ffb3ac",
+                      "background": "#fff8f7",
+                      "warning": "#FFA000",
+                      "error-container": "#ffdad6",
+                      "surface-container-highest": "#f9dcd9",
+                      "surface-container-high": "#ffe2de"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "base": "4px",
+                      "target-min": "48px",
+                      "xl": "32px",
+                      "lg": "24px",
+                      "sm": "12px",
+                      "md": "16px",
+                      "gutter-phone": "16px",
+                      "gutter-tablet": "24px",
+                      "xs": "8px"
+              },
+              "fontFamily": {
+                      "headline-lg": [
+                              "Hanken Grotesk"
+                      ],
+                      "body-lg": [
+                              "Inter"
+                      ],
+                      "label-md": [
+                              "JetBrains Mono"
+                      ],
+                      "section-title": [
+                              "Hanken Grotesk"
+                      ],
+                      "body-md": [
+                              "Inter"
+                      ],
+                      "metadata": [
+                              "Inter"
+                      ],
+                      "headline-md": [
+                              "Hanken Grotesk"
+                      ],
+                      "hero-title": [
+                              "Hanken Grotesk"
+                      ],
+                      "hero-title-mobile": [
+                              "Hanken Grotesk"
+                      ]
+              },
+              "fontSize": {
+                      "headline-lg": [
+                              "24px",
+                              {
+                                      "lineHeight": "32px",
+                                      "fontWeight": "800"
+                              }
+                      ],
+                      "body-lg": [
+                              "17px",
+                              {
+                                      "lineHeight": "26px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "label-md": [
+                              "13px",
+                              {
+                                      "lineHeight": "16px",
+                                      "fontWeight": "500"
+                              }
+                      ],
+                      "section-title": [
+                              "18px",
+                              {
+                                      "lineHeight": "24px",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "body-md": [
+                              "15px",
+                              {
+                                      "lineHeight": "22px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "metadata": [
+                              "12px",
+                              {
+                                      "lineHeight": "16px",
+                                      "fontWeight": "500"
+                              }
+                      ],
+                      "headline-md": [
+                              "20px",
+                              {
+                                      "lineHeight": "28px",
+                                      "fontWeight": "750"
+                              }
+                      ],
+                      "hero-title": [
+                              "32px",
+                              {
+                                      "lineHeight": "36px",
+                                      "letterSpacing": "-0.02em",
+                                      "fontWeight": "900"
+                              }
+                      ],
+                      "hero-title-mobile": [
+                              "28px",
+                              {
+                                      "lineHeight": "32px",
+                                      "fontWeight": "900"
+                              }
+                      ]
+              }
+      },
+          },
+        }
+    </script>
+</head>
+<body class="bg-canvas-l0 text-on-surface font-body-md antialiased min-h-screen flex flex-col md:flex-row">
+<!-- Navigation Drawer (Desktop) -->
+<nav class="hidden lg:flex flex-col h-screen p-md gap-xs bg-surface border-r border-outline-variant w-64 fixed left-0 z-10 bg-surface-container-low">
+<div class="mb-lg">
+<h1 class="font-headline-lg text-headline-lg text-brand-strong">SOW Administrator</h1>
+<p class="font-metadata text-metadata text-on-surface-variant">Project Command <span class="ml-2 bg-surface-variant px-2 py-1 rounded">v2.4.0</span></p>
+</div>
+<div class="flex flex-col gap-xs flex-grow">
+<a class="flex items-center gap-md text-on-surface-variant hover:bg-surface-variant px-md py-sm rounded-lg transition-all cursor-pointer active:opacity-80" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-label-md text-label-md">Dashboard</span>
+</a>
+<a class="flex items-center gap-md bg-primary text-on-primary rounded-lg px-md py-sm cursor-pointer active:opacity-80" href="#">
+<span class="material-symbols-outlined">event_available</span>
+<span class="font-label-md text-label-md">Master Schedule</span>
+</a>
+<a class="flex items-center gap-md text-on-surface-variant hover:bg-surface-variant px-md py-sm rounded-lg transition-all cursor-pointer active:opacity-80" href="#">
+<span class="material-symbols-outlined">settings_applications</span>
+<span class="font-label-md text-label-md">House Config</span>
+</a>
+<a class="flex items-center gap-md text-on-surface-variant hover:bg-surface-variant px-md py-sm rounded-lg transition-all cursor-pointer active:opacity-80" href="#">
+<span class="material-symbols-outlined">groups</span>
+<span class="font-label-md text-label-md">Team Management</span>
+</a>
+<a class="flex items-center gap-md text-on-surface-variant hover:bg-surface-variant px-md py-sm rounded-lg transition-all cursor-pointer active:opacity-80" href="#">
+<span class="material-symbols-outlined">inventory_2</span>
+<span class="font-label-md text-label-md">Resource Allocation</span>
+</a>
+<a class="flex items-center gap-md text-on-surface-variant hover:bg-surface-variant px-md py-sm rounded-lg transition-all cursor-pointer active:opacity-80" href="#">
+<span class="material-symbols-outlined">history_edu</span>
+<span class="font-label-md text-label-md">Audit Logs</span>
+</a>
+</div>
+</nav>
+<!-- Top App Bar (Mobile) -->
+<header class="md:hidden flex items-center justify-between px-gutter-phone h-target-min w-full top-0 sticky bg-surface shadow-sm z-20">
+<button class="text-primary active:scale-95 duration-100 p-2">
+<span class="material-symbols-outlined">menu</span>
+</button>
+<h1 class="font-headline-md text-headline-md-mobile font-black text-brand-strong">RC SOW Project</h1>
+<button class="text-primary active:scale-95 duration-100 p-2">
+<span class="material-symbols-outlined">sync</span>
+</button>
+</header>
+<!-- Main Content Area -->
+<main class="flex-1 lg:ml-64 p-gutter-phone md:p-gutter-tablet flex flex-col gap-lg">
+<!-- Header Section -->
+<section class="flex flex-col md:flex-row justify-between items-start md:items-center gap-sm">
+<div>
+<h2 class="font-hero-title-mobile md:font-hero-title text-hero-title-mobile md:text-hero-title text-on-surface">Schedule Configuration</h2>
+<p class="font-body-md text-body-md text-on-surface-variant mt-1">Manage master timelines and assignments across all parishes.</p>
+</div>
+<div class="flex gap-sm">
+<button class="h-target-min px-lg rounded-full border border-outline flex items-center gap-sm text-primary hover:bg-surface-variant transition-colors">
+<span class="material-symbols-outlined">filter_list</span>
+<span class="font-label-md text-label-md uppercase">Filter</span>
+</button>
+<button class="h-target-min px-lg rounded-full bg-brand-red text-on-primary flex items-center gap-sm hover:bg-primary transition-colors shadow-sm">
+<span class="material-symbols-outlined">add</span>
+<span class="font-label-md text-label-md uppercase">New Milestone</span>
+</button>
+</div>
+</section>
+<!-- KPI / Hero Section -->
+<section class="grid grid-cols-1 md:grid-cols-3 gap-md">
+<div class="bg-surface-l1 p-md rounded-xl shadow-sm border border-outline-variant flex items-center gap-md">
+<div class="bg-brand-soft p-sm rounded-full text-brand-red">
+<span class="material-symbols-outlined">home_work</span>
+</div>
+<div>
+<p class="font-metadata text-metadata text-on-surface-variant uppercase tracking-wider">Active Houses</p>
+<p class="font-headline-lg text-headline-lg text-on-surface">42</p>
+</div>
+</div>
+<div class="bg-surface-l1 p-md rounded-xl shadow-sm border border-outline-variant flex items-center gap-md">
+<div class="bg-warning/20 p-sm rounded-full text-warning">
+<span class="material-symbols-outlined">warning</span>
+</div>
+<div>
+<p class="font-metadata text-metadata text-on-surface-variant uppercase tracking-wider">Schedule Blockers</p>
+<p class="font-headline-lg text-headline-lg text-on-surface">3</p>
+</div>
+</div>
+<div class="bg-surface-l1 p-md rounded-xl shadow-sm border border-outline-variant flex items-center gap-md">
+<div class="bg-success/20 p-sm rounded-full text-success">
+<span class="material-symbols-outlined">check_circle</span>
+</div>
+<div>
+<p class="font-metadata text-metadata text-on-surface-variant uppercase tracking-wider">On Track</p>
+<p class="font-headline-lg text-headline-lg text-on-surface">85%</p>
+</div>
+</div>
+</section>
+<!-- Multi-pane Layout: Main Gantt & List -->
+<div class="flex flex-col xl:flex-row gap-lg flex-1">
+<!-- Left Pane: House List & Assignments -->
+<section class="w-full xl:w-1/3 bg-surface-l1 rounded-xl shadow-sm border border-outline-variant overflow-hidden flex flex-col">
+<div class="p-md border-b border-outline-variant bg-surface-container-lowest">
+<h3 class="font-section-title text-section-title text-on-surface mb-md">House Assignments</h3>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-sm top-1/2 -translate-y-1/2 text-on-surface-variant">search</span>
+<input class="w-full pl-xl pr-sm py-sm rounded-lg border-outline-variant focus:ring-primary focus:border-primary font-body-md bg-surface-container" placeholder="Search House ID or Carpenter..." type="text"/>
+</div>
+</div>
+<div class="overflow-y-auto flex-1">
+<ul class="divide-y divide-outline-variant">
+<li class="p-md hover:bg-surface-variant transition-colors flex flex-col gap-sm">
+<div class="flex justify-between items-center">
+<span class="font-label-md text-label-md bg-surface-dim px-2 py-1 rounded">H12-StJohn</span>
+<span class="w-2 h-2 rounded-full bg-success"></span>
+</div>
+<div class="flex items-center gap-sm">
+<span class="material-symbols-outlined text-on-surface-variant" style="font-variation-settings: 'FILL' 1;">person</span>
+<select class="flex-1 font-body-md text-body-md border-none bg-transparent p-0 focus:ring-0 cursor-pointer">
+<option>Lead: J. Smith</option>
+<option>Lead: A. Davis</option>
+<option>Unassigned</option>
+</select>
+</div>
+</li>
+<li class="p-md bg-brand-soft/30 hover:bg-brand-soft/50 transition-colors flex flex-col gap-sm">
+<div class="flex justify-between items-center">
+<span class="font-label-md text-label-md bg-surface-dim px-2 py-1 rounded">H13-StMary</span>
+<span class="w-2 h-2 rounded-full bg-warning"></span>
+</div>
+<div class="flex items-center gap-sm">
+<span class="material-symbols-outlined text-on-surface-variant" style="font-variation-settings: 'FILL' 1;">person</span>
+<select class="flex-1 font-body-md text-body-md border-none bg-transparent p-0 focus:ring-0 cursor-pointer">
+<option>Lead: A. Davis</option>
+<option>Lead: J. Smith</option>
+<option>Unassigned</option>
+</select>
+</div>
+</li>
+</ul>
+</div>
+</section>
+<!-- Right Pane: Gantt / Timeline View -->
+<section class="w-full xl:w-2/3 bg-surface-l1 rounded-xl shadow-sm border border-outline-variant flex flex-col overflow-hidden">
+<div class="p-md border-b border-outline-variant bg-surface-container-lowest flex justify-between items-center">
+<h3 class="font-section-title text-section-title text-on-surface">Master Timeline</h3>
+<div class="flex gap-sm">
+<button class="p-2 rounded hover:bg-surface-variant text-on-surface-variant"><span class="material-symbols-outlined">chevron_left</span></button>
+<span class="font-label-md text-label-md py-2">Oct 2023</span>
+<button class="p-2 rounded hover:bg-surface-variant text-on-surface-variant"><span class="material-symbols-outlined">chevron_right</span></button>
+</div>
+</div>
+<div class="p-md flex-1 overflow-x-auto">
+<!-- Simplified Gantt Visualization -->
+<div class="min-w-[600px]">
+<!-- Timeline Header -->
+<div class="flex border-b border-outline-variant pb-2 mb-4 font-metadata text-metadata text-on-surface-variant">
+<div class="w-1/4">Phase</div>
+<div class="w-3/4 flex justify-between px-2">
+<span>Week 1</span>
+<span>Week 2</span>
+<span>Week 3</span>
+<span>Week 4</span>
+</div>
+</div>
+<!-- Timeline Rows -->
+<div class="flex flex-col gap-md">
+<div class="flex items-center">
+<div class="w-1/4 font-body-md text-body-md pr-sm truncate">Foundation</div>
+<div class="w-3/4 relative h-8 bg-surface-container rounded">
+<div class="absolute left-0 w-1/2 h-full bg-secondary rounded flex items-center px-sm text-on-primary font-metadata">Completed</div>
+</div>
+</div>
+<div class="flex items-center">
+<div class="w-1/4 font-body-md text-body-md pr-sm truncate">Framing (H12, H13)</div>
+<div class="w-3/4 relative h-8 bg-surface-container rounded">
+<div class="absolute left-1/4 w-1/2 h-full bg-brand-red rounded flex items-center px-sm text-on-primary font-metadata shadow-sm">Active</div>
+</div>
+</div>
+<div class="flex items-center">
+<div class="w-1/4 font-body-md text-body-md pr-sm truncate">Roofing</div>
+<div class="w-3/4 relative h-8 bg-surface-container rounded">
+<div class="absolute left-2/3 w-1/4 h-full bg-outline-variant rounded flex items-center px-sm text-on-surface-variant font-metadata border border-outline border-dashed">Scheduled</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+</div>
+</main>
+<!-- Bottom Nav Bar (Mobile) -->
+<nav class="md:hidden fixed bottom-0 left-0 w-full flex justify-around items-center px-xs pb-safe bg-surface border-t border-outline-variant shadow-lg z-50 h-target-min">
+<a class="flex flex-col items-center justify-center text-on-surface-variant hover:bg-brand-soft" href="#">
+<span class="material-symbols-outlined">home</span>
+<span class="font-label-md text-label-md">Houses</span>
+</a>
+<a class="flex flex-col items-center justify-center bg-primary-container text-on-primary-container rounded-xl px-3 py-1 active:scale-90 duration-150" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">calendar_today</span>
+<span class="font-label-md text-label-md">Schedule</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant hover:bg-brand-soft" href="#">
+<span class="material-symbols-outlined">engineering</span>
+<span class="font-label-md text-label-md">Teams</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant hover:bg-brand-soft" href="#">
+<span class="material-symbols-outlined">report_problem</span>
+<span class="font-label-md text-label-md">Issues</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant hover:bg-brand-soft" href="#">
+<span class="material-symbols-outlined">person</span>
+<span class="font-label-md text-label-md">Profile</span>
+</a>
+</nav>
+</body></html>

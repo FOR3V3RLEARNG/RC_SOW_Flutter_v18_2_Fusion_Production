@@ -1,0 +1,289 @@
+<!DOCTYPE html><html lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Schedule Site Visit</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com" rel="preconnect">
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;700;800;900&amp;family=Inter:wght@400;500&amp;family=JetBrains+Mono:wght@500&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "on-primary-fixed": "#410003",
+                      "on-secondary-fixed": "#001c3a",
+                      "brand-strong": "#B71C1C",
+                      "error-container": "#ffdad6",
+                      "surface": "#fff8f7",
+                      "outline-variant": "#e4beba",
+                      "on-surface-variant": "#5b403d",
+                      "tertiary-container": "#00799c",
+                      "tertiary-fixed-dim": "#7bd1f8",
+                      "on-tertiary-fixed": "#001f2a",
+                      "on-secondary": "#ffffff",
+                      "on-error": "#ffffff",
+                      "canvas-l0": "#F5F7F9",
+                      "inverse-surface": "#3e2c2a",
+                      "primary-container": "#d32f2f",
+                      "brand-soft": "#FFEBEE",
+                      "on-primary-fixed-variant": "#930010",
+                      "on-primary": "#ffffff",
+                      "secondary": "#005faf",
+                      "surface-container": "#ffe9e7",
+                      "tertiary-fixed": "#bee9ff",
+                      "background": "#fff8f7",
+                      "success": "#2E7D32",
+                      "on-primary-container": "#fff2f0",
+                      "surface-l1": "#FFFFFF",
+                      "surface-container-high": "#ffe2de",
+                      "on-tertiary": "#ffffff",
+                      "on-tertiary-container": "#e9f7ff",
+                      "surface-container-lowest": "#ffffff",
+                      "info": "#0288D1",
+                      "on-background": "#271816",
+                      "inverse-on-surface": "#ffedeb",
+                      "outline": "#8f6f6c",
+                      "on-secondary-container": "#003567",
+                      "secondary-container": "#54a0fe",
+                      "primary-fixed": "#ffdad6",
+                      "on-secondary-fixed-variant": "#004786",
+                      "surface-tint": "#ba1a20",
+                      "on-surface": "#271816",
+                      "surface-container-low": "#fff0ef",
+                      "on-error-container": "#93000a",
+                      "surface-variant": "#f9dcd9",
+                      "brand-red": "#D32F2F",
+                      "secondary-fixed-dim": "#a5c8ff",
+                      "warning": "#FFA000",
+                      "surface-container-highest": "#f9dcd9",
+                      "error": "#C62828",
+                      "primary": "#af101a",
+                      "surface-l2": "#F0F3F5",
+                      "tertiary": "#005f7b",
+                      "on-tertiary-fixed-variant": "#004d65",
+                      "secondary-fixed": "#d4e3ff",
+                      "surface-dim": "#f1d3d0",
+                      "primary-fixed-dim": "#ffb3ac",
+                      "inverse-primary": "#ffb3ac",
+                      "surface-bright": "#fff8f7"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "gutter-phone": "16px",
+                      "gutter-tablet": "24px",
+                      "xs": "8px",
+                      "base": "4px",
+                      "lg": "24px",
+                      "xl": "32px",
+                      "sm": "12px",
+                      "md": "16px",
+                      "target-min": "48px"
+              },
+              "fontFamily": {
+                      "body-lg": ["Inter"],
+                      "hero-title": ["Hanken Grotesk"],
+                      "hero-title-mobile": ["Hanken Grotesk"],
+                      "section-title": ["Hanken Grotesk"],
+                      "label-md": ["JetBrains Mono"],
+                      "metadata": ["Inter"],
+                      "body-md": ["Inter"],
+                      "headline-md": ["Hanken Grotesk"],
+                      "headline-lg": ["Hanken Grotesk"]
+              },
+              "fontSize": {
+                      "body-lg": ["17px", {"lineHeight": "26px", "fontWeight": "400"}],
+                      "hero-title": ["32px", {"lineHeight": "36px", "letterSpacing": "-0.02em", "fontWeight": "900"}],
+                      "hero-title-mobile": ["28px", {"lineHeight": "32px", "fontWeight": "900"}],
+                      "section-title": ["18px", {"lineHeight": "24px", "fontWeight": "700"}],
+                      "label-md": ["13px", {"lineHeight": "16px", "fontWeight": "500"}],
+                      "metadata": ["12px", {"lineHeight": "16px", "fontWeight": "500"}],
+                      "body-md": ["15px", {"lineHeight": "22px", "fontWeight": "400"}],
+                      "headline-md": ["20px", {"lineHeight": "28px", "fontWeight": "750"}],
+                      "headline-lg": ["24px", {"lineHeight": "32px", "fontWeight": "800"}]
+              },
+              boxShadow: {
+                  'l1': '0 4px 4px rgba(0, 0, 0, 0.05)',
+                  'l3': '0 8px 24px rgba(0, 0, 0, 0.12)',
+              }
+            },
+          },
+        }
+    </script>
+<style>
+        body { -webkit-tap-highlight-color: transparent; }
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+</head>
+<body class="bg-canvas-l0 text-on-surface antialiased pb-[100px]">
+<!-- TopAppBar from JSON -->
+<header class="fixed docked full-width top-0 bg-surface dark:bg-surface text-primary dark:text-inverse-primary flat no shadows flex justify-between items-center px-gutter-phone h-16 w-full z-40 border-b border-surface-variant/50">
+<button class="flex items-center justify-center w-12 h-12 rounded-full hover:bg-surface-container-low dark:hover:bg-surface-container-highest transition-colors active:opacity-80 active:scale-95 transition-all duration-150">
+<span class="material-symbols-outlined text-primary">home_work</span>
+</button>
+<div class="text-headline-md font-headline-md font-black text-brand-red dark:text-inverse-primary text-center flex-1">
+            RC SOW
+        </div>
+<button class="flex items-center justify-center w-12 h-12 rounded-full hover:bg-surface-container-low dark:hover:bg-surface-container-highest transition-colors active:opacity-80 active:scale-95 transition-all duration-150 text-on-surface-variant">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+</header>
+<main class="pt-20 px-gutter-phone max-w-lg mx-auto">
+<!-- Page Context Header -->
+<div class="mb-lg">
+<h1 class="font-hero-title-mobile text-hero-title-mobile text-on-surface mb-base">H12 • Schedule Visit</h1>
+<p class="font-body-md text-body-md text-on-surface-variant flex items-center gap-xs">
+<span class="material-symbols-outlined text-[16px]">location_on</span>
+                St. Elizabeth • Thornton
+            </p>
+</div>
+<!-- Summary Card -->
+<div class="bg-surface-l1 rounded-[16px] shadow-l1 p-md mb-xl flex flex-col gap-sm border border-surface-variant/30">
+<div class="flex justify-between items-start">
+<div class="font-label-md text-label-md text-on-surface-variant bg-surface-container-low px-2 py-1 rounded">House H12</div>
+<div class="bg-surface-container text-primary font-metadata text-metadata px-2 py-1 rounded flex items-center gap-1">
+<div class="w-1.5 h-1.5 rounded-full bg-primary"></div>
+                    Active Repair
+                </div>
+</div>
+<div class="font-metadata text-metadata text-outline flex items-center gap-xs">
+<span class="material-symbols-outlined text-[14px]">my_location</span>
+                18.0674° N, 77.8184° W
+            </div>
+</div>
+<!-- Scheduling Form -->
+<form class="flex flex-col gap-lg">
+<!-- Type of Visit (Segmented Control) -->
+<div class="flex flex-col gap-xs">
+<label class="font-label-md text-label-md text-on-surface">Format</label>
+<div class="flex bg-surface-l2 p-1 rounded-full min-h-target-min items-center">
+<button class="flex-1 bg-surface-l1 shadow-sm text-primary rounded-full py-2 font-label-md text-label-md text-center transition-all h-full flex items-center justify-center" type="button">
+                        Site Visit
+                    </button>
+<button class="flex-1 text-on-surface-variant rounded-full py-2 font-label-md text-label-md text-center hover:bg-surface-container-low transition-all h-full flex items-center justify-center" type="button">
+                        Remote Call
+                    </button>
+</div>
+</div>
+<!-- Date -->
+<div class="flex flex-col gap-xs">
+<label class="font-label-md text-label-md text-on-surface" for="visit-date">Date of Visit</label>
+<div class="relative">
+<input class="w-full bg-surface-l1 border border-outline-variant text-on-surface rounded-[16px] min-h-target-min px-md font-body-md focus:border-primary focus:ring-1 focus:ring-primary transition-all outline-none appearance-none" id="visit-date" type="date">
+</div>
+</div>
+<!-- Participants (Multi-select Chips) -->
+<div class="flex flex-col gap-xs">
+<label class="font-label-md text-label-md text-on-surface">Technical Team Participants</label>
+<div class="flex flex-wrap gap-2">
+<button class="bg-brand-soft border border-primary-fixed-dim text-primary rounded-full px-4 min-h-[40px] font-label-md text-label-md flex items-center gap-1 transition-all" type="button">
+<span class="material-symbols-outlined text-[16px]">check</span> Site Supervisor
+                    </button>
+<button class="bg-surface-l2 border border-outline-variant text-on-surface-variant rounded-full px-4 min-h-[40px] font-label-md text-label-md flex items-center gap-1 hover:bg-surface-container transition-all" type="button">
+                        Carpenter
+                    </button>
+<button class="bg-surface-l2 border border-outline-variant text-on-surface-variant rounded-full px-4 min-h-[40px] font-label-md text-label-md flex items-center gap-1 hover:bg-surface-container transition-all" type="button">
+                        Regional Supervisor
+                    </button>
+<button class="bg-surface-l2 border border-outline-variant text-on-surface-variant rounded-full px-4 min-h-[40px] font-label-md text-label-md flex items-center gap-1 hover:bg-surface-container transition-all" type="button">
+                        Construction Spec.
+                    </button>
+</div>
+</div>
+<!-- Purpose -->
+<div class="flex flex-col gap-xs">
+<label class="font-label-md text-label-md text-on-surface" for="visit-purpose">Purpose of Visit</label>
+<div class="relative">
+<select class="w-full bg-surface-l1 border border-outline-variant text-on-surface rounded-[16px] min-h-target-min px-md pr-10 font-body-md focus:border-primary focus:ring-1 focus:ring-primary transition-all appearance-none outline-none" id="visit-purpose">
+<option disabled="" selected="" value="">Select primary purpose</option>
+<option value="tech">Technical inspection</option>
+<option value="progress">Progress check</option>
+<option value="material">Material verification</option>
+<option value="issue">Issue resolution</option>
+</select>
+<span class="material-symbols-outlined absolute right-md top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none">arrow_drop_down</span>
+</div>
+</div>
+<!-- Priority -->
+<div class="flex flex-col gap-xs">
+<label class="font-label-md text-label-md text-on-surface">Priority</label>
+<div class="flex gap-2">
+<label class="flex-1">
+<input checked="" class="peer sr-only" name="priority" type="radio" value="standard">
+<div class="bg-surface-l2 border border-outline-variant text-on-surface-variant rounded-[12px] min-h-target-min flex items-center justify-center font-label-md text-label-md peer-checked:bg-surface-container peer-checked:border-primary peer-checked:text-primary transition-all cursor-pointer">
+                            Standard
+                        </div>
+</label>
+<label class="flex-1">
+<input class="peer sr-only" name="priority" type="radio" value="urgent">
+<div class="bg-surface-l2 border border-outline-variant text-on-surface-variant rounded-[12px] min-h-target-min flex items-center justify-center font-label-md text-label-md peer-checked:bg-warning/20 peer-checked:border-warning peer-checked:text-warning transition-all cursor-pointer">
+                            Urgent
+                        </div>
+</label>
+<label class="flex-1">
+<input class="peer sr-only" name="priority" type="radio" value="emergency">
+<div class="bg-surface-l2 border border-outline-variant text-on-surface-variant rounded-[12px] min-h-target-min flex items-center justify-center font-label-md text-label-md peer-checked:bg-error-container peer-checked:border-error peer-checked:text-error transition-all cursor-pointer">
+                            Emergency
+                        </div>
+</label>
+</div>
+</div>
+<!-- Notes -->
+<div class="flex flex-col gap-xs">
+<label class="font-label-md text-label-md text-on-surface" for="visit-notes">Notes / Comments</label>
+<textarea class="w-full bg-surface-l1 border border-outline-variant text-on-surface rounded-[16px] p-md font-body-md focus:border-primary focus:ring-1 focus:ring-primary transition-all outline-none resize-none" id="visit-notes" placeholder="Add specific details or instructions for the team..." rows="3"></textarea>
+</div>
+<!-- Submit Action -->
+<div class="mt-md">
+<button class="w-full bg-brand-red text-on-primary min-h-target-min rounded-[16px] font-section-title text-section-title uppercase tracking-wider flex items-center justify-center gap-2 hover:bg-brand-strong transition-colors active:scale-[0.98]" type="button">
+<span class="material-symbols-outlined text-[20px]">calendar_add_on</span>
+                    Schedule Visit
+                </button>
+</div><div class="mt-sm flex justify-center">
+    <button class="w-full border border-outline-variant text-primary min-h-target-min rounded-[16px] font-label-md text-label-md uppercase tracking-wider flex items-center justify-center gap-2 hover:bg-surface-container transition-colors active:scale-[0.98]" type="button">
+        <span class="material-symbols-outlined text-[20px]">history_edu</span>
+        View Daily Site Logs
+    </button>
+</div>
+</form>
+</main>
+<!-- BottomNavBar from JSON -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-2 py-3 pb-safe bg-surface-container-lowest dark:bg-inverse-surface border-t border-outline-variant dark:border-none shadow-lg rounded-t-xl">
+<!-- Dashboard (Inactive) -->
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-surface-variant px-4 py-1.5 hover:bg-surface-container-high dark:hover:bg-surface-variant transition-colors rounded-xl" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="text-label-md font-label-md mt-1">Dashboard</span>
+</a>
+<!-- Scope (Inactive) -->
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-surface-variant px-4 py-1.5 hover:bg-surface-container-high dark:hover:bg-surface-variant transition-colors rounded-xl" href="#">
+<span class="material-symbols-outlined">assignment</span>
+<span class="text-label-md font-label-md mt-1">Scope</span>
+</a>
+<!-- Control (Active) -->
+<a class="flex flex-col items-center justify-center bg-primary-container dark:bg-primary text-on-primary-container dark:text-on-primary rounded-xl px-4 py-1.5 transition-all scale-95 duration-100" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">settings_suggest</span>
+<span class="text-label-md font-label-md mt-1">Control</span>
+</a>
+<!-- Houses (Inactive) -->
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-surface-variant px-4 py-1.5 hover:bg-surface-container-high dark:hover:bg-surface-variant transition-colors rounded-xl" href="#">
+<span class="material-symbols-outlined">home</span>
+<span class="text-label-md font-label-md mt-1">Houses</span>
+</a>
+<!-- More (Inactive) -->
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-surface-variant px-4 py-1.5 hover:bg-surface-container-high dark:hover:bg-surface-variant transition-colors rounded-xl" href="#">
+<span class="material-symbols-outlined">more_horiz</span>
+<span class="text-label-md font-label-md mt-1">More</span>
+</a>
+</nav>
+
+
+</body></html>

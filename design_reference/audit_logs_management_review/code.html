@@ -1,0 +1,419 @@
+<!DOCTYPE html><html class="light" lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>RC SOW Management - Audit Logs</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;700;800;900&amp;family=Inter:wght@400;500;600&amp;family=JetBrains+Mono:wght@500&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-container-lowest": "#ffffff",
+                        "primary-fixed": "#ffdad6",
+                        "on-surface-variant": "#5b403d",
+                        "primary": "#af101a",
+                        "brand-strong": "#B71C1C",
+                        "surface-variant": "#f9dcd9",
+                        "warning": "#FFA000",
+                        "on-secondary-fixed-variant": "#004786",
+                        "secondary-container": "#54a0fe",
+                        "success": "#2E7D32",
+                        "error": "#C62828",
+                        "tertiary-container": "#00799c",
+                        "surface-l1": "#FFFFFF",
+                        "tertiary": "#005f7b",
+                        "brand-soft": "#FFEBEE",
+                        "primary-container": "#d32f2f",
+                        "secondary-fixed-dim": "#a5c8ff",
+                        "brand-red": "#D32F2F",
+                        "surface-container-low": "#fff0ef",
+                        "canvas-l0": "#F5F7F9",
+                        "on-tertiary-container": "#e9f7ff",
+                        "surface-container": "#ffe9e7",
+                        "on-surface": "#271816",
+                        "on-secondary-container": "#003567",
+                        "on-primary-fixed-variant": "#930010",
+                        "on-tertiary": "#ffffff",
+                        "surface": "#fff8f7",
+                        "inverse-on-surface": "#ffedeb",
+                        "on-tertiary-fixed": "#001f2a",
+                        "primary-fixed-dim": "#ffb3ac",
+                        "error-container": "#ffdad6",
+                        "on-tertiary-fixed-variant": "#004d65",
+                        "inverse-surface": "#3e2c2a",
+                        "background": "#fff8f7",
+                        "on-secondary-fixed": "#001c3a",
+                        "surface-dim": "#f1d3d0",
+                        "on-error-container": "#93000a",
+                        "on-primary-container": "#fff2f0",
+                        "outline-variant": "#e4beba",
+                        "tertiary-fixed-dim": "#7bd1f8",
+                        "surface-bright": "#fff8f7",
+                        "surface-container-high": "#ffe2de",
+                        "secondary-fixed": "#d4e3ff",
+                        "inverse-primary": "#ffb3ac",
+                        "outline": "#8f6f6c",
+                        "tertiary-fixed": "#bee9ff",
+                        "on-primary": "#ffffff",
+                        "surface-container-highest": "#f9dcd9",
+                        "surface-l2": "#F0F3F5",
+                        "surface-tint": "#ba1a20",
+                        "info": "#0288D1",
+                        "secondary": "#005faf",
+                        "on-primary-fixed": "#410003",
+                        "on-error": "#ffffff",
+                        "on-background": "#271816",
+                        "on-secondary": "#ffffff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "sm": "12px",
+                        "lg": "24px",
+                        "md": "16px",
+                        "xs": "8px",
+                        "gutter-phone": "16px",
+                        "xl": "32px",
+                        "target-min": "48px",
+                        "gutter-tablet": "24px",
+                        "base": "4px"
+                    },
+                    "fontFamily": {
+                        "hero-title-mobile": ["Hanken Grotesk"],
+                        "metadata": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "label-md": ["JetBrains Mono"],
+                        "section-title": ["Hanken Grotesk"],
+                        "hero-title": ["Hanken Grotesk"],
+                        "headline-lg": ["Hanken Grotesk"],
+                        "headline-md": ["Hanken Grotesk"],
+                        "body-md": ["Inter"]
+                    },
+                    "fontSize": {
+                        "hero-title-mobile": ["28px", { "lineHeight": "32px", "fontWeight": "900" }],
+                        "metadata": ["12px", { "lineHeight": "16px", "fontWeight": "500" }],
+                        "body-lg": ["17px", { "lineHeight": "26px", "fontWeight": "400" }],
+                        "label-md": ["13px", { "lineHeight": "16px", "fontWeight": "500" }],
+                        "section-title": ["18px", { "lineHeight": "24px", "fontWeight": "700" }],
+                        "hero-title": ["32px", { "lineHeight": "36px", "letterSpacing": "-0.02em", "fontWeight": "900" }],
+                        "headline-lg": ["24px", { "lineHeight": "32px", "fontWeight": "800" }],
+                        "headline-md": ["20px", { "lineHeight": "28px", "fontWeight": "750" }],
+                        "body-md": ["15px", { "lineHeight": "22px", "fontWeight": "400" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .material-symbols-outlined.fill {
+            font-variation-settings: 'FILL' 1;
+        }
+    </style>
+</head>
+<body class="bg-canvas-l0 text-on-background font-body-md min-h-screen flex antialiased">
+<!-- TopAppBar for Mobile (Hidden on MD+) -->
+<header class="md:hidden flex items-center justify-between px-md w-full h-target-min bg-surface dark:bg-surface shadow-sm sticky top-0 z-50">
+<div class="flex items-center gap-xs">
+<span class="material-symbols-outlined text-primary dark:text-primary-fixed-dim fill">roofing</span>
+<span class="font-headline-md text-headline-md font-black text-primary dark:text-primary-fixed-dim">H12 | Operational</span>
+</div>
+<button class="w-target-min h-target-min flex items-center justify-center text-primary dark:text-primary-fixed-dim active:scale-95 transition-transform duration-200">
+<span class="material-symbols-outlined">cloud_sync</span>
+</button>
+</header>
+<!-- Side Navigation (Desktop/Tablet) -->
+<nav class="hidden md:flex flex-col w-[280px] bg-surface border-r border-outline-variant h-screen sticky top-0 z-40">
+<div class="p-lg flex items-center gap-sm">
+<div class="w-10 h-10 bg-primary-container rounded-lg flex items-center justify-center">
+<span class="material-symbols-outlined text-on-primary-container fill">roofing</span>
+</div>
+<div>
+<h1 class="font-headline-md text-headline-md font-black text-primary leading-tight">H12</h1>
+<p class="font-metadata text-metadata text-on-surface-variant">SOW Management</p>
+</div>
+</div>
+<div class="flex-1 px-sm py-md space-y-xs overflow-y-auto">
+<a class="flex items-center gap-sm px-md py-sm rounded-lg text-on-surface-variant hover:bg-surface-container-low transition-colors" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-label-md text-label-md">Dashboard</span>
+</a>
+<a class="flex items-center gap-sm px-md py-sm rounded-lg text-on-surface-variant hover:bg-surface-container-low transition-colors" href="#">
+<span class="material-symbols-outlined">architecture</span>
+<span class="font-label-md text-label-md">Scope</span>
+</a>
+<a class="flex items-center gap-sm px-md py-sm rounded-lg text-on-surface-variant hover:bg-surface-container-low transition-colors" href="#">
+<span class="material-symbols-outlined">home_work</span>
+<span class="font-label-md text-label-md">Houses</span>
+</a>
+<div class="pt-sm mt-sm border-t border-outline-variant">
+<span class="px-md font-metadata text-metadata text-outline uppercase tracking-wider mb-xs block">System</span>
+<a class="flex items-center gap-sm px-md py-sm rounded-lg text-on-surface-variant hover:bg-surface-container-low transition-colors" href="#">
+<span class="material-symbols-outlined">group</span>
+<span class="font-label-md text-label-md">Team</span>
+</a>
+<a class="flex items-center gap-sm px-md py-sm rounded-lg bg-primary-container text-on-primary-container transition-colors" href="#">
+<span class="material-symbols-outlined fill">history</span>
+<span class="font-label-md text-label-md font-bold">Audit Logs</span>
+</a>
+<a class="flex items-center gap-sm px-md py-sm rounded-lg text-on-surface-variant hover:bg-surface-container-low transition-colors" href="#">
+<span class="material-symbols-outlined">settings_remote</span>
+<span class="font-label-md text-label-md">Control</span>
+</a>
+</div>
+</div>
+<div class="p-md border-t border-outline-variant">
+<div class="flex items-center gap-sm">
+<div class="w-8 h-8 rounded-full bg-secondary-container flex items-center justify-center text-on-secondary-container font-label-md text-label-md">
+                    JD
+                </div>
+<div>
+<p class="font-metadata text-metadata text-on-surface font-semibold">Jane Doe</p>
+<p class="font-metadata text-metadata text-on-surface-variant">Field Commander</p>
+</div>
+</div>
+</div>
+</nav>
+<!-- Main Content Canvas -->
+<main class="flex-1 flex flex-col h-screen overflow-hidden">
+<!-- Top Action Bar -->
+<div class="bg-surface-l1 border-b border-outline-variant px-lg py-md flex flex-col sm:flex-row sm:items-center justify-between gap-md shrink-0">
+<div>
+<h2 class="font-headline-lg text-headline-lg text-on-surface flex items-center gap-sm">
+                    Audit Logs
+                    <span class="inline-flex items-center justify-center bg-surface-container-highest text-on-surface-variant font-label-md text-label-md rounded-full px-sm py-1">24,592</span>
+</h2>
+<p class="font-body-md text-body-md text-on-surface-variant mt-1">Chronological record of all system activities.</p>
+</div>
+<div class="flex items-center gap-sm"><button class="h-target-min px-lg rounded-lg bg-primary text-on-primary flex items-center gap-xs hover:bg-brand-strong transition-colors shadow-sm active:scale-95">
+<span class="material-symbols-outlined">sync</span>
+<span class="font-label-md text-label-md uppercase">Sync Now</span>
+</button>
+<button class="h-target-min px-lg rounded-lg border border-outline-variant text-on-surface flex items-center gap-xs hover:bg-surface-container-low transition-colors">
+<span class="material-symbols-outlined">download</span>
+<span class="font-label-md text-label-md uppercase">Export CSV</span>
+</button>
+</div>
+</div>
+<!-- Filters & Search -->
+<div class="bg-surface-container-low px-lg py-sm border-b border-outline-variant flex flex-wrap items-center gap-lg">
+    <div class="flex items-center gap-sm">
+        <div class="w-2 h-2 rounded-full bg-success animate-pulse"></div>
+        <span class="font-metadata text-metadata text-on-surface-variant uppercase tracking-wider">System:</span>
+        <span class="font-label-md text-label-md text-success font-bold">Online</span>
+    </div>
+    <div class="h-4 w-px bg-outline-variant hidden sm:block"></div>
+    <div class="flex items-center gap-sm">
+        <span class="material-symbols-outlined text-on-surface-variant text-[18px]">update</span>
+        <span class="font-metadata text-metadata text-on-surface-variant uppercase tracking-wider">Last Full Sync:</span>
+        <span class="font-label-md text-label-md text-on-surface">2m ago</span>
+    </div>
+    <div class="h-4 w-px bg-outline-variant hidden sm:block"></div>
+    <div class="flex items-center gap-sm">
+        <span class="material-symbols-outlined text-warning text-[18px]">pending_actions</span>
+        <span class="font-metadata text-metadata text-on-surface-variant uppercase tracking-wider">Pending Records:</span>
+        <span class="font-label-md text-label-md text-warning font-bold">1</span>
+    </div>
+</div><div class="bg-surface-l1 px-lg py-sm border-b border-outline-variant shrink-0 flex flex-wrap items-center gap-sm shadow-[0_4px_6px_-1px_rgba(0,0,0,0.02)]">
+<div class="relative flex-1 min-w-[250px]">
+<span class="material-symbols-outlined absolute left-sm top-1/2 -translate-y-1/2 text-on-surface-variant">search</span>
+<input class="w-full h-target-min pl-10 pr-sm rounded-lg border border-outline-variant bg-surface focus:ring-2 focus:ring-primary focus:border-primary font-body-md text-body-md" placeholder="Search House ID, User, or Action..." type="text">
+</div>
+<div class="flex items-center gap-xs overflow-x-auto pb-1 sm:pb-0 hide-scrollbar">
+<select class="h-target-min rounded-lg border border-outline-variant bg-surface font-label-md text-label-md text-on-surface px-md pr-8 focus:ring-primary focus:border-primary">
+<option>All Parishes</option>
+<option>San Jose</option>
+<option>San Miguel</option>
+</select>
+<select class="h-target-min rounded-lg border border-outline-variant bg-surface font-label-md text-label-md text-on-surface px-md pr-8 focus:ring-primary focus:border-primary">
+<option>All Roles</option>
+<option>Field Tech</option>
+<option>Supervisor</option>
+</select>
+<select class="h-target-min rounded-lg border border-outline-variant bg-surface font-label-md text-label-md text-on-surface px-md pr-8 focus:ring-primary focus:border-primary">
+<option>All Actions</option>
+<option>Status Change</option>
+<option>Evidence Upload</option>
+<option>Approval</option>
+</select>
+<button class="h-target-min px-md rounded-lg border border-outline-variant bg-surface text-on-surface flex items-center gap-xs hover:bg-surface-container-low transition-colors whitespace-nowrap">
+<span class="material-symbols-outlined">calendar_month</span>
+<span class="font-label-md text-label-md">Last 7 Days</span>
+</button>
+</div>
+</div>
+<!-- Log Table / Main View -->
+<div class="flex-1 overflow-auto p-md lg:p-lg">
+<div class="bg-surface-l1 rounded-xl shadow-sm border border-outline-variant overflow-hidden">
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead class="bg-surface-container-lowest border-b border-outline-variant">
+<tr>
+<th class="p-md font-metadata text-metadata text-on-surface-variant uppercase tracking-wider">Timestamp</th>
+<th class="p-md font-metadata text-metadata text-on-surface-variant uppercase tracking-wider">House ID</th>
+<th class="p-md font-metadata text-metadata text-on-surface-variant uppercase tracking-wider">User</th>
+<th class="p-md font-metadata text-metadata text-on-surface-variant uppercase tracking-wider">Action</th>
+<th class="p-md font-metadata text-metadata text-on-surface-variant uppercase tracking-wider">Reference</th>
+<th class="p-md font-metadata text-metadata text-on-surface-variant uppercase tracking-wider">Status</th>
+<th class="p-md w-10"></th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant">
+<!-- Log Row 1 -->
+<tr class="hover:bg-surface-container-low transition-colors cursor-pointer group">
+<td class="p-md align-top">
+<p class="font-body-md text-body-md text-on-surface font-medium">Just now</p>
+<p class="font-metadata text-metadata text-on-surface-variant mt-1">Oct 24, 14:32:05</p>
+</td>
+<td class="p-md align-top">
+<span class="font-label-md text-label-md bg-surface-container px-2 py-1 rounded text-on-surface">H12-SJO-045</span>
+</td>
+<td class="p-md align-top">
+<p class="font-body-md text-body-md text-on-surface">Carlos M.</p>
+<p class="font-metadata text-metadata text-on-surface-variant">Field Tech</p>
+</td>
+<td class="p-md align-top">
+<p class="font-body-md text-body-md text-on-surface">Status updated to <span class="font-semibold text-warning">Quality Review</span></p>
+</td>
+<td class="p-md align-top">
+<a class="inline-flex items-center gap-xs text-secondary hover:underline font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined text-[16px]">image</span>
+                                        View Photo
+                                    </a>
+</td>
+<td class="p-md align-top">
+<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-success/10 text-success font-metadata text-metadata border border-success/20">
+<span class="material-symbols-outlined text-[14px] fill">check_circle</span>
+Synced
+</span>
+</td>
+<td class="p-md align-top text-right">
+<button class="text-on-surface-variant group-hover:text-primary transition-colors">
+<span class="material-symbols-outlined">chevron_right</span>
+</button>
+</td>
+</tr>
+<!-- Log Row 2 -->
+<tr class="hover:bg-surface-container-low transition-colors cursor-pointer group">
+<td class="p-md align-top">
+<p class="font-body-md text-body-md text-on-surface font-medium">15m ago</p>
+<p class="font-metadata text-metadata text-on-surface-variant mt-1">Oct 24, 14:17:22</p>
+</td>
+<td class="p-md align-top">
+<span class="font-label-md text-label-md bg-surface-container px-2 py-1 rounded text-on-surface">H12-SMI-112</span>
+</td>
+<td class="p-md align-top">
+<p class="font-body-md text-body-md text-on-surface">Ana P.</p>
+<p class="font-metadata text-metadata text-on-surface-variant">Supervisor</p>
+</td>
+<td class="p-md align-top">
+<p class="font-body-md text-body-md text-on-surface">Material Request <span class="font-semibold text-success">Approved</span></p>
+</td>
+<td class="p-md align-top">
+<a class="inline-flex items-center gap-xs text-secondary hover:underline font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined text-[16px]">description</span>
+                                        View Form
+                                    </a>
+</td>
+<td class="p-md align-top">
+<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-success/10 text-success font-metadata text-metadata border border-success/20">
+<span class="material-symbols-outlined text-[14px] fill">check_circle</span>
+Synced
+</span>
+</td>
+<td class="p-md align-top text-right">
+<button class="text-on-surface-variant group-hover:text-primary transition-colors">
+<span class="material-symbols-outlined">chevron_right</span>
+</button>
+</td>
+</tr>
+<!-- Log Row 3 (Pending) -->
+<tr class="hover:bg-surface-container-low transition-colors cursor-pointer group bg-brand-soft/30">
+<td class="p-md align-top">
+<p class="font-body-md text-body-md text-on-surface font-medium">1h ago</p>
+<p class="font-metadata text-metadata text-on-surface-variant mt-1">Oct 24, 13:30:00</p>
+</td>
+<td class="p-md align-top">
+<span class="font-label-md text-label-md bg-surface-container px-2 py-1 rounded text-on-surface">H12-SJO-045</span>
+</td>
+<td class="p-md align-top">
+<p class="font-body-md text-body-md text-on-surface">Carlos M.</p>
+<p class="font-metadata text-metadata text-on-surface-variant">Field Tech</p>
+</td>
+<td class="p-md align-top">
+<p class="font-body-md text-body-md text-on-surface">Evidence Upload: Roof Structure</p>
+</td>
+<td class="p-md align-top">
+<span class="text-on-surface-variant font-label-md text-label-md italic">Pending Sync</span>
+</td>
+<td class="p-md align-top">
+<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-warning/10 text-warning font-metadata text-metadata border border-warning/20">
+<span class="material-symbols-outlined text-[14px] animate-spin">sync</span>
+Pending
+</span>
+</td>
+<td class="p-md align-top text-right">
+<button class="text-on-surface-variant group-hover:text-primary transition-colors">
+<span class="material-symbols-outlined">chevron_right</span>
+</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- Pagination Footer -->
+<div class="bg-surface border-t border-outline-variant p-sm flex items-center justify-between">
+<p class="font-metadata text-metadata text-on-surface-variant pl-md">Showing 1-3 of 24,592</p>
+<div class="flex items-center gap-xs">
+<button class="w-8 h-8 flex items-center justify-center rounded text-on-surface-variant hover:bg-surface-container-highest disabled:opacity-50" disabled="">
+<span class="material-symbols-outlined">chevron_left</span>
+</button>
+<button class="w-8 h-8 flex items-center justify-center rounded text-on-surface-variant hover:bg-surface-container-highest">
+<span class="material-symbols-outlined">chevron_right</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- BottomNavBar for Mobile (Hidden on MD+) -->
+<nav class="md:hidden fixed bottom-0 w-full z-50 bg-surface dark:bg-surface shadow-[0_-1px_3px_rgba(0,0,0,0.05)] pb-safe h-16 flex justify-around items-center px-sm">
+<a class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1 active:scale-95 transition-transform duration-150" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-label-md text-label-md text-[10px]">Dashboard</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1 active:scale-95 transition-transform duration-150" href="#">
+<span class="material-symbols-outlined">architecture</span>
+<span class="font-label-md text-label-md text-[10px]">Scope</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1 active:scale-95 transition-transform duration-150" href="#">
+<span class="material-symbols-outlined">home_work</span>
+<span class="font-label-md text-label-md text-[10px]">Houses</span>
+</a>
+<a class="flex flex-col items-center justify-center bg-primary-container text-on-primary-container rounded-xl px-4 py-1 active:scale-95 transition-transform duration-150" href="#">
+<span class="material-symbols-outlined fill">more_horiz</span>
+<span class="font-label-md text-label-md text-[10px]">More</span>
+</a>
+</nav>
+<style>
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+
+
+</body></html>

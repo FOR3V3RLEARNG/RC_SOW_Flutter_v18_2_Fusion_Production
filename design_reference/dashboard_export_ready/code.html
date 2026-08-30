@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>RC SOW - Dashboard</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&amp;family=Hanken+Grotesk:wght@700;800;900&amp;family=JetBrains+Mono:wght@500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "on-background": "#271816",
+                      "tertiary-fixed": "#bee9ff",
+                      "on-error-container": "#93000a",
+                      "surface-dim": "#f1d3d0",
+                      "on-tertiary-fixed-variant": "#004d65",
+                      "tertiary-fixed-dim": "#7bd1f8",
+                      "error": "#C62828",
+                      "primary-container": "#d32f2f",
+                      "on-surface": "#271816",
+                      "on-primary-fixed-variant": "#930010",
+                      "surface": "#fff8f7",
+                      "success": "#2E7D32",
+                      "error-container": "#ffdad6",
+                      "tertiary-container": "#00799c",
+                      "primary": "#af101a",
+                      "primary-fixed-dim": "#ffb3ac",
+                      "on-tertiary-container": "#e9f7ff",
+                      "outline-variant": "#e4beba",
+                      "on-tertiary": "#ffffff",
+                      "on-secondary-fixed-variant": "#004786",
+                      "canvas-l0": "#F5F7F9",
+                      "surface-container-low": "#fff0ef",
+                      "surface-container": "#ffe9e7",
+                      "inverse-surface": "#3e2c2a",
+                      "tertiary": "#005f7b",
+                      "on-error": "#ffffff",
+                      "secondary-fixed": "#d4e3ff",
+                      "on-tertiary-fixed": "#001f2a",
+                      "outline": "#8f6f6c",
+                      "inverse-primary": "#ffb3ac",
+                      "surface-l2": "#F0F3F5",
+                      "on-secondary": "#ffffff",
+                      "primary-fixed": "#ffdad6",
+                      "surface-bright": "#fff8f7",
+                      "secondary": "#005faf",
+                      "brand-strong": "#B71C1C",
+                      "surface-container-highest": "#f9dcd9",
+                      "surface-container-lowest": "#ffffff",
+                      "warning": "#FFA000",
+                      "surface-container-high": "#ffe2de",
+                      "inverse-on-surface": "#ffedeb",
+                      "secondary-container": "#54a0fe",
+                      "surface-variant": "#f9dcd9",
+                      "on-secondary-fixed": "#001c3a",
+                      "on-surface-variant": "#5b403d",
+                      "brand-soft": "#FFEBEE",
+                      "info": "#0288D1",
+                      "on-primary-container": "#fff2f0",
+                      "surface-tint": "#ba1a20",
+                      "on-primary-fixed": "#410003",
+                      "on-secondary-container": "#003567",
+                      "background": "#fff8f7",
+                      "surface-l1": "#FFFFFF",
+                      "secondary-fixed-dim": "#a5c8ff",
+                      "brand-red": "#D32F2F",
+                      "on-primary": "#ffffff"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "sm": "12px",
+                      "gutter-tablet": "24px",
+                      "base": "4px",
+                      "xl": "32px",
+                      "xs": "8px",
+                      "lg": "24px",
+                      "md": "16px",
+                      "gutter-phone": "16px",
+                      "target-min": "48px"
+              },
+              "fontFamily": {
+                      "body-md": [
+                              "Inter"
+                      ],
+                      "headline-lg": [
+                              "Hanken Grotesk"
+                      ],
+                      "hero-title": [
+                              "Hanken Grotesk"
+                      ],
+                      "headline-md": [
+                              "Hanken Grotesk"
+                      ],
+                      "body-lg": [
+                              "Inter"
+                      ],
+                      "section-title": [
+                              "Hanken Grotesk"
+                      ],
+                      "hero-title-mobile": [
+                              "Hanken Grotesk"
+                      ],
+                      "metadata": [
+                              "Inter"
+                      ],
+                      "label-md": [
+                              "JetBrains Mono"
+                      ]
+              },
+              "fontSize": {
+                      "body-md": [
+                              "15px",
+                              {
+                                      "lineHeight": "22px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "headline-lg": [
+                              "24px",
+                              {
+                                      "lineHeight": "32px",
+                                      "fontWeight": "800"
+                              }
+                      ],
+                      "hero-title": [
+                              "32px",
+                              {
+                                      "lineHeight": "36px",
+                                      "letterSpacing": "-0.02em",
+                                      "fontWeight": "900"
+                              }
+                      ],
+                      "headline-md": [
+                              "20px",
+                              {
+                                      "lineHeight": "28px",
+                                      "fontWeight": "750"
+                              }
+                      ],
+                      "body-lg": [
+                              "17px",
+                              {
+                                      "lineHeight": "26px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "section-title": [
+                              "18px",
+                              {
+                                      "lineHeight": "24px",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "hero-title-mobile": [
+                              "28px",
+                              {
+                                      "lineHeight": "32px",
+                                      "fontWeight": "900"
+                              }
+                      ],
+                      "metadata": [
+                              "12px",
+                              {
+                                      "lineHeight": "16px",
+                                      "fontWeight": "500"
+                              }
+                      ],
+                      "label-md": [
+                              "13px",
+                              {
+                                      "lineHeight": "16px",
+                                      "fontWeight": "500"
+                              }
+                      ]
+              }
+      },
+          },
+        }
+    </script>
+<style>
+        body { background-color: #F5F7F9; } /* Canvas L0 */
+        .pb-safe { padding-bottom: env(safe-area-inset-bottom); }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+</head>
+<body class="font-body-md text-on-background antialiased flex flex-col min-h-screen">
+<!-- TopAppBar -->
+<header class="bg-surface dark:bg-surface flex justify-between items-center px-gutter-phone h-16 w-full docked full-width top-0 sticky z-40 flat no shadows">
+<a class="flex items-center gap-xs cursor-pointer active:opacity-80 transition-all duration-150" href="#">
+<div class="text-brand-red flex items-center justify-center w-10 h-10 rounded-full bg-brand-soft">
+<span class="material-symbols-outlined text-[24px]" style="font-variation-settings: 'FILL' 1;">home_work</span>
+</div>
+<div class="flex flex-col">
+<span class="text-headline-md font-headline-md font-black text-brand-red dark:text-inverse-primary leading-tight">RC SOW</span>
+<span class="text-metadata font-metadata text-on-surface-variant">Admin • All Parishes</span>
+</div>
+</a>
+<div class="flex items-center gap-xs"><button class="w-10 h-10 flex items-center justify-center rounded-full text-on-surface-variant hover:bg-surface-container-low transition-colors h-target-min">
+<img alt="Map Location Icon" class="w-6 h-6" src="https://lh3.googleusercontent.com/aida/AEtjO1U0RTUuY_EUH2fki2KRfSYZQqEzw3PmFV85WZ9HhA4ZJmQp0XxC5oSk4UuGpd-7osSALZPgOZQgXHw0fzRKrks_XbGSJfM-gik6lBpD3OjSFfZAR6RYUrgJHSA_KsM0bf7lH_z01JJOBjvtptrWCJMCru8l8EPXlZGEUzD93MZF2rxaA4O1fUttDKK2aFcixaiomEnnl24B8X3gwOBSkE3WczHJJ-vzWsi_erUofD0Zg6DrKUYcwmJnsks"/>
+</button>
+<button class="w-10 h-10 flex items-center justify-center rounded-full text-on-surface-variant hover:bg-surface-container-low transition-colors">
+<span class="material-symbols-outlined">map</span>
+</button>
+<button class="w-10 h-10 flex items-center justify-center rounded-full text-on-surface-variant hover:bg-surface-container-low transition-colors">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="w-10 h-10 flex items-center justify-center rounded-full text-on-surface-variant hover:bg-surface-container-low transition-colors">
+<span class="material-symbols-outlined">settings</span>
+</button>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="flex-1 px-gutter-phone py-md flex flex-col gap-xl pb-24 md:pb-8">
+<!-- Live Production Hero -->
+<section class="bg-brand-soft rounded-3xl p-md md:p-lg flex flex-col gap-md relative overflow-hidden">
+<div class="inline-flex items-center gap-base bg-brand-red/10 text-brand-red px-3 py-1 rounded-full w-fit">
+<span class="material-symbols-outlined text-[14px]">bolt</span>
+<span class="text-metadata font-metadata uppercase tracking-wider font-bold">Live Production</span>
+</div>
+<div>
+<h1 class="text-hero-title-mobile md:text-hero-title font-hero-title-mobile md:font-hero-title text-on-background mb-2">From assessment to paid completion</h1>
+<p class="text-body-md font-body-md text-on-surface-variant max-w-2xl">1 active houses • 1 controlled records. Keep approvals, field evidence, materials, completion and payment connected.</p>
+</div>
+<a class="bg-brand-red/10 text-brand-red font-label-md text-label-md px-md py-sm rounded-full flex items-center gap-sm w-fit hover:bg-brand-red/20 transition-colors h-target-min" href="{{DATA:SCREEN:SCREEN_79}}">
+<span class="material-symbols-outlined text-[20px]">handyman</span>
+                Open production control
+            </a>
+<!-- Radial Progress Decoration -->
+<div class="absolute bottom-4 right-4 md:bottom-8 md:right-8 w-24 h-24 rounded-full border-8 border-brand-red/20 flex flex-col items-center justify-center">
+<span class="text-headline-md font-headline-md text-brand-red">0%</span>
+<span class="text-metadata font-metadata text-brand-red">closed</span>
+</div>
+</section>
+<!-- Quick Tabs (Scrollable) -->
+<div class="flex overflow-x-auto gap-sm pb-2 scrollbar-hide -mx-gutter-phone px-gutter-phone md:mx-0 md:px-0">
+<a class="bg-brand-soft text-brand-red rounded-full px-lg py-sm flex items-center gap-xs whitespace-nowrap h-target-min font-label-md text-label-md font-bold" href="{{DATA:SCREEN:SCREEN_12}}"><span class="material-symbols-outlined text-[20px]">assignment</span>Scope</a>
+<a class="bg-surface-l1 text-on-surface-variant border border-outline-variant/30 rounded-full px-lg py-sm flex items-center gap-xs whitespace-nowrap h-target-min font-label-md text-label-md hover:bg-surface-l2 transition-colors" href="{{DATA:SCREEN:SCREEN_79}}"><span class="material-symbols-outlined text-[20px]">fact_check</span>Control</a>
+<a class="bg-surface-l1 text-on-surface-variant border border-outline-variant/30 rounded-full px-lg py-sm flex items-center gap-xs whitespace-nowrap h-target-min font-label-md text-label-md hover:bg-surface-l2 transition-colors" href="{{DATA:SCREEN:SCREEN_26}}"><span class="material-symbols-outlined text-[20px]">home</span>Houses</a>
+<a class="bg-surface-l1 text-on-surface-variant border border-outline-variant/30 rounded-full px-lg py-sm flex items-center gap-xs whitespace-nowrap h-target-min font-label-md text-label-md hover:bg-surface-l2 transition-colors" href="{{DATA:SCREEN:SCREEN_4}}">
+<span class="material-symbols-outlined text-[20px]">chat</span>
+                Messages
+            </a>
+</div>
+<!-- Operational Pulse -->
+<section>
+<h2 class="text-section-title font-section-title text-on-background mb-md">Operational pulse</h2>
+<div class="grid grid-cols-2 md:grid-cols-4 gap-md">
+<!-- Card 1 -->
+<div class="bg-surface-l1 rounded-2xl p-md shadow-sm border border-outline-variant/20 flex flex-col gap-sm relative hover:shadow-md transition-shadow cursor-pointer">
+<div class="bg-brand-soft text-brand-red w-10 h-10 rounded-full flex items-center justify-center">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">home_work</span>
+</div>
+<span class="material-symbols-outlined absolute top-4 right-4 text-on-surface-variant text-[20px]">arrow_outward</span>
+<div class="mt-2">
+<div class="text-hero-title-mobile font-hero-title-mobile text-brand-red">1</div>
+<div class="text-label-md font-label-md font-bold text-on-background">Active houses</div>
+</div>
+</div>
+<!-- Card 2 -->
+<div class="bg-surface-l1 rounded-2xl p-md shadow-sm border border-outline-variant/20 flex flex-col gap-sm relative hover:shadow-md transition-shadow cursor-pointer">
+<div class="bg-secondary-fixed text-secondary w-10 h-10 rounded-full flex items-center justify-center">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">mail</span>
+</div>
+<span class="material-symbols-outlined absolute top-4 right-4 text-on-surface-variant text-[20px]">arrow_outward</span>
+<div class="mt-2">
+<div class="text-hero-title-mobile font-hero-title-mobile text-secondary">0</div>
+<div class="text-label-md font-label-md font-bold text-on-background">Unread messages</div>
+</div>
+</div>
+<!-- Card 3 -->
+<div class="bg-surface-l1 rounded-2xl p-md shadow-sm border border-outline-variant/20 flex flex-col gap-sm relative hover:shadow-md transition-shadow cursor-pointer">
+<div class="bg-[#E0F2F1] text-[#00897B] w-10 h-10 rounded-full flex items-center justify-center">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">error</span>
+</div>
+<span class="material-symbols-outlined absolute top-4 right-4 text-on-surface-variant text-[20px]">arrow_outward</span>
+<div class="mt-2">
+<div class="text-hero-title-mobile font-hero-title-mobile text-[#00897B]">0</div>
+<div class="text-label-md font-label-md font-bold text-on-background">Needs attention</div>
+</div>
+</div>
+<!-- Card 4 -->
+<div class="bg-surface-l1 rounded-2xl p-md shadow-sm border border-outline-variant/20 flex flex-col gap-sm relative hover:shadow-md transition-shadow cursor-pointer">
+<div class="bg-[#EDE7F6] text-[#5E35B1] w-10 h-10 rounded-full flex items-center justify-center">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">account_tree</span>
+</div>
+<span class="material-symbols-outlined absolute top-4 right-4 text-on-surface-variant text-[20px]">arrow_outward</span>
+<div class="mt-2">
+<div class="text-hero-title-mobile font-hero-title-mobile text-[#5E35B1]">1</div>
+<div class="text-label-md font-label-md font-bold text-on-background">Production records</div>
+</div>
+</div>
+<div class="bg-surface-l1 rounded-2xl p-md shadow-sm border border-outline-variant/20 flex flex-col gap-sm relative hover:shadow-md transition-shadow cursor-pointer">
+<div class="bg-brand-soft text-brand-red w-10 h-10 rounded-full flex items-center justify-center">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">trending_up</span>
+</div>
+<span class="material-symbols-outlined absolute top-4 right-4 text-on-surface-variant text-[20px]">arrow_outward</span>
+<div class="mt-2">
+<div class="text-hero-title-mobile font-hero-title-mobile text-brand-red">12</div>
+<div class="text-label-md font-label-md font-bold text-on-background">Weekly Projections</div>
+</div>
+</div></div>
+</section>
+<!-- Production Chain -->
+<section class="bg-surface-l1 rounded-3xl p-md md:p-lg shadow-sm border border-outline-variant/20">
+<h2 class="text-section-title font-section-title text-on-background mb-1">Production chain</h2>
+<p class="text-metadata font-metadata text-on-surface-variant mb-lg max-w-xl">A visible workflow preserves orientation: every downstream action belongs to a known house and production stage.</p>
+<div class="flex items-center justify-between overflow-x-auto pb-4 scrollbar-hide gap-2">
+<!-- Scope -->
+<div class="flex-shrink-0 bg-canvas-l0 rounded-2xl p-md w-32 flex flex-col gap-sm items-center text-center">
+<span class="material-symbols-outlined text-brand-red">assignment</span>
+<div>
+<div class="text-headline-lg font-headline-lg text-on-background">0</div>
+<div class="text-metadata font-metadata text-on-surface-variant">Scope</div>
+</div>
+<div class="flex items-center gap-xs mt-1">
+<span class="w-2 h-2 rounded-full bg-success"></span>
+<span class="text-[10px] font-bold text-success uppercase">Approved</span>
+</div></div>
+<span class="material-symbols-outlined text-outline-variant text-[20px] flex-shrink-0">arrow_forward</span>
+<!-- Control -->
+<div class="flex-shrink-0 bg-canvas-l0 rounded-2xl p-md w-32 flex flex-col gap-sm items-center text-center">
+<span class="material-symbols-outlined text-brand-red">account_tree</span>
+<div>
+<div class="text-headline-lg font-headline-lg text-on-background">1</div>
+<div class="text-metadata font-metadata text-on-surface-variant">Control</div>
+</div>
+<div class="flex items-center gap-xs mt-1">
+<span class="w-2 h-2 rounded-full bg-warning"></span>
+<span class="text-[10px] font-bold text-warning uppercase">Pending</span>
+</div></div>
+<span class="material-symbols-outlined text-outline-variant text-[20px] flex-shrink-0">arrow_forward</span>
+<!-- Delivery -->
+<div class="flex-shrink-0 bg-canvas-l0 rounded-2xl p-md w-32 flex flex-col gap-sm items-center text-center">
+<span class="material-symbols-outlined text-brand-red">handyman</span>
+<div>
+<div class="text-headline-lg font-headline-lg text-on-background">0</div>
+<div class="text-metadata font-metadata text-on-surface-variant">Delivery</div>
+</div>
+</div>
+<span class="material-symbols-outlined text-outline-variant text-[20px] flex-shrink-0">arrow_forward</span>
+<!-- Completion -->
+<div class="flex-shrink-0 bg-canvas-l0 rounded-2xl p-md w-32 flex flex-col gap-sm items-center text-center">
+<span class="material-symbols-outlined text-brand-red">verified</span>
+<div>
+<div class="text-headline-lg font-headline-lg text-on-background">0</div>
+<div class="text-metadata font-metadata text-on-surface-variant">Completion</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Recent Houses -->
+<section class="flex flex-col gap-md">
+<h2 class="text-section-title font-section-title text-on-background">Recent activity</h2>
+<div class="flex flex-col gap-sm">
+<div class="bg-surface-l1 rounded-2xl p-md border border-outline-variant/20 flex items-start gap-md">
+<div class="w-10 h-10 rounded-full bg-brand-soft text-brand-red flex items-center justify-center flex-shrink-0">
+<span class="material-symbols-outlined">cancel</span>
+</div>
+<div class="flex-1">
+<p class="text-body-md text-on-background"><strong>Log Rejected:</strong> H01 Electrical Rough-in</p>
+<p class="text-metadata text-on-surface-variant mb-2">2 hours ago • Admin</p>
+<button class="text-brand-red text-label-md font-bold hover:underline">View Reason</button>
+</div>
+</div>
+<div class="bg-surface-l1 rounded-2xl p-md border border-outline-variant/20 flex items-start gap-md">
+<div class="w-10 h-10 rounded-full bg-[#E8F5E9] text-[#2E7D32] flex items-center justify-center flex-shrink-0">
+<span class="material-symbols-outlined">check_circle</span>
+</div>
+<div class="flex-1">
+<p class="text-body-md text-on-background"><strong>Log Approved:</strong> H01 Foundation Pour</p>
+<p class="text-metadata text-on-surface-variant">5 hours ago • Supervisor</p>
+</div>
+</div>
+</div>
+</section><section>
+<div class="flex justify-between items-center mb-md">
+<h2 class="text-section-title font-section-title text-on-background">Recent houses</h2>
+<a class="text-brand-red text-label-md font-label-md font-bold hover:underline h-target-min flex items-center" href="#">View all</a>
+</div>
+<a class="bg-surface-l1 rounded-2xl p-md shadow-sm border border-outline-variant/20 flex items-center gap-md hover:bg-surface-container-low transition-colors cursor-pointer h-24" href="{{DATA:SCREEN:SCREEN_26}}"><div class="bg-brand-soft text-brand-red w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0"><span class="material-symbols-outlined text-[28px]" style="font-variation-settings: 'FILL' 1;">home_work</span></div><div class="flex-1 min-w-0"><h3 class="text-body-md font-body-md font-bold text-on-background truncate">H01 •</h3><p class="text-metadata font-metadata text-on-surface-variant truncate">Hanover • Haughton Grove • Completed</p></div><div class="bg-[#E8F5E9] text-[#2E7D32] px-3 py-1 rounded-full text-label-md font-label-md font-bold flex-shrink-0">100%</div></a>
+</section>
+</main>
+<!-- FAB: Users Online -->
+<a class="fixed bottom-44 right-4 md:bottom-28 md:right-8 bg-brand-red text-white w-14 h-14 rounded-full flex items-center justify-center shadow-lg z-50 transition-transform hover:scale-110 active:scale-95" href="{{DATA:SCREEN:SCREEN_4}}"><span class="material-symbols-outlined text-[28px]">chat</span><div class="absolute -top-1 -right-1 bg-white text-brand-red text-[10px] font-bold w-5 h-5 rounded-full flex items-center justify-center border-2 border-brand-red shadow-sm">3</div></a><button class="fixed bottom-24 right-4 md:bottom-8 md:right-8 bg-[#00796B] hover:bg-[#00695C] text-white rounded-2xl px-md py-sm flex items-center gap-sm shadow-lg z-40 transition-transform hover:scale-105 h-target-min">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">group</span>
+<span class="font-label-md text-label-md font-bold">Users online</span>
+</button>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-2 py-3 pb-safe bg-surface-container-lowest dark:bg-inverse-surface border-t border-outline-variant dark:border-none shadow-lg md:hidden rounded-t-xl">
+<!-- Dashboard (Active) -->
+<a class="flex flex-col items-center justify-center bg-brand-soft dark:bg-primary text-brand-red dark:text-on-primary rounded-xl px-4 py-1.5 transition-all scale-95 duration-100" href="#">
+<span class="material-symbols-outlined text-[24px]" style="font-variation-settings: 'FILL' 1;">dashboard</span>
+<span class="text-label-md font-label-md mt-1">Dashboard</span>
+</a>
+<!-- Scope -->
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-surface-variant px-4 py-1.5 hover:bg-surface-container-high dark:hover:bg-surface-variant transition-colors rounded-xl" href="{{DATA:SCREEN:SCREEN_12}}">
+<span class="material-symbols-outlined text-[24px]">assignment</span>
+<span class="text-label-md font-label-md mt-1">Scope</span>
+</a>
+<!-- Control -->
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-surface-variant px-4 py-1.5 hover:bg-surface-container-high dark:hover:bg-surface-variant transition-colors rounded-xl" href="{{DATA:SCREEN:SCREEN_79}}">
+<span class="material-symbols-outlined text-[24px]">settings_suggest</span>
+<span class="text-label-md font-label-md mt-1">Control</span>
+</a>
+<!-- Houses -->
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-surface-variant px-4 py-1.5 hover:bg-surface-container-high dark:hover:bg-surface-variant transition-colors rounded-xl" href="{{DATA:SCREEN:SCREEN_26}}">
+<span class="material-symbols-outlined text-[24px]">home</span>
+<span class="text-label-md font-label-md mt-1">Houses</span>
+</a>
+<!-- More -->
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-surface-variant px-4 py-1.5 hover:bg-surface-container-high dark:hover:bg-surface-variant transition-colors rounded-xl" href="#">
+<span class="material-symbols-outlined text-[24px]">more_horiz</span>
+<span class="text-label-md font-label-md mt-1">More</span>
+</a>
+</nav>
+</body></html>
