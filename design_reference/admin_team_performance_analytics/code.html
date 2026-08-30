@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Team Performance Analytics - Operations Command</title>
+<!-- Tailwind CSS Setup -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-primary-container": "#fff2f0",
+                        "surface-l1": "#FFFFFF",
+                        "secondary-container": "#54a0fe",
+                        "tertiary-fixed": "#bee9ff",
+                        "surface-container-low": "#fff0ef",
+                        "primary": "#af101a",
+                        "on-tertiary-container": "#e9f7ff",
+                        "error-container": "#ffdad6",
+                        "background": "#fff8f7",
+                        "on-tertiary": "#ffffff",
+                        "tertiary-fixed-dim": "#7bd1f8",
+                        "tertiary-container": "#00799c",
+                        "surface-dim": "#f1d3d0",
+                        "on-surface-variant": "#5b403d",
+                        "secondary": "#005faf",
+                        "surface-variant": "#f9dcd9",
+                        "success": "#2E7D32",
+                        "outline-variant": "#e4beba",
+                        "on-primary": "#ffffff",
+                        "inverse-primary": "#ffb3ac",
+                        "brand-strong": "#B71C1C",
+                        "brand-soft": "#FFEBEE",
+                        "error": "#C62828",
+                        "surface-container-highest": "#f9dcd9",
+                        "surface-l2": "#F0F3F5",
+                        "on-secondary": "#ffffff",
+                        "warning": "#FFA000",
+                        "surface": "#fff8f7",
+                        "on-surface": "#271816",
+                        "on-error": "#ffffff",
+                        "canvas-l0": "#F5F7F9",
+                        "on-tertiary-fixed": "#001f2a",
+                        "info": "#0288D1",
+                        "inverse-surface": "#3e2c2a",
+                        "on-background": "#271816",
+                        "surface-container": "#ffe9e7",
+                        "surface-bright": "#fff8f7",
+                        "on-secondary-fixed": "#001c3a",
+                        "on-primary-fixed": "#410003",
+                        "primary-fixed": "#ffdad6",
+                        "brand-red": "#D32F2F",
+                        "outline": "#8f6f6c",
+                        "surface-container-lowest": "#ffffff",
+                        "on-secondary-container": "#003567",
+                        "tertiary": "#005f7b",
+                        "surface-container-high": "#ffe2de",
+                        "on-tertiary-fixed-variant": "#004d65",
+                        "on-error-container": "#93000a",
+                        "primary-container": "#d32f2f",
+                        "on-secondary-fixed-variant": "#004786",
+                        "primary-fixed-dim": "#ffb3ac",
+                        "surface-tint": "#ba1a20",
+                        "secondary-fixed-dim": "#a5c8ff",
+                        "inverse-on-surface": "#ffedeb",
+                        "secondary-fixed": "#d4e3ff",
+                        "on-primary-fixed-variant": "#930010"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "base": "4px",
+                        "md": "16px",
+                        "xs": "8px",
+                        "target-min": "48px",
+                        "lg": "24px",
+                        "gutter-phone": "16px",
+                        "xl": "32px",
+                        "sm": "12px",
+                        "gutter-tablet": "24px"
+                    },
+                    "fontFamily": {
+                        "headline-lg": ["Hanken Grotesk"],
+                        "body-md": ["Inter"],
+                        "hero-title-mobile": ["Hanken Grotesk"],
+                        "hero-title": ["Hanken Grotesk"],
+                        "headline-md": ["Hanken Grotesk"],
+                        "label-md": ["JetBrains Mono"],
+                        "body-lg": ["Inter"],
+                        "metadata": ["Inter"],
+                        "section-title": ["Hanken Grotesk"]
+                    },
+                    "fontSize": {
+                        "headline-lg": ["24px", { "lineHeight": "32px", "fontWeight": "800" }],
+                        "body-md": ["15px", { "lineHeight": "22px", "fontWeight": "400" }],
+                        "hero-title-mobile": ["28px", { "lineHeight": "32px", "fontWeight": "900" }],
+                        "hero-title": ["32px", { "lineHeight": "36px", "letterSpacing": "-0.02em", "fontWeight": "900" }],
+                        "headline-md": ["20px", { "lineHeight": "28px", "fontWeight": "750" }],
+                        "label-md": ["13px", { "lineHeight": "16px", "fontWeight": "500" }],
+                        "body-lg": ["17px", { "lineHeight": "26px", "fontWeight": "400" }],
+                        "metadata": ["12px", { "lineHeight": "16px", "fontWeight": "500" }],
+                        "section-title": ["18px", { "lineHeight": "24px", "fontWeight": "700" }]
+                    }
+                }
+            }
+        }
+    </script>
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;700;800;900&amp;family=Inter:wght@400;500&amp;family=JetBrains+Mono:wght@500&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-family: 'Material Symbols Outlined';
+            font-weight: normal;
+            font-style: normal;
+            font-size: 24px;
+            line-height: 1;
+            letter-spacing: normal;
+            text-transform: none;
+            display: inline-block;
+            white-space: nowrap;
+            word-wrap: normal;
+            direction: ltr;
+            -webkit-font-smoothing: antialiased;
+        }
+    </style>
+</head>
+<body class="bg-canvas-l0 text-on-surface font-body-md h-screen flex flex-col overflow-hidden">
+<!-- Shared Component: TopAppBar -->
+<header class="fixed top-0 w-full z-50 bg-surface dark:bg-on-background bg-surface-container-low dark:bg-on-surface-variant shadow-sm flex items-center justify-between px-gutter-phone md:px-gutter-tablet h-[64px] border-b border-outline-variant">
+<div class="flex items-center gap-md">
+<button class="h-target-min w-target-min flex items-center justify-center rounded-full hover:bg-surface-variant transition-colors active:scale-95 transition-transform text-primary dark:text-primary-fixed">
+<span class="material-symbols-outlined" data-icon="menu">menu</span>
+</button>
+<h1 class="font-headline-lg text-headline-lg font-black text-brand-red dark:text-primary-fixed">RC SOW Operations</h1>
+</div>
+<button class="h-target-min w-target-min flex items-center justify-center rounded-full hover:bg-surface-variant transition-colors active:scale-95 transition-transform text-primary dark:text-primary-fixed">
+<span class="material-symbols-outlined" data-icon="sync">sync</span>
+</button>
+</header>
+<!-- Main Layout Container (Below Fixed Header) -->
+<div class="flex-1 flex overflow-hidden pt-[64px]">
+<!-- Shared Component: NavigationDrawer -->
+<aside class="h-full w-80 rounded-r-xl bg-surface dark:bg-on-background bg-surface-container dark:bg-on-surface-variant shadow-xl flex flex-col py-lg border-r border-outline-variant hidden md:flex shrink-0 z-40 relative">
+<!-- Drawer Header (Profile) -->
+<div class="px-lg pb-lg mb-sm border-b border-outline-variant flex items-center gap-md">
+<img alt="Field Supervisor" class="w-[48px] h-[48px] rounded-full object-cover border-2 border-surface-container-high" data-alt="A high-quality, professional headshot photo of Marcus Thorne, Field Operations Lead. He is wearing a neat, dark collared shirt under a high-visibility construction vest. Clean, bright, natural daytime lighting illuminating a dependable and focused expression. The background is a subtly blurred construction site environment, ensuring a trustworthy and corporate-ready appearance." src="https://lh3.googleusercontent.com/aida-public/AB6AXuA0NjMue68VaWpkk503CUiw8P90BrCv4ijoKGA5g1pNSUIbXKirCb8Q8VBjNUAf_W9mKh9sKSGUniksmcXy_p_t0C9nEFbSkzcxrqMnOrxpHyvePca7xpwmfDaFQESJCy9Mtt3GqUSg9ANZkZRrkUE16F63-mzdS1o3MgBzwmWHKTXk0qMa5RNAt5GDYmXpztGmidv4hoFYEtfauSM29Nkzm2zM4kL9cJ_SfQkgw8ku76UcOFpZAHpoFQ"/>
+<div class="flex flex-col">
+<span class="font-headline-md text-headline-md text-on-surface">Marcus Thorne</span>
+<span class="font-metadata text-metadata text-on-surface-variant">Field Operations Lead</span>
+<span class="font-metadata text-metadata text-tertiary mt-1 bg-tertiary-fixed/30 px-2 py-0.5 rounded inline-block w-fit">Sector 7 - Active</span>
+</div>
+</div>
+<!-- Drawer Navigation Items -->
+<nav class="flex flex-col flex-1 overflow-y-auto px-xs">
+<!-- Active Item -->
+<a class="flex items-center gap-md px-md py-sm h-target-min bg-brand-soft text-brand-strong font-bold rounded-lg m-xs transition-all duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard" data-weight="fill" style="font-variation-settings: 'FILL' 1;">dashboard</span>
+<span class="font-body-md text-body-md">Dashboard</span>
+</a>
+<!-- Inactive Items -->
+<a class="flex items-center gap-md px-md py-sm h-target-min text-on-surface-variant m-xs hover:bg-surface-variant rounded-lg transition-all duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="map">map</span>
+<span class="font-body-md text-body-md">Resource Mapping</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm h-target-min text-on-surface-variant m-xs hover:bg-surface-variant rounded-lg transition-all duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="trending_up">trending_up</span>
+<span class="font-body-md text-body-md">Promotion Logic</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm h-target-min text-on-surface-variant m-xs hover:bg-surface-variant rounded-lg transition-all duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="history_edu">history_edu</span>
+<span class="font-body-md text-body-md">Audit Trail</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm h-target-min text-on-surface-variant m-xs hover:bg-surface-variant rounded-lg transition-all duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="cloud_done">cloud_done</span>
+<span class="font-body-md text-body-md">Sync Status</span>
+</a>
+</nav>
+</aside>
+<!-- Main Content Area -->
+<main class="flex-1 flex overflow-hidden">
+<!-- Center Canvas (KPIs + Table) -->
+<div class="flex-1 overflow-y-auto p-gutter-tablet flex flex-col gap-xl">
+<!-- Page Title -->
+<div class="flex items-center justify-between">
+<h2 class="font-hero-title text-hero-title text-on-surface">Team Performance Analytics</h2>
+<span class="font-metadata text-metadata text-on-surface-variant flex items-center gap-xs bg-surface-l1 px-md py-xs rounded-full border border-outline-variant shadow-sm">
+<span class="w-2 h-2 rounded-full bg-[#2E7D32]"></span> Live Data Sync
+                    </span>
+</div>
+<!-- KPI Tiles Section -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-md">
+<!-- KPI 1 -->
+<div class="bg-surface-l1 rounded-xl p-lg shadow-sm border border-outline-variant flex flex-col gap-sm relative overflow-hidden group hover:border-brand-soft transition-colors">
+<div class="absolute top-0 right-0 w-24 h-24 bg-brand-soft/20 rounded-bl-full -mr-8 -mt-8 z-0"></div>
+<div class="flex items-center gap-xs text-on-surface-variant font-body-md text-body-md z-10 relative">
+<span class="material-symbols-outlined text-[20px]" data-icon="speed">speed</span>
+                            Avg. Throughput
+                        </div>
+<div class="font-hero-title text-hero-title text-on-surface z-10 relative mt-1">
+                            1.4 <span class="font-body-md text-body-md text-on-surface-variant font-normal">Houses/Wk</span>
+</div>
+<div class="flex items-center gap-1 text-[13px] font-medium text-[#2E7D32] mt-auto z-10 relative">
+<span class="material-symbols-outlined text-[16px]" data-icon="arrow_upward">arrow_upward</span>
+                            +12% vs last month
+                        </div>
+</div>
+<!-- KPI 2 -->
+<div class="bg-surface-l1 rounded-xl p-lg shadow-sm border border-outline-variant flex flex-col gap-sm relative overflow-hidden group hover:border-tertiary-fixed transition-colors">
+<div class="absolute top-0 right-0 w-24 h-24 bg-tertiary-fixed/20 rounded-bl-full -mr-8 -mt-8 z-0"></div>
+<div class="flex items-center gap-xs text-on-surface-variant font-body-md text-body-md z-10 relative">
+<span class="material-symbols-outlined text-[20px]" data-icon="fact_check">fact_check</span>
+                            Quality Score
+                        </div>
+<div class="font-hero-title text-hero-title text-on-surface z-10 relative mt-1">
+                            98.2<span class="font-headline-md text-headline-md text-on-surface-variant font-normal">%</span>
+</div>
+<div class="flex items-center gap-1 text-[13px] font-medium text-on-surface-variant mt-auto z-10 relative">
+<span class="material-symbols-outlined text-[16px]" data-icon="horizontal_rule">horizontal_rule</span>
+                            Stable
+                        </div>
+</div>
+<!-- KPI 3 -->
+<div class="bg-surface-l1 rounded-xl p-lg shadow-sm border border-outline-variant flex flex-col gap-sm relative overflow-hidden group hover:border-secondary-container transition-colors">
+<div class="absolute top-0 right-0 w-24 h-24 bg-secondary-container/10 rounded-bl-full -mr-8 -mt-8 z-0"></div>
+<div class="flex items-center gap-xs text-on-surface-variant font-body-md text-body-md z-10 relative">
+<span class="material-symbols-outlined text-[20px]" data-icon="payments">payments</span>
+                            Payout Velocity
+                        </div>
+<div class="font-hero-title text-hero-title text-on-surface z-10 relative mt-1">
+                            2.1 <span class="font-body-md text-body-md text-on-surface-variant font-normal">Days</span>
+</div>
+<div class="flex items-center gap-1 text-[13px] font-medium text-brand-red mt-auto z-10 relative">
+<span class="material-symbols-outlined text-[16px]" data-icon="arrow_downward">arrow_downward</span>
+                            -0.4 days avg delay
+                        </div>
+</div>
+</div>
+<!-- Sortable Data Table Section -->
+<div class="flex flex-col gap-md">
+<div class="flex items-center justify-between">
+<h3 class="font-section-title text-section-title text-on-surface">Active Field Crews</h3>
+<button class="h-target-min px-md flex items-center justify-center gap-xs bg-surface-l1 border border-outline-variant rounded-lg text-on-surface hover:bg-surface-variant transition-colors shadow-sm font-label-md text-label-md uppercase tracking-wider">
+<span class="material-symbols-outlined text-[18px]" data-icon="download">download</span>
+                            Export
+                        </button>
+</div>
+<div class="bg-surface-l1 border border-outline-variant rounded-xl overflow-hidden shadow-sm">
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse min-w-[800px]">
+<thead>
+<tr class="bg-surface-container-low border-b border-outline-variant">
+<th class="font-label-md text-label-md text-on-surface-variant uppercase py-sm px-md cursor-pointer hover:bg-surface-container transition-colors">
+<div class="flex items-center gap-1">Crew Name <span class="material-symbols-outlined text-[16px]" data-icon="arrow_drop_down">arrow_drop_down</span></div>
+</th>
+<th class="font-label-md text-label-md text-on-surface-variant uppercase py-sm px-md">Lead Carpenter</th>
+<th class="font-label-md text-label-md text-on-surface-variant uppercase py-sm px-md">Assistant</th>
+<th class="font-label-md text-label-md text-on-surface-variant uppercase py-sm px-md">Helper</th>
+<th class="font-label-md text-label-md text-on-surface-variant uppercase py-sm px-md">Current House</th>
+<th class="font-label-md text-label-md text-on-surface-variant uppercase py-sm px-md cursor-pointer hover:bg-surface-container transition-colors">
+<div class="flex items-center gap-1">Efficiency <span class="material-symbols-outlined text-[16px]" data-icon="swap_vert">swap_vert</span></div>
+</th>
+<th class="font-label-md text-label-md text-on-surface-variant uppercase py-sm px-md">Status</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant">
+<!-- Row 1 -->
+<tr class="hover:bg-surface-container-lowest transition-colors group">
+<td class="py-sm px-md">
+<span class="font-label-md text-label-md text-brand-strong bg-brand-soft px-sm py-xs rounded border border-brand-soft/50">ALPHA-7</span>
+</td>
+<td class="py-sm px-md flex items-center gap-sm">
+<img alt="Lead Carpenter" class="w-8 h-8 rounded-full object-cover border border-outline-variant" data-alt="A professional headshot of a Lead Carpenter. An older Hispanic male with a sturdy build, wearing a clean hard hat and safety glasses resting on his head. He wears a yellow high-vis vest over a blue work shirt. Background is a bright, sunny field operations yard. The lighting is crisp, evoking a sense of experienced reliability and modern industrial precision." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCQ4szzRTdwnwFEp_QvXhI7ovuSPHDXIoPWUy6X-T_BGMojk1Z0-Qne47p9UBxswMqdrwGbflbFZsWxXrhtJ01fko8ByXXfv4_mHy8N8yiLiTjy8fJgwR9tbEubFqLtXs_AvbX67jGu1oJQD9OioZv0mQUOOY-aa6JnxI-FK8cxFFpIfqPR5axzZkWp494ubRZ5NFEBCdhWIPJRknMtQ3h920kz9FMBFHLi1c2UrLNG6YrSUAXwKWaZ4g"/>
+<span class="font-body-md text-body-md text-on-surface font-medium">J. Ramirez</span>
+</td>
+<td class="py-sm px-md font-body-md text-body-md text-on-surface-variant">T. Washington</td>
+<td class="py-sm px-md font-body-md text-body-md text-on-surface-variant">S. Davis</td>
+<td class="py-sm px-md">
+<span class="font-label-md text-label-md text-on-surface">HS-8924</span>
+</td>
+<td class="py-sm px-md">
+<div class="flex items-center text-[#FFA000]">
+<span class="material-symbols-outlined text-[18px]" data-icon="star" data-weight="fill" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[18px]" data-icon="star" data-weight="fill" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[18px]" data-icon="star" data-weight="fill" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[18px]" data-icon="star" data-weight="fill" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[18px]" data-icon="star_half" data-weight="fill" style="font-variation-settings: 'FILL' 1;">star_half</span>
+</div>
+</td>
+<td class="py-sm px-md">
+<span class="inline-flex items-center gap-1 px-sm py-0.5 rounded-full bg-surface-container-high border border-outline-variant font-metadata text-metadata text-on-surface">
+<span class="w-1.5 h-1.5 rounded-full bg-[#2E7D32]"></span> Active
+                                            </span>
+</td>
+</tr>
+<!-- Row 2 -->
+<tr class="hover:bg-surface-container-lowest transition-colors group">
+<td class="py-sm px-md">
+<span class="font-label-md text-label-md text-brand-strong bg-brand-soft px-sm py-xs rounded border border-brand-soft/50">BRAVO-2</span>
+</td>
+<td class="py-sm px-md flex items-center gap-sm">
+<img alt="Lead Carpenter" class="w-8 h-8 rounded-full object-cover border border-outline-variant" data-alt="A high-quality portrait of a Lead Carpenter, a strong Caucasian female in her late 30s. She is wearing a pristine white hard hat, a reflective orange safety vest, and carrying a clipboard. The setting is a bright, clear day at a residential rebuild site. The aesthetic is clean, professional, and communicates a strong 'Humanitarian Precision' brand." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBuXT6a1bfhRjXRLyVNoew2AOMSFynbzdrud50JsCLOis5Q72LZYfQeHOhHl1w2rzcrrn19BmhWFwA_HEB7WyXdn27LLSQzFMqAAWPBNwHUD_84ZZhjD5cjwXa0k2Em2lm01LRkpMi9IT-jc_ymiWJ16cGE-3Voz_roRmZmSUkM95Xk_mRMwh1Wc3xrkz6AXanNCnDV2AFgEo_hMpV7TYQtaGTiubFfIykwayV8Z9wL8SxkwW9POQvh3Q"/>
+<span class="font-body-md text-body-md text-on-surface font-medium">L. Miller</span>
+</td>
+<td class="py-sm px-md font-body-md text-body-md text-on-surface-variant">K. Chen</td>
+<td class="py-sm px-md font-body-md text-body-md text-on-surface-variant">-</td>
+<td class="py-sm px-md">
+<span class="font-label-md text-label-md text-on-surface">HS-1102</span>
+</td>
+<td class="py-sm px-md">
+<div class="flex items-center text-[#FFA000]">
+<span class="material-symbols-outlined text-[18px]" data-icon="star" data-weight="fill" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[18px]" data-icon="star" data-weight="fill" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[18px]" data-icon="star" data-weight="fill" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[18px]" data-icon="star" data-weight="fill" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[18px]" data-icon="star" data-weight="fill" style="font-variation-settings: 'FILL' 1;">star</span>
+</div>
+</td>
+<td class="py-sm px-md">
+<span class="inline-flex items-center gap-1 px-sm py-0.5 rounded-full bg-surface-container-high border border-outline-variant font-metadata text-metadata text-on-surface">
+<span class="w-1.5 h-1.5 rounded-full bg-[#2E7D32]"></span> Active
+                                            </span>
+</td>
+</tr>
+<!-- Row 3 -->
+<tr class="hover:bg-surface-container-lowest transition-colors group">
+<td class="py-sm px-md">
+<span class="font-label-md text-label-md text-brand-strong bg-brand-soft px-sm py-xs rounded border border-brand-soft/50">ECHO-9</span>
+</td>
+<td class="py-sm px-md flex items-center gap-sm">
+<div class="w-8 h-8 rounded-full bg-surface-variant flex items-center justify-center font-label-md text-label-md text-on-surface-variant border border-outline-variant">
+                                                AW
+                                            </div>
+<span class="font-body-md text-body-md text-on-surface font-medium">A. Wright</span>
+</td>
+<td class="py-sm px-md font-body-md text-body-md text-on-surface-variant">P. Santos</td>
+<td class="py-sm px-md font-body-md text-body-md text-on-surface-variant">M. Johnson</td>
+<td class="py-sm px-md">
+<span class="font-label-md text-label-md text-on-surface">HS-8841</span>
+</td>
+<td class="py-sm px-md">
+<div class="flex items-center text-[#FFA000]">
+<span class="material-symbols-outlined text-[18px]" data-icon="star" data-weight="fill" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[18px]" data-icon="star" data-weight="fill" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[18px]" data-icon="star" data-weight="fill" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[18px]" data-icon="star_border">star_border</span>
+<span class="material-symbols-outlined text-[18px]" data-icon="star_border">star_border</span>
+</div>
+</td>
+<td class="py-sm px-md">
+<span class="inline-flex items-center gap-1 px-sm py-0.5 rounded-full bg-error-container border border-outline-variant font-metadata text-metadata text-on-error-container">
+<span class="w-1.5 h-1.5 rounded-full bg-error"></span> Blocked: Mat.
+                                            </span>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="bg-surface-container-low border-t border-outline-variant px-md py-sm flex items-center justify-between">
+<span class="font-metadata text-metadata text-on-surface-variant">Showing 1 to 3 of 42 crews</span>
+<div class="flex gap-1">
+<button class="w-8 h-8 flex items-center justify-center rounded hover:bg-surface-variant transition-colors disabled:opacity-50 text-on-surface-variant">
+<span class="material-symbols-outlined text-[18px]" data-icon="chevron_left">chevron_left</span>
+</button>
+<button class="w-8 h-8 flex items-center justify-center rounded hover:bg-surface-variant transition-colors text-on-surface-variant">
+<span class="material-symbols-outlined text-[18px]" data-icon="chevron_right">chevron_right</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Contextual Filter Sidebar (Right) -->
+<aside class="w-[320px] bg-surface-l1 border-l border-outline-variant flex flex-col hidden lg:flex shrink-0 shadow-[-4px_0_15px_rgba(0,0,0,0.02)]">
+<div class="p-lg border-b border-outline-variant flex items-center justify-between bg-surface-container-lowest">
+<h3 class="font-section-title text-section-title text-on-surface flex items-center gap-xs">
+<span class="material-symbols-outlined" data-icon="filter_list">filter_list</span>
+                        View Filters
+                    </h3>
+<button class="font-metadata text-metadata text-brand-red hover:underline uppercase tracking-wide">Reset</button>
+</div>
+<div class="flex-1 overflow-y-auto p-lg flex flex-col gap-lg bg-surface">
+<!-- Filter Group: Parish -->
+<div class="flex flex-col gap-sm">
+<label class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">Parish Focus</label>
+<div class="flex flex-wrap gap-xs">
+<button class="px-md h-[32px] rounded-full font-body-md text-body-md bg-brand-red text-on-primary border border-brand-red shadow-sm transition-all">St. Bernard</button>
+<button class="px-md h-[32px] rounded-full font-body-md text-body-md bg-surface-l1 text-on-surface border border-outline-variant hover:bg-surface-variant transition-all">Orleans</button>
+<button class="px-md h-[32px] rounded-full font-body-md text-body-md bg-surface-l1 text-on-surface border border-outline-variant hover:bg-surface-variant transition-all">Jefferson</button>
+<button class="px-md h-[32px] rounded-full font-body-md text-body-md bg-surface-l1 text-on-surface border border-outline-variant hover:bg-surface-variant transition-all">Plaquemines</button>
+</div>
+</div>
+<!-- Filter Group: Cluster -->
+<div class="flex flex-col gap-sm">
+<label class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">Operational Cluster</label>
+<div class="relative">
+<select class="w-full h-target-min pl-md pr-xl py-sm rounded-lg border border-outline-variant bg-surface-l1 font-body-md text-body-md text-on-surface appearance-none focus:outline-none focus:border-brand-red focus:ring-1 focus:ring-brand-red cursor-pointer">
+<option value="all">All Clusters</option>
+<option selected="" value="c1">Cluster 1 (North)</option>
+<option value="c2">Cluster 2 (South)</option>
+<option value="c3">Cluster 3 (East)</option>
+</select>
+<span class="material-symbols-outlined absolute right-md top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none" data-icon="expand_more">expand_more</span>
+</div>
+</div>
+<!-- Filter Group: Efficiency Rating -->
+<div class="flex flex-col gap-sm">
+<label class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">Min. Efficiency</label>
+<div class="flex gap-2">
+<label class="flex items-center gap-xs cursor-pointer group">
+<input checked="" class="text-brand-red focus:ring-brand-red bg-surface-l1 border-outline-variant" name="eff" type="radio"/>
+<span class="font-body-md text-body-md text-on-surface group-hover:text-brand-strong transition-colors">Any</span>
+</label>
+<label class="flex items-center gap-xs cursor-pointer group ml-4">
+<input class="text-brand-red focus:ring-brand-red bg-surface-l1 border-outline-variant" name="eff" type="radio"/>
+<span class="font-body-md text-body-md text-on-surface group-hover:text-brand-strong transition-colors flex items-center gap-1">4+ <span class="material-symbols-outlined text-[16px] text-[#FFA000]" data-icon="star" data-weight="fill" style="font-variation-settings: 'FILL' 1;">star</span></span>
+</label>
+</div>
+</div>
+</div>
+<div class="p-lg border-t border-outline-variant bg-surface-container-lowest">
+<button class="w-full h-target-min flex items-center justify-center bg-brand-red text-on-primary rounded-lg font-label-md text-label-md uppercase tracking-wider shadow-sm hover:bg-brand-strong active:scale-95 transition-all">
+                        Apply Filters
+                    </button>
+</div>
+</aside>
+</main>
+</div>
+</body></html>

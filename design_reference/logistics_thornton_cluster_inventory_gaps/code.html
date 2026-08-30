@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Thornton Cluster • Inventory Gaps</title>
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;700;800;900&amp;family=Inter:wght@400;500;600&amp;family=JetBrains+Mono:wght@500&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Theme Configuration -->
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "info": "#0288D1",
+                    "on-surface-variant": "#5b403d",
+                    "brand-red": "#D32F2F",
+                    "primary-container": "#d32f2f",
+                    "surface-container-low": "#fff0ef",
+                    "on-primary-fixed": "#410003",
+                    "outline-variant": "#e4beba",
+                    "surface-container-high": "#ffe2de",
+                    "surface-tint": "#ba1a20",
+                    "on-secondary-fixed": "#001c3a",
+                    "surface-l2": "#F0F3F5",
+                    "surface": "#fff8f7",
+                    "secondary": "#005faf",
+                    "inverse-surface": "#3e2c2a",
+                    "primary-fixed-dim": "#ffb3ac",
+                    "canvas-l0": "#F5F7F9",
+                    "on-primary": "#ffffff",
+                    "surface-l1": "#FFFFFF",
+                    "primary-fixed": "#ffdad6",
+                    "on-secondary": "#ffffff",
+                    "success": "#2E7D32",
+                    "primary": "#af101a",
+                    "surface-container-lowest": "#ffffff",
+                    "error": "#C62828",
+                    "tertiary-container": "#00799c",
+                    "on-tertiary-fixed-variant": "#004d65",
+                    "background": "#fff8f7",
+                    "on-error-container": "#93000a",
+                    "secondary-fixed": "#d4e3ff",
+                    "brand-strong": "#B71C1C",
+                    "on-secondary-fixed-variant": "#004786",
+                    "brand-soft": "#FFEBEE",
+                    "surface-container": "#ffe9e7",
+                    "on-tertiary": "#ffffff",
+                    "inverse-primary": "#ffb3ac",
+                    "on-primary-fixed-variant": "#930010",
+                    "on-secondary-container": "#003567",
+                    "secondary-fixed-dim": "#a5c8ff",
+                    "inverse-on-surface": "#ffedeb",
+                    "on-error": "#ffffff",
+                    "on-tertiary-container": "#e9f7ff",
+                    "secondary-container": "#54a0fe",
+                    "outline": "#8f6f6c",
+                    "on-primary-container": "#fff2f0",
+                    "tertiary": "#005f7b",
+                    "warning": "#FFA000",
+                    "surface-variant": "#f9dcd9",
+                    "tertiary-fixed-dim": "#7bd1f8",
+                    "surface-bright": "#fff8f7",
+                    "tertiary-fixed": "#bee9ff",
+                    "on-tertiary-fixed": "#001f2a",
+                    "on-surface": "#271816",
+                    "error-container": "#ffdad6",
+                    "surface-container-highest": "#f9dcd9",
+                    "on-background": "#271816",
+                    "surface-dim": "#f1d3d0"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "lg": "24px",
+                    "gutter-phone": "16px",
+                    "md": "16px",
+                    "xl": "32px",
+                    "base": "4px",
+                    "gutter-tablet": "24px",
+                    "sm": "12px",
+                    "target-min": "48px",
+                    "xs": "8px"
+            },
+            "fontFamily": {
+                    "metadata": ["Inter"],
+                    "body-lg": ["Inter"],
+                    "section-title": ["Hanken Grotesk"],
+                    "body-md": ["Inter"],
+                    "headline-lg": ["Hanken Grotesk"],
+                    "hero-title-mobile": ["Hanken Grotesk"],
+                    "label-md": ["JetBrains Mono"],
+                    "hero-title": ["Hanken Grotesk"],
+                    "headline-md": ["Hanken Grotesk"]
+            },
+            "fontSize": {
+                    "metadata": ["12px", {"lineHeight": "16px", "fontWeight": "500"}],
+                    "body-lg": ["17px", {"lineHeight": "26px", "fontWeight": "400"}],
+                    "section-title": ["18px", {"lineHeight": "24px", "fontWeight": "700"}],
+                    "body-md": ["15px", {"lineHeight": "22px", "fontWeight": "400"}],
+                    "headline-lg": ["24px", {"lineHeight": "32px", "fontWeight": "800"}],
+                    "hero-title-mobile": ["28px", {"lineHeight": "32px", "fontWeight": "900"}],
+                    "label-md": ["13px", {"lineHeight": "16px", "fontWeight": "500"}],
+                    "hero-title": ["32px", {"lineHeight": "36px", "letterSpacing": "-0.02em", "fontWeight": "900"}],
+                    "headline-md": ["20px", {"lineHeight": "28px", "fontWeight": "750"}]
+            }
+          }
+        }
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-canvas-l0 text-on-surface font-body-md antialiased pb-40 md:pb-24">
+<!-- TopAppBar -->
+<header class="bg-surface dark:bg-surface flex justify-between items-center px-gutter-phone h-16 w-full fixed top-0 z-40">
+<button aria-label="Home" class="text-primary dark:text-inverse-primary hover:bg-surface-container-low dark:hover:bg-surface-container-highest transition-colors rounded-full p-2 -ml-2">
+<span class="material-symbols-outlined" data-icon="home_work" data-weight="fill">home_work</span>
+</button>
+<div class="text-headline-md font-headline-md font-black text-brand-red dark:text-inverse-primary">RC SOW</div>
+<button aria-label="Notifications" class="text-primary dark:text-inverse-primary hover:bg-surface-container-low dark:hover:bg-surface-container-highest transition-colors rounded-full p-2 -mr-2">
+<span class="material-symbols-outlined" data-icon="notifications" data-weight="fill">notifications</span>
+</button>
+</header>
+<main class="pt-20 px-gutter-phone max-w-4xl mx-auto">
+<!-- Hero Header -->
+<section class="mb-lg">
+<h1 class="text-headline-lg font-headline-lg text-on-surface mb-1">Thornton Cluster • Inventory Gaps</h1>
+<p class="text-metadata font-metadata text-on-surface-variant">Cross-referencing active Material Requests with live Parish Storage.</p>
+</section>
+<!-- Fulfillment Progress Bento -->
+<section class="mb-xl grid grid-cols-1 md:grid-cols-2 gap-sm">
+<div class="bg-surface-l1 rounded-lg p-md shadow-sm border border-outline-variant flex flex-col justify-between relative overflow-hidden">
+<div class="absolute top-0 left-0 w-1 h-full bg-success"></div>
+<div>
+<div class="text-metadata font-metadata text-on-surface-variant uppercase tracking-wider mb-2">Cluster Delivery Rate</div>
+<div class="text-hero-title font-hero-title text-on-surface">68%</div>
+</div>
+<div class="mt-4 flex items-center gap-2">
+<span class="material-symbols-outlined text-success text-sm">trending_up</span>
+<span class="text-metadata font-metadata text-success">+12% vs last week</span>
+</div>
+</div>
+<div class="bg-surface-l1 rounded-lg p-md shadow-sm border border-outline-variant flex flex-col justify-center">
+<div class="flex justify-between items-end mb-2">
+<div class="text-metadata font-metadata text-on-surface-variant uppercase tracking-wider">Volume Overview</div>
+<div class="text-metadata font-metadata text-on-surface">1,240 Total Req.</div>
+</div>
+<!-- Mini Bar Chart -->
+<div class="w-full h-3 bg-surface-container-highest rounded-full overflow-hidden flex">
+<div class="bg-success h-full" style="width: 68%;" title="Delivered"></div>
+<div class="bg-warning h-full" style="width: 15%;" title="Pending"></div>
+<div class="bg-error h-full" style="width: 17%;" title="Gap"></div>
+</div>
+<div class="flex gap-4 mt-3">
+<div class="flex items-center gap-1"><div class="w-2 h-2 rounded-full bg-success"></div><span class="text-metadata font-metadata text-on-surface-variant">Delivered (843)</span></div>
+<div class="flex items-center gap-1"><div class="w-2 h-2 rounded-full bg-warning"></div><span class="text-metadata font-metadata text-on-surface-variant">Pending (186)</span></div>
+<div class="flex items-center gap-1"><div class="w-2 h-2 rounded-full bg-error"></div><span class="text-metadata font-metadata text-on-surface-variant">Gap (211)</span></div>
+</div>
+</div>
+</section>
+<!-- Critical Shortfalls -->
+<section class="mb-xl">
+<div class="flex items-center gap-2 mb-sm">
+<span class="material-symbols-outlined text-error" data-icon="warning" data-weight="fill">warning</span>
+<h2 class="text-section-title font-section-title text-on-surface">Critical Shortfalls</h2>
+</div>
+<div class="flex flex-col gap-sm">
+<!-- Card 1 -->
+<div class="bg-brand-soft rounded-lg p-md border-l-4 border-error shadow-sm relative">
+<div class="flex justify-between items-start mb-3">
+<div>
+<h3 class="text-body-lg font-body-lg text-on-surface font-semibold">Corrugated Zinc Sheets (10ft)</h3>
+<span class="text-label-md font-label-md text-on-surface-variant bg-surface-container-high px-2 py-0.5 rounded mt-1 inline-block">MAT-ZN-10</span>
+</div>
+<span class="bg-error text-on-error text-label-md font-label-md px-2 py-1 rounded-sm uppercase tracking-wide">Out of Stock</span>
+</div>
+<div class="grid grid-cols-3 gap-2 bg-surface-l1 rounded p-2 mb-3 border border-error-container">
+<div class="text-center">
+<div class="text-metadata font-metadata text-on-surface-variant">Requested</div>
+<div class="text-body-md font-body-md text-on-surface font-medium">145</div>
+</div>
+<div class="text-center border-l border-outline-variant">
+<div class="text-metadata font-metadata text-on-surface-variant">Available</div>
+<div class="text-body-md font-body-md text-on-surface font-medium">0</div>
+</div>
+<div class="text-center border-l border-outline-variant bg-error-container">
+<div class="text-metadata font-metadata text-error font-bold">Deficit</div>
+<div class="text-body-md font-body-md text-error font-bold">-145</div>
+</div>
+</div>
+<div class="flex items-center gap-2 mt-2">
+<span class="text-metadata font-metadata text-on-surface-variant">Blocking:</span>
+<div class="flex gap-1 flex-wrap">
+<span class="bg-surface-container-highest text-on-surface text-label-md font-label-md px-2 py-0.5 rounded-full border border-outline-variant">H12</span>
+<span class="bg-surface-container-highest text-on-surface text-label-md font-label-md px-2 py-0.5 rounded-full border border-outline-variant">H14</span>
+<span class="bg-surface-container-highest text-on-surface text-label-md font-label-md px-2 py-0.5 rounded-full border border-outline-variant">H28</span>
+</div>
+</div>
+</div>
+<!-- Card 2 -->
+<div class="bg-brand-soft rounded-lg p-md border-l-4 border-error shadow-sm relative">
+<div class="flex justify-between items-start mb-3">
+<div>
+<h3 class="text-body-lg font-body-lg text-on-surface font-semibold">Cement (50lb Bags)</h3>
+<span class="text-label-md font-label-md text-on-surface-variant bg-surface-container-high px-2 py-0.5 rounded mt-1 inline-block">MAT-CM-50</span>
+</div>
+<span class="bg-error text-on-error text-label-md font-label-md px-2 py-1 rounded-sm uppercase tracking-wide">Critical Deficit</span>
+</div>
+<div class="grid grid-cols-3 gap-2 bg-surface-l1 rounded p-2 mb-3 border border-error-container">
+<div class="text-center">
+<div class="text-metadata font-metadata text-on-surface-variant">Requested</div>
+<div class="text-body-md font-body-md text-on-surface font-medium">80</div>
+</div>
+<div class="text-center border-l border-outline-variant">
+<div class="text-metadata font-metadata text-on-surface-variant">Available</div>
+<div class="text-body-md font-body-md text-on-surface font-medium">12</div>
+</div>
+<div class="text-center border-l border-outline-variant bg-error-container">
+<div class="text-metadata font-metadata text-error font-bold">Deficit</div>
+<div class="text-body-md font-body-md text-error font-bold">-68</div>
+</div>
+</div>
+<div class="flex items-center gap-2 mt-2">
+<span class="text-metadata font-metadata text-on-surface-variant">Blocking:</span>
+<div class="flex gap-1 flex-wrap">
+<span class="bg-surface-container-highest text-on-surface text-label-md font-label-md px-2 py-0.5 rounded-full border border-outline-variant">H05</span>
+<span class="bg-surface-container-highest text-on-surface text-label-md font-label-md px-2 py-0.5 rounded-full border border-outline-variant">H09</span>
+<span class="text-metadata font-metadata text-on-surface-variant underline cursor-pointer">+2 more</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Low Stock Alerts -->
+<section class="mb-xl">
+<div class="flex items-center gap-2 mb-sm">
+<span class="material-symbols-outlined text-warning" data-icon="inventory_2" data-weight="fill">inventory_2</span>
+<h2 class="text-section-title font-section-title text-on-surface">Low Stock Alerts (&lt; 15% Buffer)</h2>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-sm">
+<!-- Low Card 1 -->
+<div class="bg-surface-l1 rounded-lg p-sm border border-outline-variant flex items-center justify-between">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded bg-warning/20 flex items-center justify-center text-warning font-bold">
+<span class="material-symbols-outlined">hardware</span>
+</div>
+<div>
+<div class="text-body-md font-body-md font-semibold text-on-surface line-clamp-1">Roofing Nails (2")</div>
+<div class="text-metadata font-metadata text-on-surface-variant">Buffer: 8% (est. 1 day left)</div>
+</div>
+</div>
+<span class="bg-warning text-on-surface text-label-md font-label-md px-2 py-1 rounded-sm uppercase tracking-wide">Low</span>
+</div>
+<!-- Low Card 2 -->
+<div class="bg-surface-l1 rounded-lg p-sm border border-outline-variant flex items-center justify-between">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded bg-warning/20 flex items-center justify-center text-warning font-bold">
+<span class="material-symbols-outlined">foundation</span>
+</div>
+<div>
+<div class="text-body-md font-body-md font-semibold text-on-surface line-clamp-1">Treated Lumber 2x4x16</div>
+<div class="text-metadata font-metadata text-on-surface-variant">Buffer: 12% (est. 2 days left)</div>
+</div>
+</div>
+<span class="bg-warning text-on-surface text-label-md font-label-md px-2 py-1 rounded-sm uppercase tracking-wide">Low</span>
+</div>
+</div>
+</section>
+</main>
+<!-- Action Bar -->
+<div class="fixed bottom-16 left-0 w-full bg-surface-l1 border-t border-outline-variant p-3 z-40 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)] md:bottom-0">
+<div class="max-w-4xl mx-auto flex gap-3">
+<button class="flex-1 h-[48px] bg-brand-red hover:bg-brand-strong text-on-primary font-section-title text-body-md uppercase tracking-wide rounded flex items-center justify-center gap-2 transition-colors">
+<span class="material-symbols-outlined" data-icon="local_shipping">local_shipping</span>
+                Request Bulk Transfer
+            </button>
+<button aria-label="Notify Warehouse" class="flex-none w-[48px] h-[48px] border border-outline text-on-surface hover:bg-surface-container transition-colors rounded flex items-center justify-center">
+<span class="material-symbols-outlined" data-icon="cell_tower">cell_tower</span>
+</button>
+</div>
+</div>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-2 py-3 pb-safe bg-surface-container-lowest dark:bg-inverse-surface border-t border-outline-variant dark:border-none shadow-lg md:hidden rounded-t-xl">
+<button class="flex flex-col items-center justify-center text-on-surface-variant dark:text-surface-variant px-4 py-1.5 hover:bg-surface-container-high dark:hover:bg-surface-variant transition-colors group">
+<span class="material-symbols-outlined group-hover:scale-95 transition-transform duration-100" data-icon="dashboard">dashboard</span>
+<span class="text-label-md font-label-md mt-1">Dashboard</span>
+</button>
+<button class="flex flex-col items-center justify-center text-on-surface-variant dark:text-surface-variant px-4 py-1.5 hover:bg-surface-container-high dark:hover:bg-surface-variant transition-colors group">
+<span class="material-symbols-outlined group-hover:scale-95 transition-transform duration-100" data-icon="assignment">assignment</span>
+<span class="text-label-md font-label-md mt-1">Scope</span>
+</button>
+<!-- Active Tab: Control -->
+<button class="flex flex-col items-center justify-center bg-primary-container dark:bg-primary text-on-primary-container dark:text-on-primary rounded-xl px-4 py-1.5 transition-all opacity-80 scale-95 duration-150 group">
+<span class="material-symbols-outlined" data-icon="settings_suggest" data-weight="fill">settings_suggest</span>
+<span class="text-label-md font-label-md mt-1">Control</span>
+</button>
+<button class="flex flex-col items-center justify-center text-on-surface-variant dark:text-surface-variant px-4 py-1.5 hover:bg-surface-container-high dark:hover:bg-surface-variant transition-colors group">
+<span class="material-symbols-outlined group-hover:scale-95 transition-transform duration-100" data-icon="home">home</span>
+<span class="text-label-md font-label-md mt-1">Houses</span>
+</button>
+<button class="flex flex-col items-center justify-center text-on-surface-variant dark:text-surface-variant px-4 py-1.5 hover:bg-surface-container-high dark:hover:bg-surface-variant transition-colors group">
+<span class="material-symbols-outlined group-hover:scale-95 transition-transform duration-100" data-icon="more_horiz">more_horiz</span>
+<span class="text-label-md font-label-md mt-1">More</span>
+</button>
+</nav>
+</body></html>

@@ -1,14 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'app.dart';
-import 'core/supabase_config.dart';
+import 'core/app_state.dart';
 
-Future<void> main() async {
+void main() {
   WidgetsFlutterBinding.ensureInitialized();
-  await Supabase.initialize(
-    url: SupabaseConfig.url,
-    publishableKey: SupabaseConfig.publishableKey,
-  );
-  runApp(const RcSowApp());
+  runApp(RcSowApp(state: AppState.seeded()));
 }

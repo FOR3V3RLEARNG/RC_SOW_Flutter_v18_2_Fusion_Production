@@ -1,0 +1,318 @@
+<!DOCTYPE html><html class="light" lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>RC SOW Operations - Request Transfer</title>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect">
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;700;800;900&amp;family=Inter:wght@400;500&amp;family=JetBrains+Mono:wght@500&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<style>
+        .material-symbols-outlined {
+            font-family: 'Material Symbols Outlined';
+            font-weight: normal;
+            font-style: normal;
+            font-size: 24px;
+            line-height: 1;
+            letter-spacing: normal;
+            text-transform: none;
+            display: inline-block;
+            white-space: nowrap;
+            word-wrap: normal;
+            direction: ltr;
+            -webkit-font-feature-settings: 'liga';
+            -webkit-font-smoothing: antialiased;
+        }
+        
+        /* Hide scrollbar for clean horizontal scrolls */
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "surface-container-highest": "#f9dcd9",
+                    "warning": "#FFA000",
+                    "surface-container-lowest": "#ffffff",
+                    "outline-variant": "#e4beba",
+                    "error": "#C62828",
+                    "surface-bright": "#fff8f7",
+                    "on-primary-container": "#fff2f0",
+                    "secondary-fixed": "#d4e3ff",
+                    "surface-container-low": "#fff0ef",
+                    "on-secondary-fixed": "#001c3a",
+                    "surface-dim": "#f1d3d0",
+                    "on-error-container": "#93000a",
+                    "surface-l2": "#F0F3F5",
+                    "on-primary-fixed": "#410003",
+                    "on-background": "#271816",
+                    "tertiary-fixed": "#bee9ff",
+                    "success": "#2E7D32",
+                    "on-tertiary-fixed-variant": "#004d65",
+                    "on-error": "#ffffff",
+                    "on-surface-variant": "#5b403d",
+                    "surface-variant": "#f9dcd9",
+                    "on-primary-fixed-variant": "#930010",
+                    "primary-fixed-dim": "#ffb3ac",
+                    "on-secondary": "#ffffff",
+                    "error-container": "#ffdad6",
+                    "surface-tint": "#ba1a20",
+                    "on-tertiary": "#ffffff",
+                    "surface-l1": "#FFFFFF",
+                    "canvas-l0": "#F5F7F9",
+                    "secondary-container": "#54a0fe",
+                    "primary-fixed": "#ffdad6",
+                    "inverse-surface": "#3e2c2a",
+                    "tertiary-container": "#00799c",
+                    "info": "#0288D1",
+                    "brand-strong": "#B71C1C",
+                    "inverse-on-surface": "#ffedeb",
+                    "surface": "#fff8f7",
+                    "primary-container": "#d32f2f",
+                    "on-tertiary-container": "#e9f7ff",
+                    "surface-container": "#ffe9e7",
+                    "background": "#fff8f7",
+                    "secondary-fixed-dim": "#a5c8ff",
+                    "primary": "#af101a",
+                    "on-secondary-fixed-variant": "#004786",
+                    "brand-soft": "#FFEBEE",
+                    "secondary": "#005faf",
+                    "on-secondary-container": "#003567",
+                    "outline": "#8f6f6c",
+                    "tertiary-fixed-dim": "#7bd1f8",
+                    "on-surface": "#271816",
+                    "inverse-primary": "#ffb3ac",
+                    "tertiary": "#005f7b",
+                    "surface-container-high": "#ffe2de",
+                    "on-primary": "#ffffff",
+                    "on-tertiary-fixed": "#001f2a",
+                    "brand-red": "#D32F2F"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "base": "4px",
+                    "lg": "24px",
+                    "md": "16px",
+                    "xs": "8px",
+                    "gutter-phone": "16px",
+                    "sm": "12px",
+                    "target-min": "48px",
+                    "xl": "32px",
+                    "gutter-tablet": "24px"
+            },
+            "fontFamily": {
+                    "section-title": ["Hanken Grotesk"],
+                    "body-md": ["Inter"],
+                    "body-lg": ["Inter"],
+                    "headline-lg": ["Hanken Grotesk"],
+                    "hero-title-mobile": ["Hanken Grotesk"],
+                    "hero-title": ["Hanken Grotesk"],
+                    "label-md": ["JetBrains Mono"],
+                    "metadata": ["Inter"],
+                    "headline-md": ["Hanken Grotesk"]
+            },
+            "fontSize": {
+                    "section-title": ["18px", {"lineHeight": "24px", "fontWeight": "700"}],
+                    "body-md": ["15px", {"lineHeight": "22px", "fontWeight": "400"}],
+                    "body-lg": ["17px", {"lineHeight": "26px", "fontWeight": "400"}],
+                    "headline-lg": ["24px", {"lineHeight": "32px", "fontWeight": "800"}],
+                    "hero-title-mobile": ["28px", {"lineHeight": "32px", "fontWeight": "900"}],
+                    "hero-title": ["32px", {"lineHeight": "36px", "letterSpacing": "-0.02em", "fontWeight": "900"}],
+                    "label-md": ["13px", {"lineHeight": "16px", "fontWeight": "500"}],
+                    "metadata": ["12px", {"lineHeight": "16px", "fontWeight": "500"}],
+                    "headline-md": ["20px", {"lineHeight": "28px", "fontWeight": "750"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+</head>
+<body class="bg-canvas-l0 text-on-background min-h-screen flex flex-col pt-[64px] pb-[80px] md:pb-0 font-body-md text-body-md selection:bg-brand-soft selection:text-brand-strong">
+<!-- TopAppBar Component -->
+<header class="fixed top-0 w-full z-50 bg-surface dark:bg-on-background shadow-sm bg-surface-container-low dark:bg-on-surface-variant flex items-center justify-between px-gutter-phone md:px-gutter-tablet h-[64px]">
+<button aria-label="Menu" class="w-[48px] h-[48px] flex items-center justify-center text-on-surface-variant hover:bg-surface-variant transition-colors active:scale-95 transition-transform rounded-full">
+<span class="material-symbols-outlined">menu</span>
+</button>
+<h1 class="font-headline-lg text-headline-lg font-black text-brand-red dark:text-primary-fixed tracking-tight">
+            RC SOW Operations
+        </h1>
+<button aria-label="Sync Status" class="w-[48px] h-[48px] flex items-center justify-center text-on-surface-variant hover:bg-surface-variant transition-colors active:scale-95 transition-transform rounded-full">
+<span class="material-symbols-outlined">sync</span>
+</button>
+</header>
+<!-- Main Canvas -->
+<main class="flex-1 w-full max-w-4xl mx-auto px-gutter-phone md:px-gutter-tablet py-lg">
+<!-- Header Section -->
+<div class="mb-lg">
+<div class="inline-flex items-center gap-2 px-3 py-1 bg-brand-soft text-brand-strong rounded-full font-label-md text-label-md mb-xs">
+<span class="material-symbols-outlined text-[16px]">swap_horiz</span>
+                RESOURCE DISPATCH
+            </div>
+<h2 class="font-hero-title-mobile text-hero-title-mobile md:font-hero-title md:text-hero-title text-on-background">
+                Request Personnel Transfer
+            </h2>
+<p class="font-body-md text-body-md text-on-surface-variant mt-1">
+                Deploy critical trade skills across active construction sectors. All requests are logged in the audit trail.
+            </p>
+</div>
+<!-- Bento Grid Form Layout -->
+<form class="grid grid-cols-1 md:grid-cols-12 gap-md" onsubmit="event.preventDefault();">
+<!-- Context Card -->
+<div class="col-span-1 md:col-span-12 bg-surface-l1 rounded-xl p-md shadow-sm border border-surface-container-high flex flex-col md:flex-row gap-md items-start md:items-center justify-between">
+<div class="flex-1 w-full">
+<label class="block font-label-md text-label-md text-on-surface-variant mb-1 uppercase tracking-wider">Origin Sector</label>
+<div class="h-target-min flex items-center bg-surface-l2 rounded-[16px] px-md border border-transparent w-full">
+<span class="material-symbols-outlined text-on-surface-variant mr-3">home_pin</span>
+<span class="font-label-md text-label-md text-on-background">Sector 7 - Central Hub</span>
+<span class="ml-auto font-metadata text-metadata text-success flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">check_circle</span> Active
+                        </span>
+</div>
+</div>
+<div class="hidden md:flex items-center justify-center text-on-surface-variant px-sm">
+<span class="material-symbols-outlined text-[32px]">arrow_right_alt</span>
+</div>
+<div class="flex-1 w-full">
+<label class="block font-label-md text-label-md text-on-surface-variant mb-1 uppercase tracking-wider">Target Destination</label>
+<div class="relative w-full">
+<select class="h-target-min w-full rounded-[16px] border border-outline bg-surface-l1 px-md pr-xl text-on-background font-body-md text-body-md focus:border-brand-red focus:ring-1 focus:ring-brand-red appearance-none outline-none transition-shadow">
+<option disabled="" selected="" value="">Select active site...</option>
+<option value="s3">Sector 3 - North Ridge</option>
+<option value="s8">Sector 8 - East Valley</option>
+<option value="s12">Sector 12 - Riverside</option>
+</select>
+<div class="absolute inset-y-0 right-0 flex items-center pr-md pointer-events-none text-on-surface-variant">
+<span class="material-symbols-outlined">expand_more</span>
+</div>
+</div>
+<div class="mt-md"><label class="block font-label-md text-label-md text-on-surface-variant mb-1 uppercase tracking-wider">Target House (H-Code)</label><div class="relative w-full"><select class="h-target-min w-full rounded-[16px] border border-outline bg-surface-l1 px-md pr-xl text-on-background font-body-md text-body-md focus:border-brand-red focus:ring-1 focus:ring-brand-red appearance-none outline-none transition-shadow"><option disabled="" selected="" value="">Select H-Code...</option><option value="h101">H-101 (Medical)</option><option value="h204">H-204 (Logistics)</option><option value="h305">H-305 (Shelter)</option></select><div class="absolute inset-y-0 right-0 flex items-center pr-md pointer-events-none text-on-surface-variant"><span class="material-symbols-outlined">house</span></div></div></div></div>
+</div>
+<!-- Resource Type & Quantity -->
+<div class="col-span-1 md:col-span-7 bg-surface-l1 rounded-xl p-md shadow-sm border border-surface-container-high flex flex-col gap-lg"><div><label class="block font-label-md text-label-md text-on-surface-variant mb-sm uppercase tracking-wider">Transfer Duration</label><div class="flex bg-surface-l2 rounded-[16px] p-1 w-full h-[56px] relative"><label class="flex-1 cursor-pointer relative z-10"><input checked="" class="peer sr-only" name="transfer_term" type="radio" value="permanent"><div class="h-full flex items-center justify-center rounded-[12px] text-on-surface-variant font-label-md text-label-md peer-checked:bg-surface-l1 peer-checked:text-on-background peer-checked:shadow-sm transition-all duration-200"><span class="material-symbols-outlined mr-2 text-[20px]">all_inclusive</span>Permanent</div></label><label class="flex-1 cursor-pointer relative z-10"><input class="peer sr-only" name="transfer_term" type="radio" value="temporary"><div class="h-full flex items-center justify-center rounded-[12px] text-on-surface-variant font-label-md text-label-md peer-checked:bg-surface-l1 peer-checked:text-on-background peer-checked:shadow-sm transition-all duration-200"><span class="material-symbols-outlined mr-2 text-[20px]">calendar_today</span>Temporary</div></label></div></div>
+<div>
+<label class="block font-label-md text-label-md text-on-surface-variant mb-sm uppercase tracking-wider">Personnel Type</label>
+<div class="flex bg-surface-l2 rounded-[16px] p-1 w-full h-[56px] relative">
+<!-- Custom Segmented Control -->
+<label class="flex-1 cursor-pointer relative z-10">
+<input checked="" class="peer sr-only" name="personnel_type" type="radio">
+<div class="h-full flex items-center justify-center rounded-[12px] text-on-surface-variant font-label-md text-label-md peer-checked:bg-surface-l1 peer-checked:text-on-background peer-checked:shadow-sm transition-all duration-200">
+<span class="material-symbols-outlined mr-2 text-[20px]">handyman</span>
+                                Carpenter
+                            </div>
+</label>
+<label class="flex-1 cursor-pointer relative z-10">
+<input class="peer sr-only" name="personnel_type" type="radio">
+<div class="h-full flex items-center justify-center rounded-[12px] text-on-surface-variant font-label-md text-label-md peer-checked:bg-surface-l1 peer-checked:text-on-background peer-checked:shadow-sm transition-all duration-200">
+<span class="material-symbols-outlined mr-2 text-[20px]">engineering</span>
+                                Assistant
+                            </div>
+</label>
+</div>
+</div>
+<div>
+<label class="block font-label-md text-label-md text-on-surface-variant mb-sm uppercase tracking-wider">Quantity Required</label>
+<div class="flex items-center gap-md">
+<button class="h-target-min w-target-min rounded-[16px] bg-surface-l2 text-on-surface-variant flex items-center justify-center hover:bg-surface-container-high active:scale-95 transition-all outline-none focus:ring-2 focus:ring-brand-soft" onclick="this.nextElementSibling.stepDown()" type="button">
+<span class="material-symbols-outlined">remove</span>
+</button>
+<input class="h-target-min flex-1 md:flex-none md:w-[120px] text-center rounded-[16px] border border-outline bg-surface-l1 font-headline-md text-headline-md text-on-background outline-none focus:border-brand-red focus:ring-1 focus:ring-brand-red m-0 p-0 appearance-none pointer-events-none" max="20" min="1" type="number" value="2">
+<button class="h-target-min w-target-min rounded-[16px] bg-surface-l2 text-on-surface-variant flex items-center justify-center hover:bg-surface-container-high active:scale-95 transition-all outline-none focus:ring-2 focus:ring-brand-soft" onclick="this.previousElementSibling.stepUp()" type="button">
+<span class="material-symbols-outlined">add</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Logistics Panel -->
+<div class="col-span-1 md:col-span-5 bg-surface-l1 rounded-xl p-md shadow-sm border border-surface-container-high flex flex-col gap-lg">
+<div><div class="grid grid-cols-2 gap-sm"><div class="col-span-1"><label class="block font-label-md text-label-md text-on-surface-variant mb-sm uppercase tracking-wider">Start Date</label><input class="h-target-min w-full rounded-[16px] border border-outline bg-surface-l1 px-md text-on-background font-body-md text-body-md outline-none focus:border-brand-red focus:ring-1 focus:ring-brand-red appearance-none" type="date"></div><div class="col-span-1"><label class="block font-label-md text-label-md text-on-surface-variant mb-sm uppercase tracking-wider">End Date</label><input class="h-target-min w-full rounded-[16px] border border-outline bg-surface-l1 px-md text-on-background font-body-md text-body-md outline-none focus:border-brand-red focus:ring-1 focus:ring-brand-red appearance-none" type="date"></div></div></div>
+<div>
+<label class="block font-label-md text-label-md text-on-surface-variant mb-sm uppercase tracking-wider">Urgency Level</label>
+<div class="flex flex-col gap-xs">
+<label class="cursor-pointer group">
+<input checked="" class="peer sr-only" name="urgency" type="radio" value="routine">
+<div class="flex items-center p-sm rounded-[12px] border border-surface-container-highest bg-surface-l1 peer-checked:bg-surface-container peer-checked:border-outline-variant transition-colors h-[48px]">
+<span class="w-4 h-4 rounded-full border-2 border-on-surface-variant mr-3 group-hover:border-primary peer-checked:border-brand-red peer-checked:bg-brand-red relative after:content-[''] after:absolute after:inset-0 after:m-auto after:w-1.5 after:h-1.5 after:bg-white after:rounded-full after:opacity-0 peer-checked:after:opacity-100 transition-all"></span>
+<span class="font-body-md text-body-md text-on-background flex-1">Routine (48h)</span>
+<span class="material-symbols-outlined text-info text-[20px]">schedule</span>
+</div>
+</label>
+<label class="cursor-pointer group">
+<input class="peer sr-only" name="urgency" type="radio" value="priority">
+<div class="flex items-center p-sm rounded-[12px] border border-surface-container-highest bg-surface-l1 peer-checked:bg-warning/10 peer-checked:border-warning/50 transition-colors h-[48px]">
+<span class="w-4 h-4 rounded-full border-2 border-on-surface-variant mr-3 group-hover:border-primary peer-checked:border-warning peer-checked:bg-warning relative after:content-[''] after:absolute after:inset-0 after:m-auto after:w-1.5 after:h-1.5 after:bg-white after:rounded-full after:opacity-0 peer-checked:after:opacity-100 transition-all"></span>
+<span class="font-body-md text-body-md text-on-background flex-1">Priority (24h)</span>
+<span class="material-symbols-outlined text-warning text-[20px]">bolt</span>
+</div>
+</label>
+<label class="cursor-pointer group">
+<input class="peer sr-only" name="urgency" type="radio" value="critical">
+<div class="flex items-center p-sm rounded-[12px] border border-surface-container-highest bg-surface-l1 peer-checked:bg-brand-soft peer-checked:border-brand-red transition-colors h-[48px]">
+<span class="w-4 h-4 rounded-full border-2 border-on-surface-variant mr-3 group-hover:border-primary peer-checked:border-brand-red peer-checked:bg-brand-red relative after:content-[''] after:absolute after:inset-0 after:m-auto after:w-1.5 after:h-1.5 after:bg-white after:rounded-full after:opacity-0 peer-checked:after:opacity-100 transition-all"></span>
+<span class="font-body-md text-body-md text-brand-strong font-medium flex-1">Critical (Immediate)</span>
+<span class="material-symbols-outlined text-brand-red text-[20px]">warning</span>
+</div>
+</label>
+</div>
+</div>
+</div>
+<!-- Justification -->
+<div class="col-span-1 md:col-span-12 bg-surface-l1 rounded-xl p-md shadow-sm border border-surface-container-high">
+<label class="block font-label-md text-label-md text-on-surface-variant mb-sm uppercase tracking-wider">Reason / Justification</label>
+<textarea class="w-full rounded-[16px] border border-outline bg-surface-l1 p-md text-on-background font-body-md text-body-md outline-none focus:border-brand-red focus:ring-1 focus:ring-brand-red resize-none" placeholder="Provide operational context for this request..." rows="3"></textarea>
+</div>
+<!-- Action Area -->
+<div class="col-span-1 md:col-span-12 mt-md">
+<button class="w-full h-[56px] bg-brand-red text-on-primary rounded-[16px] font-label-md text-[15px] font-bold uppercase tracking-wider flex items-center justify-center gap-3 hover:bg-brand-strong active:scale-[0.98] transition-all shadow-md" type="submit">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">send</span>
+                    Submit Transfer Request
+                </button>
+</div>
+</form>
+</main>
+<!-- BottomNavBar Component (Mobile Only) -->
+<nav class="md:hidden fixed bottom-0 w-full z-50 h-[80px] bg-surface dark:bg-on-background bg-surface-container-lowest dark:bg-on-surface shadow-lg flex justify-around items-center px-xs pb-safe border-t-0">
+<!-- Tab: Transfers (Active) -->
+<button class="flex flex-col items-center justify-center bg-primary-container text-on-primary-container rounded-xl px-md py-xs active:scale-90 duration-150 w-full h-[64px] mx-1">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">swap_horiz</span>
+<span class="font-label-md text-[11px] font-bold mt-1">Transfers</span>
+</button>
+<!-- Tab: Teams -->
+<button class="flex flex-col items-center justify-center text-on-surface-variant dark:text-surface-variant px-md py-xs hover:bg-surface-variant dark:hover:bg-inverse-surface active:scale-90 duration-150 rounded-xl w-full h-[64px] mx-1">
+<span class="material-symbols-outlined">groups</span>
+<span class="font-label-md text-[11px] mt-1">Teams</span>
+</button>
+<!-- Tab: Alerts -->
+<button class="flex flex-col items-center justify-center text-on-surface-variant dark:text-surface-variant px-md py-xs hover:bg-surface-variant dark:hover:bg-inverse-surface active:scale-90 duration-150 rounded-xl w-full h-[64px] mx-1 relative">
+<span class="absolute top-1 right-3 w-2 h-2 bg-brand-red rounded-full"></span>
+<span class="material-symbols-outlined">notifications</span>
+<span class="font-label-md text-[11px] mt-1">Alerts</span>
+</button>
+<!-- Tab: Settings -->
+<button class="flex flex-col items-center justify-center text-on-surface-variant dark:text-surface-variant px-md py-xs hover:bg-surface-variant dark:hover:bg-inverse-surface active:scale-90 duration-150 rounded-xl w-full h-[64px] mx-1">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-label-md text-[11px] mt-1">Settings</span>
+</button>
+</nav>
+</body></html>

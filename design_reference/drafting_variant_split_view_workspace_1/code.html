@@ -1,0 +1,380 @@
+<!DOCTYPE html><html class="light" lang="en" style=""><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport">
+<title>Scope: Roof Drawing</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&amp;family=JetBrains+Mono:wght@500&amp;family=Hanken+Grotesk:wght@700;750;800;900&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-primary-container": "#fff2f0",
+                        "surface-tint": "#ba1a20",
+                        "tertiary": "#005f7b",
+                        "on-surface-variant": "#5b403d",
+                        "on-background": "#271816",
+                        "primary-fixed": "#ffdad6",
+                        "outline-variant": "#e4beba",
+                        "surface-container-highest": "#f9dcd9",
+                        "outline": "#8f6f6c",
+                        "brand-red": "#D32F2F",
+                        "primary": "#af101a",
+                        "info": "#0288D1",
+                        "on-primary": "#ffffff",
+                        "on-secondary-container": "#003567",
+                        "on-tertiary-fixed": "#001f2a",
+                        "surface-l1": "#FFFFFF",
+                        "secondary-container": "#54a0fe",
+                        "tertiary-container": "#00799c",
+                        "warning": "#FFA000",
+                        "on-secondary": "#ffffff",
+                        "secondary": "#005faf",
+                        "on-surface": "#271816",
+                        "on-secondary-fixed": "#001c3a",
+                        "background": "#fff8f7",
+                        "surface-container-lowest": "#ffffff",
+                        "canvas-l0": "#F5F7F9",
+                        "inverse-primary": "#ffb3ac",
+                        "surface-variant": "#f9dcd9",
+                        "surface-l2": "#F0F3F5",
+                        "surface": "#fff8f7",
+                        "inverse-on-surface": "#ffedeb",
+                        "primary-container": "#d32f2f",
+                        "inverse-surface": "#3e2c2a",
+                        "on-tertiary-container": "#e9f7ff",
+                        "primary-fixed-dim": "#ffb3ac",
+                        "secondary-fixed": "#d4e3ff",
+                        "on-error": "#ffffff",
+                        "tertiary-fixed": "#bee9ff",
+                        "tertiary-fixed-dim": "#7bd1f8",
+                        "surface-dim": "#f1d3d0",
+                        "on-primary-fixed": "#410003",
+                        "on-tertiary-fixed-variant": "#004d65",
+                        "on-primary-fixed-variant": "#930010",
+                        "surface-bright": "#fff8f7",
+                        "success": "#2E7D32",
+                        "on-tertiary": "#ffffff",
+                        "error-container": "#ffdad6",
+                        "on-error-container": "#93000a",
+                        "error": "#C62828",
+                        "surface-container-high": "#ffe2de",
+                        "brand-soft": "#FFEBEE",
+                        "surface-container": "#ffe9e7",
+                        "on-secondary-fixed-variant": "#004786",
+                        "secondary-fixed-dim": "#a5c8ff",
+                        "brand-strong": "#B71C1C",
+                        "surface-container-low": "#fff0ef"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "gutter-tablet": "24px",
+                        "base": "4px",
+                        "xl": "32px",
+                        "lg": "24px",
+                        "gutter-phone": "16px",
+                        "sm": "12px",
+                        "target-min": "48px",
+                        "xs": "8px",
+                        "md": "16px"
+                    },
+                    "fontFamily": {
+                        "body-lg": ["Inter"],
+                        "label-md": ["JetBrains Mono"],
+                        "headline-lg": ["Hanken Grotesk"],
+                        "section-title": ["Hanken Grotesk"],
+                        "headline-md": ["Hanken Grotesk"],
+                        "metadata": ["Inter"],
+                        "body-md": ["Inter"],
+                        "hero-title": ["Hanken Grotesk"],
+                        "hero-title-mobile": ["Hanken Grotesk"]
+                    },
+                    "fontSize": {
+                        "body-lg": ["17px", { "lineHeight": "26px", "fontWeight": "400" }],
+                        "label-md": ["13px", { "lineHeight": "16px", "fontWeight": "500" }],
+                        "headline-lg": ["24px", { "lineHeight": "32px", "fontWeight": "800" }],
+                        "section-title": ["18px", { "lineHeight": "24px", "fontWeight": "700" }],
+                        "headline-md": ["20px", { "lineHeight": "28px", "fontWeight": "750" }],
+                        "metadata": ["12px", { "lineHeight": "16px", "fontWeight": "500" }],
+                        "body-md": ["15px", { "lineHeight": "22px", "fontWeight": "400" }],
+                        "hero-title": ["32px", { "lineHeight": "36px", "letterSpacing": "-0.02em", "fontWeight": "900" }],
+                        "hero-title-mobile": ["28px", { "lineHeight": "32px", "fontWeight": "900" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .material-symbols-outlined[data-weight="fill"] {
+            font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .bg-grid {
+            background-size: 20px 20px;
+            background-image: linear-gradient(to right, #e4beba 1px, transparent 1px), linear-gradient(to bottom, #e4beba 1px, transparent 1px);
+        }
+        .pb-safe { padding-bottom: env(safe-area-inset-bottom, 20px); }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+</head>
+<body class="bg-canvas-l0 text-on-background font-body-md h-screen w-full flex flex-col overflow-hidden">
+<!-- TopAppBar -->
+<header class="bg-surface text-primary flex justify-between items-center px-gutter-phone h-16 w-full docked full-width top-0 z-40">
+<div class="flex items-center gap-sm">
+<button class="h-target-min w-target-min flex items-center justify-center hover:bg-surface-container-low transition-colors rounded-full text-primary">
+<span class="material-symbols-outlined" data-icon="arrow_back">arrow_back</span>
+</button>
+<div class="flex flex-col">
+<h1 class="text-headline-md font-headline-md font-black text-brand-red">H12 • Roof Drawing</h1>
+<p class="text-metadata font-metadata text-on-surface-variant">Hanover • Cluster A3</p>
+<div class="flex items-center gap-1 text-[10px] font-metadata text-success opacity-80 mt-0.5">
+<span class="material-symbols-outlined text-[12px]">cloud_done</span>
+<span class="">Draft Saved</span>
+</div></div>
+</div>
+<button class="h-target-min w-target-min flex items-center justify-center hover:bg-surface-container-low transition-colors rounded-full text-primary">
+<span class="material-symbols-outlined" data-icon="export_notes">export_notes</span>
+</button><button class="h-target-min w-target-min flex items-center justify-center hover:bg-surface-container-low transition-colors rounded-full text-primary">
+<span class="material-symbols-outlined" data-icon="more_vert">more_vert</span>
+</button>
+</header>
+<!-- Workflow Stepper -->
+<div class="bg-surface border-b border-surface-container-highest px-gutter-phone py-sm flex justify-between items-center z-30 shadow-sm relative">
+<div class="flex flex-col items-center">
+<div class="w-8 h-8 rounded-full bg-success text-on-primary flex items-center justify-center mb-1">
+<span class="material-symbols-outlined text-sm" data-icon="check">check</span>
+</div>
+<span class="text-metadata font-metadata text-success">House</span>
+</div>
+<div class="flex-1 h-[2px] bg-success mx-2 mt-[-16px]"></div>
+<div class="flex flex-col items-center">
+<div class="w-8 h-8 rounded-full bg-brand-red text-on-primary flex items-center justify-center mb-1 shadow-sm">
+<span class="text-label-md font-label-md">02</span>
+</div>
+<span class="text-metadata font-metadata text-brand-red font-bold">Roof</span>
+</div>
+<div class="flex-1 h-[2px] bg-surface-container-highest mx-2 mt-[-16px]"></div>
+<div class="flex flex-col items-center">
+<div class="w-8 h-8 rounded-full bg-surface-container-highest text-on-surface-variant flex items-center justify-center mb-1">
+<span class="text-label-md font-label-md">03</span>
+</div>
+<span class="text-metadata font-metadata text-on-surface-variant">Print</span>
+</div>
+<div class="flex-1 h-[2px] bg-surface-container-highest mx-2 mt-[-16px]"></div>
+<div class="flex flex-col items-center">
+<div class="w-8 h-8 rounded-full bg-surface-container-highest text-on-surface-variant flex items-center justify-center mb-1">
+<span class="text-label-md font-label-md">04</span>
+</div>
+<span class="text-metadata font-metadata text-on-surface-variant">Files</span>
+</div>
+</div>
+<!-- Main Workspace - Split Screen -->
+<main class="flex-1 relative overflow-hidden bg-canvas-l0 flex pb-[80px]">
+<!-- Drawing Grid Area (Left 50%) -->
+<div class="w-1/2 relative h-full flex flex-col border-r border-outline-variant/30">
+<!-- Grid Canvas -->
+<div class="absolute inset-0 bg-grid opacity-30"></div>
+<!-- Canvas Content Area -->
+<div class="relative w-full h-full flex items-center justify-center overflow-hidden"><div class="absolute top-4 left-1/2 -translate-x-1/2 z-20 bg-brand-red/90 text-on-primary px-4 py-1 rounded-full text-metadata font-bold flex items-center gap-2 shadow-md pointer-events-none"><span class="material-symbols-outlined text-sm">draw</span>DRAWING MODE</div><div class="absolute bottom-20 left-1/2 -translate-x-1/2 z-20 bg-on-surface/80 text-surface px-4 py-2 rounded-lg text-metadata flex items-center gap-2 opacity-80 animate-pulse pointer-events-none"><span class="material-symbols-outlined">touch_app</span>Tap and drag to draw wall sections</div>
+<div class="absolute top-4 right-4 z-20 flex flex-col gap-2">
+<button class="bg-brand-soft border border-brand-red/30 rounded-lg px-3 py-1.5 shadow-sm flex items-center gap-2 text-metadata font-metadata text-brand-red font-bold"><span class="material-symbols-outlined text-[18px]" data-icon="grid_on">grid_on</span>Snap Active</button>
+<button class="bg-surface-l1 border border-error/20 rounded-lg px-3 py-1.5 shadow-sm flex items-center gap-2 text-metadata font-metadata text-error">
+<span class="material-symbols-outlined text-[18px]" data-icon="delete_sweep">delete_sweep</span>
+                    Clear
+                </button>
+</div>
+<!-- SVG Drawing placeholder representing an L-shaped roof -->
+<svg class="absolute z-10 overflow-visible" height="240" viewBox="0 0 280 240" width="280">
+<!-- Main Roof Outline -->
+<path d="M 40 40 L 240 40 L 240 120 L 140 120 L 140 200 L 40 200 Z" fill="rgba(255, 255, 255, 0.8)" stroke="#8f6f6c" stroke-linejoin="round" stroke-width="2"></path>
+<!-- Ridge Lines (Dotted) -->
+<line stroke="#8f6f6c" stroke-dasharray="4" stroke-width="2" x1="90" x2="190" y1="90" y2="90"></line>
+<line stroke="#8f6f6c" stroke-dasharray="4" stroke-width="2" x1="40" x2="90" y1="40" y2="90"></line>
+<line stroke="#8f6f6c" stroke-dasharray="4" stroke-width="2" x1="240" x2="190" y1="40" y2="90"></line>
+<!-- Drainage Arrows -->
+<path d="M 140 140 L 140 170 M 135 165 L 140 170 L 145 165" fill="none" stroke="#0288D1" stroke-width="2"></path>
+<!-- Active Line Highlight -->
+<line stroke="#D32F2F" stroke-linecap="round" stroke-width="4" x1="40" x2="240" y1="40" y2="40"></line>
+<!-- Large Touch Targets (48dp equivalent) -->
+<circle class="cursor-pointer shadow-lg" cx="40" cy="40" fill="#0288D1" r="12" stroke="#ffffff" stroke-width="3"></circle>
+<circle class="cursor-pointer shadow-lg" cx="240" cy="40" fill="#0288D1" r="12" stroke="#ffffff" stroke-width="3"></circle>
+<circle class="cursor-pointer shadow-lg" cx="240" cy="120" fill="#0288D1" r="12" stroke="#ffffff" stroke-width="3"></circle>
+<circle class="cursor-pointer shadow-lg" cx="140" cy="120" fill="#0288D1" r="12" stroke="#ffffff" stroke-width="3"></circle>
+<circle class="cursor-pointer shadow-lg" cx="140" cy="200" fill="#0288D1" r="12" stroke="#ffffff" stroke-width="3"></circle>
+<circle class="cursor-pointer shadow-lg" cx="40" cy="200" fill="#0288D1" r="12" stroke="#ffffff" stroke-width="3"></circle>
+<!-- Dimension Labels -->
+<text class="animate-pulse" fill="#D32F2F" font-family="JetBrains Mono" font-size="12" font-weight="bold" text-anchor="middle" x="140" y="25">24.5 ft</text>
+<!-- Ridge Line Group -->
+<g>
+<line stroke="#D32F2F" stroke-dasharray="6,4" stroke-width="2" x1="40" x2="240" y1="120" y2="120"></line>
+<text fill="#D32F2F" font-family="JetBrains Mono" font-size="10" font-weight="bold" text-anchor="middle" x="140" y="110">Ridge: 24.5 ft</text>
+</g><!-- Drain Direction Group -->
+<g>
+<path d="M 90 140 L 90 180 M 85 175 L 90 180 L 95 175" fill="none" stroke="#0288D1" stroke-width="3"></path>
+<text fill="#0288D1" font-family="Inter" font-size="9" font-weight="bold" x="95" y="160">Drain Direction</text>
+<rect fill="#2E7D32" height="12" rx="6" width="45" x="95" y="165"></rect>
+<text fill="#ffffff" font-family="Inter" font-size="8" text-anchor="middle" x="117.5" y="174">Enabled</text>
+<!-- Rotation Handle -->
+<circle class="cursor-pointer shadow-md" cx="90" cy="130" fill="#D32F2F" r="10"></circle>
+<text fill="#ffffff" font-family="Material Symbols Outlined" font-size="14" text-anchor="middle" x="90" y="134">rotate_right</text>
+<text fill="#D32F2F" font-family="Hanken Grotesk" font-size="9" font-weight="bold" x="105" y="133">Rotate 360°</text>
+</g></svg>
+<!-- Floating FAB Menu -->
+<div class="absolute bottom-4 right-4 flex flex-col gap-2 z-30">
+<button class="h-12 w-12 flex items-center justify-center rounded-full bg-brand-red text-on-primary shadow-lg hover:bg-brand-strong transition-colors">
+<span class="material-symbols-outlined" data-icon="polyline">polyline</span>
+</button>
+<button class="h-10 w-10 flex items-center justify-center rounded-full bg-surface-l1 border border-surface-container-highest text-on-surface-variant shadow-sm hover:bg-surface-container-low transition-colors self-end">
+<span class="material-symbols-outlined" data-icon="horizontal_rule">horizontal_rule</span>
+</button>
+<button class="h-10 w-10 flex items-center justify-center rounded-full bg-surface-l1 border border-surface-container-highest text-on-surface-variant shadow-sm hover:bg-surface-container-low transition-colors self-end">
+<span class="material-symbols-outlined" data-icon="diagonal_line">diagonal_line</span>
+</button>
+</div>
+<!-- Correction Group (Top Left) -->
+<div class="absolute top-4 left-4 z-20 flex gap-2">
+<button class="h-10 w-10 flex items-center justify-center rounded-lg bg-surface-l1 border border-surface-container-highest shadow-sm hover:bg-surface-container-high text-on-surface-variant">
+<span class="material-symbols-outlined" data-icon="undo">undo</span>
+</button>
+<button class="h-10 w-10 flex items-center justify-center rounded-lg bg-surface-l1 border border-surface-container-highest shadow-sm hover:bg-surface-container-high text-on-surface-variant">
+<span class="material-symbols-outlined" data-icon="redo">redo</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Properties Panel (Right 50%) -->
+<div class="w-1/2 bg-surface-l1 overflow-y-auto z-20 shadow-[-4px_0_20px_rgba(0,0,0,0.05)] flex flex-col relative h-full">
+<!-- Measurement Inputs Overlay -->
+<div class="bg-surface-l1 border-b border-brand-red p-md shadow-sm mb-4">
+<div class="flex items-center justify-between gap-2">
+<div class="flex flex-col gap-1 w-full">
+<div class="flex items-center gap-xs justify-center bg-brand-soft/30 p-2 rounded-lg border border-brand-red/20">
+<input class="w-16 bg-transparent border-none text-brand-red font-label-md text-label-md p-0 focus:ring-0 text-center" type="text" value="24.5">
+<span class="text-on-surface-variant font-label-md text-label-md">ft</span>
+<button class="h-8 w-8 flex items-center justify-center rounded-full bg-brand-soft text-brand-red ml-2">
+<span class="material-symbols-outlined text-[18px]" data-icon="check">check</span>
+</button>
+</div>
+<div class="flex justify-center gap-4 mt-2">
+<button class="text-[10px] font-bold uppercase text-brand-red border-b-2 border-brand-red pb-1">Len</button>
+<button class="text-[10px] font-bold uppercase text-on-surface-variant opacity-50 pb-1">Hgt</button>
+<button class="text-[10px] font-bold uppercase text-on-surface-variant opacity-50 pb-1">Pit</button>
+</div>
+</div>
+</div>
+</div>
+<div class="px-md flex-1 flex flex-col pb-6">
+<div class="flex justify-between items-end mb-6 mt-2">
+<div>
+<h3 class="text-section-title font-section-title text-on-background">Wall Details</h3>
+<p class="text-metadata font-metadata text-on-surface-variant">North Elevation (Selected)</p>
+</div>
+<div class="bg-brand-soft text-brand-red px-sm py-1 rounded-full text-metadata font-metadata border border-brand-red/20">
+                    Active
+                </div>
+</div>
+<div class="flex flex-col gap-md mb-6 flex-1">
+<div class="bg-canvas-l0 rounded-xl p-sm border border-surface-container-highest flex flex-col">
+<span class="text-metadata font-metadata text-on-surface-variant mb-1">Roof Type</span>
+<select class="bg-transparent border-none p-0 font-bold text-on-background focus:ring-0 w-full">
+<option>Gable</option>
+<option>Hip</option>
+<option>Shed</option>
+</select>
+</div>
+<div class="bg-canvas-l0 rounded-xl p-sm border border-surface-container-highest flex flex-col">
+<span class="text-metadata font-metadata text-on-surface-variant mb-1">Pitch</span>
+<div class="flex items-center gap-2">
+<span class="text-body-md font-body-md font-bold text-on-background">6/12</span>
+<span class="bg-brand-red text-on-primary text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider font-section-title">Auto</span>
+</div>
+</div>
+<div class="bg-canvas-l0 rounded-xl p-sm border border-surface-container-highest flex flex-col">
+<span class="text-metadata font-metadata text-on-surface-variant mb-1">Length / Height</span>
+<span class="text-body-md font-body-md font-bold text-on-background">24.5' / 9.0'</span>
+</div>
+<div class="bg-canvas-l0 rounded-xl p-sm border border-surface-container-highest flex flex-col gap-3">
+<div class="flex items-center justify-between">
+<div class="flex flex-col">
+<span class="text-metadata font-metadata text-on-surface-variant">Drain System</span>
+<span class="text-label-md font-bold text-success">Enabled</span>
+</div>
+<div class="w-12 h-6 bg-success rounded-full relative shadow-inner cursor-pointer">
+<div class="absolute right-1 top-1 w-4 h-4 bg-white rounded-full shadow-sm"></div>
+</div>
+</div>
+<div class="flex items-center justify-between bg-surface-l1 p-2 rounded-lg border border-surface-container-highest">
+<span class="text-metadata font-metadata text-on-surface-variant flex items-center gap-1"><span class="material-symbols-outlined text-[16px] text-brand-red">rotate_right</span> Rotation</span>
+<div class="flex items-center gap-2">
+<input class="w-16 h-1 bg-surface-container-high rounded-lg appearance-none cursor-pointer accent-brand-red" max="360" min="0" type="range" value="180">
+<span class="text-label-md font-bold text-brand-red font-label-md w-8 text-right">180°</span>
+</div>
+</div>
+</div>
+</div>
+<div class="mt-auto pt-4">
+<button class="w-full h-target-min bg-brand-red hover:bg-brand-strong text-on-primary rounded-xl font-body-md text-body-md font-bold uppercase tracking-wide flex items-center justify-center gap-xs transition-colors shadow-md"><span class="material-symbols-outlined" data-icon="send">send</span>
+SUBMIT DRAWING</button>
+</div>
+</div>
+</div>
+<div class="fixed inset-0 bg-on-background/20 z-50 flex items-end justify-center pointer-events-none opacity-0 transition-opacity">
+<div class="bg-surface w-full max-w-md rounded-t-xl p-gutter-phone shadow-lg pointer-events-auto">
+<div class="w-12 h-1 bg-outline-variant/30 rounded-full mx-auto mb-6"></div>
+<h3 class="text-headline-md font-headline-md mb-4">Export Drawing</h3>
+<div class="flex flex-col gap-2">
+<button class="flex items-center gap-md p-md hover:bg-surface-container-low rounded-lg transition-colors">
+<span class="material-symbols-outlined text-brand-red">picture_as_pdf</span>
+<span class="font-body-md">Export as PDF</span>
+</button>
+<button class="flex items-center gap-md p-md hover:bg-surface-container-low rounded-lg transition-colors">
+<span class="material-symbols-outlined text-success">table_chart</span>
+<span class="font-body-md">Export as Excel (XLSX)</span>
+</button>
+<button class="flex items-center gap-md p-md hover:bg-surface-container-low rounded-lg transition-colors">
+<span class="material-symbols-outlined text-info">edit_document</span>
+<span class="font-body-md">Manipulatable Document</span>
+</button>
+</div>
+<button class="w-full mt-6 py-3 text-on-surface-variant font-bold uppercase tracking-wider">Cancel</button>
+</div>
+</div></main>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-2 py-3 pb-safe bg-surface-container-lowest border-t border-outline-variant shadow-lg rounded-t-xl">
+<div class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1.5 hover:bg-surface-container-high transition-colors rounded-xl">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span class="text-label-md font-label-md mt-1">Dashboard</span>
+</div>
+<div class="flex flex-col items-center justify-center bg-primary-container text-on-primary-container rounded-xl px-4 py-1.5 transition-all scale-95">
+<span class="material-symbols-outlined" data-icon="assignment">assignment</span>
+<span class="text-label-md font-label-md mt-1">Scope</span>
+</div>
+<div class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1.5 hover:bg-surface-container-high transition-colors rounded-xl">
+<span class="material-symbols-outlined" data-icon="settings_suggest">settings_suggest</span>
+<span class="text-label-md font-label-md mt-1">Control</span>
+</div>
+<div class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1.5 hover:bg-surface-container-high transition-colors rounded-xl">
+<span class="material-symbols-outlined" data-icon="home">home</span>
+<span class="text-label-md font-label-md mt-1">Houses</span>
+</div>
+<div class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1.5 hover:bg-surface-container-high transition-colors rounded-xl">
+<span class="material-symbols-outlined" data-icon="more_horiz">more_horiz</span>
+<span class="text-label-md font-label-md mt-1">More</span>
+</div>
+</nav>
+
+
+</body></html>

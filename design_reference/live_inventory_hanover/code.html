@@ -1,0 +1,303 @@
+<!DOCTYPE html><html class="h-full" lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Live Inventory: Hanover</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;700;800;900&amp;family=Inter:wght@400;500;600&amp;family=JetBrains+Mono:wght@500&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "surface": "#fff8f7",
+                        "surface-variant": "#f9dcd9",
+                        "tertiary-fixed-dim": "#7bd1f8",
+                        "on-tertiary-container": "#e9f7ff",
+                        "primary-fixed": "#ffdad6",
+                        "outline": "#8f6f6c",
+                        "secondary-fixed": "#d4e3ff",
+                        "tertiary-container": "#00799c",
+                        "surface-l1": "#FFFFFF",
+                        "surface-container-highest": "#f9dcd9",
+                        "primary": "#af101a",
+                        "inverse-primary": "#ffb3ac",
+                        "surface-tint": "#ba1a20",
+                        "on-tertiary": "#ffffff",
+                        "primary-container": "#d32f2f",
+                        "error-container": "#ffdad6",
+                        "surface-container-high": "#ffe2de",
+                        "tertiary": "#005f7b",
+                        "background": "#fff8f7",
+                        "surface-container-lowest": "#ffffff",
+                        "on-error": "#ffffff",
+                        "surface-container": "#ffe9e7",
+                        "brand-red": "#D32F2F",
+                        "brand-strong": "#B71C1C",
+                        "error": "#C62828",
+                        "secondary-fixed-dim": "#a5c8ff",
+                        "primary-fixed-dim": "#ffb3ac",
+                        "surface-container-low": "#fff0ef",
+                        "inverse-on-surface": "#ffedeb",
+                        "secondary-container": "#54a0fe",
+                        "on-secondary-fixed-variant": "#004786",
+                        "brand-soft": "#FFEBEE",
+                        "on-tertiary-fixed-variant": "#004d65",
+                        "surface-bright": "#fff8f7",
+                        "tertiary-fixed": "#bee9ff",
+                        "surface-dim": "#f1d3d0",
+                        "secondary": "#005faf",
+                        "on-surface": "#271816",
+                        "outline-variant": "#e4beba",
+                        "on-surface-variant": "#5b403d",
+                        "canvas-l0": "#F5F7F9",
+                        "inverse-surface": "#3e2c2a",
+                        "on-error-container": "#93000a",
+                        "on-primary": "#ffffff",
+                        "on-primary-container": "#fff2f0",
+                        "warning": "#FFA000",
+                        "info": "#0288D1",
+                        "on-tertiary-fixed": "#001f2a",
+                        "on-primary-fixed-variant": "#930010",
+                        "on-secondary": "#ffffff",
+                        "on-primary-fixed": "#410003",
+                        "on-secondary-fixed": "#001c3a",
+                        "success": "#2E7D32",
+                        "on-background": "#271816",
+                        "on-secondary-container": "#003567",
+                        "surface-l2": "#F0F3F5"
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    spacing: {
+                        "target-min": "48px",
+                        "base": "4px",
+                        "lg": "24px",
+                        "sm": "12px",
+                        "xl": "32px",
+                        "gutter-phone": "16px",
+                        "xs": "8px",
+                        "gutter-tablet": "24px",
+                        "md": "16px"
+                    },
+                    fontFamily: {
+                        "label-md": ["JetBrains Mono"],
+                        "hero-title": ["Hanken Grotesk"],
+                        "headline-lg": ["Hanken Grotesk"],
+                        "headline-md": ["Hanken Grotesk"],
+                        "metadata": ["Inter"],
+                        "body-md": ["Inter"],
+                        "section-title": ["Hanken Grotesk"],
+                        "hero-title-mobile": ["Hanken Grotesk"],
+                        "body-lg": ["Inter"],
+                        "label-md-mobile": ["JetBrains Mono"]
+                    },
+                    fontSize: {
+                        "label-md": ["13px", { lineHeight: "16px", fontWeight: "500" }],
+                        "hero-title": ["32px", { lineHeight: "36px", letterSpacing: "-0.02em", fontWeight: "900" }],
+                        "headline-lg": ["24px", { lineHeight: "32px", fontWeight: "800" }],
+                        "headline-md": ["20px", { lineHeight: "28px", fontWeight: "750" }],
+                        "metadata": ["12px", { lineHeight: "16px", fontWeight: "500" }],
+                        "body-md": ["15px", { lineHeight: "22px", fontWeight: "400" }],
+                        "section-title": ["18px", { lineHeight: "24px", fontWeight: "700" }],
+                        "hero-title-mobile": ["28px", { lineHeight: "32px", fontWeight: "900" }],
+                        "body-lg": ["17px", { lineHeight: "26px", fontWeight: "400" }],
+                        "label-md-mobile": ["12px", { lineHeight: "14px", fontWeight: "500" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-canvas-l0 text-on-surface h-full flex flex-col font-body-md overflow-x-hidden">
+<!-- TopAppBar -->
+<header class="bg-surface dark:bg-surface-dim shadow-sm flex justify-between items-center w-full px-gutter-phone md:px-gutter-tablet h-target-min z-50 sticky top-0">
+<div class="flex items-center gap-xs">
+<span class="material-symbols-outlined text-primary dark:text-primary-fixed-dim" style="font-variation-settings: 'FILL' 1;">roofing</span>
+<span class="font-hero-title text-hero-title font-black text-primary dark:text-primary-fixed-dim tracking-tight">RC SOW Operations</span>
+</div>
+<div class="flex items-center">
+<span class="material-symbols-outlined text-on-surface-variant">account_circle</span>
+</div>
+</header>
+<div class="flex flex-1 overflow-hidden">
+<!-- Main Content -->
+<main class="flex-1 overflow-y-auto pb-24 lg:pb-8">
+<!-- Page Header / Context -->
+<div class="px-gutter-phone py-md bg-surface-l1 shadow-[0_4px_4px_rgba(0,0,0,0.05)] sticky top-0 z-40">
+<div class="flex flex-col gap-sm">
+<div class="flex justify-between items-start">
+<div>
+<h1 class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface">Hanover • Live Inventory</h1>
+<p class="font-metadata text-metadata text-on-surface-variant flex items-center gap-1 mt-1">
+<span class="material-symbols-outlined text-[14px]">cloud_sync</span>
+                                Last Synced: Today, 08:42 AM
+                            </p>
+</div>
+</div>
+<!-- Search & Filter Controls -->
+<div class="flex flex-col gap-sm mt-xs">
+<div class="relative w-full h-target-min flex items-center">
+<span class="material-symbols-outlined absolute left-sm text-on-surface-variant">search</span>
+<input class="w-full h-full pl-xl pr-sm rounded-lg border border-outline-variant bg-surface focus:border-primary focus:ring-1 focus:ring-primary font-body-md text-body-md placeholder-on-surface-variant/70" placeholder="Search materials..." type="text">
+<button class="absolute right-2 h-8 w-8 flex items-center justify-center text-primary hover:bg-primary-container/10 rounded-full transition-colors"><span class="material-symbols-outlined">qr_code_scanner</span></button></div>
+<div class="flex gap-sm overflow-x-auto pb-1 scrollbar-hide">
+<button class="h-target-min px-4 rounded-lg bg-surface-variant text-on-surface-variant border border-outline-variant flex items-center gap-2 whitespace-nowrap shrink-0 hover:bg-surface-container-high transition-colors font-label-md text-label-md">
+<span class="material-symbols-outlined text-[18px]">filter_list</span>
+                                All Categories
+                            </button>
+<button class="h-target-min px-4 rounded-lg bg-brand-soft text-brand-strong border-brand-red border flex items-center gap-2 whitespace-nowrap shrink-0 font-label-md text-label-md">
+                                Hanover Parish
+                            </button>
+</div>
+</div>
+</div>
+</div>
+<!-- Inventory List (Bento-style Cards for Mobile) -->
+<div class="p-gutter-phone flex flex-col gap-md">
+<!-- Inventory Item Card 1 -->
+<div class="bg-surface-l1 rounded-xl p-md border border-outline-variant/30 shadow-[0_2px_8px_rgba(0,0,0,0.04)] flex flex-col gap-sm">
+<div class="flex justify-between items-start">
+<div>
+<h3 class="font-section-title text-section-title text-on-surface">Rafters 2x6x16 Treated</h3>
+<span class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider block mt-1">MAT-001 • Lumber</span>
+</div>
+<span class="inline-flex items-center px-2 py-1 rounded-full bg-success/10 text-success font-metadata text-metadata border border-success/20">
+                            In Stock
+                        </span>
+</div>
+<div class="grid grid-cols-2 gap-sm mt-xs bg-canvas-l0 p-sm rounded-lg border border-outline-variant/50">
+<div class="flex flex-col">
+<span class="font-metadata text-metadata text-on-surface-variant">BOQ Target</span>
+<span class="font-headline-md text-headline-md text-on-surface">450</span>
+</div>
+<div class="flex flex-col">
+<span class="font-metadata text-metadata text-on-surface-variant">Current Total</span>
+<span class="font-headline-md text-headline-md text-primary">420</span>
+</div>
+</div>
+<div class="flex justify-between items-center pt-2 border-t border-outline-variant/30 mt-1">
+<div class="flex gap-4">
+<div class="flex flex-col">
+<span class="font-metadata text-metadata text-on-surface-variant">Delivered</span>
+<span class="font-body-md text-body-md text-on-surface">400</span>
+</div>
+<div class="flex flex-col">
+<span class="font-metadata text-metadata text-on-surface-variant">Additional</span>
+<span class="font-body-md text-body-md text-on-surface">20</span>
+</div>
+</div>
+<button class="h-target-min px-4 rounded-lg bg-primary text-on-primary flex items-center gap-2 font-label-md text-label-md hover:bg-brand-strong transition-colors shadow-sm"><span class="material-symbols-outlined text-[18px]">edit_square</span>Quick Adjust</button>
+</div>
+</div>
+<!-- Inventory Item Card 2 -->
+<div class="bg-surface-l1 rounded-xl p-md border border-outline-variant/30 shadow-[0_2px_8px_rgba(0,0,0,0.04)] flex flex-col gap-sm ring-2 ring-error/30">
+<div class="flex justify-between items-start">
+<div>
+<h3 class="font-section-title text-section-title text-on-surface">Zinc 26-gauge Corrugated</h3>
+<span class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider block mt-1">MAT-042 • Roofing</span>
+</div>
+<span class="inline-flex items-center px-2 py-1 rounded-full bg-error-container text-on-error-container font-metadata text-metadata border border-error/20 animate-pulse">
+                            Low Stock
+                        </span>
+</div>
+<div class="grid grid-cols-2 gap-sm mt-xs bg-canvas-l0 p-sm rounded-lg border border-outline-variant/50">
+<div class="flex flex-col">
+<span class="font-metadata text-metadata text-on-surface-variant">BOQ Target</span>
+<span class="font-headline-md text-headline-md text-on-surface">1200</span>
+</div>
+<div class="flex flex-col">
+<span class="font-metadata text-metadata text-on-surface-variant">Current Total</span>
+<span class="font-headline-md text-headline-md text-error">350</span>
+</div>
+</div>
+<div class="flex justify-between items-center pt-2 border-t border-outline-variant/30 mt-1">
+<div class="flex gap-4">
+<div class="flex flex-col">
+<span class="font-metadata text-metadata text-on-surface-variant">Delivered</span>
+<span class="font-body-md text-body-md text-on-surface">350</span>
+</div>
+<div class="flex flex-col">
+<span class="font-metadata text-metadata text-on-surface-variant">Additional</span>
+<span class="font-body-md text-body-md text-on-surface">0</span>
+</div>
+</div>
+<button class="h-target-min px-4 rounded-lg bg-primary text-on-primary flex items-center gap-2 font-label-md text-label-md hover:bg-brand-strong transition-colors shadow-sm"><span class="material-symbols-outlined text-[18px]">edit_square</span>Quick Adjust</button>
+</div>
+</div>
+<!-- Inventory Item Card 3 -->
+<div class="bg-surface-l1 rounded-xl p-md border border-outline-variant/30 shadow-[0_2px_8px_rgba(0,0,0,0.04)] flex flex-col gap-sm">
+<div class="flex justify-between items-start">
+<div>
+<h3 class="font-section-title text-section-title text-on-surface">Cement (Portland)</h3>
+<span class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider block mt-1">MAT-105 • Masonry</span>
+</div>
+<span class="inline-flex items-center px-2 py-1 rounded-full bg-surface-variant text-on-surface-variant font-metadata text-metadata border border-outline-variant/50">
+                            Out of Stock
+                        </span>
+</div>
+<div class="grid grid-cols-2 gap-sm mt-xs bg-canvas-l0 p-sm rounded-lg border border-outline-variant/50">
+<div class="flex flex-col">
+<span class="font-metadata text-metadata text-on-surface-variant">BOQ Target</span>
+<span class="font-headline-md text-headline-md text-on-surface">800</span>
+</div>
+<div class="flex flex-col">
+<span class="font-metadata text-metadata text-on-surface-variant">Current Total</span>
+<span class="font-headline-md text-headline-md text-on-surface-variant">0</span>
+</div>
+</div>
+<div class="flex justify-between items-center pt-2 border-t border-outline-variant/30 mt-1">
+<div class="flex gap-4">
+<div class="flex flex-col">
+<span class="font-metadata text-metadata text-on-surface-variant">Delivered</span>
+<span class="font-body-md text-body-md text-on-surface">0</span>
+</div>
+<div class="flex flex-col">
+<span class="font-metadata text-metadata text-on-surface-variant">Additional</span>
+<span class="font-body-md text-body-md text-on-surface">0</span>
+</div>
+</div>
+<button class="h-target-min px-4 rounded-lg bg-primary text-on-primary flex items-center gap-2 font-label-md text-label-md hover:bg-brand-strong transition-colors shadow-sm"><span class="material-symbols-outlined text-[18px]">edit_square</span>Quick Adjust</button>
+</div>
+</div>
+</div>
+<button class="fixed bottom-24 right-gutter-phone z-50 w-14 h-14 rounded-full bg-primary text-on-primary shadow-lg flex items-center justify-center hover:scale-105 transition-transform active:scale-95"><span class="material-symbols-outlined text-[32px]">add</span></button></main>
+</div>
+<!-- BottomNavBar -->
+<nav class="lg:hidden fixed bottom-0 w-full flex justify-around items-center px-4 py-2 pb-safe bg-surface dark:bg-surface-dim shadow-lg z-50">
+<a class="flex flex-col items-center justify-center text-on-surface-variant hover:bg-surface-variant w-full py-1 rounded-xl" href="#">
+<span class="material-symbols-outlined mb-1">analytics</span>
+<span class="font-label-md-mobile text-label-md-mobile">Dashboard</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant hover:bg-surface-variant w-full py-1 rounded-xl" href="#">
+<span class="material-symbols-outlined mb-1">alt_route</span>
+<span class="font-label-md-mobile text-label-md-mobile">Lifecycle</span>
+</a>
+<a class="flex flex-col items-center justify-center bg-primary-container text-on-primary-container rounded-xl px-4 py-1 w-full scale-95 transition-transform duration-150" href="#">
+<span class="material-symbols-outlined mb-1">warehouse</span>
+<span class="font-label-md-mobile text-label-md-mobile">Inventory</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant hover:bg-surface-variant w-full py-1 rounded-xl" href="#">
+<span class="material-symbols-outlined mb-1">badge</span>
+<span class="font-label-md-mobile text-label-md-mobile">Teams</span>
+</a>
+</nav>
+
+
+</body></html>

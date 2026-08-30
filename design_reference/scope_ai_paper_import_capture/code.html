@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>AI Scope Import</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500;700&amp;family=Hanken+Grotesk:wght@700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+                  "secondary-fixed": "#d4e3ff",
+                  "surface-container-low": "#fff0ef",
+                  "outline": "#8f6f6c",
+                  "on-surface": "#271816",
+                  "on-tertiary-fixed-variant": "#004d65",
+                  "surface-container-high": "#ffe2de",
+                  "on-secondary-container": "#003567",
+                  "primary": "#af101a",
+                  "success": "#2E7D32",
+                  "on-tertiary-container": "#e9f7ff",
+                  "on-error": "#ffffff",
+                  "brand-soft": "#FFEBEE",
+                  "primary-container": "#d32f2f",
+                  "surface-l1": "#FFFFFF",
+                  "secondary-fixed-dim": "#a5c8ff",
+                  "surface-l2": "#F0F3F5",
+                  "on-tertiary": "#ffffff",
+                  "tertiary-fixed": "#bee9ff",
+                  "inverse-on-surface": "#ffedeb",
+                  "on-primary": "#ffffff",
+                  "on-primary-fixed-variant": "#930010",
+                  "on-error-container": "#93000a",
+                  "surface-container": "#ffe9e7",
+                  "surface-dim": "#f1d3d0",
+                  "surface-variant": "#f9dcd9",
+                  "error-container": "#ffdad6",
+                  "on-primary-container": "#fff2f0",
+                  "on-tertiary-fixed": "#001f2a",
+                  "brand-red": "#D32F2F",
+                  "tertiary-fixed-dim": "#7bd1f8",
+                  "on-primary-fixed": "#410003",
+                  "outline-variant": "#e4beba",
+                  "on-secondary-fixed-variant": "#004786",
+                  "background": "#fff8f7",
+                  "brand-strong": "#B71C1C",
+                  "canvas-l0": "#F5F7F9",
+                  "tertiary": "#005f7b",
+                  "surface": "#fff8f7",
+                  "info": "#0288D1",
+                  "on-secondary": "#ffffff",
+                  "surface-bright": "#fff8f7",
+                  "inverse-primary": "#ffb3ac",
+                  "surface-tint": "#ba1a20",
+                  "surface-container-highest": "#f9dcd9",
+                  "surface-container-lowest": "#ffffff",
+                  "on-background": "#271816",
+                  "on-secondary-fixed": "#001c3a",
+                  "error": "#C62828",
+                  "secondary": "#005faf",
+                  "primary-fixed": "#ffdad6",
+                  "warning": "#FFA000",
+                  "tertiary-container": "#00799c",
+                  "secondary-container": "#54a0fe",
+                  "primary-fixed-dim": "#ffb3ac",
+                  "inverse-surface": "#3e2c2a",
+                  "on-surface-variant": "#5b403d"
+          },
+          "borderRadius": {
+                  "DEFAULT": "0.25rem",
+                  "lg": "0.5rem",
+                  "xl": "0.75rem",
+                  "full": "9999px"
+          },
+          "spacing": {
+                  "gutter-tablet": "24px",
+                  "md": "16px",
+                  "xl": "32px",
+                  "base": "4px",
+                  "xs": "8px",
+                  "target-min": "48px",
+                  "lg": "24px",
+                  "gutter-phone": "16px",
+                  "sm": "12px"
+          },
+          "fontFamily": {
+                  "label-md": [
+                          "JetBrains Mono"
+                  ],
+                  "body-md": [
+                          "Inter"
+                  ],
+                  "hero-title-mobile": [
+                          "Hanken Grotesk"
+                  ],
+                  "hero-title": [
+                          "Hanken Grotesk"
+                  ],
+                  "headline-md": [
+                          "Hanken Grotesk"
+                  ],
+                  "section-title": [
+                          "Hanken Grotesk"
+                  ],
+                  "headline-lg": [
+                          "Hanken Grotesk"
+                  ],
+                  "body-lg": [
+                          "Inter"
+                  ],
+                  "metadata": [
+                          "Inter"
+                  ]
+          },
+          "fontSize": {
+                  "label-md": [
+                          "13px",
+                          {
+                                  "lineHeight": "16px",
+                                  "fontWeight": "500"
+                          }
+                  ],
+                  "body-md": [
+                          "15px",
+                          {
+                                  "lineHeight": "22px",
+                                  "fontWeight": "400"
+                          }
+                  ],
+                  "hero-title-mobile": [
+                          "28px",
+                          {
+                                  "lineHeight": "32px",
+                                  "fontWeight": "900"
+                          }
+                  ],
+                  "hero-title": [
+                          "32px",
+                          {
+                                  "lineHeight": "36px",
+                                  "letterSpacing": "-0.02em",
+                                  "fontWeight": "900"
+                          }
+                  ],
+                  "headline-md": [
+                          "20px",
+                          {
+                                  "lineHeight": "28px",
+                                  "fontWeight": "750"
+                          }
+                  ],
+                  "section-title": [
+                          "18px",
+                          {
+                                  "lineHeight": "24px",
+                                  "fontWeight": "700"
+                          }
+                  ],
+                  "headline-lg": [
+                          "24px",
+                          {
+                                  "lineHeight": "32px",
+                                  "fontWeight": "800"
+                          }
+                  ],
+                  "body-lg": [
+                          "17px",
+                          {
+                                  "lineHeight": "26px",
+                                  "fontWeight": "400"
+                          }
+                  ],
+                  "metadata": [
+                          "12px",
+                          {
+                                  "lineHeight": "16px",
+                                  "fontWeight": "500"
+                          }
+                  ]
+          }
+        }
+      }
+    }
+  </script>
+<style>
+    body {
+      background-color: #000;
+      color: #fff;
+    }
+    .scanner-line {
+      width: 100%;
+      height: 2px;
+      background: #D32F2F;
+      position: absolute;
+      top: 0;
+      left: 0;
+      animation: scan 2s infinite linear;
+      box-shadow: 0 0 10px #D32F2F;
+    }
+    @keyframes scan {
+      0% { top: 0; opacity: 0; }
+      10% { opacity: 1; }
+      90% { opacity: 1; }
+      100% { top: 100%; opacity: 0; }
+    }
+    .corner-tl { top: -2px; left: -2px; border-top: 4px solid #D32F2F; border-left: 4px solid #D32F2F; }
+    .corner-tr { top: -2px; right: -2px; border-top: 4px solid #D32F2F; border-right: 4px solid #D32F2F; }
+    .corner-bl { bottom: -2px; left: -2px; border-bottom: 4px solid #D32F2F; border-left: 4px solid #D32F2F; }
+    .corner-br { bottom: -2px; right: -2px; border-bottom: 4px solid #D32F2F; border-right: 4px solid #D32F2F; }
+  </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="h-screen w-screen overflow-hidden flex flex-col relative font-body-md text-body-md">
+<!-- Top Navigation (Task-Focused - Minimal) -->
+<header class="flex items-center justify-between px-gutter-phone py-sm w-full z-50 absolute top-0 left-0 bg-gradient-to-b from-black/80 to-transparent">
+<button aria-label="Close" class="text-white p-xs flex items-center justify-center rounded-full bg-black/40 backdrop-blur-sm active:scale-95 transition-transform">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">close</span>
+</button>
+<div class="text-center text-white">
+<h1 class="font-headline-md text-headline-md m-0">AI Scope Import</h1>
+<p class="font-metadata text-metadata opacity-80 m-0">Position drawing in frame</p>
+</div>
+<button aria-label="Flash" class="text-white p-xs flex items-center justify-center rounded-full bg-black/40 backdrop-blur-sm active:scale-95 transition-transform">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">flash_off</span>
+</button>
+</header>
+<!-- Viewfinder Canvas -->
+<main class="flex-1 relative w-full h-full bg-gray-900 flex items-center justify-center overflow-hidden">
+<!-- Camera Feed Mock (Would be live video in prod) -->
+<div class="absolute inset-0 w-full h-full bg-gray-800 opacity-60" data-alt="A slightly blurred, top-down view of a hand-drawn architectural floor plan sketch on grid paper resting on a wooden desk. Ambient office lighting." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBWLZAUiYkuiLzO4WdzVctr_TsXMZjhCVfQCqIe1VOnDsJWK7NzGp8BN6GeyUjPmcBY9MU8inotCyt0BqFgzu1Kkd9VeRJqkBVhUz6jVwOoYonan0JDfihUydMmVLuucLmiA8OLvmSUuDSCcYWitPE3FveehyulR35l-dQPY-1jBf-ophZdZae6nWOjiFkE8gDkttSt2HSu11rI_IDI7kJaSIJYdLp93kPJHo6g47KVzmHtz9yiMA77WA')"></div>
+<!-- Alignment Overlay -->
+<div class="relative w-[85%] aspect-[3/4] border-2 border-white/30 rounded-lg box-border">
+<!-- Corners -->
+<div class="absolute w-8 h-8 corner-tl"></div>
+<div class="absolute w-8 h-8 corner-tr"></div>
+<div class="absolute w-8 h-8 corner-bl"></div>
+<div class="absolute w-8 h-8 corner-br"></div>
+<!-- Scanner Line (Active State) -->
+<div class="scanner-line hidden" id="scanner-line"></div>
+<!-- Detection Points (Processing State Mock) -->
+<div class="hidden" id="processing-overlay">
+<div class="absolute top-1/4 left-1/4 w-3 h-3 bg-brand-red rounded-full shadow-[0_0_8px_#D32F2F] animate-pulse"></div>
+<div class="absolute top-1/2 right-1/3 w-3 h-3 bg-brand-red rounded-full shadow-[0_0_8px_#D32F2F] animate-pulse" style="animation-delay: 0.2s;"></div>
+<div class="absolute bottom-1/3 left-1/2 w-3 h-3 bg-brand-red rounded-full shadow-[0_0_8px_#D32F2F] animate-pulse" style="animation-delay: 0.4s;"></div>
+</div>
+</div>
+<!-- Helpful Hint -->
+<div class="absolute top-[20%] left-0 w-full text-center px-lg">
+<div class="inline-block bg-black/60 text-white font-metadata text-metadata px-md py-xs rounded-full backdrop-blur-md border border-white/20">
+        Ensure edges are visible and well-lit
+      </div>
+</div>
+</main>
+<!-- Bottom Actions -->
+<footer class="w-full bg-surface/10 backdrop-blur-lg border-t border-white/20 pb-safe z-50 absolute bottom-0 left-0">
+<div class="flex items-center justify-between px-gutter-phone py-lg w-full">
+<!-- Gallery Upload -->
+<button aria-label="Gallery" class="flex flex-col items-center justify-center text-white active:scale-95 transition-transform w-[80px]">
+<div class="w-target-min h-target-min rounded-full bg-white/10 flex items-center justify-center mb-xs">
+<span class="material-symbols-outlined text-white" style="font-variation-settings: 'FILL' 0;">photo_library</span>
+</div>
+<span class="font-metadata text-metadata">Gallery</span>
+</button>
+<!-- Capture Button -->
+<button aria-label="Capture Document" class="w-20 h-20 rounded-full border-4 border-white flex items-center justify-center active:scale-90 transition-transform" id="capture-btn">
+<div class="w-16 h-16 rounded-full bg-white"></div>
+</button>
+<!-- Mode Switch (Document vs Photo) -->
+<button aria-label="Mode" class="flex flex-col items-center justify-center text-white active:scale-95 transition-transform w-[80px]">
+<div class="w-target-min h-target-min rounded-full bg-white/10 flex items-center justify-center mb-xs">
+<span class="material-symbols-outlined text-white" style="font-variation-settings: 'FILL' 1;">document_scanner</span>
+</div>
+<span class="font-metadata text-metadata text-brand-red font-bold">Auto</span>
+</button>
+</div>
+</footer>
+<script>
+    document.getElementById('capture-btn').addEventListener('click', function() {
+      // Simulate processing state
+      const scanner = document.getElementById('scanner-line');
+      const overlay = document.getElementById('processing-overlay');
+      
+      scanner.classList.remove('hidden');
+      overlay.classList.remove('hidden');
+      
+      // Reset after 3 seconds
+      setTimeout(() => {
+        scanner.classList.add('hidden');
+        overlay.classList.add('hidden');
+        // In a real app, this would transition to a confirmation/editing screen
+      }, 3000);
+    });
+  </script>
+</body></html>

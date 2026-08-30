@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
+<title>Consumable Request - H2</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;700;800;900&amp;family=Inter:wght@400;500;600&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "surface-l2": "#F0F3F5",
+                        "inverse-primary": "#ffb3ac",
+                        "error": "#C62828",
+                        "on-surface": "#271816",
+                        "on-surface-variant": "#5b403d",
+                        "on-tertiary-fixed": "#001f2a",
+                        "secondary": "#005faf",
+                        "tertiary": "#005f7b",
+                        "on-error": "#ffffff",
+                        "surface-container-high": "#ffe2de",
+                        "on-tertiary": "#ffffff",
+                        "secondary-container": "#54a0fe",
+                        "on-primary": "#ffffff",
+                        "on-secondary-fixed-variant": "#004786",
+                        "canvas-l0": "#F5F7F9",
+                        "tertiary-container": "#00799c",
+                        "surface-container-lowest": "#ffffff",
+                        "on-secondary-container": "#003567",
+                        "on-tertiary-container": "#e9f7ff",
+                        "on-primary-container": "#fff2f0",
+                        "brand-strong": "#B71C1C",
+                        "on-secondary": "#ffffff",
+                        "surface-container-low": "#fff0ef",
+                        "on-error-container": "#93000a",
+                        "on-primary-fixed": "#410003",
+                        "tertiary-fixed-dim": "#7bd1f8",
+                        "surface-l1": "#FFFFFF",
+                        "warning": "#FFA000",
+                        "brand-red": "#D32F2F",
+                        "success": "#2E7D32",
+                        "primary-fixed": "#ffdad6",
+                        "secondary-fixed-dim": "#a5c8ff",
+                        "surface-tint": "#ba1a20",
+                        "on-secondary-fixed": "#001c3a",
+                        "surface-container-highest": "#f9dcd9",
+                        "surface-variant": "#f9dcd9",
+                        "on-primary-fixed-variant": "#930010",
+                        "surface-bright": "#fff8f7",
+                        "inverse-surface": "#3e2c2a",
+                        "primary-fixed-dim": "#ffb3ac",
+                        "on-background": "#271816",
+                        "error-container": "#ffdad6",
+                        "outline-variant": "#e4beba",
+                        "tertiary-fixed": "#bee9ff",
+                        "primary": "#af101a",
+                        "inverse-on-surface": "#ffedeb",
+                        "surface-container": "#ffe9e7",
+                        "surface-dim": "#f1d3d0",
+                        "info": "#0288D1",
+                        "secondary-fixed": "#d4e3ff",
+                        "outline": "#8f6f6c",
+                        "on-tertiary-fixed-variant": "#004d65",
+                        "surface": "#fff8f7",
+                        "brand-soft": "#FFEBEE",
+                        "primary-container": "#d32f2f",
+                        "background": "#fff8f7"
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    spacing: {
+                        "gutter-tablet": "24px",
+                        "target-min": "48px",
+                        "base": "4px",
+                        "gutter-phone": "16px",
+                        "lg": "24px",
+                        "md": "16px",
+                        "xl": "32px",
+                        "xs": "8px",
+                        "sm": "12px"
+                    },
+                    fontFamily: {
+                        "section-title": ["Hanken Grotesk"],
+                        "metadata": ["Inter"],
+                        "hero-title-mobile": ["Hanken Grotesk"],
+                        "headline-md": ["Hanken Grotesk"],
+                        "label-md": ["JetBrains Mono"],
+                        "hero-title": ["Hanken Grotesk"],
+                        "body-lg": ["Inter"],
+                        "body-md": ["Inter"],
+                        "headline-lg": ["Hanken Grotesk"]
+                    },
+                    fontSize: {
+                        "section-title": ["18px", { lineHeight: "24px", fontWeight: "700" }],
+                        "metadata": ["12px", { lineHeight: "16px", fontWeight: "500" }],
+                        "hero-title-mobile": ["28px", { lineHeight: "32px", fontWeight: "900" }],
+                        "headline-md": ["20px", { lineHeight: "28px", fontWeight: "750" }],
+                        "label-md": ["13px", { lineHeight: "16px", fontWeight: "500" }],
+                        "hero-title": ["32px", { lineHeight: "36px", letterSpacing: "-0.02em", fontWeight: "900" }],
+                        "body-lg": ["17px", { lineHeight: "26px", fontWeight: "400" }],
+                        "body-md": ["15px", { lineHeight: "22px", fontWeight: "400" }],
+                        "headline-lg": ["24px", { lineHeight: "32px", fontWeight: "800" }]
+                    }
+                }
+            }
+        };
+    </script>
+<style>
+        body { -webkit-tap-highlight-color: transparent; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        .icon-fill { font-variation-settings: 'FILL' 1; }
+        .input-ring:focus-within { outline: 2px solid theme('colors.primary'); outline-offset: -2px; }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-canvas-l0 text-on-surface min-h-screen font-body-md pb-[100px] md:pb-0">
+<!-- TopAppBar -->
+<header class="bg-surface dark:bg-surface shadow-sm w-full sticky top-0 z-50 flex items-center justify-between px-md w-full h-target-min">
+<button class="w-target-min h-target-min flex items-center justify-center text-on-surface-variant hover:bg-surface-container-low active:scale-95 transition-transform duration-200 rounded-full">
+<span class="material-symbols-outlined" data-icon="close">close</span>
+</button>
+<h1 class="font-headline-md text-headline-md font-black text-primary dark:text-primary-fixed-dim">H2 | Logistics</h1>
+<button class="w-target-min h-target-min flex items-center justify-center text-on-surface-variant hover:bg-surface-container-low active:scale-95 transition-transform duration-200 rounded-full">
+<div class="relative">
+<span class="material-symbols-outlined icon-fill text-success" data-icon="cloud_done">cloud_done</span>
+</div>
+</button>
+</header>
+<main class="max-w-[800px] mx-auto px-gutter-phone md:px-gutter-tablet py-lg flex flex-col gap-lg">
+<!-- Status Indicator -->
+<div class="flex items-center justify-center gap-xs text-metadata font-metadata text-on-surface-variant bg-surface-l1 rounded-full py-xs px-sm w-fit mx-auto shadow-sm">
+<span class="material-symbols-outlined text-[16px]">cloud_sync</span>
+<span>Draft saved on device • Just now</span>
+</div>
+<!-- Section 1: Context Info -->
+<section class="bg-surface-l1 rounded-xl shadow-[0_4px_4px_rgba(0,0,0,0.05)] p-md md:p-lg flex flex-col gap-md">
+<h2 class="font-section-title text-section-title text-on-surface border-b border-surface-l2 pb-xs">1. Context Information</h2>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-md mt-sm">
+<!-- House Code Pill -->
+<div class="flex flex-col gap-xs">
+<label class="font-metadata text-metadata text-on-surface-variant">House Code</label>
+<div class="h-target-min bg-surface-l2 rounded-lg flex items-center px-sm gap-sm text-on-surface-variant font-label-md text-label-md">
+<span class="material-symbols-outlined text-[20px]">lock</span>
+                        H2
+                    </div>
+</div>
+<!-- Parish & Cluster -->
+<div class="flex flex-col gap-xs">
+<label class="font-metadata text-metadata text-on-surface-variant">Location Context</label>
+<div class="h-target-min bg-surface-l2 rounded-lg flex items-center px-sm text-on-surface-variant font-body-md text-body-md truncate">
+                        Parish A / Cluster North
+                    </div>
+</div>
+<!-- Dates -->
+<div class="flex flex-col gap-xs">
+<label class="font-metadata text-metadata text-on-surface">Request Date</label>
+<div class="relative h-target-min input-ring rounded-lg border border-outline-variant bg-surface overflow-hidden">
+<input class="w-full h-full px-sm outline-none bg-transparent font-body-md text-body-md text-on-surface" type="date" value="2023-10-24"/>
+</div>
+</div>
+<div class="flex flex-col gap-xs">
+<label class="font-metadata text-metadata text-on-surface">Date Needed By <span class="text-error">*</span></label>
+<div class="relative h-target-min input-ring rounded-lg border border-outline-variant bg-surface overflow-hidden">
+<input class="w-full h-full px-sm outline-none bg-transparent font-body-md text-body-md text-on-surface" required="" type="date"/>
+</div>
+</div>
+<!-- Personnel -->
+<div class="flex flex-col gap-xs">
+<label class="font-metadata text-metadata text-on-surface">Supervisor <span class="text-error">*</span></label>
+<div class="relative h-target-min input-ring rounded-lg border border-outline-variant bg-surface overflow-hidden flex items-center">
+<span class="material-symbols-outlined text-on-surface-variant ml-sm absolute">search</span>
+<select class="w-full h-full pl-xl pr-sm outline-none bg-transparent font-body-md text-body-md text-on-surface appearance-none cursor-pointer">
+<option value="">Select Supervisor...</option>
+<option value="1">Jane Doe (ID: 442)</option>
+<option value="2">John Smith (ID: 991)</option>
+</select>
+<span class="material-symbols-outlined text-on-surface-variant absolute right-sm pointer-events-none">expand_more</span>
+</div>
+</div>
+<div class="flex flex-col gap-xs">
+<label class="font-metadata text-metadata text-on-surface">Carpenter (Optional)</label>
+<div class="relative h-target-min input-ring rounded-lg border border-outline-variant bg-surface overflow-hidden flex items-center">
+<span class="material-symbols-outlined text-on-surface-variant ml-sm absolute">search</span>
+<input class="w-full h-full pl-xl pr-sm outline-none bg-transparent font-body-md text-body-md text-on-surface" placeholder="Search Carpenter name..." type="text"/>
+</div>
+</div>
+</div>
+<!-- Delivery Notes -->
+<div class="flex flex-col gap-xs mt-sm">
+<label class="font-metadata text-metadata text-on-surface">Delivery Location Notes</label>
+<div class="relative input-ring rounded-lg border border-outline-variant bg-surface p-sm">
+<textarea class="w-full outline-none bg-transparent font-body-md text-body-md text-on-surface resize-none" placeholder="e.g. Back entrance near the shed..." rows="3"></textarea>
+</div>
+</div>
+</section>
+<!-- Section 2: Requested Items -->
+<section class="bg-surface-l1 rounded-xl shadow-[0_4px_4px_rgba(0,0,0,0.05)] p-md md:p-lg flex flex-col gap-md">
+<div class="flex justify-between items-center border-b border-surface-l2 pb-xs">
+<h2 class="font-section-title text-section-title text-on-surface">2. Consumable Items</h2>
+<span class="bg-surface-l2 text-on-surface-variant font-label-md text-label-md px-sm py-1 rounded-full">2 Items</span>
+</div>
+<!-- Item List -->
+<div class="flex flex-col gap-md mt-sm">
+<!-- Row 1 -->
+<div class="bg-surface-l2 p-sm rounded-lg flex flex-col md:flex-row gap-sm items-start md:items-center relative group">
+<button class="absolute top-sm right-sm w-8 h-8 flex items-center justify-center text-on-surface-variant hover:text-error bg-surface-l1 rounded-full shadow-sm md:hidden">
+<span class="material-symbols-outlined text-[18px]">delete</span>
+</button>
+<div class="flex-1 w-full flex flex-col gap-1">
+<label class="font-metadata text-metadata text-on-surface-variant md:hidden">Item</label>
+<select class="w-full h-target-min px-sm rounded border border-outline-variant bg-surface outline-none focus:border-primary font-body-md text-body-md">
+<option>Nails (Box)</option>
+<option>Screws (Box)</option>
+<option>Sandpaper (Pack)</option>
+</select>
+</div>
+<div class="flex gap-sm w-full md:w-auto">
+<div class="flex-1 md:w-24 flex flex-col gap-1">
+<label class="font-metadata text-metadata text-on-surface-variant md:hidden">Qty</label>
+<input class="w-full h-target-min px-sm rounded border border-outline-variant bg-surface outline-none focus:border-primary font-body-md text-body-md text-center" type="number" value="2"/>
+</div>
+<div class="flex-1 md:w-32 flex flex-col gap-1">
+<label class="font-metadata text-metadata text-on-surface-variant md:hidden">Est. Price</label>
+<input class="w-full h-target-min px-sm rounded border border-outline-variant bg-surface outline-none focus:border-primary font-body-md text-body-md text-right" placeholder="$0.00" type="number"/>
+</div>
+</div>
+<button class="hidden md:flex w-10 h-10 items-center justify-center text-on-surface-variant hover:text-error hover:bg-error-container rounded-full transition-colors">
+<span class="material-symbols-outlined">delete</span>
+</button>
+</div>
+<!-- Row 2 -->
+<div class="bg-surface-l2 p-sm rounded-lg flex flex-col md:flex-row gap-sm items-start md:items-center relative group">
+<button class="absolute top-sm right-sm w-8 h-8 flex items-center justify-center text-on-surface-variant hover:text-error bg-surface-l1 rounded-full shadow-sm md:hidden">
+<span class="material-symbols-outlined text-[18px]">delete</span>
+</button>
+<div class="flex-1 w-full flex flex-col gap-1">
+<label class="font-metadata text-metadata text-on-surface-variant md:hidden">Item</label>
+<select class="w-full h-target-min px-sm rounded border border-outline-variant bg-surface outline-none focus:border-primary font-body-md text-body-md">
+<option>Screws (Box)</option>
+<option selected="">Wood Glue (Bottle)</option>
+<option>Sandpaper (Pack)</option>
+</select>
+</div>
+<div class="flex gap-sm w-full md:w-auto">
+<div class="flex-1 md:w-24 flex flex-col gap-1">
+<label class="font-metadata text-metadata text-on-surface-variant md:hidden">Qty</label>
+<input class="w-full h-target-min px-sm rounded border border-outline-variant bg-surface outline-none focus:border-primary font-body-md text-body-md text-center" type="number" value="1"/>
+</div>
+<div class="flex-1 md:w-32 flex flex-col gap-1">
+<label class="font-metadata text-metadata text-on-surface-variant md:hidden">Est. Price</label>
+<input class="w-full h-target-min px-sm rounded border border-outline-variant bg-surface outline-none focus:border-primary font-body-md text-body-md text-right" placeholder="$0.00" type="number"/>
+</div>
+</div>
+<button class="hidden md:flex w-10 h-10 items-center justify-center text-on-surface-variant hover:text-error hover:bg-error-container rounded-full transition-colors">
+<span class="material-symbols-outlined">delete</span>
+</button>
+</div>
+</div>
+<!-- Add Item Button -->
+<button class="mt-sm h-target-min w-full rounded-lg border-2 border-dashed border-primary text-primary font-label-md text-label-md uppercase tracking-wider flex items-center justify-center gap-xs hover:bg-primary-container hover:border-transparent transition-colors">
+<span class="material-symbols-outlined text-[20px]">add_circle</span>
+                Add Another Item
+            </button>
+</section>
+<!-- Section 3: Evidence Chain -->
+<section class="bg-surface-l1 rounded-xl shadow-[0_4px_4px_rgba(0,0,0,0.05)] p-md md:p-lg flex flex-col gap-md">
+<h2 class="font-section-title text-section-title text-on-surface border-b border-surface-l2 pb-xs">3. Evidence Chain</h2>
+<div class="flex flex-col gap-xs mt-sm">
+<label class="font-metadata text-metadata text-on-surface flex justify-between">
+<span>Supervisor Signature <span class="text-error">*</span></span>
+<span class="text-on-surface-variant">Tap to sign</span>
+</label>
+<div class="w-full h-[150px] bg-canvas-l0 rounded-lg border border-outline-variant relative flex items-center justify-center cursor-crosshair">
+<!-- Fake signature path for visual -->
+<svg class="absolute inset-0 w-full h-full opacity-0 hover:opacity-10 pointer-events-none" preserveaspectratio="none" viewbox="0 0 100 100">
+<path d="M20,50 Q40,20 60,50 T90,30" fill="none" stroke="var(--on-surface)" stroke-width="2"></path>
+</svg>
+<span class="font-metadata text-metadata text-on-surface-variant/50 uppercase tracking-widest absolute bottom-sm">Sign Here</span>
+</div>
+<div class="flex justify-between items-center mt-1">
+<button class="text-primary font-metadata text-metadata hover:underline">Clear Signature</button>
+<span class="text-on-surface-variant font-metadata text-metadata">Timestamp pending submission</span>
+</div>
+</div>
+</section>
+<!-- Action Bar (Sticky on mobile, static on desktop) -->
+<div class="fixed bottom-0 left-0 w-full bg-surface-l1 border-t border-outline-variant p-md flex gap-md md:relative md:bg-transparent md:border-t-0 md:p-0 md:mt-md z-40 pb-safe md:pb-0">
+<button class="flex-1 h-target-min rounded-full border border-outline-variant text-on-surface font-label-md text-label-md uppercase tracking-wider hover:bg-surface-l2 transition-colors flex items-center justify-center gap-xs">
+                Save Draft
+            </button>
+<button class="flex-[2] h-target-min rounded-full bg-brand-red text-on-primary font-label-md text-label-md uppercase tracking-wider hover:bg-brand-strong transition-colors flex items-center justify-center gap-xs shadow-md">
+<span class="material-symbols-outlined text-[20px]">send</span>
+                Submit Request
+            </button>
+</div>
+</main>
+</body></html>

@@ -1,10 +1,11 @@
 .dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
 .packages
 build/
+coverage/
 android/.gradle/
 android/local.properties
-*.jks
-*.keystore
-key.properties
-.env
-.env.*
+ios/Pods/
+macos/Pods/
+
