@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Admin: Payment Payout Logic &amp; Configuration - Humanitarian Command</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:ital,wght@0,100..900;1,100..900&amp;family=Inter:wght@100..900&amp;family=JetBrains+Mono:wght@100..800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "surface-tint": "#ba1a20",
+                      "table-header": "#F0F3F5",
+                      "on-secondary": "#ffffff",
+                      "on-secondary-container": "#003e75",
+                      "tertiary-fixed": "#bee9ff",
+                      "surface-dim": "#d8dadc",
+                      "on-background": "#191c1e",
+                      "on-secondary-fixed-variant": "#004786",
+                      "error": "#ba1a1a",
+                      "surface-container-high": "#e6e8ea",
+                      "primary-fixed-dim": "#ffb3ac",
+                      "on-tertiary-container": "#eaf7ff",
+                      "primary-fixed": "#ffdad6",
+                      "on-primary-fixed-variant": "#930010",
+                      "outline": "#8f6f6c",
+                      "inverse-surface": "#2d3133",
+                      "text-on-surface": "#271816",
+                      "attention-amber": "#FFA000",
+                      "on-tertiary": "#ffffff",
+                      "surface-variant": "#e0e3e5",
+                      "surface-bright": "#f8f9fb",
+                      "secondary-fixed": "#d4e3ff",
+                      "on-error": "#ffffff",
+                      "on-primary": "#ffffff",
+                      "on-secondary-fixed": "#001c3a",
+                      "on-tertiary-fixed-variant": "#004d64",
+                      "tertiary-container": "#2e7895",
+                      "on-primary-container": "#fff2f0",
+                      "secondary-fixed-dim": "#a5c8ff",
+                      "on-surface-variant": "#5b403d",
+                      "secondary": "#005faf",
+                      "on-error-container": "#93000a",
+                      "outline-variant": "#e4beba",
+                      "error-container": "#ffdad6",
+                      "success-green": "#2E7D32",
+                      "secondary-container": "#6cabff",
+                      "inverse-primary": "#ffb3ac",
+                      "border-subtle": "#E4BEBA",
+                      "info-blue": "#0288D1",
+                      "brand-strong": "#B71C1C",
+                      "primary": "#af101a",
+                      "on-primary-fixed": "#410003",
+                      "on-tertiary-fixed": "#001f2a",
+                      "background": "#f8f9fb",
+                      "on-surface": "#191c1e",
+                      "surface-container-highest": "#e0e3e5",
+                      "surface-container-low": "#f2f4f6",
+                      "surface-container": "#eceef0",
+                      "brand-red": "#D32F2F",
+                      "surface-container-lowest": "#ffffff",
+                      "brand-soft": "#FFEBEE",
+                      "tertiary": "#005f7b",
+                      "tertiary-fixed-dim": "#8bd0f0",
+                      "inverse-on-surface": "#eff1f3",
+                      "primary-container": "#d32f2f",
+                      "surface": "#f8f9fb"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "gutter-desktop": "24px",
+                      "md": "16px",
+                      "lg": "24px",
+                      "base": "4px",
+                      "xs": "8px",
+                      "margin-edge": "32px",
+                      "sm": "12px",
+                      "xl": "32px"
+              },
+              "fontFamily": {
+                      "body-md": [
+                              "Inter"
+                      ],
+                      "label-mono": [
+                              "JetBrains Mono"
+                      ],
+                      "display-lg": [
+                              "Hanken Grotesk"
+                      ],
+                      "body-lg": [
+                              "Inter"
+                      ],
+                      "body-sm": [
+                              "Inter"
+                      ],
+                      "section-title": [
+                              "Hanken Grotesk"
+                      ],
+                      "headline-md": [
+                              "Hanken Grotesk"
+                      ],
+                      "headline-lg": [
+                              "Hanken Grotesk"
+                      ],
+                      "metadata": [
+                              "Inter"
+                      ]
+              },
+              "fontSize": {
+                      "body-md": [
+                              "14px",
+                              {
+                                      "lineHeight": "20px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "label-mono": [
+                              "12px",
+                              {
+                                      "lineHeight": "16px",
+                                      "fontWeight": "500"
+                              }
+                      ],
+                      "display-lg": [
+                              "32px",
+                              {
+                                      "lineHeight": "40px",
+                                      "letterSpacing": "-0.02em",
+                                      "fontWeight": "900"
+                              }
+                      ],
+                      "body-lg": [
+                              "16px",
+                              {
+                                      "lineHeight": "24px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "body-sm": [
+                              "13px",
+                              {
+                                      "lineHeight": "18px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "section-title": [
+                              "16px",
+                              {
+                                      "lineHeight": "24px",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "headline-md": [
+                              "20px",
+                              {
+                                      "lineHeight": "28px",
+                                      "fontWeight": "750"
+                              }
+                      ],
+                      "headline-lg": [
+                              "24px",
+                              {
+                                      "lineHeight": "32px",
+                                      "fontWeight": "800"
+                              }
+                      ],
+                      "metadata": [
+                              "11px",
+                              {
+                                      "lineHeight": "14px",
+                                      "letterSpacing": "0.05em",
+                                      "fontWeight": "600"
+                              }
+                      ]
+              }
+      },
+          },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .material-symbols-outlined[data-weight="fill"] {
+            font-variation-settings: 'FILL' 1;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-surface font-body-md h-screen overflow-hidden flex flex-col">
+<!-- TopNavBar -->
+<header class="bg-surface-container-lowest dark:bg-inverse-surface border-b border-outline-variant dark:border-outline flex justify-between items-center w-full px-gutter-desktop h-16 z-50 shrink-0">
+<div class="flex items-center gap-lg">
+<span class="font-headline-md text-headline-md font-black text-brand-strong dark:text-primary-fixed-dim">HUMANITARIAN COMMAND</span>
+<div class="flex items-center bg-surface-container-high rounded-full px-sm py-xs gap-sm">
+<span class="material-symbols-outlined text-on-surface-variant">search</span>
+<input class="bg-transparent border-none focus:ring-0 text-body-sm font-body-sm placeholder-on-surface-variant w-64 p-0" placeholder="Search global commands..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-md"><div class="flex items-center gap-xs px-sm py-1 bg-primary-container text-on-primary-container rounded-full border border-primary cursor-pointer hover:bg-brand-strong transition-colors" onclick="window.location.href='{{DATA:SCREEN:SCREEN_43}}'"><span class="material-symbols-outlined text-sm">warning</span><span class="font-metadata text-[10px] uppercase">Override Alert</span></div><div class="flex items-center gap-xs px-sm py-1 bg-secondary-container text-on-secondary-container rounded-full border border-secondary cursor-pointer hover:bg-surface-container-high transition-colors" onclick="window.location.href='{{DATA:SCREEN:SCREEN_127}}'"><span class="material-symbols-outlined text-sm">inventory_2</span><span class="font-metadata text-[10px] uppercase">Inventory Alert</span></div>
+<div class="flex items-center gap-xs px-sm py-xs bg-brand-soft rounded-full border border-border-subtle cursor-pointer hover:bg-surface-container-high transition-colors" title="Excel Sync Status: Connected">
+<span class="material-symbols-outlined text-success-green" data-weight="fill">cloud_done</span>
+<span class="font-label-mono text-label-mono text-success-green">SYNC_ACTIVE</span>
+</div>
+<button class="p-xs rounded-full hover:bg-surface-container-high dark:hover:bg-surface-variant transition-colors text-on-surface-variant dark:text-surface-variant">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="p-xs rounded-full hover:bg-surface-container-high dark:hover:bg-surface-variant transition-colors text-on-surface-variant dark:text-surface-variant">
+<span class="material-symbols-outlined">sync</span>
+</button>
+<button class="p-xs rounded-full hover:bg-surface-container-high dark:hover:bg-surface-variant transition-colors text-on-surface-variant dark:text-surface-variant">
+<span class="material-symbols-outlined">account_circle</span>
+</button>
+</div>
+</header>
+<div class="flex flex-1 overflow-hidden">
+<!-- SideNavBar -->
+<nav class="bg-surface-container-low dark:bg-surface-dim border-r border-outline-variant dark:border-outline flex flex-col py-lg z-40 w-64 shrink-0 overflow-y-auto">
+<div class="px-lg pb-md mb-md border-b border-border-subtle flex items-center gap-sm">
+<div class="w-10 h-10 bg-primary-container rounded flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-on-primary-container" data-weight="fill">shield</span>
+</div>
+<div>
+<h2 class="font-headline-sm text-headline-sm font-extrabold text-on-surface">HQ COMMAND</h2>
+<p class="font-metadata text-metadata text-on-surface-variant">Global Operations</p>
+</div>
+</div>
+<div class="flex-1 flex flex-col gap-base">
+<a class="flex items-center gap-md px-lg py-sm w-full transition-all text-on-surface-variant dark:text-surface-variant hover:bg-surface-container-high hover:translate-x-1 duration-200" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-section-title text-section-title">Dashboard</span>
+</a>
+<a class="flex items-center gap-md px-lg py-sm w-full transition-all bg-brand-soft dark:bg-primary-container text-brand-strong dark:text-on-primary-container font-bold border-r-4 border-primary hover:translate-x-1 duration-200" href="#">
+<span class="material-symbols-outlined" data-weight="fill">payments</span>
+<span class="font-section-title text-section-title">Finance</span>
+</a>
+<a class="flex items-center gap-md px-lg py-sm w-full transition-all text-on-surface-variant dark:text-surface-variant hover:bg-surface-container-high hover:translate-x-1 duration-200" href="#">
+<span class="material-symbols-outlined">assignment_ind</span>
+<span class="font-section-title text-section-title">Attendance</span>
+</a>
+<a class="flex items-center gap-md px-lg py-sm w-full transition-all text-on-surface-variant dark:text-surface-variant hover:bg-surface-container-high hover:translate-x-1 duration-200" href="#">
+<span class="material-symbols-outlined">inventory_2</span>
+<span class="font-section-title text-section-title">Logistics</span>
+</a>
+<a class="flex items-center gap-md px-lg py-sm w-full transition-all text-on-surface-variant dark:text-surface-variant hover:bg-surface-container-high hover:translate-x-1 duration-200" href="#">
+<span class="material-symbols-outlined">history_edu</span>
+<span class="font-section-title text-section-title">Audit Logs</span>
+</a>
+</div>
+<div class="mt-auto pt-md border-t border-border-subtle flex flex-col gap-base">
+<a class="flex items-center gap-md px-lg py-sm w-full transition-all text-on-surface-variant dark:text-surface-variant hover:bg-surface-container-high hover:translate-x-1 duration-200" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-section-title text-section-title">Settings</span>
+</a>
+<a class="flex items-center gap-md px-lg py-sm w-full transition-all text-on-surface-variant dark:text-surface-variant hover:bg-surface-container-high hover:translate-x-1 duration-200" href="#">
+<span class="material-symbols-outlined">help</span>
+<span class="font-section-title text-section-title">Support</span>
+</a>
+</div>
+</nav>
+<!-- Main Content Area (12-column grid equivalent) -->
+<main class="flex-1 overflow-y-auto p-gutter-desktop bg-surface relative">
+<div class="max-w-[1440px] mx-auto flex flex-col gap-lg">
+<!-- Page Header -->
+<div class="flex justify-between items-end pb-sm border-b border-border-subtle">
+<div>
+<h1 class="font-headline-lg text-headline-lg text-on-surface mb-base">Admin: Payment Payout Logic &amp; Configuration</h1>
+<p class="font-body-md text-body-md text-on-surface-variant">Defines the formulaic relationship between field execution and financial disbursement.</p>
+</div>
+<div class="flex gap-sm">
+<button class="h-10 px-md bg-surface-container-high text-on-surface font-section-title text-section-title rounded hover:bg-surface-variant transition-colors border border-border-subtle flex items-center gap-xs">
+<span class="material-symbols-outlined text-sm">history</span>
+                            REVISION LOG
+                        </button>
+<button class="h-10 px-md bg-primary text-on-primary font-section-title text-section-title uppercase rounded hover:bg-brand-strong transition-colors flex items-center gap-xs shadow-sm">
+<span class="material-symbols-outlined text-sm">save</span>
+                            SAVE CONFIGURATION
+                        </button>
+</div>
+</div>
+<!-- Bento Grid Layout -->
+<div class="grid grid-cols-12 gap-lg">
+<!-- Top Row: Rates & Trigger Gates (4 + 8) -->
+<!-- Payout Rate Configuration -->
+<div class="col-span-12 xl:col-span-5 bg-surface-container-lowest rounded border border-border-subtle p-md shadow-sm">
+<div class="flex items-center gap-xs mb-md pb-xs border-b border-border-subtle">
+<span class="material-symbols-outlined text-on-surface-variant">request_quote</span>
+<h2 class="font-section-title text-section-title text-on-surface">Payout Rate Configuration</h2>
+</div>
+<div class="flex flex-col gap-md">
+<div>
+<label class="font-label-mono text-label-mono text-on-surface-variant block mb-base uppercase">Base Rate / Square</label>
+<div class="relative">
+<span class="absolute left-sm top-1/2 -translate-y-1/2 font-label-mono text-on-surface-variant">$</span>
+<input class="w-full bg-surface border border-outline-variant rounded py-xs pl-8 pr-sm font-label-mono text-body-md text-on-surface focus:border-primary focus:ring-1 focus:ring-primary transition-all" type="text" value="23,000.00"/>
+</div>
+</div>
+<div>
+<label class="font-label-mono text-label-mono text-on-surface-variant block mb-base uppercase">Demolition Rate</label>
+<div class="relative">
+<span class="absolute left-sm top-1/2 -translate-y-1/2 font-label-mono text-on-surface-variant">$</span>
+<input class="w-full bg-surface border border-outline-variant rounded py-xs pl-8 pr-sm font-label-mono text-body-md text-on-surface focus:border-primary focus:ring-1 focus:ring-primary transition-all" type="text" value="5,000.00"/>
+</div>
+</div>
+<div>
+<label class="font-label-mono text-label-mono text-on-surface-variant block mb-base uppercase">Additional Work Multiplier</label>
+<div class="flex items-center gap-sm">
+<input class="w-24 bg-surface border border-outline-variant rounded py-xs px-sm font-label-mono text-body-md text-on-surface focus:border-primary focus:ring-1 focus:ring-primary transition-all" step="0.1" type="number" value="1.5"/>
+<span class="font-body-sm text-on-surface-variant">x Standard Hourly</span>
+</div>
+</div>
+</div>
+</div><div class="col-span-12 xl:col-span-12 bg-surface-container-lowest rounded border border-border-subtle p-md shadow-sm flex items-center justify-between"><div class="flex items-center gap-md"><div class="w-10 h-10 bg-tertiary-container rounded flex items-center justify-center"><span class="material-symbols-outlined text-on-tertiary-container">calendar_today</span></div><div><h2 class="font-section-title text-section-title text-on-surface">Construction Schedule Integration</h2><p class="font-body-sm text-on-surface-variant">Sync payout milestones with real-time site progress.</p></div></div><button class="h-10 px-md bg-surface-container-high text-on-surface font-section-title text-section-title rounded hover:bg-surface-variant transition-colors border border-border-subtle flex items-center gap-xs" onclick="window.location.href='{{DATA:SCREEN:SCREEN_96}}'"><span class="material-symbols-outlined text-sm">link</span>VIEW SCHEDULE</button></div>
+<!-- Trigger Gates -->
+<div class="col-span-12 xl:col-span-7 bg-surface-container-lowest rounded border border-border-subtle p-md shadow-sm">
+<div class="flex items-center justify-between mb-md pb-xs border-b border-border-subtle">
+<div class="flex items-center gap-xs">
+<span class="material-symbols-outlined text-on-surface-variant">gavel</span>
+<h2 class="font-section-title text-section-title text-on-surface">Mandatory Release Gates</h2>
+</div>
+<span class="font-metadata text-metadata bg-brand-soft text-brand-strong px-xs py-1 rounded">STRICT ENFORCEMENT</span>
+</div>
+<div class="grid grid-cols-2 gap-sm"><div class="flex flex-col gap-sm"><h3 class="font-metadata text-metadata text-on-surface-variant uppercase border-b border-border-subtle pb-xs">Completion &amp; Quality</h3><label class="flex items-start gap-sm p-sm border border-border-subtle rounded bg-surface hover:bg-surface-container-low transition-colors cursor-pointer" onclick="window.location.href='{{DATA:SCREEN:SCREEN_158}}'"><input checked="" class="mt-1 text-primary focus:ring-primary rounded border-outline-variant" type="checkbox"/><div><span class="font-section-title text-body-md text-on-surface block">Notice of Completion</span><span class="font-body-sm text-on-surface-variant">Form #NOC-7A submitted by Site Lead</span></div></label><label class="flex items-start gap-sm p-sm border border-border-subtle rounded bg-surface hover:bg-surface-container-low transition-colors cursor-pointer"><input checked="" class="mt-1 text-primary focus:ring-primary rounded border-outline-variant" type="checkbox"/><div><span class="font-section-title text-body-md text-on-surface block">Final Inspection Photo</span><span class="font-body-sm text-on-surface-variant">Geotagged L3 Visual Evidence</span></div></label></div><div class="flex flex-col gap-sm"><h3 class="font-metadata text-metadata text-on-surface-variant uppercase border-b border-border-subtle pb-xs">Payment &amp; Finance</h3><label class="flex items-start gap-sm p-sm border border-border-subtle rounded bg-surface hover:bg-surface-container-low transition-colors cursor-pointer" onclick="window.location.href='{{DATA:SCREEN:SCREEN_156}}'"><input checked="" class="mt-1 text-primary focus:ring-primary rounded border-outline-variant" type="checkbox"/><div><span class="font-section-title text-body-md text-on-surface block">Beneficiary Signature</span><span class="font-body-sm text-on-surface-variant">Digital ink or thumbprint verified</span></div></label><label class="flex items-start gap-sm p-sm border border-border-subtle rounded bg-surface hover:bg-surface-container-low transition-colors cursor-pointer"><input checked="" class="mt-1 text-primary focus:ring-primary rounded border-outline-variant" type="checkbox"/><div><span class="font-section-title text-body-md text-on-surface block">Work Log Verification</span><span class="font-body-sm text-on-surface-variant">Cross-referenced with attendance sheets</span></div></label></div></div>
+</div>
+<!-- Middle Row: Allocation Logic (Full width) -->
+<div class="col-span-12 bg-surface-container-lowest rounded border border-border-subtle p-md shadow-sm">
+<div class="flex items-center justify-between mb-md pb-xs border-b border-border-subtle">
+<div class="flex items-center gap-xs">
+<span class="material-symbols-outlined text-on-surface-variant">pie_chart</span>
+<h2 class="font-section-title text-section-title text-on-surface">Crew Allocation Logic</h2>
+</div>
+<span class="font-label-mono text-label-mono text-on-surface-variant">TOTAL DISTRIBUTION MUST EQUAL 100%</span>
+</div>
+<!-- Visual Split Bar -->
+<div class="h-6 w-full rounded-full overflow-hidden flex mb-sm bg-surface-container-high border border-border-subtle">
+<div class="h-full bg-tertiary-container flex items-center justify-center font-label-mono text-[10px] text-white" style="width: 46%;">46% L.C.</div>
+<div class="h-full bg-secondary-container flex items-center justify-center font-label-mono text-[10px] text-on-secondary-fixed" style="width: 31%;">31% ASST.</div>
+<div class="h-full bg-primary-fixed-dim flex items-center justify-center font-label-mono text-[10px] text-on-primary-fixed" style="width: 23%;">23% G.L.</div>
+</div>
+<div class="grid grid-cols-3 gap-md">
+<div class="bg-surface p-sm rounded border border-border-subtle border-t-4 border-t-tertiary-container">
+<label class="font-metadata text-metadata text-on-surface-variant block mb-xs uppercase">Lead Carpenter</label>
+<div class="flex items-center gap-sm">
+<input class="w-20 bg-surface-container-lowest border border-outline-variant rounded py-xs px-sm font-label-mono text-body-md text-on-surface text-center" type="number" value="46"/>
+<span class="font-section-title text-section-title text-on-surface">%</span>
+</div>
+<p class="font-body-sm text-on-surface-variant mt-xs line-clamp-2">Directs execution and assumes liability.</p>
+</div>
+<div class="bg-surface p-sm rounded border border-border-subtle border-t-4 border-t-secondary-container">
+<label class="font-metadata text-metadata text-on-surface-variant block mb-xs uppercase">Assistant</label>
+<div class="flex items-center gap-sm">
+<input class="w-20 bg-surface-container-lowest border border-outline-variant rounded py-xs px-sm font-label-mono text-body-md text-on-surface text-center" type="number" value="31"/>
+<span class="font-section-title text-section-title text-on-surface">%</span>
+</div>
+<p class="font-body-sm text-on-surface-variant mt-xs line-clamp-2">Skilled support and secondary oversight.</p>
+</div>
+<div class="bg-surface p-sm rounded border border-border-subtle border-t-4 border-t-primary-fixed-dim">
+<label class="font-metadata text-metadata text-on-surface-variant block mb-xs uppercase">General Laborers</label>
+<div class="flex items-center gap-sm">
+<input class="w-20 bg-surface-container-lowest border border-outline-variant rounded py-xs px-sm font-label-mono text-body-md text-on-surface text-center" type="number" value="23"/>
+<span class="font-section-title text-section-title text-on-surface">%</span>
+</div>
+<p class="font-body-sm text-on-surface-variant mt-xs line-clamp-2">Shared pool for manual clearance/prep.</p>
+</div>
+</div>
+</div>
+<!-- Bottom Row: Active Queue (Full width table) -->
+<div class="col-span-12 bg-surface-container-lowest rounded border border-border-subtle shadow-sm flex flex-col h-[400px]">
+<div class="p-md border-b border-border-subtle flex justify-between items-center bg-surface-bright shrink-0">
+<div class="flex items-center gap-xs">
+<span class="material-symbols-outlined text-on-surface-variant">list_alt</span>
+<h2 class="font-section-title text-section-title text-on-surface">Active Payout Queue (Pending Calculation)</h2>
+</div>
+<button class="text-primary font-metadata text-metadata uppercase hover:underline flex items-center gap-1">
+                                View Full Register <span class="material-symbols-outlined text-[14px]">arrow_forward</span>
+</button>
+</div>
+<div class="overflow-y-auto flex-1">
+<table class="w-full text-left border-collapse min-w-[800px]">
+<thead class="bg-table-header sticky top-0 z-10 border-b border-border-subtle">
+<tr>
+<th class="py-sm px-md font-metadata text-metadata text-on-surface-variant w-10">SYNC</th>
+<th class="py-sm px-md font-metadata text-metadata text-on-surface-variant">HOUSE ID</th>
+<th class="py-sm px-md font-metadata text-metadata text-on-surface-variant">STATUS</th>
+<th class="py-sm px-md font-metadata text-metadata text-on-surface-variant text-right">TOTAL CALC ($)</th>
+<th class="py-sm px-md font-metadata text-metadata text-on-surface-variant text-right">LEAD (46%)</th>
+<th class="py-sm px-md font-metadata text-metadata text-on-surface-variant text-right">ASST (31%)</th>
+<th class="py-sm px-md font-metadata text-metadata text-on-surface-variant text-right">LABOR (23%)</th>
+<th class="py-sm px-md font-metadata text-metadata text-on-surface-variant text-center">ACTION</th>
+</tr>
+</thead>
+<tbody class="font-body-sm divide-y divide-border-subtle">
+<tr class="hover:bg-surface-container-low transition-colors group">
+<td class="py-xs px-md"><span class="material-symbols-outlined text-success-green text-[18px]">cloud_done</span></td>
+<td class="py-xs px-md font-label-mono text-on-surface font-semibold">H12-BETA</td>
+<td class="py-xs px-md"><span class="inline-block px-2 py-0.5 rounded-full bg-tertiary-fixed text-on-tertiary-fixed-variant font-metadata text-[10px]">GATES CLEARED</span></td>
+<td class="py-xs px-md font-label-mono text-right font-medium">28,000.00</td>
+<td class="py-xs px-md font-label-mono text-right text-on-surface-variant">12,880.00</td>
+<td class="py-xs px-md font-label-mono text-right text-on-surface-variant">8,680.00</td>
+<td class="py-xs px-md font-label-mono text-right text-on-surface-variant">6,440.00</td>
+<td class="py-xs px-md text-center">
+<button class="h-8 px-sm bg-primary text-on-primary font-metadata text-metadata uppercase rounded hover:bg-brand-strong transition-colors opacity-0 group-hover:opacity-100">AUTHORIZE</button>
+</td>
+</tr>
+<tr class="hover:bg-surface-container-low transition-colors bg-[#F0F3F5]/30 group">
+<td class="py-xs px-md"><span class="material-symbols-outlined text-attention-amber text-[18px]">sync_problem</span></td>
+<td class="py-xs px-md font-label-mono text-on-surface font-semibold">H04-ALPHA</td>
+<td class="py-xs px-md"><span class="inline-block px-2 py-0.5 rounded-full bg-surface-container-high text-on-surface-variant font-metadata text-[10px]">PENDING NOC</span></td>
+<td class="py-xs px-md font-label-mono text-right font-medium">23,000.00</td>
+<td class="py-xs px-md font-label-mono text-right text-on-surface-variant">10,580.00</td>
+<td class="py-xs px-md font-label-mono text-right text-on-surface-variant">7,130.00</td>
+<td class="py-xs px-md font-label-mono text-right text-on-surface-variant">5,290.00</td>
+<td class="py-xs px-md text-center">
+<button class="h-8 px-sm bg-surface-container-high text-on-surface-variant font-metadata text-metadata uppercase rounded cursor-not-allowed border border-border-subtle" disabled="">LOCKED</button>
+</td>
+</tr>
+<tr class="hover:bg-surface-container-low transition-colors group">
+<td class="py-xs px-md"><span class="material-symbols-outlined text-success-green text-[18px]">cloud_done</span></td>
+<td class="py-xs px-md font-label-mono text-on-surface font-semibold">H18-GAMMA</td>
+<td class="py-xs px-md"><span class="inline-block px-2 py-0.5 rounded-full bg-tertiary-fixed text-on-tertiary-fixed-variant font-metadata text-[10px]">GATES CLEARED</span></td>
+<td class="py-xs px-md font-label-mono text-right font-medium">32,500.00</td>
+<td class="py-xs px-md font-label-mono text-right text-on-surface-variant">14,950.00</td>
+<td class="py-xs px-md font-label-mono text-right text-on-surface-variant">10,075.00</td>
+<td class="py-xs px-md font-label-mono text-right text-on-surface-variant">7,475.00</td>
+<td class="py-xs px-md text-center">
+<button class="h-8 px-sm bg-primary text-on-primary font-metadata text-metadata uppercase rounded hover:bg-brand-strong transition-colors opacity-0 group-hover:opacity-100">AUTHORIZE</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</div>
+</main>
+</div>
+</body></html>

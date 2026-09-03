@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Weekly Projection Log</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;700;800;900&family=Inter:wght@400;500&family=JetBrains+Mono:wght@500&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@100..900&family=Inter:wght@100..900&family=JetBrains+Mono:wght@100..900&display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .material-symbols-outlined[data-weight="fill"] {
+            font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "brand-red": "#D32F2F",
+                        "on-secondary-fixed-variant": "#004786",
+                        "surface-container-high": "#ffe2de",
+                        "surface": "#fff8f7",
+                        "primary": "#af101a",
+                        "inverse-on-surface": "#ffedeb",
+                        "secondary-fixed-dim": "#a5c8ff",
+                        "on-primary-fixed": "#410003",
+                        "inverse-surface": "#3e2c2a",
+                        "error": "#C62828",
+                        "outline-variant": "#e4beba",
+                        "surface-l2": "#F0F3F5",
+                        "outline": "#8f6f6c",
+                        "on-tertiary-fixed-variant": "#004d65",
+                        "surface-container-lowest": "#ffffff",
+                        "tertiary-fixed": "#bee9ff",
+                        "on-background": "#271816",
+                        "surface-bright": "#fff8f7",
+                        "brand-soft": "#FFEBEE",
+                        "tertiary": "#005f7b",
+                        "tertiary-fixed-dim": "#7bd1f8",
+                        "on-secondary": "#ffffff",
+                        "primary-container": "#d32f2f",
+                        "on-tertiary": "#ffffff",
+                        "on-error": "#ffffff",
+                        "tertiary-container": "#00799c",
+                        "on-surface": "#271816",
+                        "on-primary": "#ffffff",
+                        "info": "#0288D1",
+                        "primary-fixed-dim": "#ffb3ac",
+                        "surface-container": "#ffe9e7",
+                        "on-primary-fixed-variant": "#930010",
+                        "surface-dim": "#f1d3d0",
+                        "on-primary-container": "#fff2f0",
+                        "primary-fixed": "#ffdad6",
+                        "surface-container-highest": "#f9dcd9",
+                        "surface-variant": "#f9dcd9",
+                        "on-tertiary-container": "#e9f7ff",
+                        "on-secondary-container": "#003567",
+                        "background": "#fff8f7",
+                        "on-secondary-fixed": "#001c3a",
+                        "secondary-fixed": "#d4e3ff",
+                        "canvas-l0": "#F5F7F9",
+                        "surface-tint": "#ba1a20",
+                        "error-container": "#ffdad6",
+                        "warning": "#FFA000",
+                        "on-tertiary-fixed": "#001f2a",
+                        "inverse-primary": "#ffb3ac",
+                        "secondary-container": "#54a0fe",
+                        "on-error-container": "#93000a",
+                        "secondary": "#005faf",
+                        "success": "#2E7D32",
+                        "on-surface-variant": "#5b403d",
+                        "brand-strong": "#B71C1C",
+                        "surface-l1": "#FFFFFF",
+                        "surface-container-low": "#fff0ef"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "lg": "24px",
+                        "sm": "12px",
+                        "xl": "32px",
+                        "md": "16px",
+                        "xs": "8px",
+                        "target-min": "48px",
+                        "base": "4px",
+                        "gutter-tablet": "24px",
+                        "gutter-phone": "16px"
+                    },
+                    "fontFamily": {
+                        "hero-title": ["Hanken Grotesk"],
+                        "hero-title-mobile": ["Hanken Grotesk"],
+                        "headline-md": ["Hanken Grotesk"],
+                        "metadata": ["Inter"],
+                        "section-title": ["Hanken Grotesk"],
+                        "body-md": ["Inter"],
+                        "label-md": ["JetBrains Mono"],
+                        "body-lg": ["Inter"],
+                        "headline-lg": ["Hanken Grotesk"]
+                    },
+                    "fontSize": {
+                        "hero-title": ["32px", { "lineHeight": "36px", "letterSpacing": "-0.02em", "fontWeight": "900" }],
+                        "hero-title-mobile": ["28px", { "lineHeight": "32px", "fontWeight": "900" }],
+                        "headline-md": ["20px", { "lineHeight": "28px", "fontWeight": "750" }],
+                        "metadata": ["12px", { "lineHeight": "16px", "fontWeight": "500" }],
+                        "section-title": ["18px", { "lineHeight": "24px", "fontWeight": "700" }],
+                        "body-md": ["15px", { "lineHeight": "22px", "fontWeight": "400" }],
+                        "label-md": ["13px", { "lineHeight": "16px", "fontWeight": "500" }],
+                        "body-lg": ["17px", { "lineHeight": "26px", "fontWeight": "400" }],
+                        "headline-lg": ["24px", { "lineHeight": "32px", "fontWeight": "800" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-canvas-l0 text-on-surface font-body-md min-h-screen pt-[64px] pb-[80px] md:pb-0 md:pt-0">
+<!-- TopAppBar (Mobile & Desktop) -->
+<header class="fixed top-0 w-full z-50 bg-surface dark:bg-surface-dim shadow-sm flex justify-between items-center px-gutter-phone h-target-min">
+<button aria-label="Menu" class="p-2 -ml-2 text-primary dark:text-primary-fixed hover:bg-surface-container-high transition-colors rounded-full active:scale-95 transition-transform">
+<span class="material-symbols-outlined" data-icon="menu">menu</span>
+</button>
+<div class="font-headline-md text-headline-md font-black text-brand-red dark:text-brand-strong">RC SOW</div>
+<button aria-label="Sync" class="p-2 -mr-2 text-primary dark:text-primary-fixed hover:bg-surface-container-high transition-colors rounded-full active:scale-95 transition-transform">
+<span class="material-symbols-outlined" data-icon="sync">sync</span>
+</button>
+</header>
+<!-- Desktop Nav Shell (Hidden on Mobile) -->
+<nav class="hidden md:flex fixed top-0 w-full z-40 bg-surface dark:bg-surface-dim shadow-sm pt-[48px] px-gutter-tablet h-16 items-center justify-start gap-md border-b border-outline-variant">
+<!-- Scope is active as this is a planning/projection task -->
+<a class="text-on-surface-variant dark:text-outline-variant hover:bg-surface-container-high transition-colors px-4 py-2 rounded-lg font-label-md text-label-md flex items-center gap-2" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span> Dashboard
+        </a>
+<a class="text-primary dark:text-primary-fixed hover:bg-surface-container-high transition-colors px-4 py-2 rounded-lg font-label-md text-label-md flex items-center gap-2 bg-primary-container/10" href="#">
+<span class="material-symbols-outlined" data-icon="architecture" data-weight="fill">architecture</span> Scope
+        </a>
+<a class="text-on-surface-variant dark:text-outline-variant hover:bg-surface-container-high transition-colors px-4 py-2 rounded-lg font-label-md text-label-md flex items-center gap-2" href="#">
+<span class="material-symbols-outlined" data-icon="fact_check">fact_check</span> Control
+        </a>
+<a class="text-on-surface-variant dark:text-outline-variant hover:bg-surface-container-high transition-colors px-4 py-2 rounded-lg font-label-md text-label-md flex items-center gap-2" href="#">
+<span class="material-symbols-outlined" data-icon="home">home</span> Houses
+        </a>
+</nav>
+<!-- Main Content Area -->
+<main class="max-w-3xl mx-auto px-gutter-phone md:px-gutter-tablet py-lg md:pt-[128px]">
+<div class="mb-xl">
+<h1 class="font-headline-lg-mobile text-headline-lg-mobile md:font-headline-lg md:text-headline-lg text-on-surface mb-2">Weekly Projection Log</h1>
+<p class="font-body-md text-body-md text-on-surface-variant">Plan resource allocation and milestones for the upcoming week.</p>
+</div>
+<form class="space-y-lg">
+<!-- Section 1: Context -->
+<section class="bg-surface-l1 shadow-[0_4px_16px_rgba(0,0,0,0.05)] rounded-xl p-md md:p-lg border border-outline-variant/30">
+<h2 class="font-section-title text-section-title text-on-surface mb-md flex items-center gap-2">
+<span class="material-symbols-outlined text-primary" data-icon="calendar_today">calendar_today</span>
+                    Scheduling Context
+                </h2>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-md">
+<div class="flex flex-col gap-2">
+<label class="font-label-md text-label-md text-on-surface-variant" for="week-start">Week Starting</label>
+<input class="h-target-min px-4 rounded-[16px] border border-outline bg-transparent text-on-surface focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-shadow w-full font-body-md" id="week-start" required="" type="date"/>
+</div>
+<div class="flex flex-col gap-2">
+<label class="font-label-md text-label-md text-on-surface-variant" for="parish">Parish / Cluster</label>
+<select class="h-target-min px-4 rounded-[16px] border border-outline bg-transparent text-on-surface focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-shadow w-full font-body-md appearance-none" id="parish" required="">
+<option value="">Select Cluster...</option>
+<option value="st-mary">St. Mary's Sector A</option>
+<option value="st-mary-b">St. Mary's Sector B</option>
+<option value="portland">Portland North</option>
+</select>
+</div>
+</div>
+</section>
+<!-- Section 2: Assignments -->
+<section class="bg-surface-l1 shadow-[0_4px_16px_rgba(0,0,0,0.05)] rounded-xl p-md md:p-lg border border-outline-variant/30">
+<div class="flex justify-between items-center mb-md">
+<h2 class="font-section-title text-section-title text-on-surface flex items-center gap-2">
+<span class="material-symbols-outlined text-primary" data-icon="home_work">home_work</span>
+                        House Assignments
+                    </h2>
+<button class="text-primary font-label-md text-label-md flex items-center gap-1 hover:bg-brand-soft px-3 py-2 rounded-lg transition-colors h-target-min" type="button">
+<span class="material-symbols-outlined" data-icon="add">add</span> Add House
+                    </button>
+</div>
+<!-- House Entry 1 -->
+<div class="bg-surface-l2 rounded-lg p-md border border-outline-variant/50 relative overflow-hidden group mb-4">
+<div class="absolute left-0 top-0 bottom-0 w-1 bg-brand-red"></div>
+<div class="flex flex-col md:flex-row md:items-start gap-md">
+<div class="flex-1 space-y-4">
+<div class="flex justify-between items-start">
+<div>
+<span class="font-label-md text-label-md text-on-surface bg-outline-variant/30 px-2 py-1 rounded">HS-4092</span>
+<p class="font-body-md text-body-md text-on-surface-variant mt-1">Lot 14, Riverside Drive</p>
+</div>
+<button class="text-on-surface-variant hover:text-error transition-colors p-2 -mr-2" type="button">
+<span class="material-symbols-outlined" data-icon="close">close</span>
+</button>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+<div class="flex flex-col gap-2">
+<label class="font-label-md text-label-md text-on-surface-variant text-xs">Projected Milestone</label>
+<select class="h-12 px-3 rounded-lg border border-outline bg-transparent text-on-surface focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-shadow w-full font-body-md text-sm">
+<option>Foundation Complete</option>
+<option selected="">Roofing 50%</option>
+<option>Roofing Complete</option>
+<option>Final Inspection</option>
+</select>
+</div>
+<div class="flex flex-col gap-2">
+<label class="font-label-md text-label-md text-on-surface-variant text-xs">Estimated Hours</label>
+<input class="h-12 px-3 rounded-lg border border-outline bg-transparent text-on-surface focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-shadow w-full font-body-md text-sm" type="number" value="24"/>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- House Entry 2 -->
+<div class="bg-surface-l2 rounded-lg p-md border border-outline-variant/50 relative overflow-hidden group">
+<div class="absolute left-0 top-0 bottom-0 w-1 bg-outline-variant group-hover:bg-primary/50 transition-colors"></div>
+<div class="flex flex-col md:flex-row md:items-start gap-md">
+<div class="flex-1 space-y-4">
+<div class="flex justify-between items-start">
+<div>
+<span class="font-label-md text-label-md text-on-surface bg-outline-variant/30 px-2 py-1 rounded">HS-4105</span>
+<p class="font-body-md text-body-md text-on-surface-variant mt-1">Lot 22, Valley Road</p>
+</div>
+<button class="text-on-surface-variant hover:text-error transition-colors p-2 -mr-2" type="button">
+<span class="material-symbols-outlined" data-icon="close">close</span>
+</button>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+<div class="flex flex-col gap-2">
+<label class="font-label-md text-label-md text-on-surface-variant text-xs">Projected Milestone</label>
+<select class="h-12 px-3 rounded-lg border border-outline bg-transparent text-on-surface focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-shadow w-full font-body-md text-sm">
+<option selected="">Foundation Complete</option>
+<option>Roofing 50%</option>
+<option>Roofing Complete</option>
+<option>Final Inspection</option>
+</select>
+</div>
+<div class="flex flex-col gap-2">
+<label class="font-label-md text-label-md text-on-surface-variant text-xs">Estimated Hours</label>
+<input class="h-12 px-3 rounded-lg border border-outline bg-transparent text-on-surface focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-shadow w-full font-body-md text-sm" type="number" value="16"/>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Section 3: Resources -->
+<section class="bg-surface-l1 shadow-[0_4px_16px_rgba(0,0,0,0.05)] rounded-xl p-md md:p-lg border border-outline-variant/30 mb-xl">
+<h2 class="font-section-title text-section-title text-on-surface mb-md flex items-center gap-2">
+<span class="material-symbols-outlined text-primary" data-icon="construction">construction</span>
+                    Resource Needs
+                </h2>
+<div class="flex flex-col gap-2">
+<label class="font-label-md text-label-md text-on-surface-variant" for="resources">Material & Equipment Requests</label>
+<textarea class="px-4 py-3 rounded-[16px] border border-outline bg-transparent text-on-surface focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-shadow w-full font-body-md resize-none" id="resources" placeholder="E.g., Need additional zinc sheets for HS-4092 by Wednesday..." rows="4"></textarea>
+</div>
+</section>
+<!-- Submit Action -->
+<div class="flex flex-col gap-4 mt-xl border-t border-outline-variant/30 pt-lg">
+<p class="font-metadata text-metadata text-on-surface-variant text-center">Submitting will send this log to the Regional Coordinator for approval.</p>
+<button class="h-target-min w-full bg-brand-red text-on-primary font-section-title text-section-title rounded-full hover:bg-brand-strong transition-colors shadow-sm active:scale-[0.98] flex items-center justify-center gap-2" type="submit">
+<span class="material-symbols-outlined" data-icon="send">send</span>
+                    Submit for Approval
+                </button>
+</div>
+</form>
+</main>
+<!-- Floating Chat Bubble -->
+<button aria-label="Open Support Chat" class="fixed bottom-24 right-4 md:bottom-8 md:right-8 w-14 h-14 bg-tertiary-container text-on-tertiary-container rounded-full shadow-lg flex items-center justify-center hover:bg-tertiary transition-colors active:scale-90 z-40">
+<span class="material-symbols-outlined" data-icon="chat" data-weight="fill">chat</span>
+</button>
+<!-- BottomNavBar (Mobile Only) -->
+<nav class="md:hidden fixed bottom-0 left-0 w-full flex justify-around items-center px-xs pb-sm pt-xs bg-surface dark:bg-surface-container-lowest border-t border-outline-variant z-50">
+<!-- Scope is active -->
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline p-xs group" href="#">
+<span class="material-symbols-outlined group-hover:text-primary transition-colors" data-icon="dashboard">dashboard</span>
+<span class="font-label-md text-[10px] mt-1 group-hover:text-primary transition-colors">Dashboard</span>
+</a>
+<a class="flex flex-col items-center justify-center bg-primary-container dark:bg-primary text-on-primary-container dark:text-on-primary rounded-xl px-sm py-xs" href="#">
+<span class="material-symbols-outlined" data-icon="architecture" data-weight="fill">architecture</span>
+<span class="font-label-md text-[10px] mt-1">Scope</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline p-xs group" href="#">
+<span class="material-symbols-outlined group-hover:text-primary transition-colors" data-icon="fact_check">fact_check</span>
+<span class="font-label-md text-[10px] mt-1 group-hover:text-primary transition-colors">Control</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline p-xs group" href="#">
+<span class="material-symbols-outlined group-hover:text-primary transition-colors" data-icon="home">home</span>
+<span class="font-label-md text-[10px] mt-1 group-hover:text-primary transition-colors">Houses</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline p-xs group" href="#">
+<span class="material-symbols-outlined group-hover:text-primary transition-colors" data-icon="more_horiz">more_horiz</span>
+<span class="font-label-md text-[10px] mt-1 group-hover:text-primary transition-colors">More</span>
+</a>
+</nav>
+</body></html>

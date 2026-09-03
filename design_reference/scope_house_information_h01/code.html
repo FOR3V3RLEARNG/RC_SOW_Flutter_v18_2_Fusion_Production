@@ -1,0 +1,364 @@
+<!DOCTYPE html><html class="light" lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Scope of Work - H01</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com" rel="preconnect">
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;700;800;900&amp;family=Inter:wght@400;500;600&amp;family=JetBrains+Mono:wght@500&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "inverse-surface": "#2d3133",
+                        "on-surface": "#191c1e",
+                        "on-error-container": "#93000a",
+                        "tertiary": "#005f7b",
+                        "surface-container-lowest": "#ffffff",
+                        "on-secondary-container": "#003e75",
+                        "brand-red": "#D32F2F",
+                        "on-error": "#ffffff",
+                        "on-secondary-fixed": "#001c3a",
+                        "secondary-fixed-dim": "#a5c8ff",
+                        "secondary-container": "#6cabff",
+                        "brand-soft": "#FFEBEE",
+                        "primary-fixed": "#ffdad6",
+                        "on-tertiary-fixed-variant": "#004d64",
+                        "surface": "#f8f9fb",
+                        "secondary": "#005faf",
+                        "surface-container-high": "#e6e8ea",
+                        "secondary-fixed": "#d4e3ff",
+                        "attention-amber": "#FFA000",
+                        "success-green": "#2E7D32",
+                        "on-tertiary-fixed": "#001f2a",
+                        "on-primary-fixed-variant": "#930010",
+                        "tertiary-container": "#2e7895",
+                        "on-secondary-fixed-variant": "#004786",
+                        "primary": "#af101a",
+                        "inverse-primary": "#ffb3ac",
+                        "surface-container-low": "#f2f4f6",
+                        "on-background": "#191c1e",
+                        "primary-fixed-dim": "#ffb3ac",
+                        "info-blue": "#0288D1",
+                        "on-primary-fixed": "#410003",
+                        "surface-container-highest": "#e0e3e5",
+                        "on-tertiary-container": "#eaf7ff",
+                        "surface-dim": "#d8dadc",
+                        "surface-variant": "#e0e3e5",
+                        "tertiary-fixed": "#bee9ff",
+                        "border-subtle": "#E4BEBA",
+                        "primary-container": "#d32f2f",
+                        "surface-tint": "#ba1a20",
+                        "text-on-surface": "#271816",
+                        "surface-bright": "#f8f9fb",
+                        "table-header": "#F0F3F5",
+                        "on-secondary": "#ffffff",
+                        "inverse-on-surface": "#eff1f3",
+                        "brand-strong": "#B71C1C",
+                        "error-container": "#ffdad6",
+                        "on-surface-variant": "#5b403d",
+                        "on-primary-container": "#fff2f0",
+                        "on-tertiary": "#ffffff",
+                        "background": "#f8f9fb",
+                        "tertiary-fixed-dim": "#8bd0f0",
+                        "error": "#ba1a1a",
+                        "outline-variant": "#e4beba",
+                        "outline": "#8f6f6c",
+                        "surface-container": "#eceef0",
+                        "on-primary": "#ffffff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "md": "16px",
+                        "xs": "8px",
+                        "gutter-desktop": "24px",
+                        "base": "4px",
+                        "sm": "12px",
+                        "lg": "24px",
+                        "margin-edge": "32px",
+                        "xl": "32px"
+                    },
+                    "fontFamily": {
+                        "label-mono": ["JetBrains Mono"],
+                        "body-md": ["Inter"],
+                        "headline-md": ["Hanken Grotesk"],
+                        "display-lg": ["Hanken Grotesk"],
+                        "body-sm": ["Inter"],
+                        "metadata": ["Inter"],
+                        "section-title": ["Hanken Grotesk"],
+                        "headline-lg": ["Hanken Grotesk"],
+                        "body-lg": ["Inter"]
+                    },
+                    "fontSize": {
+                        "label-mono": ["12px", { "lineHeight": "16px", "fontWeight": "500" }],
+                        "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+                        "headline-md": ["20px", { "lineHeight": "28px", "fontWeight": "750" }],
+                        "display-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "900" }],
+                        "body-sm": ["13px", { "lineHeight": "18px", "fontWeight": "400" }],
+                        "metadata": ["11px", { "lineHeight": "14px", "letterSpacing": "0.05em", "fontWeight": "600" }],
+                        "section-title": ["16px", { "lineHeight": "24px", "fontWeight": "700" }],
+                        "headline-lg": ["24px", { "lineHeight": "32px", "fontWeight": "800" }],
+                        "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "400" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        .bento-grid {
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            gap: 24px;
+        }
+        @media (max-width: 1024px) {
+            .bento-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-surface min-h-screen flex flex-col antialiased">
+<!-- TopAppBar -->
+<header class="bg-surface dark:bg-surface-dim shadow-sm flex justify-between items-center w-full px-gutter-desktop h-16 z-50 sticky top-0">
+<div class="flex items-center gap-md">
+<span class="material-symbols-outlined text-primary dark:text-primary-fixed-dim" style="font-variation-settings: 'FILL' 1;">roofing</span>
+<span class="font-headline-lg text-headline-lg font-black text-primary tracking-tight uppercase">RC SOW Operations</span>
+</div>
+<nav class="hidden md:flex gap-lg h-full items-center">
+<!-- Navigation Items (simulated for top app bar based on side/bottom logic context) -->
+<a class="text-on-surface-variant hover:bg-surface-container-high transition-colors px-4 py-2 rounded-md font-label-mono text-label-mono flex items-center gap-2" href="#">
+<span class="material-symbols-outlined text-[18px]">dashboard</span> Dashboard
+             </a>
+<a class="text-primary font-bold border-b-2 border-primary hover:bg-surface-container-high transition-colors px-4 py-2 flex items-center gap-2 font-label-mono text-label-mono h-full" href="#">
+<span class="material-symbols-outlined text-[18px]" style="font-variation-settings: 'FILL' 1;">description</span> Scope
+             </a>
+<a class="text-on-surface-variant hover:bg-surface-container-high transition-colors px-4 py-2 rounded-md font-label-mono text-label-mono flex items-center gap-2" href="#">
+<span class="material-symbols-outlined text-[18px]">analytics</span> Control
+             </a>
+</nav>
+<div class="flex items-center">
+<div class="w-8 h-8 rounded-full bg-surface-variant flex items-center justify-center text-on-surface-variant font-metadata text-metadata border border-outline-variant overflow-hidden">
+<img alt="User profile avatar" class="object-cover w-full h-full" data-alt="A professional headshot of a Red Cross operational manager in uniform, taken in a bright, modern studio setting with a clean white background. The lighting is soft and even, reflecting a corporate and trustworthy institutional identity." src="https://lh3.googleusercontent.com/aida-public/AB6AXuD1OIqtZe3FHIGn6eJ4E9jbUZehvxtw6zrGiiyn0rukmI6I9ZTw4IwT4OTZUx-5QiM-A3UoRjlpx62_tj7nMTA6hLuFjFwUxJZM6MxkKOzKTKaFcj31ny3uUTSxM08k8Ys7l1qv20uDseUXupyNGivma8JrU9lfxJqOFvqzwLKX1xnGwVaNNA-XwTU1jrK_HzqtIKc0JMnJF3HKAYs3B21CznenCOQJ3qnz4AHEoIPqmgUdSnDkb_3Zuw">
+</div>
+</div>
+</header>
+<!-- Main Layout Container -->
+<div class="flex-1 flex overflow-hidden">
+<!-- NavigationDrawer (Desktop) -->
+<aside class="hidden lg:flex flex-col h-full py-lg bg-surface-container-low border-r border-outline-variant w-80 shrink-0">
+<div class="px-lg mb-8">
+<h2 class="font-headline-lg text-headline-lg font-extrabold text-primary">RC SOW Command</h2>
+</div>
+<nav class="flex flex-col gap-2">
+<a class="text-on-surface-variant hover:bg-surface-variant rounded-lg mx-2 my-1 px-4 py-3 flex items-center gap-md font-body-md text-body-md transition-colors" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+                    Production Hub
+                </a>
+<a class="bg-primary-container text-on-primary-container rounded-lg mx-2 my-1 px-4 py-3 flex items-center gap-md font-body-md text-body-md shadow-sm transition-all" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">fact_check</span>
+                    Evidence Audit
+                </a>
+<a class="text-on-surface-variant hover:bg-surface-variant rounded-lg mx-2 my-1 px-4 py-3 flex items-center gap-md font-body-md text-body-md transition-colors" href="#">
+<span class="material-symbols-outlined">inventory_2</span>
+                    Inventory
+                </a>
+<a class="text-on-surface-variant hover:bg-surface-variant rounded-lg mx-2 my-1 px-4 py-3 flex items-center gap-md font-body-md text-body-md transition-colors" href="#">
+<span class="material-symbols-outlined">payments</span>
+                    Financials
+                </a>
+<a class="text-on-surface-variant hover:bg-surface-variant rounded-lg mx-2 my-1 px-4 py-3 flex items-center gap-md font-body-md text-body-md transition-colors" href="#">
+<span class="material-symbols-outlined">group</span>
+                    Team Performance
+                </a>
+</nav>
+</aside>
+<!-- Main Content Area -->
+<main class="flex-1 overflow-y-auto p-gutter-desktop pb-32 md:pb-gutter-desktop bg-surface-bright">
+<!-- Page Header -->
+<div class="mb-8 flex flex-col gap-2">
+<div class="flex items-center gap-2 text-on-surface-variant font-label-mono text-label-mono">
+<span class="uppercase tracking-widest text-primary font-bold">SCOPE</span>
+<span>/</span>
+<span class="font-bold text-on-surface">H01</span>
+</div>
+<div class="flex flex-col md:flex-row md:items-end justify-between gap-4">
+<div>
+<h1 class="font-display-lg text-display-lg text-on-surface">Scope of Work</h1>
+<p class="font-body-md text-body-md text-on-surface-variant mt-1 flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]">location_on</span>
+                            Beneficiary: <strong class="text-on-surface">Haughton Grove, Hanover</strong>
+</p>
+</div>
+<div class="flex items-center gap-4">
+<div class="flex items-center gap-2 bg-success-green/10 text-success-green px-3 py-1.5 rounded-full border border-success-green/20">
+<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+<span class="font-metadata text-metadata uppercase tracking-wide">Assessment Completed</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Lifecycle Rail / Stepper -->
+<div class="mb-lg border-b border-border-subtle pb-4 overflow-x-auto">
+<div class="flex items-center min-w-max">
+<div class="flex items-center gap-2">
+<div class="w-8 h-8 rounded-full bg-brand-red text-white flex items-center justify-center font-label-mono text-label-mono">01</div>
+<span class="font-section-title text-section-title text-brand-strong border-b-2 border-brand-red pb-1">House</span>
+</div>
+<div class="w-16 h-px bg-border-subtle mx-4"></div>
+<div class="flex items-center gap-2 opacity-60">
+<div class="w-8 h-8 rounded-full bg-surface-variant text-on-surface-variant flex items-center justify-center font-label-mono text-label-mono">02</div>
+<span class="font-section-title text-section-title text-on-surface-variant pb-1">Roof</span>
+</div>
+<div class="w-16 h-px bg-border-subtle mx-4"></div>
+<div class="flex items-center gap-2 opacity-60">
+<div class="w-8 h-8 rounded-full bg-surface-variant text-on-surface-variant flex items-center justify-center font-label-mono text-label-mono">03</div>
+<span class="font-section-title text-section-title text-on-surface-variant pb-1">Print</span>
+</div>
+<div class="w-16 h-px bg-border-subtle mx-4"></div>
+<div class="flex items-center gap-2 opacity-60">
+<div class="w-8 h-8 rounded-full bg-surface-variant text-on-surface-variant flex items-center justify-center font-label-mono text-label-mono">04</div>
+<span class="font-section-title text-section-title text-on-surface-variant pb-1">Files</span>
+</div>
+</div>
+</div>
+<!-- Bento Grid Content -->
+<div class="bento-grid">
+<!-- Technical Summary Card -->
+<div class="col-span-12 lg:col-span-8 bg-surface-container-lowest rounded-xl shadow-sm border border-outline-variant p-lg">
+<div class="flex justify-between items-center mb-6">
+<h3 class="font-section-title text-section-title flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">analytics</span>
+                            Technical Summary
+                        </h3>
+<span class="font-metadata text-metadata text-on-surface-variant bg-surface-variant px-2 py-1 rounded">H01-TECH-REV</span>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-md mb-6">
+<!-- House Type -->
+<div class="bg-surface p-4 rounded-lg border border-border-subtle">
+<span class="font-metadata text-metadata text-on-surface-variant uppercase tracking-wider block mb-1">House Type</span>
+<div class="flex items-center justify-between">
+<span class="font-body-lg text-body-lg font-semibold text-on-surface">Standard Shelter</span>
+<span class="material-symbols-outlined text-border-subtle">home</span>
+</div>
+</div>
+<!-- Roof Type -->
+<div class="bg-surface p-4 rounded-lg border border-border-subtle">
+<span class="font-metadata text-metadata text-on-surface-variant uppercase tracking-wider block mb-1">Roof Configuration</span>
+<div class="flex items-center justify-between">
+<span class="font-body-lg text-body-lg font-semibold text-on-surface">Gable</span>
+<span class="material-symbols-outlined text-border-subtle">roofing</span>
+</div>
+</div>
+</div>
+<!-- Measurements -->
+<div class="bg-brand-soft/30 p-md rounded-lg border border-brand-soft">
+<h4 class="font-label-mono text-label-mono text-brand-strong mb-4 flex items-center gap-2">
+<span class="material-symbols-outlined text-[16px]">straighten</span> PRIMARY MEASUREMENTS
+                        </h4>
+<div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+<div class="flex flex-col">
+<span class="font-metadata text-metadata text-on-surface-variant mb-1">LENGTH</span>
+<span class="font-headline-md text-headline-md font-black text-on-surface">24<span class="text-sm font-normal text-on-surface-variant">ft</span></span>
+</div>
+<div class="flex flex-col border-l border-outline-variant pl-4">
+<span class="font-metadata text-metadata text-on-surface-variant mb-1">WIDTH</span>
+<span class="font-headline-md text-headline-md font-black text-on-surface">18<span class="text-sm font-normal text-on-surface-variant">ft</span></span>
+</div>
+<div class="flex flex-col border-l border-outline-variant pl-4">
+<span class="font-metadata text-metadata text-on-surface-variant mb-1">TOTAL AREA</span>
+<span class="font-headline-md text-headline-md font-black text-on-surface">432<span class="text-sm font-normal text-on-surface-variant">sq ft</span></span>
+</div>
+</div>
+</div>
+<div class="mt-8 flex justify-end">
+<button class="bg-brand-red hover:bg-brand-strong text-white font-label-mono text-label-mono uppercase tracking-wider px-6 py-3 rounded flex items-center gap-2 transition-colors">
+                            Proceed to Roof Specs
+                            <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
+</button>
+</div>
+</div>
+<!-- Side Panel: Production Pulse / Next Action -->
+<div class="col-span-12 lg:col-span-4 flex flex-col gap-lg">
+<!-- Progress Card -->
+<div class="bg-surface-container-lowest rounded-xl shadow-sm border border-outline-variant p-lg relative overflow-hidden">
+<div class="absolute top-0 right-0 p-4 opacity-5 pointer-events-none">
+<span class="material-symbols-outlined text-9xl">engineering</span>
+</div>
+<h3 class="font-section-title text-section-title mb-2">Phase Progress</h3>
+<div class="flex items-end gap-2 mb-4">
+<span class="font-display-lg text-display-lg text-primary">1</span>
+<span class="font-headline-md text-headline-md text-on-surface-variant mb-1">/ 4</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant mb-4">House Information verification in progress. Next phase will require structural sign-off.</p>
+<div class="w-full bg-surface-variant rounded-full h-2">
+<div class="bg-brand-red h-2 rounded-full" style="width: 25%"></div>
+</div>
+</div>
+<!-- Evidence Strip Snippet -->
+<div class="bg-surface-container-lowest rounded-xl shadow-sm border border-outline-variant p-lg">
+<div class="flex justify-between items-center mb-4">
+<h3 class="font-section-title text-section-title">Site Evidence</h3>
+<a class="text-primary font-label-mono text-label-mono flex items-center gap-1 hover:underline" href="#">
+                                View All <span class="material-symbols-outlined text-[14px]">arrow_outward</span>
+</a>
+</div>
+<div class="grid grid-cols-2 gap-2">
+<div class="relative rounded-lg overflow-hidden h-24 bg-surface-variant border border-outline-variant">
+<div class="bg-cover bg-center w-full h-full absolute inset-0" data-alt="A clear, high-resolution photograph of an assessment site for a standard shelter house, showing an empty plot of land with measurement stakes visible. The image is taken during daylight under clear skies, embodying a pragmatic, documentary style consistent with humanitarian field assessments." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDP_MC9kVsXF5fFi-RlELzEE90YdjVX2KrXUazMnvaXJPEzPgrnMc86XgkZuKFMyq_-kE3t4Mg_UaAwn2V5TG2Vxfux4JqiRnhudVnZfrXA_d-NLcKrCgny8XcoNroJs0MCOcymv9WO9GfU-bvDasa6jA7zzbO2LL_u_naTyeHOK3LPZqqeD2oKD3k-w3d-QwI0NRm8VWdInGF4uLXOpzLLLllaU6LPC8PLj0PSlJ2PR0O-z7GRiBLemA')"></div>
+<div class="absolute bottom-0 left-0 right-0 bg-inverse-surface/80 p-1 flex justify-between items-center">
+<span class="font-metadata text-metadata text-white">BEFORE</span>
+<span class="material-symbols-outlined text-success-green text-[14px]" style="font-variation-settings: 'FILL' 1;">verified</span>
+</div>
+</div>
+<div class="relative rounded-lg overflow-hidden h-24 bg-surface-variant border border-outline-variant flex items-center justify-center border-dashed">
+<div class="text-center">
+<span class="material-symbols-outlined text-on-surface-variant mb-1">add_a_photo</span>
+<span class="block font-metadata text-metadata text-on-surface-variant">AWAITING</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+</div>
+<!-- BottomNavBar (Mobile) -->
+<nav class="lg:hidden fixed bottom-0 w-full flex justify-around items-center px-4 py-2 pb-safe bg-surface dark:bg-surface-dim border-t border-outline-variant shadow-lg z-50">
+<a class="flex flex-col items-center justify-center text-on-surface-variant hover:bg-surface-variant w-16 h-14 rounded-xl transition-colors" href="#">
+<span class="material-symbols-outlined">analytics</span>
+<span class="font-label-mono text-label-mono text-[10px] mt-1">Dashboard</span>
+</a>
+<a class="flex flex-col items-center justify-center bg-primary-container text-on-primary-container rounded-xl px-4 py-1 w-16 h-14 scale-95 transition-transform duration-150" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">alt_route</span>
+<span class="font-label-mono text-label-mono text-[10px] mt-1">Scope</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant hover:bg-surface-variant w-16 h-14 rounded-xl transition-colors" href="#">
+<span class="material-symbols-outlined">warehouse</span>
+<span class="font-label-mono text-label-mono text-[10px] mt-1">Inventory</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant hover:bg-surface-variant w-16 h-14 rounded-xl transition-colors" href="#">
+<span class="material-symbols-outlined">badge</span>
+<span class="font-label-mono text-label-mono text-[10px] mt-1">Teams</span>
+</a>
+</nav>
+</body></html>

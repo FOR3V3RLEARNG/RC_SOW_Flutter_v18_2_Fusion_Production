@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>RC SOW - Messaging</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@700;800;900&amp;family=Inter:wght@400;500&amp;family=JetBrains+Mono:wght@500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "primary-fixed-dim": "#ffb3ac",
+                        "surface-container-highest": "#f9dcd9",
+                        "on-primary-fixed": "#410003",
+                        "canvas-l0": "#F5F7F9",
+                        "on-background": "#271816",
+                        "on-error-container": "#93000a",
+                        "on-tertiary-container": "#e9f7ff",
+                        "warning": "#FFA000",
+                        "on-error": "#ffffff",
+                        "secondary-fixed-dim": "#a5c8ff",
+                        "surface-l2": "#F0F3F5",
+                        "background": "#fff8f7",
+                        "surface-dim": "#f1d3d0",
+                        "primary-fixed": "#ffdad6",
+                        "outline-variant": "#e4beba",
+                        "surface": "#fff8f7",
+                        "surface-variant": "#f9dcd9",
+                        "on-tertiary": "#ffffff",
+                        "surface-container-low": "#fff0ef",
+                        "surface-l1": "#FFFFFF",
+                        "error-container": "#ffdad6",
+                        "on-secondary-container": "#003567",
+                        "inverse-on-surface": "#ffedeb",
+                        "secondary-fixed": "#d4e3ff",
+                        "tertiary-container": "#00799c",
+                        "inverse-primary": "#ffb3ac",
+                        "inverse-surface": "#3e2c2a",
+                        "info": "#0288D1",
+                        "on-surface-variant": "#5b403d",
+                        "on-secondary-fixed": "#001c3a",
+                        "tertiary-fixed": "#bee9ff",
+                        "outline": "#8f6f6c",
+                        "tertiary": "#005f7b",
+                        "brand-red": "#D32F2F",
+                        "on-secondary": "#ffffff",
+                        "success": "#2E7D32",
+                        "surface-bright": "#fff8f7",
+                        "primary": "#af101a",
+                        "surface-container-high": "#ffe2de",
+                        "surface-container": "#ffe9e7",
+                        "on-secondary-fixed-variant": "#004786",
+                        "on-surface": "#271816",
+                        "on-primary": "#ffffff",
+                        "on-primary-fixed-variant": "#930010",
+                        "on-primary-container": "#fff2f0",
+                        "surface-tint": "#ba1a20",
+                        "on-tertiary-fixed-variant": "#004d65",
+                        "tertiary-fixed-dim": "#7bd1f8",
+                        "secondary-container": "#54a0fe",
+                        "brand-strong": "#B71C1C",
+                        "secondary": "#005faf",
+                        "on-tertiary-fixed": "#001f2a",
+                        "brand-soft": "#FFEBEE",
+                        "error": "#C62828",
+                        "primary-container": "#d32f2f",
+                        "surface-container-lowest": "#ffffff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "md": "16px",
+                        "sm": "12px",
+                        "base": "4px",
+                        "xl": "32px",
+                        "lg": "24px",
+                        "gutter-tablet": "24px",
+                        "gutter-phone": "16px",
+                        "xs": "8px",
+                        "target-min": "48px"
+                    },
+                    "fontFamily": {
+                        "metadata": ["Inter"],
+                        "section-title": ["Hanken Grotesk"],
+                        "body-md": ["Inter"],
+                        "hero-title": ["Hanken Grotesk"],
+                        "label-md": ["JetBrains Mono"],
+                        "body-lg": ["Inter"],
+                        "hero-title-mobile": ["Hanken Grotesk"],
+                        "headline-lg": ["Hanken Grotesk"],
+                        "headline-md": ["Hanken Grotesk"]
+                    },
+                    "fontSize": {
+                        "metadata": ["12px", { "lineHeight": "16px", "fontWeight": "500" }],
+                        "section-title": ["18px", { "lineHeight": "24px", "fontWeight": "700" }],
+                        "body-md": ["15px", { "lineHeight": "22px", "fontWeight": "400" }],
+                        "hero-title": ["32px", { "lineHeight": "36px", "letterSpacing": "-0.02em", "fontWeight": "900" }],
+                        "label-md": ["13px", { "lineHeight": "16px", "fontWeight": "500" }],
+                        "body-lg": ["17px", { "lineHeight": "26px", "fontWeight": "400" }],
+                        "hero-title-mobile": ["28px", { "lineHeight": "32px", "fontWeight": "900" }],
+                        "headline-lg": ["24px", { "lineHeight": "32px", "fontWeight": "800" }],
+                        "headline-md": ["20px", { "lineHeight": "28px", "fontWeight": "750" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .drawer-slide-in {
+            animation: slideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+        .drawer-slide-out {
+            animation: slideOut 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+        @keyframes slideIn {
+            from { transform: translateY(100%); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        @keyframes slideOut {
+            from { transform: translateY(0); opacity: 1; }
+            to { transform: translateY(100%); opacity: 0; }
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-canvas-l0 text-on-surface font-body-md min-h-screen overflow-hidden flex flex-col relative">
+<!-- Top App Bar -->
+<header class="fixed top-0 w-full z-50 bg-surface shadow-sm flex justify-between items-center px-gutter-phone h-target-min">
+<div class="flex items-center gap-sm cursor-pointer hover:bg-surface-container-high transition-colors p-xs rounded-lg active:scale-95 transition-transform text-primary">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">gpp_maybe</span>
+</div>
+<h1 class="font-headline-md text-headline-md font-black text-brand-red">RC SOW</h1>
+<div class="flex items-center gap-sm cursor-pointer hover:bg-surface-container-high transition-colors p-xs rounded-lg active:scale-95 transition-transform text-primary">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">sync</span>
+</div>
+</header>
+<!-- Main Content Canvas (Background Map) -->
+<main class="flex-1 mt-[48px] mb-[72px] md:mb-0 bg-canvas-l0 relative flex items-center justify-center p-gutter-phone">
+<div class="absolute inset-0 bg-cover bg-center opacity-30 pointer-events-none" data-alt="A highly detailed overhead map view of a rural parish in Jamaica, focusing on scattered residential structures. The style is modern, bright, and slightly abstract, utilizing the primary brand red and soft surface colors to highlight operational zones. The lighting suggests early morning clear skies, providing a calm, professional backdrop for field operations mapping." data-location="Jamaica" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCk4qUgWk7i_MOQq4h5uMfULNu4XEoTHdZk_fLtrFzeQFzXCjV_l1MObGS0tAcZeeMidjjmojkHgQ6HERxFTw6jrAjRE_sCWXcbbTJwz4b4OBbSxNxiNthimgbIodTGUfABZRZ1f9phfxsUVSieuYKAkUWeyXssS5HsZ6OMNYfoyoB65-vEETemVxigLgbYV2nnYDdMqo6gMuPHO2DOmTnwHIjN_Fb92fm-eHAxH4KQo7MTUiYCfKmdZA')"></div>
+<div class="z-10 text-center max-w-md">
+<p class="font-body-lg text-body-lg text-on-surface-variant mb-4">Field operations map overlay active. Select a house or unit to begin assessment.</p>
+</div>
+</main>
+<!-- Floating Action Button (Chat Toggle) -->
+<button class="fixed bottom-[88px] md:bottom-lg right-gutter-phone w-14 h-14 bg-brand-red text-on-primary rounded-full shadow-lg flex items-center justify-center hover:bg-primary transition-colors z-40 active:scale-95" id="chat-toggle-btn">
+<span class="material-symbols-outlined text-[28px]" style="font-variation-settings: 'FILL' 1;">chat</span>
+<span class="absolute top-0 right-0 w-4 h-4 bg-warning text-[10px] font-metadata text-on-surface flex items-center justify-center rounded-full border-2 border-surface-l1">3</span>
+</button>
+<!-- Messaging Drawer Overlay -->
+<div class="fixed inset-0 bg-inverse-surface/40 z-50 hidden backdrop-blur-sm transition-opacity duration-300 opacity-0" id="chat-drawer-overlay"></div>
+<!-- Messaging Drawer Container -->
+<div class="fixed bottom-0 right-0 w-full md:w-[420px] h-[751px] md:h-[600px] bg-surface-l1 rounded-t-[24px] md:rounded-bl-[24px] md:rounded-tr-none md:bottom-auto md:top-24 md:right-gutter-phone shadow-2xl z-50 flex flex-col transform translate-y-full md:translate-y-0 md:translate-x-full hidden" id="chat-drawer">
+<!-- Drawer Header -->
+<div class="flex items-center justify-between px-md py-sm border-b border-surface-variant bg-surface-l1 rounded-t-[24px] md:rounded-tl-[24px]">
+<h2 class="font-section-title text-section-title text-on-surface">Field Comms</h2>
+<button class="p-xs text-on-surface-variant hover:bg-surface-container-low rounded-full transition-colors active:scale-95" id="close-drawer-btn">
+<span class="material-symbols-outlined text-[24px]">close</span>
+</button>
+</div>
+<!-- Chat List View -->
+<div class="flex-1 flex flex-col h-full bg-surface-l2" id="chat-list-view">
+<!-- Tabs -->
+<div class="flex bg-surface-l1 border-b border-surface-variant">
+<button class="flex-1 py-sm font-label-md text-label-md text-primary border-b-2 border-brand-red relative">
+                    General
+                </button>
+<button class="flex-1 py-sm font-label-md text-label-md text-on-surface-variant hover:bg-surface-container-lowest transition-colors relative">
+                    Parish
+                    <span class="absolute top-3 right-8 w-2 h-2 bg-brand-red rounded-full"></span>
+</button>
+</div>
+<!-- List Items -->
+<div class="flex-1 overflow-y-auto p-xs space-y-xs">
+<!-- Chat Item 1 (Active/Unread) -->
+<button class="w-full flex items-center gap-sm p-sm bg-surface-l1 rounded-xl shadow-sm hover:bg-surface-container-low transition-colors text-left" onclick="openChatView('Marcus Thorne')">
+<div class="relative">
+<div class="w-12 h-12 bg-primary-container text-on-primary-container rounded-full flex items-center justify-center font-section-title text-section-title">MT</div>
+<span class="absolute bottom-0 right-0 w-3 h-3 bg-success border-2 border-surface-l1 rounded-full"></span>
+</div>
+<div class="flex-1 min-w-0">
+<div class="flex justify-between items-baseline mb-1">
+<h3 class="font-section-title text-[15px] font-bold text-on-surface truncate">Marcus Thorne</h3>
+<span class="font-metadata text-[11px] text-brand-red">10:42 AM</span>
+</div>
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px] text-on-surface-variant">photo</span>
+<p class="font-body-md text-[13px] text-on-surface-variant truncate font-medium">Roof truss damage verified...</p>
+</div>
+</div>
+<div class="w-5 h-5 bg-brand-red text-on-primary rounded-full flex items-center justify-center font-metadata text-[11px]">2</div>
+</button>
+<!-- Chat Item 2 -->
+<button class="w-full flex items-center gap-sm p-sm bg-surface-l1 rounded-xl hover:bg-surface-container-low transition-colors text-left" onclick="openChatView('Hanover Team')">
+<div class="w-12 h-12 bg-secondary-container text-on-secondary-container rounded-full flex items-center justify-center font-section-title text-section-title">
+<span class="material-symbols-outlined">group</span>
+</div>
+<div class="flex-1 min-w-0">
+<div class="flex justify-between items-baseline mb-1">
+<h3 class="font-section-title text-[15px] font-bold text-on-surface truncate">Hanover Operations</h3>
+<span class="font-metadata text-[11px] text-on-surface-variant">Yesterday</span>
+</div>
+<p class="font-body-md text-[13px] text-on-surface-variant truncate">Supply drop scheduled for 0800</p>
+</div>
+</button>
+<!-- Chat Item 3 -->
+<button class="w-full flex items-center gap-sm p-sm bg-surface-l1 rounded-xl hover:bg-surface-container-low transition-colors text-left" onclick="openChatView('General Broadcast')">
+<div class="w-12 h-12 bg-tertiary-container text-on-tertiary-container rounded-full flex items-center justify-center font-section-title text-section-title">
+<span class="material-symbols-outlined">campaign</span>
+</div>
+<div class="flex-1 min-w-0">
+<div class="flex justify-between items-baseline mb-1">
+<h3 class="font-section-title text-[15px] font-bold text-on-surface truncate">General Broadcast</h3>
+<span class="font-metadata text-[11px] text-on-surface-variant">Mon</span>
+</div>
+<p class="font-body-md text-[13px] text-on-surface-variant truncate">Weather alert: heavy rain expected</p>
+</div>
+</button>
+<!-- Chat Item 4 -->
+<button class="w-full flex items-center gap-sm p-sm bg-surface-l1 rounded-xl hover:bg-surface-container-low transition-colors text-left">
+<div class="w-12 h-12 bg-surface-variant text-on-surface-variant rounded-full flex items-center justify-center font-section-title text-section-title">
+<span class="material-symbols-outlined">group</span>
+</div>
+<div class="flex-1 min-w-0">
+<div class="flex justify-between items-baseline mb-1">
+<h3 class="font-section-title text-[15px] font-bold text-on-surface truncate">St. Elizabeth</h3>
+<span class="font-metadata text-[11px] text-on-surface-variant">Mon</span>
+</div>
+<p class="font-body-md text-[13px] text-on-surface-variant truncate">Assessment 45% complete</p>
+</div>
+</button>
+</div>
+</div>
+<!-- Active Chat View (Hidden by default) -->
+<div class="hidden flex-1 flex flex-col h-full bg-surface-l2 absolute inset-0 rounded-t-[24px] md:rounded-l-[24px] z-10 w-full overflow-hidden" id="active-chat-view">
+<!-- Chat Header -->
+<div class="flex items-center gap-sm px-sm py-sm border-b border-surface-variant bg-surface-l1 z-20">
+<button class="p-xs text-on-surface-variant hover:bg-surface-container-low rounded-full transition-colors active:scale-95" onclick="closeChatView()">
+<span class="material-symbols-outlined text-[20px]">arrow_back</span>
+</button>
+<div class="w-10 h-10 bg-primary-container text-on-primary-container rounded-full flex items-center justify-center font-section-title text-[14px]">MT</div>
+<div class="flex-1">
+<h3 class="font-section-title text-[16px] text-on-surface leading-tight" id="active-chat-name">Marcus Thorne</h3>
+<p class="font-metadata text-[11px] text-success flex items-center gap-1"><span class="w-1.5 h-1.5 bg-success rounded-full inline-block"></span>Site Supervisor</p>
+</div>
+<button class="p-xs text-on-surface-variant hover:bg-surface-container-low rounded-full transition-colors active:scale-95">
+<span class="material-symbols-outlined text-[20px]">more_vert</span>
+</button>
+</div>
+<!-- Chat Canvas -->
+<div class="flex-1 overflow-y-auto p-md space-y-md flex flex-col bg-canvas-l0">
+<!-- Date Chip -->
+<div class="flex justify-center my-2">
+<span class="bg-surface-variant text-on-surface-variant font-metadata text-[11px] px-3 py-1 rounded-full">Today</span>
+</div>
+<!-- Received Message (Text) -->
+<div class="flex gap-2 max-w-[85%] self-start">
+<div class="w-8 h-8 bg-primary-container text-on-primary-container rounded-full flex-shrink-0 flex items-center justify-center font-section-title text-[11px] mt-auto hidden md:flex">MT</div>
+<div class="bg-surface-l1 text-on-surface p-sm rounded-2xl rounded-bl-none shadow-sm border border-surface-variant">
+<p class="font-body-md text-[14px]">I've completed the initial assessment for House Code HNV-042. Major structural damage to the roof.</p>
+<span class="font-metadata text-[10px] text-on-surface-variant block text-right mt-1">10:35 AM</span>
+</div>
+</div>
+<!-- Sent Message (Photo) -->
+<div class="flex gap-2 max-w-[85%] self-end flex-row-reverse">
+<div class="bg-brand-red text-on-primary p-1 rounded-2xl rounded-br-none shadow-sm border border-brand-strong">
+<img class="w-[200px] h-[150px] object-cover rounded-xl border border-white/20 mb-1" data-alt="A close-up, high-quality documentary photo of a heavily damaged residential roof structure. Wooden trusses are exposed, splintered, and partially collapsed. The sky is visible through large gaps where roofing material is missing. The photo is taken in bright daylight, casting strong shadows that emphasize the structural failure. The overall aesthetic is raw, detailed, and evidentiary, suitable for a field assessment report." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAQaf9nWWAXyNbbUEL_QJ_q-BymW-W-HwjDkZwE9BnN1kP96_P4k-Esq9v6tZ4wILzAJTf4tvY9dPQEiOIlp7p2-7oP7sFXpvBN2b7t73T0Ss_t9HCpEVwgTo6nw9kpRnFxzE-ySWb7uXs6bFcblyYQrcFDbtTSzP6o3a8Ac9DHyOqyOIivApCcKbsoKi32FeWWVs6QRAe1WnQDJNJ-kZSUxw9x7-3zCF_SfglMdPv-pF98Z2RsdSZdGQ"/>
+<p class="font-body-md text-[13px] px-2 py-1">Please confirm receipt of evidence.</p>
+<span class="font-metadata text-[10px] text-inverse-primary block text-right px-2 flex items-center justify-end gap-1">10:38 AM <span class="material-symbols-outlined text-[14px]" style="font-variation-settings: 'FILL' 1;">done_all</span></span>
+</div>
+</div>
+<!-- Received Message (Voice Note) -->
+<div class="flex gap-2 max-w-[85%] self-start">
+<div class="bg-surface-l1 text-on-surface p-sm rounded-2xl rounded-bl-none shadow-sm border border-surface-variant min-w-[200px]">
+<div class="flex items-center gap-sm">
+<button class="w-10 h-10 bg-surface-container-high rounded-full flex items-center justify-center text-primary active:scale-95">
+<span class="material-symbols-outlined text-[24px]" style="font-variation-settings: 'FILL' 1;">play_arrow</span>
+</button>
+<!-- Fake Waveform -->
+<div class="flex-1 flex items-center h-8 gap-0.5 opacity-60">
+<div class="w-1 h-3 bg-primary rounded-full"></div>
+<div class="w-1 h-5 bg-primary rounded-full"></div>
+<div class="w-1 h-8 bg-primary rounded-full"></div>
+<div class="w-1 h-4 bg-primary rounded-full"></div>
+<div class="w-1 h-6 bg-primary rounded-full"></div>
+<div class="w-1 h-2 bg-on-surface-variant rounded-full"></div>
+<div class="w-1 h-3 bg-on-surface-variant rounded-full"></div>
+<div class="w-1 h-2 bg-on-surface-variant rounded-full"></div>
+</div>
+<span class="font-metadata text-[11px] text-on-surface-variant">0:14</span>
+</div>
+<span class="font-metadata text-[10px] text-on-surface-variant block text-right mt-1">10:42 AM</span>
+</div>
+</div>
+</div>
+<!-- Input Bar -->
+<div class="bg-surface-l1 px-sm py-xs border-t border-surface-variant flex items-end gap-sm z-20 pb-md md:pb-sm">
+<button class="w-10 h-10 flex items-center justify-center text-on-surface-variant hover:bg-surface-container-low rounded-full transition-colors flex-shrink-0 mb-1">
+<span class="material-symbols-outlined text-[24px]">add</span>
+</button>
+<div class="flex-1 bg-surface-container-lowest border border-outline-variant rounded-[24px] min-h-[48px] flex items-center px-md py-xs shadow-inner">
+<textarea class="w-full bg-transparent border-none focus:ring-0 resize-none font-body-md text-on-surface placeholder:text-on-surface-variant/50 max-h-[100px] py-1 text-[15px]" placeholder="Message..." rows="1" style="field-sizing: content;"></textarea>
+</div>
+<button class="w-12 h-12 flex items-center justify-center bg-brand-red text-on-primary rounded-full hover:bg-primary transition-colors flex-shrink-0 shadow-sm mb-0.5 active:scale-95">
+<span class="material-symbols-outlined text-[24px]" style="font-variation-settings: 'FILL' 1;">mic</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Bottom Navigation Bar (Mobile Only) -->
+<nav class="md:hidden fixed bottom-0 w-full z-40 bg-surface border-t border-outline-variant flex justify-around items-center px-xs pb-sm pt-xs pb-6">
+<div class="flex flex-col items-center justify-center text-on-surface-variant p-xs w-[64px]">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">dashboard</span>
+<span class="font-label-md text-[11px] mt-1">Dashboard</span>
+</div>
+<div class="flex flex-col items-center justify-center text-on-surface-variant p-xs w-[64px]">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">architecture</span>
+<span class="font-label-md text-[11px] mt-1">Scope</span>
+</div>
+<div class="flex flex-col items-center justify-center text-on-surface-variant p-xs w-[64px]">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">fact_check</span>
+<span class="font-label-md text-[11px] mt-1">Control</span>
+</div>
+<div class="flex flex-col items-center justify-center bg-primary-container text-on-primary-container rounded-xl px-sm py-xs w-[64px]">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">home</span>
+<span class="font-label-md text-[11px] mt-1">Houses</span>
+</div>
+<div class="flex flex-col items-center justify-center text-on-surface-variant p-xs w-[64px]">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">more_horiz</span>
+<span class="font-label-md text-[11px] mt-1">More</span>
+</div>
+</nav>
+<script>
+        const chatToggleBtn = document.getElementById('chat-toggle-btn');
+        const chatDrawerOverlay = document.getElementById('chat-drawer-overlay');
+        const chatDrawer = document.getElementById('chat-drawer');
+        const closeDrawerBtn = document.getElementById('close-drawer-btn');
+        
+        const chatListView = document.getElementById('chat-list-view');
+        const activeChatView = document.getElementById('active-chat-view');
+        const activeChatName = document.getElementById('active-chat-name');
+
+        function toggleDrawer() {
+            const isHidden = chatDrawer.classList.contains('hidden');
+            
+            if (isHidden) {
+                // Show
+                chatDrawerOverlay.classList.remove('hidden');
+                chatDrawer.classList.remove('hidden');
+                
+                // Slight delay for transition classes to take effect
+                requestAnimationFrame(() => {
+                    chatDrawerOverlay.classList.remove('opacity-0');
+                    chatDrawerOverlay.classList.add('opacity-100');
+                    
+                    if (window.innerWidth < 768) {
+                        chatDrawer.classList.remove('translate-y-full');
+                    } else {
+                        chatDrawer.classList.remove('translate-x-full');
+                        chatDrawer.classList.add('drawer-slide-in');
+                    }
+                });
+            } else {
+                // Hide
+                chatDrawerOverlay.classList.remove('opacity-100');
+                chatDrawerOverlay.classList.add('opacity-0');
+                
+                if (window.innerWidth < 768) {
+                    chatDrawer.classList.add('translate-y-full');
+                } else {
+                    chatDrawer.classList.remove('drawer-slide-in');
+                    chatDrawer.classList.add('drawer-slide-out');
+                }
+                
+                setTimeout(() => {
+                    chatDrawerOverlay.classList.add('hidden');
+                    chatDrawer.classList.add('hidden');
+                    if (window.innerWidth >= 768) {
+                        chatDrawer.classList.remove('drawer-slide-out');
+                        chatDrawer.classList.add('translate-x-full');
+                    }
+                }, 300); // match animation duration
+            }
+        }
+
+        function openChatView(name) {
+            activeChatName.textContent = name;
+            activeChatView.classList.remove('hidden');
+            chatListView.classList.add('hidden');
+        }
+
+        function closeChatView() {
+            activeChatView.classList.add('hidden');
+            chatListView.classList.remove('hidden');
+        }
+
+        chatToggleBtn.addEventListener('click', toggleDrawer);
+        closeDrawerBtn.addEventListener('click', toggleDrawer);
+        chatDrawerOverlay.addEventListener('click', toggleDrawer);
+
+    </script>
+</body></html>

@@ -1,0 +1,10 @@
+# Storage Health Threshold Rules
+- **Critical Level**: Triggers immediate high-priority alert and automated transfer request proposal.
+- **Low Stock Level**: Triggers amber warning on material catalog and adds to weekly logistics briefing.
+- **Healthy Level**: Standard operational state.
+
+## Default Material Thresholds (Configurable)
+- **Ridge Beams (2x8)**: Critical < 10, Low < 25
+- **Zinc Sheets (26ga)**: Critical < 50, Low < 150
+- **Hurricane Straps**: Critical < 40, Low < 100
+- **Galvanized Nails (Pounds)**: Critical < 20, Low < 50

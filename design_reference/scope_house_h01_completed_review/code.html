@@ -1,0 +1,370 @@
+<!DOCTYPE html><html class="h-full" lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>H01 Scope - RC SOW Operations</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;700;800;900&amp;family=Inter:wght@400;500;700&amp;family=JetBrains+Mono:wght@500&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-container": "#ffe9e7",
+                        "on-error-container": "#93000a",
+                        "on-secondary-container": "#003567",
+                        "info": "#0288D1",
+                        "on-secondary-fixed": "#001c3a",
+                        "brand-red": "#D32F2F",
+                        "on-tertiary-fixed": "#001f2a",
+                        "inverse-on-surface": "#ffedeb",
+                        "on-primary-fixed-variant": "#930010",
+                        "on-tertiary-container": "#e9f7ff",
+                        "brand-soft": "#FFEBEE",
+                        "canvas-l0": "#F5F7F9",
+                        "on-surface-variant": "#5b403d",
+                        "surface-tint": "#ba1a20",
+                        "tertiary-fixed": "#bee9ff",
+                        "on-primary-fixed": "#410003",
+                        "outline-variant": "#e4beba",
+                        "on-secondary-fixed-variant": "#004786",
+                        "outline": "#8f6f6c",
+                        "on-tertiary": "#ffffff",
+                        "primary-fixed-dim": "#ffb3ac",
+                        "surface-bright": "#fff8f7",
+                        "primary-container": "#d32f2f",
+                        "warning": "#FFA000",
+                        "on-error": "#ffffff",
+                        "on-primary": "#ffffff",
+                        "primary-fixed": "#ffdad6",
+                        "on-background": "#271816",
+                        "secondary-container": "#54a0fe",
+                        "error-container": "#ffdad6",
+                        "surface-variant": "#f9dcd9",
+                        "inverse-primary": "#ffb3ac",
+                        "tertiary": "#005f7b",
+                        "primary": "#af101a",
+                        "secondary": "#005faf",
+                        "surface": "#fff8f7",
+                        "tertiary-container": "#00799c",
+                        "surface-container-high": "#ffe2de",
+                        "on-tertiary-fixed-variant": "#004d65",
+                        "surface-dim": "#f1d3d0",
+                        "surface-l2": "#F0F3F5",
+                        "surface-container-highest": "#f9dcd9",
+                        "surface-l1": "#FFFFFF",
+                        "inverse-surface": "#3e2c2a",
+                        "success": "#2E7D32",
+                        "brand-strong": "#B71C1C",
+                        "surface-container-lowest": "#ffffff",
+                        "background": "#fff8f7",
+                        "tertiary-fixed-dim": "#7bd1f8",
+                        "error": "#C62828",
+                        "secondary-fixed": "#d4e3ff",
+                        "on-primary-container": "#fff2f0",
+                        "on-surface": "#271816",
+                        "on-secondary": "#ffffff",
+                        "surface-container-low": "#fff0ef",
+                        "secondary-fixed-dim": "#a5c8ff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "xl": "32px",
+                        "gutter-phone": "16px",
+                        "lg": "24px",
+                        "md": "16px",
+                        "base": "4px",
+                        "xs": "8px",
+                        "gutter-tablet": "24px",
+                        "sm": "12px",
+                        "target-min": "48px"
+                    },
+                    "fontFamily": {
+                        "headline-lg": ["Hanken Grotesk"],
+                        "hero-title-mobile": ["Hanken Grotesk"],
+                        "headline-md": ["Hanken Grotesk"],
+                        "metadata": ["Inter"],
+                        "label-md": ["JetBrains Mono"],
+                        "label-md-mobile": ["JetBrains Mono"],
+                        "body-md": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "hero-title": ["Hanken Grotesk"],
+                        "section-title": ["Hanken Grotesk"]
+                    },
+                    "fontSize": {
+                        "headline-lg": ["24px", { "lineHeight": "32px", "fontWeight": "800" }],
+                        "hero-title-mobile": ["28px", { "lineHeight": "32px", "fontWeight": "900" }],
+                        "headline-md": ["20px", { "lineHeight": "28px", "fontWeight": "750" }],
+                        "metadata": ["12px", { "lineHeight": "16px", "fontWeight": "500" }],
+                        "label-md": ["13px", { "lineHeight": "16px", "fontWeight": "500" }],
+                        "label-md-mobile": ["11px", { "lineHeight": "14px", "fontWeight": "500" }],
+                        "body-md": ["15px", { "lineHeight": "22px", "fontWeight": "400" }],
+                        "body-lg": ["17px", { "lineHeight": "26px", "fontWeight": "400" }],
+                        "hero-title": ["32px", { "lineHeight": "36px", "letterSpacing": "-0.02em", "fontWeight": "900" }],
+                        "section-title": ["18px", { "lineHeight": "24px", "fontWeight": "700" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        .material-symbols-outlined.fill { font-variation-settings: 'FILL' 1; }
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-canvas-l0 text-on-surface h-full flex flex-col font-body-md overflow-hidden">
+<!-- TopAppBar -->
+<header class="flex justify-between items-center w-full px-gutter-phone md:px-gutter-tablet h-target-min z-50 bg-surface dark:bg-surface-dim shadow-sm docked full-width top-0">
+<div class="flex items-center gap-md">
+<span class="material-symbols-outlined text-primary dark:text-primary-fixed-dim" data-icon="roofing" data-weight="outline">roofing</span>
+<h1 class="font-hero-title text-hero-title font-black text-primary dark:text-primary-fixed-dim tracking-tight">RC SOW Operations</h1>
+</div>
+<div class="flex items-center gap-md">
+<span class="material-symbols-outlined text-success" data-icon="cloud_done" data-weight="fill" title="Synced">cloud_done</span>
+<div class="w-8 h-8 rounded-full bg-surface-variant flex items-center justify-center overflow-hidden">
+<img alt="User Avatar" class="w-full h-full object-cover" data-alt="A small, professional headshot avatar of a field operations worker in a bright, outdoor setting. Clean and well-lit, fitting a light-mode modern UI." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCgwUzwsFFDKjpahQvrxIgjEofStqkOAM1QttycstFBngCzsBtuG9qiwUM7bzBYMNcAkYcUf7Fvt_6SyOWtVuFx6yeuh7Oin0oX7WMC2i5FT4om9DPnNYSHH2oMx1cP3ioQoRz0aE_x96kZqWeXQYwSotG4RwZCtNH8uspjmsSgl4sPsmTW2SpCL5ypfdwiHWfyTmJ2oz6mwZmioSxOzy7qNZGBPO53DI5CL6x5dqi-DqstNoLabjS8Fg">
+</div>
+</div>
+</header>
+<div class="flex flex-1 overflow-hidden pb-16 lg:pb-0">
+<!-- NavigationDrawer (Desktop) -->
+<nav class="hidden lg:flex flex-col h-full py-lg bg-surface-container-low dark:bg-surface-container-lowest border-r border-outline-variant h-full w-80 rounded-r-xl flat no shadows">
+<div class="px-md pb-md">
+<h2 class="font-headline-lg text-headline-lg font-extrabold text-primary">RC SOW Command</h2>
+</div>
+<div class="flex-1 overflow-y-auto">
+<a class="text-on-surface-variant hover:bg-surface-variant rounded-lg mx-2 my-1 px-4 py-3 flex items-center gap-md" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-headline-md text-headline-md">Production Hub</span>
+</a>
+<a class="bg-primary-container text-on-primary-container rounded-lg mx-2 my-1 px-4 py-3 flex items-center gap-md opacity-80 scale-[0.99] transition-all translate-x-1 transition-transform" href="#">
+<span class="material-symbols-outlined">fact_check</span>
+<span class="font-headline-md text-headline-md">Evidence Audit</span>
+</a>
+<a class="text-on-surface-variant hover:bg-surface-variant rounded-lg mx-2 my-1 px-4 py-3 flex items-center gap-md" href="#">
+<span class="material-symbols-outlined">inventory_2</span>
+<span class="font-headline-md text-headline-md">Inventory</span>
+</a>
+<a class="text-on-surface-variant hover:bg-surface-variant rounded-lg mx-2 my-1 px-4 py-3 flex items-center gap-md" href="#">
+<span class="material-symbols-outlined">payments</span>
+<span class="font-headline-md text-headline-md">Financials</span>
+</a>
+<a class="text-on-surface-variant hover:bg-surface-variant rounded-lg mx-2 my-1 px-4 py-3 flex items-center gap-md" href="#">
+<span class="material-symbols-outlined">group</span>
+<span class="font-headline-md text-headline-md">Team Performance</span>
+</a>
+</div>
+</nav>
+<!-- Main Content Area -->
+<main class="flex-1 overflow-y-auto px-gutter-phone md:px-gutter-tablet py-lg flex flex-col gap-lg">
+<!-- Hero / House Context -->
+<section class="bg-surface-l1 rounded-xl p-lg shadow-[0_4px_16px_rgba(0,0,0,0.05)] border border-surface-variant flex flex-col md:flex-row justify-between items-start md:items-center gap-md relative overflow-hidden">
+<div class="absolute top-0 right-0 w-32 h-32 bg-brand-soft rounded-bl-full -z-10 opacity-50"></div>
+<div>
+<div class="flex items-center gap-sm mb-xs">
+<span class="font-label-md text-label-md bg-success text-on-secondary px-2 py-1 rounded-sm uppercase tracking-wider">Completed</span>
+<span class="font-label-md text-label-md text-on-surface-variant flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">history</span> 2 days ago</span>
+</div>
+<h2 class="font-hero-title-mobile md:font-hero-title text-hero-title-mobile md:text-hero-title text-on-surface mb-1">H01 • Scope</h2>
+<p class="font-body-lg text-body-lg text-on-surface-variant flex items-center gap-sm">
+<span class="material-symbols-outlined">location_on</span>
+                        Hanover • Haughton Grove
+                    </p>
+</div>
+<div class="flex gap-md w-full md:w-auto mt-4 md:mt-0">
+<button class="flex-1 md:flex-none flex items-center justify-center gap-sm bg-surface-l2 text-primary border border-outline-variant rounded-lg px-4 py-3 h-target-min font-label-md text-label-md hover:bg-surface-variant transition-colors">
+<span class="material-symbols-outlined">print</span> Print
+                    </button>
+<button class="flex-1 md:flex-none flex items-center justify-center gap-sm bg-primary text-on-primary rounded-lg px-4 py-3 h-target-min font-label-md text-label-md hover:bg-brand-strong transition-colors shadow-sm">
+<span class="material-symbols-outlined">download</span> PDF
+                    </button>
+</div>
+</section>
+<!-- Lifecycle Rail -->
+<section class="w-full overflow-x-auto hide-scrollbar py-sm -mx-gutter-phone px-gutter-phone md:mx-0 md:px-0">
+<div class="flex items-center gap-sm min-w-max">
+<div class="bg-primary text-on-primary px-4 py-2 rounded-full font-label-md text-label-md flex items-center gap-xs shadow-sm">
+<span class="material-symbols-outlined text-[16px] fill">radio_button_checked</span> Scope
+                    </div>
+<div class="w-4 h-[2px] bg-outline-variant"></div>
+<div class="bg-surface-l2 text-on-surface-variant px-4 py-2 rounded-full font-label-md text-label-md flex items-center gap-xs">
+<span class="material-symbols-outlined text-[16px]">radio_button_unchecked</span> Plan
+                    </div>
+<div class="w-4 h-[2px] bg-outline-variant"></div>
+<div class="bg-surface-l2 text-on-surface-variant px-4 py-2 rounded-full font-label-md text-label-md flex items-center gap-xs">
+<span class="material-symbols-outlined text-[16px]">radio_button_unchecked</span> Delivery
+                    </div>
+<div class="w-4 h-[2px] bg-outline-variant"></div>
+<div class="bg-surface-l2 text-on-surface-variant px-4 py-2 rounded-full font-label-md text-label-md flex items-center gap-xs">
+<span class="material-symbols-outlined text-[16px]">radio_button_unchecked</span> Quality
+                    </div>
+<div class="w-4 h-[2px] bg-outline-variant"></div>
+<div class="bg-surface-l2 text-on-surface-variant px-4 py-2 rounded-full font-label-md text-label-md flex items-center gap-xs">
+<span class="material-symbols-outlined text-[16px]">radio_button_unchecked</span> Close-out
+                    </div>
+<div class="w-4 h-[2px] bg-outline-variant"></div>
+<div class="bg-surface-l2 text-on-surface-variant px-4 py-2 rounded-full font-label-md text-label-md flex items-center gap-xs">
+<span class="material-symbols-outlined text-[16px]">radio_button_unchecked</span> Finance
+                    </div>
+</div>
+</section>
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-lg pb-lg">
+<!-- Left Column: Details & Technical -->
+<div class="lg:col-span-8 flex flex-col gap-lg">
+<!-- Property & Beneficiary Summary -->
+<section class="bg-surface-l1 rounded-xl shadow-[0_4px_16px_rgba(0,0,0,0.05)] border border-outline-variant p-md md:p-lg">
+<h3 class="font-section-title text-section-title text-on-surface mb-md flex items-center gap-sm">
+<span class="material-symbols-outlined text-primary">person</span> Beneficiary Details
+                        </h3>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-md">
+<div class="bg-canvas-l0 p-sm rounded-lg border border-surface-variant">
+<span class="font-metadata text-metadata text-on-surface-variant uppercase tracking-wider block mb-1">Primary Contact</span>
+<span class="font-body-lg text-body-lg text-on-surface">Jane Doe</span>
+</div>
+<div class="bg-canvas-l0 p-sm rounded-lg border border-surface-variant">
+<span class="font-metadata text-metadata text-on-surface-variant uppercase tracking-wider block mb-1">TRN</span>
+<span class="font-label-md text-label-md text-on-surface">123-456-789</span>
+</div>
+<div class="bg-canvas-l0 p-sm rounded-lg border border-surface-variant md:col-span-2 flex justify-between items-center">
+<div>
+<span class="font-metadata text-metadata text-on-surface-variant uppercase tracking-wider block mb-1">GPS Coordinates</span>
+<span class="font-label-md text-label-md text-on-surface">18.4231° N, 78.1254° W</span>
+</div>
+<button class="text-primary hover:text-brand-strong transition-colors p-2 rounded-full hover:bg-surface-variant">
+<span class="material-symbols-outlined">map</span>
+</button>
+</div>
+</div>
+</section>
+<!-- Assessment & Technical Data Bento Grid -->
+<section class="grid grid-cols-1 md:grid-cols-2 gap-md">
+<!-- Assessment -->
+<div class="bg-surface-l1 rounded-xl shadow-[0_4px_16px_rgba(0,0,0,0.05)] border border-outline-variant p-md flex flex-col">
+<h3 class="font-section-title text-section-title text-on-surface mb-md flex items-center gap-sm">
+<span class="material-symbols-outlined text-primary">assignment</span> Assessment
+                            </h3>
+<div class="space-y-sm flex-1">
+<div class="flex justify-between items-center border-b border-surface-variant pb-2">
+<span class="font-body-md text-body-md text-on-surface-variant">Structure Type</span>
+<span class="font-label-md text-label-md text-on-surface">RCC</span>
+</div>
+<div class="flex justify-between items-center border-b border-surface-variant pb-2">
+<span class="font-body-md text-body-md text-on-surface-variant">Damage Extent</span>
+<span class="font-label-md text-label-md text-warning bg-surface-container px-2 py-0.5 rounded-sm">Moderate</span>
+</div>
+<div class="flex justify-between items-center pt-2">
+<span class="font-body-md text-body-md text-on-surface-variant">Eligibility</span>
+<span class="font-label-md text-label-md text-success flex items-center gap-xs"><span class="material-symbols-outlined text-[16px]">check_circle</span> Approved</span>
+</div>
+</div>
+</div>
+<!-- Roof Scope -->
+<div class="bg-surface-l1 rounded-xl shadow-[0_4px_16px_rgba(0,0,0,0.05)] border border-outline-variant p-md flex flex-col">
+<h3 class="font-section-title text-section-title text-on-surface mb-md flex items-center gap-sm">
+<span class="material-symbols-outlined text-primary">architecture</span> Roof Spec
+                            </h3>
+<div class="grid grid-cols-2 gap-sm flex-1">
+<div class="bg-canvas-l0 p-sm rounded-lg border border-surface-variant">
+<span class="font-metadata text-metadata text-on-surface-variant uppercase block mb-1">Type</span>
+<span class="font-label-md text-label-md text-on-surface">Hip</span>
+</div>
+<div class="bg-canvas-l0 p-sm rounded-lg border border-surface-variant">
+<span class="font-metadata text-metadata text-on-surface-variant uppercase block mb-1">Pitch</span>
+<span class="font-label-md text-label-md text-on-surface">30°</span>
+</div>
+<div class="bg-canvas-l0 p-sm rounded-lg border border-surface-variant">
+<span class="font-metadata text-metadata text-on-surface-variant uppercase block mb-1">Rafter</span>
+<span class="font-label-md text-label-md text-on-surface">2x6</span>
+</div>
+<div class="bg-canvas-l0 p-sm rounded-lg border border-surface-variant">
+<span class="font-metadata text-metadata text-on-surface-variant uppercase block mb-1">Zinc Gauge</span>
+<span class="font-label-md text-label-md text-on-surface">26</span>
+</div>
+</div>
+</div>
+</section>
+</div>
+<!-- Right Column: Evidence & Media -->
+<div class="lg:col-span-4 flex flex-col gap-lg">
+<!-- Technical Drawing Preview (Read Only) -->
+<section class="bg-surface-l1 rounded-xl shadow-[0_4px_16px_rgba(0,0,0,0.05)] border border-outline-variant overflow-hidden flex flex-col h-full">
+<div class="p-md border-b border-surface-variant flex justify-between items-center bg-surface-l2">
+<h3 class="font-section-title text-section-title text-on-surface flex items-center gap-sm">
+<span class="material-symbols-outlined text-primary">draw</span> Schematic (Review)
+                            </h3>
+<span class="material-symbols-outlined text-on-surface-variant" title="Read Only">lock</span>
+</div>
+<div class="relative w-full h-48 md:h-64 lg:h-full min-h-[200px] bg-canvas-l0">
+<!-- Simulated blueprint texture -->
+<div class="absolute inset-0 opacity-10 bg-[radial-gradient(#8f6f6c_1px,transparent_1px)] [background-size:16px_16px]"></div>
+<img alt="Technical Drawing" class="w-full h-full object-contain p-md relative z-10" data-alt="A clean, minimalist architectural line drawing of a hip roof structure on a light neutral background. It looks like a technical blueprint but fits within a modern, light-mode web UI. Precise, thin lines, high contrast." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBdR-ogZ2FC5nEXYsuDlj-X_R863aygQ6eCdzYhvKhO2mRlJquTPVJr5z2IQ_SvvchZnhmSsfNpfSPBeMT98nrni14C7zGCiF3hcZrAc0N_fw15fPSLCzDWGOpyXEu6kkb6jowivmHN-uzoKXPyTOvHl071aFJQdjJw9zgZQQVhJqN016MaakVU9dxRuho9cdpEPA09eCip90J-tOCzhzPeJiraj0iAxIPdio3Un4-mdnyb3DBYInl_Qg">
+<div class="absolute bottom-md right-md z-20">
+<button class="bg-surface-l1/90 backdrop-blur border border-outline-variant p-2 rounded-full shadow-sm text-primary hover:bg-surface-variant">
+<span class="material-symbols-outlined">zoom_in</span>
+</button>
+</div>
+</div>
+</section>
+<!-- Evidence Strip Teaser -->
+<section class="bg-surface-l1 rounded-xl shadow-[0_4px_16px_rgba(0,0,0,0.05)] border border-outline-variant p-md">
+<div class="flex justify-between items-center mb-sm">
+<h3 class="font-section-title text-section-title text-on-surface">Evidence</h3>
+<button class="text-primary font-label-md text-label-md hover:underline">View All</button>
+</div>
+<div class="flex gap-sm overflow-x-auto hide-scrollbar pb-1">
+<div class="w-20 h-20 shrink-0 rounded-lg overflow-hidden border border-outline-variant relative group cursor-pointer">
+<img alt="Evidence Photo 1" class="w-full h-full object-cover" data-alt="A clear, daylight photograph showing moderate damage to a residential roof structure in a rural setting. Bright, natural lighting, high contrast." src="https://lh3.googleusercontent.com/aida-public/AB6AXuB1py1gqyI39_ATa2bu6lPDXgeMOypPu47dZW5joizn06W1IyjX5cmzU-VY1iZ_FCQxX086-EVyKHdXU7oZRhflqnYCCqKaMDS-_AQTi7WGoC0zmYA5JO8SXv5zm0fpuqG4aVaIPBP3hwnBjCrgz6nkox3NQE20LPYJYN0aW8FV-QnCKYb2ewWqERJ-pjfEaIiZL6w0s4OqDaViRP-rYBtJRpUb8c7Uc77dwOSR0M0gkLxkZmCBooiVvg">
+<div class="absolute inset-0 bg-black/30 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+<span class="material-symbols-outlined text-white">visibility</span>
+</div>
+</div>
+<div class="w-20 h-20 shrink-0 rounded-lg overflow-hidden border border-outline-variant relative group cursor-pointer">
+<img alt="Evidence Photo 2" class="w-full h-full object-cover" data-alt="A clear, daylight photograph showing the exterior walls of a residential structure in a rural setting. Bright, natural lighting, high contrast." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCFLysl2taWeVrHAuCwIXteMb4GQ0x2bFBTlTJ1QEc0MnGQRcW3nUOXQfk2vhUzfQwMUoMPsU_GoyYe_MEUoHQugdW8WtHSjgajPzOZe_EoqbCrbHDSkCYZH5pdf8FRzJ3uoh7qULUpkFgzBRsIVEHQ41Rgu3KNWblzGfpr8ezwk2uht2-k7AP91y3A6CqRxX-WjRLQ9-7NCv-dmvRxoamow-CLlmqOzr5LpO1cRWQR9YT90CscKAze6Q">
+<div class="absolute inset-0 bg-black/30 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+<span class="material-symbols-outlined text-white">visibility</span>
+</div>
+</div>
+<div class="w-20 h-20 shrink-0 rounded-lg border border-dashed border-primary flex flex-col items-center justify-center text-primary bg-brand-soft cursor-not-allowed opacity-50" title="Scope Locked">
+<span class="material-symbols-outlined">lock</span>
+</div>
+</div>
+</section>
+</div>
+</div>
+</main>
+</div>
+<!-- BottomNavBar (Mobile) -->
+<nav class="lg:hidden fixed bottom-0 w-full flex justify-around items-center px-4 py-2 pb-safe bg-surface dark:bg-surface-dim border-t border-outline-variant shadow-lg docked full-width bottom-0 z-50">
+<a class="flex flex-col items-center justify-center text-on-surface-variant hover:bg-surface-variant w-16 h-16 rounded-xl" href="#">
+<span class="material-symbols-outlined">analytics</span>
+<span class="font-label-md-mobile text-label-md-mobile mt-1">Dashboard</span>
+</a>
+<!-- Using Lifecycle as the closest semantic match for "Scope" phase tracking -->
+<a class="flex flex-col items-center justify-center bg-primary-container text-on-primary-container rounded-xl px-4 py-1 scale-95 transition-transform duration-150 w-16 h-16" href="#">
+<span class="material-symbols-outlined fill">alt_route</span>
+<span class="font-label-md-mobile text-label-md-mobile mt-1">Lifecycle</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant hover:bg-surface-variant w-16 h-16 rounded-xl" href="#">
+<span class="material-symbols-outlined">warehouse</span>
+<span class="font-label-md-mobile text-label-md-mobile mt-1">Inventory</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant hover:bg-surface-variant w-16 h-16 rounded-xl" href="#">
+<span class="material-symbols-outlined">badge</span>
+<span class="font-label-md-mobile text-label-md-mobile mt-1">Teams</span>
+</a>
+</nav>
+</body></html>

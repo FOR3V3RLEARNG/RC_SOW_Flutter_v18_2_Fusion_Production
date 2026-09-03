@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Admin: Parish Inventory Configuration</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@700;800;900&amp;family=Inter:wght@400;500&amp;family=JetBrains+Mono:wght@500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "surface": "#fff8f7",
+                      "surface-variant": "#f9dcd9",
+                      "tertiary-fixed-dim": "#7bd1f8",
+                      "on-tertiary-container": "#e9f7ff",
+                      "primary-fixed": "#ffdad6",
+                      "outline": "#8f6f6c",
+                      "secondary-fixed": "#d4e3ff",
+                      "tertiary-container": "#00799c",
+                      "surface-l1": "#FFFFFF",
+                      "surface-container-highest": "#f9dcd9",
+                      "primary": "#af101a",
+                      "inverse-primary": "#ffb3ac",
+                      "surface-tint": "#ba1a20",
+                      "on-tertiary": "#ffffff",
+                      "primary-container": "#d32f2f",
+                      "error-container": "#ffdad6",
+                      "surface-container-high": "#ffe2de",
+                      "tertiary": "#005f7b",
+                      "background": "#fff8f7",
+                      "surface-container-lowest": "#ffffff",
+                      "on-error": "#ffffff",
+                      "surface-container": "#ffe9e7",
+                      "brand-red": "#D32F2F",
+                      "brand-strong": "#B71C1C",
+                      "error": "#C62828",
+                      "secondary-fixed-dim": "#a5c8ff",
+                      "primary-fixed-dim": "#ffb3ac",
+                      "surface-container-low": "#fff0ef",
+                      "inverse-on-surface": "#ffedeb",
+                      "secondary-container": "#54a0fe",
+                      "on-secondary-fixed-variant": "#004786",
+                      "brand-soft": "#FFEBEE",
+                      "on-tertiary-fixed-variant": "#004d65",
+                      "surface-bright": "#fff8f7",
+                      "tertiary-fixed": "#bee9ff",
+                      "surface-dim": "#f1d3d0",
+                      "secondary": "#005faf",
+                      "on-surface": "#271816",
+                      "outline-variant": "#e4beba",
+                      "on-surface-variant": "#5b403d",
+                      "canvas-l0": "#F5F7F9",
+                      "inverse-surface": "#3e2c2a",
+                      "on-error-container": "#93000a",
+                      "on-primary": "#ffffff",
+                      "on-primary-container": "#fff2f0",
+                      "warning": "#FFA000",
+                      "info": "#0288D1",
+                      "on-tertiary-fixed": "#001f2a",
+                      "on-primary-fixed-variant": "#930010",
+                      "on-secondary": "#ffffff",
+                      "on-primary-fixed": "#410003",
+                      "on-secondary-fixed": "#001c3a",
+                      "success": "#2E7D32",
+                      "on-background": "#271816",
+                      "on-secondary-container": "#003567",
+                      "surface-l2": "#F0F3F5"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "target-min": "48px",
+                      "base": "4px",
+                      "lg": "24px",
+                      "sm": "12px",
+                      "xl": "32px",
+                      "gutter-phone": "16px",
+                      "xs": "8px",
+                      "gutter-tablet": "24px",
+                      "md": "16px"
+              },
+              "fontFamily": {
+                      "label-md": ["JetBrains Mono"],
+                      "hero-title": ["Hanken Grotesk"],
+                      "headline-lg": ["Hanken Grotesk"],
+                      "headline-md": ["Hanken Grotesk"],
+                      "metadata": ["Inter"],
+                      "body-md": ["Inter"],
+                      "section-title": ["Hanken Grotesk"],
+                      "hero-title-mobile": ["Hanken Grotesk"],
+                      "body-lg": ["Inter"]
+              },
+              "fontSize": {
+                      "label-md": ["13px", {"lineHeight": "16px", "fontWeight": "500"}],
+                      "hero-title": ["32px", {"lineHeight": "36px", "letterSpacing": "-0.02em", "fontWeight": "900"}],
+                      "headline-lg": ["24px", {"lineHeight": "32px", "fontWeight": "800"}],
+                      "headline-md": ["20px", {"lineHeight": "28px", "fontWeight": "750"}],
+                      "metadata": ["12px", {"lineHeight": "16px", "fontWeight": "500"}],
+                      "body-md": ["15px", {"lineHeight": "22px", "fontWeight": "400"}],
+                      "section-title": ["18px", {"lineHeight": "24px", "fontWeight": "700"}],
+                      "hero-title-mobile": ["28px", {"lineHeight": "32px", "fontWeight": "900"}],
+                      "body-lg": ["17px", {"lineHeight": "26px", "fontWeight": "400"}]
+              }
+            }
+          }
+        }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+</head>
+<body class="bg-canvas-l0 text-on-surface h-screen flex overflow-hidden">
+<!-- SideNavBar (Shared Component) -->
+<nav class="bg-surface-container-low w-64 flex flex-col py-lg z-40 border-r border-outline-variant flex-shrink-0 relative">
+<div class="px-lg mb-xl flex flex-col gap-base">
+<span class="font-headline-sm text-headline-sm font-extrabold text-on-surface">HQ COMMAND</span>
+<span class="font-metadata text-metadata text-on-surface-variant">Global Operations</span>
+</div>
+<div class="flex flex-col w-full flex-1 gap-base">
+<!-- Inactive Tabs -->
+<a class="flex items-center gap-md px-lg py-sm w-full transition-all text-on-surface-variant hover:bg-surface-container-high hover:translate-x-1 duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span class="font-section-title text-section-title">Dashboard</span>
+</a>
+<a class="flex items-center gap-md px-lg py-sm w-full transition-all text-on-surface-variant hover:bg-surface-container-high hover:translate-x-1 duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="payments">payments</span>
+<span class="font-section-title text-section-title">Finance</span>
+</a>
+<a class="flex items-center gap-md px-lg py-sm w-full transition-all text-on-surface-variant hover:bg-surface-container-high hover:translate-x-1 duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="assignment_ind">assignment_ind</span>
+<span class="font-section-title text-section-title">Attendance</span>
+</a>
+<a class="flex items-center gap-md px-lg py-sm w-full transition-all text-on-surface-variant hover:bg-surface-container-high hover:translate-x-1 duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="inventory_2">inventory_2</span>
+<span class="font-section-title text-section-title">Logistics</span>
+</a>
+<a class="flex items-center gap-md px-lg py-sm w-full transition-all text-on-surface-variant hover:bg-surface-container-high hover:translate-x-1 duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="history_edu">history_edu</span>
+<span class="font-section-title text-section-title">Audit Logs</span>
+</a>
+</div>
+<div class="mt-auto flex flex-col w-full gap-base pt-md border-t border-outline-variant/30">
+<!-- Active Tab (Settings) -->
+<a class="flex items-center gap-md px-lg py-sm w-full transition-all bg-brand-soft text-brand-strong font-bold border-r-4 border-primary" href="#">
+<span class="material-symbols-outlined" data-icon="settings" style="font-variation-settings: 'FILL' 1;">settings</span>
+<span class="font-section-title text-section-title">Settings</span>
+</a>
+<a class="flex items-center gap-md px-lg py-sm w-full transition-all text-on-surface-variant hover:bg-surface-container-high hover:translate-x-1 duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="help">help</span>
+<span class="font-section-title text-section-title">Support</span>
+</a>
+</div>
+</nav>
+<!-- Main Content Area -->
+<div class="flex-1 flex flex-col min-w-0">
+<!-- TopNavBar (Shared Component) - Removed borders per prohibition, using tonal shift via background -->
+<header class="flex justify-between items-center w-full px-gutter-desktop h-16 z-50 bg-surface-container-lowest shadow-sm">
+<div class="flex items-center gap-md">
+<span class="font-headline-md text-headline-md font-black text-brand-strong">HUMANITARIAN COMMAND</span>
+</div>
+<div class="flex items-center gap-md">
+<button class="text-primary hover:bg-surface-container-high transition-colors p-sm rounded-full flex items-center justify-center cursor-pointer active:opacity-80">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+</button>
+<button class="text-primary hover:bg-surface-container-high transition-colors p-sm rounded-full flex items-center justify-center cursor-pointer active:opacity-80">
+<span class="material-symbols-outlined" data-icon="sync">sync</span>
+</button>
+<button class="text-primary hover:bg-surface-container-high transition-colors p-sm rounded-full flex items-center justify-center cursor-pointer active:opacity-80">
+<span class="material-symbols-outlined" data-icon="account_circle">account_circle</span>
+</button>
+</div>
+</header>
+<!-- Main Scrollable Content -->
+<main class="flex-1 overflow-y-auto p-gutter-tablet flex flex-col gap-lg">
+<!-- Page Header -->
+<div class="flex justify-between items-end mb-sm">
+<div>
+<h1 class="font-headline-lg text-headline-lg text-on-surface mb-base">Parish Inventory Configuration</h1>
+<p class="font-body-md text-body-md text-on-surface-variant">Manage live data source connections for decentralized inventory tracking.</p>
+</div>
+<button class="bg-primary text-on-primary h-target-min px-lg rounded-xl flex items-center gap-sm font-label-md hover:opacity-90 transition-opacity">
+<span class="material-symbols-outlined">add</span>
+<span class="uppercase">Add New Parish Source</span>
+</button>
+</div>
+<!-- Configuration List -->
+<div class="flex flex-col gap-md">
+<!-- Parish Card: Hanover (Configured) -->
+<div class="bg-surface-l1 border border-outline-variant rounded-xl p-md flex flex-col gap-md shadow-sm">
+<div class="flex justify-between items-center">
+<div class="flex items-center gap-sm">
+<span class="material-symbols-outlined text-primary">warehouse</span>
+<h2 class="font-section-title text-section-title text-on-surface">Hanover</h2>
+</div>
+<div class="bg-success/10 text-success rounded-full px-sm py-xs flex items-center gap-base border border-success/20">
+<span class="material-symbols-outlined text-[14px]">check_circle</span>
+<span class="font-metadata text-metadata uppercase tracking-wide">Connection Active</span>
+</div>
+</div>
+<div class="flex flex-col gap-base w-full">
+<label class="font-metadata text-metadata text-on-surface-variant uppercase tracking-wider">Live Inventory Source (URL)</label>
+<div class="relative flex items-center w-full">
+<span class="material-symbols-outlined absolute left-sm text-on-surface-variant">link</span>
+<input class="w-full h-target-min pl-[44px] pr-sm rounded-xl border border-outline-variant bg-surface-container-lowest font-label-md text-label-md text-on-surface focus:outline-none focus:border-primary transition-colors" readonly="" type="text" value="https://onedrive.live.com/view.aspx?resid=8A7B6C5D4E3F2G1H!1234&amp;authkey=!ABcdEfGhIjKlMnOp"/>
+</div>
+<span class="font-metadata text-metadata text-on-surface-variant flex items-center gap-base mt-1">
+<span class="material-symbols-outlined text-[14px]">update</span>
+                            Last synced: Today, 08:45 AM
+                        </span>
+</div>
+<div class="flex items-center gap-sm mt-sm border-t border-outline-variant pt-md">
+<button class="h-target-min px-md rounded-xl border border-outline-variant flex items-center gap-sm font-label-md text-label-md text-on-surface hover:bg-surface-container-highest transition-colors uppercase">
+<span class="material-symbols-outlined text-[18px]">sync</span>
+                            Test Connection
+                        </button>
+<button class="h-target-min px-md rounded-xl border border-outline-variant flex items-center gap-sm font-label-md text-label-md text-on-surface hover:bg-surface-container-highest transition-colors uppercase">
+<span class="material-symbols-outlined text-[18px]">list_alt</span>
+                            View Logs
+                        </button>
+</div>
+</div>
+<!-- Parish Card: St. Elizabeth (Pending) -->
+<div class="bg-surface-l1 border border-outline-variant rounded-xl p-md flex flex-col gap-md shadow-sm">
+<div class="flex justify-between items-center">
+<div class="flex items-center gap-sm">
+<span class="material-symbols-outlined text-on-surface-variant">warehouse</span>
+<h2 class="font-section-title text-section-title text-on-surface">St. Elizabeth</h2>
+</div>
+<div class="bg-warning/10 text-warning rounded-full px-sm py-xs flex items-center gap-base border border-warning/20">
+<span class="material-symbols-outlined text-[14px]">pending</span>
+<span class="font-metadata text-metadata uppercase tracking-wide">Pending Sync</span>
+</div>
+</div>
+<div class="flex flex-col gap-base w-full">
+<label class="font-metadata text-metadata text-on-surface-variant uppercase tracking-wider">Live Inventory Source (URL)</label>
+<div class="relative flex items-center w-full">
+<span class="material-symbols-outlined absolute left-sm text-on-surface-variant">link</span>
+<input class="w-full h-target-min pl-[44px] pr-sm rounded-xl border border-outline-variant bg-surface-container-lowest font-label-md text-label-md text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors" placeholder="Paste OneDrive or SharePoint URL here..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-sm mt-sm border-t border-outline-variant pt-md">
+<button class="h-target-min px-md rounded-xl bg-surface-tint text-on-primary flex items-center gap-sm font-label-md text-label-md hover:opacity-90 transition-opacity uppercase">
+<span class="material-symbols-outlined text-[18px]">save</span>
+                            Save Configuration
+                        </button>
+</div>
+</div>
+<!-- Parish Card: Westmoreland (Empty) -->
+<div class="bg-surface-l1 border border-outline-variant rounded-xl p-md flex flex-col gap-md shadow-sm opacity-80 hover:opacity-100 transition-opacity">
+<div class="flex justify-between items-center">
+<div class="flex items-center gap-sm">
+<span class="material-symbols-outlined text-on-surface-variant">warehouse</span>
+<h2 class="font-section-title text-section-title text-on-surface">Westmoreland</h2>
+</div>
+<div class="bg-surface-variant text-on-surface-variant rounded-full px-sm py-xs flex items-center gap-base">
+<span class="material-symbols-outlined text-[14px]">do_not_disturb_on</span>
+<span class="font-metadata text-metadata uppercase tracking-wide">Not Configured</span>
+</div>
+</div>
+<div class="flex flex-col gap-base w-full">
+<label class="font-metadata text-metadata text-on-surface-variant uppercase tracking-wider">Live Inventory Source (URL)</label>
+<div class="relative flex items-center w-full">
+<span class="material-symbols-outlined absolute left-sm text-on-surface-variant">link</span>
+<input class="w-full h-target-min pl-[44px] pr-sm rounded-xl border border-outline-variant bg-surface-container-lowest font-label-md text-label-md text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors" placeholder="Paste OneDrive or SharePoint URL here..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-sm mt-sm border-t border-outline-variant pt-md">
+<button class="h-target-min px-md rounded-xl bg-surface-tint text-on-primary flex items-center gap-sm font-label-md text-label-md hover:opacity-90 transition-opacity uppercase">
+<span class="material-symbols-outlined text-[18px]">save</span>
+                            Save Configuration
+                        </button>
+</div>
+</div>
+</div>
+</main>
+</div>
+</body></html>

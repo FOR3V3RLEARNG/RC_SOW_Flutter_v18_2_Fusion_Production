@@ -1,0 +1,231 @@
+<!DOCTYPE html><html lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>AI Mapping Review - FieldOps</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;700;800;900&amp;family=Inter:wght@400;500&amp;family=JetBrains+Mono:wght@500&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "secondary-fixed": "#d4e3ff",
+                        "surface-container-low": "#fff0ef",
+                        "outline": "#8f6f6c",
+                        "on-surface": "#271816",
+                        "on-tertiary-fixed-variant": "#004d65",
+                        "surface-container-high": "#ffe2de",
+                        "on-secondary-container": "#003567",
+                        "primary": "#af101a",
+                        "success": "#2E7D32",
+                        "on-tertiary-container": "#e9f7ff",
+                        "on-error": "#ffffff",
+                        "brand-soft": "#FFEBEE",
+                        "primary-container": "#d32f2f",
+                        "surface-l1": "#FFFFFF",
+                        "secondary-fixed-dim": "#a5c8ff",
+                        "surface-l2": "#F0F3F5",
+                        "on-tertiary": "#ffffff",
+                        "tertiary-fixed": "#bee9ff",
+                        "inverse-on-surface": "#ffedeb",
+                        "on-primary": "#ffffff",
+                        "on-primary-fixed-variant": "#930010",
+                        "on-error-container": "#93000a",
+                        "surface-container": "#ffe9e7",
+                        "surface-dim": "#f1d3d0",
+                        "surface-variant": "#f9dcd9",
+                        "error-container": "#ffdad6",
+                        "on-primary-container": "#fff2f0",
+                        "on-tertiary-fixed": "#001f2a",
+                        "brand-red": "#D32F2F",
+                        "tertiary-fixed-dim": "#7bd1f8",
+                        "on-primary-fixed": "#410003",
+                        "outline-variant": "#e4beba",
+                        "on-secondary-fixed-variant": "#004786",
+                        "background": "#fff8f7",
+                        "brand-strong": "#B71C1C",
+                        "canvas-l0": "#F5F7F9",
+                        "tertiary": "#005f7b",
+                        "surface": "#fff8f7",
+                        "info": "#0288D1",
+                        "on-secondary": "#ffffff",
+                        "surface-bright": "#fff8f7",
+                        "inverse-primary": "#ffb3ac",
+                        "surface-tint": "#ba1a20",
+                        "surface-container-highest": "#f9dcd9",
+                        "surface-container-lowest": "#ffffff",
+                        "on-background": "#271816",
+                        "on-secondary-fixed": "#001c3a",
+                        "error": "#C62828",
+                        "secondary": "#005faf",
+                        "primary-fixed": "#ffdad6",
+                        "warning": "#FFA000",
+                        "tertiary-container": "#00799c",
+                        "secondary-container": "#54a0fe",
+                        "primary-fixed-dim": "#ffb3ac",
+                        "inverse-surface": "#3e2c2a",
+                        "on-surface-variant": "#5b403d"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "gutter-tablet": "24px",
+                        "md": "16px",
+                        "xl": "32px",
+                        "base": "4px",
+                        "xs": "8px",
+                        "target-min": "48px",
+                        "lg": "24px",
+                        "gutter-phone": "16px",
+                        "sm": "12px"
+                    },
+                    "fontFamily": {
+                        "label-md": ["JetBrains Mono"],
+                        "body-md": ["Inter"],
+                        "hero-title-mobile": ["Hanken Grotesk"],
+                        "hero-title": ["Hanken Grotesk"],
+                        "headline-md": ["Hanken Grotesk"],
+                        "section-title": ["Hanken Grotesk"],
+                        "headline-lg": ["Hanken Grotesk"],
+                        "body-lg": ["Inter"],
+                        "metadata": ["Inter"]
+                    },
+                    "fontSize": {
+                        "label-md": ["13px", { "lineHeight": "16px", "fontWeight": "500" }],
+                        "body-md": ["15px", { "lineHeight": "22px", "fontWeight": "400" }],
+                        "hero-title-mobile": ["28px", { "lineHeight": "32px", "fontWeight": "900" }],
+                        "hero-title": ["32px", { "lineHeight": "36px", "letterSpacing": "-0.02em", "fontWeight": "900" }],
+                        "headline-md": ["20px", { "lineHeight": "28px", "fontWeight": "750" }],
+                        "section-title": ["18px", { "lineHeight": "24px", "fontWeight": "700" }],
+                        "headline-lg": ["24px", { "lineHeight": "32px", "fontWeight": "800" }],
+                        "body-lg": ["17px", { "lineHeight": "26px", "fontWeight": "400" }],
+                        "metadata": ["12px", { "lineHeight": "16px", "fontWeight": "500" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .overlay-layer {
+            position: relative;
+        }
+        .overlay-layer::after {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: rgba(255, 248, 247, 0.4);
+            pointer-events: none;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-background min-h-screen flex flex-col font-body-md">
+<!-- TopAppBar -->
+<header class="bg-surface dark:bg-on-background text-primary dark:text-primary-fixed font-headline-md text-headline-md fixed top-0 w-full z-50 bg-surface-container-low dark:bg-on-surface-variant shadow-sm flex items-center justify-between px-gutter-phone md:px-gutter-tablet h-16">
+<button class="w-target-min h-target-min flex items-center justify-center text-on-surface-variant active:scale-95 transition-transform hover:bg-surface-variant rounded-full">
+<span class="material-symbols-outlined" data-icon="close">close</span>
+</button>
+<span class="font-headline-lg-mobile text-brand-red dark:text-primary-fixed">AI Mapping Review</span>
+<div class="w-target-min h-target-min flex items-center justify-center">
+<!-- Placeholder for balance -->
+</div>
+</header><div class="fixed top-20 left-1/2 -translate-x-1/2 z-50 w-4/5 max-w-md bg-success text-on-primary p-md rounded-lg shadow-lg flex items-center gap-md animate-bounce"><span class="material-symbols-outlined">check_circle</span><div class="flex flex-col"><p class="font-section-title text-sm">Sync Successful</p><p class="text-xs opacity-90">Data for H12 has been synced and the record is now active.</p></div></div>
+<main class="flex-grow pt-16 pb-24 px-gutter-phone flex flex-col gap-md">
+<!-- Header Info -->
+<div class="py-md flex justify-between items-end border-b border-outline-variant">
+<div>
+<h1 class="font-section-title text-section-title text-on-surface">142 Oakwood Drive</h1>
+<p class="font-metadata text-metadata text-on-surface-variant mt-base">Reviewing sketch extraction</p>
+</div>
+<div class="bg-surface-l2 px-xs py-base rounded-md flex items-center gap-xs">
+<span class="material-symbols-outlined text-info text-sm" data-icon="auto_awesome">auto_awesome</span>
+<span class="font-label-md text-label-md text-on-surface">AI Map</span>
+</div>
+</div>
+<!-- Split View / Overlay Area -->
+<div class="relative w-full h-64 rounded-xl overflow-hidden shadow-sm bg-surface-l1 border border-outline-variant overlay-layer">
+<!-- Background: Original Sketch -->
+<div class="absolute inset-0 w-full h-full opacity-60" data-alt="A top-down photograph of a hand-drawn architectural sketch on grid paper, detailing roof lines and wall dimensions, taken in a bright, outdoor setting." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDuDwjPLv_yHcpvtxd5rKSy4ETBmi_7FS9fBc4boFOEJw5voHtFsqLv3QBAvr7BXvXgsj4eQZMJpvGMf6sW-P53vSPiATTzCI5npML1uoPWkU2z-KI9hyVikJN2ZqYJF9JHRb9gaCa4x_SkQjEvAHtCeuHaks7R2y_9rTs_FzqJm8k9u22TGrrzS4X9l1iyD97M3P527LasxUTYeFhAxrU7RQmeZZ6VGC9SAwG8Kmnd5Dwt3KgoF_pAuA')"></div>
+<!-- Foreground: Digital Geometry Overlay -->
+<div class="absolute inset-0 w-full h-full flex items-center justify-center">
+<!-- Abstract Representation of Geometry Overlay -->
+<svg class="w-4/5 h-4/5 drop-shadow-md" viewBox="0 0 100 100">
+<polygon fill="none" points="20,80 80,80 80,20 50,5 20,20" stroke="#D32F2F" stroke-width="2"></polygon>
+<line stroke="#0288D1" stroke-dasharray="2,2" stroke-width="1.5" x1="20" x2="80" y1="20" y2="80"></line>
+<!-- Highlight Nodes -->
+<circle cx="20" cy="80" fill="#C62828" r="3"></circle>
+<circle cx="80" cy="80" fill="#C62828" r="3"></circle>
+<circle cx="50" cy="5" fill="#C62828" r="3"></circle>
+</svg>
+</div>
+<!-- Instruction Toast -->
+<div class="absolute top-xs left-1/2 -translate-x-1/2 bg-surface/90 backdrop-blur-sm px-md py-xs rounded-full shadow-sm flex items-center gap-xs">
+<span class="material-symbols-outlined text-on-surface-variant text-sm" data-icon="touch_app">touch_app</span>
+<span class="font-metadata text-metadata text-on-surface-variant">Tap nodes to edit</span>
+</div>
+</div>
+<!-- Technical Data Cards -->
+<div class="flex flex-col gap-xs mt-sm">
+<h2 class="font-section-title text-section-title text-on-surface mb-xs">Extracted Measurements</h2>
+<!-- Item 1 -->
+<div class="bg-surface-l1 rounded-lg p-md shadow-sm border border-outline-variant flex items-center justify-between">
+<div class="flex items-center gap-md">
+<div class="w-10 h-10 rounded-full bg-surface-l2 flex items-center justify-center text-on-surface-variant">
+<span class="material-symbols-outlined" data-icon="square_foot">square_foot</span>
+</div>
+<div>
+<p class="font-metadata text-metadata text-on-surface-variant uppercase tracking-wider">Rafters Length</p>
+<p class="font-body-lg text-body-lg text-on-surface font-medium">14.5 ft</p>
+</div>
+</div>
+<button class="text-info font-label-md text-label-md bg-surface-l2 hover:bg-surface-variant px-sm py-xs rounded-md transition-colors">Verify</button>
+</div>
+<!-- Item 2 -->
+<div class="bg-brand-soft rounded-lg p-md shadow-sm border border-brand-red/20 flex items-center justify-between">
+<div class="flex items-center gap-md">
+<div class="w-10 h-10 rounded-full bg-surface-l1 flex items-center justify-center text-brand-strong">
+<span class="material-symbols-outlined" data-icon="texture">texture</span>
+</div>
+<div>
+<p class="font-metadata text-metadata text-brand-strong uppercase tracking-wider">Zinc Area</p>
+<p class="font-body-lg text-body-lg text-on-surface font-medium flex items-center gap-xs">
+<span class="material-symbols-outlined text-warning text-sm" data-icon="error">error</span>
+                            Low Confidence
+                        </p>
+</div>
+</div>
+<button class="text-brand-strong font-label-md text-label-md bg-surface-l1 hover:bg-surface-container px-sm py-xs rounded-md transition-colors border border-brand-red/30">Edit</button>
+</div>
+<!-- Item 3 -->
+<div class="bg-surface-l1 rounded-lg p-md shadow-sm border border-outline-variant flex items-center justify-between">
+<div class="flex items-center gap-md">
+<div class="w-10 h-10 rounded-full bg-surface-l2 flex items-center justify-center text-on-surface-variant">
+<span class="material-symbols-outlined" data-icon="height">height</span>
+</div>
+<div>
+<p class="font-metadata text-metadata text-on-surface-variant uppercase tracking-wider">Wall Height</p>
+<p class="font-body-lg text-body-lg text-on-surface font-medium">8.0 ft</p>
+</div>
+</div>
+<button class="text-info font-label-md text-label-md bg-surface-l2 hover:bg-surface-variant px-sm py-xs rounded-md transition-colors">Verify</button>
+</div>
+</div>
+</main>
+<!-- Bottom Action Area -->
+<div class="fixed bottom-0 w-full bg-surface-container-lowest border-t border-outline-variant p-gutter-phone pb-safe shadow-lg z-40">
+<button class="w-full h-target-min bg-brand-red hover:bg-brand-strong text-on-primary font-section-title text-section-title rounded-xl flex items-center justify-center gap-xs active:scale-95 transition-transform"><span class="material-symbols-outlined" data-icon="check_circle">check_circle</span> Synced</button>
+</div>
+
+
+</body></html>

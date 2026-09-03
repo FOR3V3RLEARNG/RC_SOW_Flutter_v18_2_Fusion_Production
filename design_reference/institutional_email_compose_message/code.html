@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Compose Email Modal - RC SOW Project</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;700;800;900&amp;family=Inter:wght@400;500&amp;family=JetBrains+Mono:wght@500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "tertiary-fixed": "#bee9ff",
+                        "on-tertiary-fixed": "#001f2a",
+                        "inverse-surface": "#3e2c2a",
+                        "surface-tint": "#ba1a20",
+                        "surface": "#fff8f7",
+                        "secondary-container": "#54a0fe",
+                        "surface-container-high": "#ffe2de",
+                        "surface-l2": "#F0F3F5",
+                        "secondary-fixed-dim": "#a5c8ff",
+                        "on-secondary-container": "#003567",
+                        "on-error-container": "#93000a",
+                        "on-surface": "#271816",
+                        "outline-variant": "#e4beba",
+                        "tertiary": "#005f7b",
+                        "error-container": "#ffdad6",
+                        "on-primary-fixed-variant": "#930010",
+                        "secondary": "#005faf",
+                        "surface-container": "#ffe9e7",
+                        "on-primary-fixed": "#410003",
+                        "success": "#2E7D32",
+                        "canvas-l0": "#F5F7F9",
+                        "inverse-on-surface": "#ffedeb",
+                        "primary-container": "#d32f2f",
+                        "secondary-fixed": "#d4e3ff",
+                        "on-tertiary": "#ffffff",
+                        "background": "#fff8f7",
+                        "brand-red": "#D32F2F",
+                        "brand-strong": "#B71C1C",
+                        "outline": "#8f6f6c",
+                        "surface-l1": "#FFFFFF",
+                        "surface-bright": "#fff8f7",
+                        "error": "#C62828",
+                        "inverse-primary": "#ffb3ac",
+                        "surface-container-lowest": "#ffffff",
+                        "brand-soft": "#FFEBEE",
+                        "surface-container-highest": "#f9dcd9",
+                        "on-secondary-fixed-variant": "#004786",
+                        "on-secondary": "#ffffff",
+                        "on-primary": "#ffffff",
+                        "on-tertiary-fixed-variant": "#004d65",
+                        "primary-fixed": "#ffdad6",
+                        "on-background": "#271816",
+                        "on-primary-container": "#fff2f0",
+                        "surface-container-low": "#fff0ef",
+                        "on-error": "#ffffff",
+                        "primary-fixed-dim": "#ffb3ac",
+                        "primary": "#af101a",
+                        "warning": "#FFA000",
+                        "info": "#0288D1",
+                        "on-secondary-fixed": "#001c3a",
+                        "surface-dim": "#f1d3d0",
+                        "on-tertiary-container": "#e9f7ff",
+                        "surface-variant": "#f9dcd9",
+                        "tertiary-container": "#00799c",
+                        "on-surface-variant": "#5b403d",
+                        "tertiary-fixed-dim": "#7bd1f8"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px",
+                        "8px": "8px"
+                    },
+                    "spacing": {
+                        "gutter-phone": "16px",
+                        "base": "4px",
+                        "md": "16px",
+                        "sm": "12px",
+                        "lg": "24px",
+                        "xl": "32px",
+                        "xs": "8px",
+                        "gutter-tablet": "24px",
+                        "target-min": "48px"
+                    },
+                    "fontFamily": {
+                        "headline-md": ["Hanken Grotesk"],
+                        "section-title": ["Hanken Grotesk"],
+                        "hero-title": ["Hanken Grotesk"],
+                        "label-md": ["JetBrains Mono"],
+                        "metadata": ["Inter"],
+                        "headline-lg": ["Hanken Grotesk"],
+                        "hero-title-mobile": ["Hanken Grotesk"],
+                        "body-lg": ["Inter"],
+                        "body-md": ["Inter"]
+                    },
+                    "fontSize": {
+                        "headline-md": ["20px", { "lineHeight": "28px", "fontWeight": "750" }],
+                        "section-title": ["18px", { "lineHeight": "24px", "fontWeight": "700" }],
+                        "hero-title": ["32px", { "lineHeight": "36px", "letterSpacing": "-0.02em", "fontWeight": "900" }],
+                        "label-md": ["13px", { "lineHeight": "16px", "fontWeight": "500" }],
+                        "metadata": ["12px", { "lineHeight": "16px", "fontWeight": "500" }],
+                        "headline-lg": ["24px", { "lineHeight": "32px", "fontWeight": "800" }],
+                        "hero-title-mobile": ["28px", { "lineHeight": "32px", "fontWeight": "900" }],
+                        "body-lg": ["17px", { "lineHeight": "26px", "fontWeight": "400" }],
+                        "body-md": ["15px", { "lineHeight": "22px", "fontWeight": "400" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .material-symbols-outlined[data-weight="fill"] {
+            font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+</head>
+<body class="bg-canvas-l0 text-on-surface font-body-md h-screen w-screen overflow-hidden flex font-body-md text-body-md">
+<!-- Background Context (Simulated Desktop App) -->
+<div class="flex flex-col w-full h-full relative z-0 opacity-50 blur-sm pointer-events-none">
+<!-- TopAppBar Placeholder -->
+<header class="w-full top-0 sticky bg-surface shadow-sm flex items-center justify-between px-gutter-phone h-target-min border-b border-outline-variant z-10">
+<div class="flex items-center gap-md">
+<button class="text-on-surface-variant hover:bg-surface-variant rounded-full p-xs transition-colors h-target-min w-target-min flex items-center justify-center">
+<span class="material-symbols-outlined">menu</span>
+</button>
+<h1 class="font-headline-md text-headline-md font-black text-brand-strong">RC SOW Project</h1>
+</div>
+</header>
+<div class="flex flex-1 overflow-hidden">
+<!-- SideNav Placeholder -->
+<nav class="hidden lg:flex flex-col h-full w-64 border-r border-outline-variant bg-surface-container-low p-md gap-xs shrink-0">
+<div class="mb-lg">
+<h2 class="font-headline-lg text-headline-lg text-brand-strong">Navigation Drawer</h2>
+</div>
+<div class="flex flex-col gap-sm">
+<div class="flex items-center gap-md text-on-surface-variant px-md py-sm rounded-lg opacity-50"><span class="material-symbols-outlined">inbox</span><span>Inbox</span></div>
+</div>
+</nav>
+<!-- Main Content Area Placeholder -->
+<main class="flex-1 p-lg overflow-y-auto">
+<div class="bg-surface-l1 shadow-sm border border-outline-variant rounded-lg p-lg mb-md h-64"></div>
+<div class="bg-surface-l1 shadow-sm border border-outline-variant rounded-lg p-lg h-64"></div>
+</main>
+</div>
+</div>
+<!-- Modal Overlay -->
+<div class="absolute inset-0 z-50 flex items-end sm:items-center justify-end sm:justify-center pointer-events-none p-4 sm:p-lg">
+<!-- Compose Email Modal Container -->
+<div class="pointer-events-auto bg-surface-container-lowest w-full sm:w-[600px] md:w-[720px] h-[921px] sm:h-[600px] flex flex-col rounded-t-xl sm:rounded-8px shadow-2xl border border-outline-variant overflow-hidden transform transition-all duration-300 ease-out translate-y-0" style="box-shadow: 0 24px 38px 3px rgba(0,0,0,0.14), 0 9px 46px 8px rgba(0,0,0,0.12), 0 11px 15px -7px rgba(0,0,0,0.2);">
+<!-- Modal Header -->
+<header class="bg-surface-container-lowest border-b border-outline-variant px-md h-[48px] flex items-center justify-between shrink-0 rounded-t-8px">
+<h2 class="font-headline-md text-headline-md text-on-surface">New Message</h2>
+<div class="flex items-center gap-xs">
+<button aria-label="Minimize" class="text-on-surface-variant hover:bg-surface-variant hover:text-on-surface rounded p-[6px] transition-colors focus:outline-none focus:ring-2 focus:ring-primary-container">
+<span class="material-symbols-outlined text-[20px]" data-icon="minimize">minimize</span>
+</button>
+<button aria-label="Full Screen" class="text-on-surface-variant hover:bg-surface-variant hover:text-on-surface rounded p-[6px] transition-colors focus:outline-none focus:ring-2 focus:ring-primary-container">
+<span class="material-symbols-outlined text-[20px]" data-icon="open_in_full">open_in_full</span>
+</button>
+<button aria-label="Close" class="text-on-surface-variant hover:bg-error-container hover:text-on-error-container rounded p-[6px] transition-colors focus:outline-none focus:ring-2 focus:ring-error">
+<span class="material-symbols-outlined text-[20px]" data-icon="close">close</span>
+</button>
+</div>
+</header>
+<!-- Recipients & Subject -->
+<div class="flex flex-col shrink-0 border-b border-outline-variant bg-surface-container-lowest">
+<!-- To Field -->
+<div class="flex items-start px-md py-sm border-b border-outline-variant min-h-[48px]">
+<span class="font-label-md text-label-md text-on-surface-variant w-[40px] pt-1">To</span>
+<div class="flex-1 flex flex-wrap gap-xs items-center">
+<!-- Chip 1 -->
+<div class="flex items-center bg-brand-soft text-brand-strong border border-outline-variant rounded-full px-[8px] py-[2px] font-body-md text-body-md h-[28px]">
+<span class="truncate max-w-[150px]">HQ Coordination</span>
+<button class="ml-[4px] text-brand-strong hover:text-primary rounded-full focus:outline-none flex items-center justify-center">
+<span class="material-symbols-outlined text-[16px]" data-icon="close">close</span>
+</button>
+</div>
+<!-- Chip 2 -->
+<div class="flex items-center bg-surface-variant text-on-surface-variant border border-outline-variant rounded-full px-[8px] py-[2px] font-body-md text-body-md h-[28px]">
+<span class="truncate max-w-[150px]">Ministry of Infrastructure</span>
+<button class="ml-[4px] text-on-surface-variant hover:text-on-surface rounded-full focus:outline-none flex items-center justify-center">
+<span class="material-symbols-outlined text-[16px]" data-icon="close">close</span>
+</button>
+</div>
+<input class="flex-1 min-w-[120px] bg-transparent border-none focus:ring-0 p-0 font-body-md text-body-md text-on-surface placeholder:text-on-surface-variant opacity-70 h-[28px]" placeholder="Add recipient..." type="text"/>
+</div>
+</div>
+<!-- Subject Field -->
+<div class="flex items-center px-md py-sm h-[48px]">
+<input class="w-full bg-transparent border-none focus:ring-0 p-0 font-body-lg text-body-lg text-on-surface placeholder:text-on-surface-variant font-semibold" placeholder="Subject" type="text"/>
+</div>
+</div>
+<!-- Body Editor -->
+<div class="flex-1 flex flex-col relative bg-surface-l1">
+<textarea class="flex-1 w-full resize-none bg-transparent border-none focus:ring-0 p-md font-body-md text-body-md text-on-surface placeholder:text-on-surface-variant" placeholder="Compose email..."></textarea>
+<!-- Formatting Toolbar -->
+<div class="absolute bottom-0 left-0 w-full px-md py-sm flex items-center gap-xs bg-surface-l1/90 backdrop-blur-sm border-t border-outline-variant border-opacity-50">
+<button class="text-on-surface-variant hover:bg-surface-variant rounded p-[6px] transition-colors focus:outline-none">
+<span class="material-symbols-outlined text-[20px]" data-icon="format_bold">format_bold</span>
+</button>
+<button class="text-on-surface-variant hover:bg-surface-variant rounded p-[6px] transition-colors focus:outline-none">
+<span class="material-symbols-outlined text-[20px]" data-icon="format_italic">format_italic</span>
+</button>
+<button class="text-on-surface-variant hover:bg-surface-variant rounded p-[6px] transition-colors focus:outline-none">
+<span class="material-symbols-outlined text-[20px]" data-icon="format_underlined">format_underlined</span>
+</button>
+<div class="w-[1px] h-[20px] bg-outline-variant mx-xs"></div>
+<button class="text-on-surface-variant hover:bg-surface-variant rounded p-[6px] transition-colors focus:outline-none">
+<span class="material-symbols-outlined text-[20px]" data-icon="link">link</span>
+</button>
+<button class="text-on-surface-variant hover:bg-surface-variant rounded p-[6px] transition-colors focus:outline-none">
+<span class="material-symbols-outlined text-[20px]" data-icon="format_list_bulleted">format_list_bulleted</span>
+</button>
+<button class="text-on-surface-variant hover:bg-surface-variant rounded p-[6px] transition-colors focus:outline-none">
+<span class="material-symbols-outlined text-[20px]" data-icon="format_list_numbered">format_list_numbered</span>
+</button>
+</div>
+</div>
+<!-- Action Bar (Bottom) -->
+<footer class="bg-surface-container-lowest border-t border-outline-variant px-md py-sm flex items-center justify-between shrink-0 rounded-b-8px min-h-[64px]">
+<div class="flex items-center gap-sm">
+<button class="bg-brand-red hover:bg-brand-strong text-on-primary font-section-title text-section-title uppercase px-lg py-xs rounded-full h-[40px] flex items-center justify-center transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-red active:scale-95">
+                        Send
+                    </button>
+<div class="flex items-center gap-xs ml-sm text-on-surface-variant">
+<button aria-label="Attach files" class="hover:bg-surface-variant hover:text-on-surface rounded-full p-xs transition-colors focus:outline-none h-[40px] w-[40px] flex items-center justify-center">
+<span class="material-symbols-outlined" data-icon="attach_file">attach_file</span>
+</button>
+<button aria-label="Insert link" class="hover:bg-surface-variant hover:text-on-surface rounded-full p-xs transition-colors focus:outline-none h-[40px] w-[40px] flex items-center justify-center">
+<span class="material-symbols-outlined" data-icon="add_link">add_link</span>
+</button>
+<button aria-label="Emoji" class="hover:bg-surface-variant hover:text-on-surface rounded-full p-xs transition-colors focus:outline-none h-[40px] w-[40px] flex items-center justify-center">
+<span class="material-symbols-outlined" data-icon="sentiment_satisfied">sentiment_satisfied</span>
+</button>
+<button aria-label="Drive" class="hover:bg-surface-variant hover:text-on-surface rounded-full p-xs transition-colors focus:outline-none h-[40px] w-[40px] flex items-center justify-center">
+<span class="material-symbols-outlined" data-icon="add_to_drive">add_to_drive</span>
+</button>
+</div>
+</div>
+<div>
+<button aria-label="Delete/Discard" class="text-on-surface-variant hover:text-error hover:bg-error-container rounded-full p-xs transition-colors focus:outline-none h-[40px] w-[40px] flex items-center justify-center">
+<span class="material-symbols-outlined" data-icon="delete">delete</span>
+</button>
+</div>
+</footer>
+</div>
+</div>
+</body></html>

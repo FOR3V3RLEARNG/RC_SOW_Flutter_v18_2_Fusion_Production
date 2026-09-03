@@ -1,0 +1,45 @@
+name: RC SOW Connected Green Gate
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v6
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+      - name: Generate platform scaffolding
+        run: flutter create --platforms=android,web --project-name=rc_sow_connected .
+      - name: Resolve dependencies
+        run: flutter pub get
+      - name: Format source
+        run: dart format lib test
+      - name: Analyze
+        run: flutter analyze
+      - name: Test
+        run: flutter test
+      - name: Build web
+        run: flutter build web --release
+      - name: Upload web preview
+        uses: actions/upload-artifact@v7
+        with:
+          name: RC-SOW-v19.1.0-Web-Preview
+          path: build/web
+          if-no-files-found: error
+          retention-days: 30
+      - name: Build Android APK
+        run: flutter build apk --release
+      - name: Upload Android APK
+        uses: actions/upload-artifact@v7
+        with:
+          name: RC-SOW-v19.1.0-Android-APK
+          path: build/app/outputs/flutter-apk/app-release.apk
+          if-no-files-found: error
+          retention-days: 30

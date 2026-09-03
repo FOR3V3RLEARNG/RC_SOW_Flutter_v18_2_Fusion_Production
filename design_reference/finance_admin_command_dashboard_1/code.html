@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>RC SOW Command - Finance &amp; Admin</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;700;800;900&amp;family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "primary-fixed-dim": "#ffb3ac",
+                    "on-error-container": "#93000a",
+                    "brand-strong": "#B71C1C",
+                    "brand-red": "#D32F2F",
+                    "on-primary-container": "#fff2f0",
+                    "error-container": "#ffdad6",
+                    "secondary-container": "#54a0fe",
+                    "on-tertiary-fixed": "#001f2a",
+                    "tertiary-fixed-dim": "#7bd1f8",
+                    "surface-tint": "#ba1a20",
+                    "on-tertiary": "#ffffff",
+                    "error": "#C62828",
+                    "primary-container": "#d32f2f",
+                    "success": "#2E7D32",
+                    "on-secondary-fixed-variant": "#004786",
+                    "primary": "#af101a",
+                    "tertiary-container": "#00799c",
+                    "canvas-l0": "#F5F7F9",
+                    "surface-dim": "#f1d3d0",
+                    "surface-container-lowest": "#ffffff",
+                    "tertiary": "#005f7b",
+                    "tertiary-fixed": "#bee9ff",
+                    "inverse-on-surface": "#ffedeb",
+                    "surface": "#fff8f7",
+                    "background": "#fff8f7",
+                    "on-tertiary-fixed-variant": "#004d65",
+                    "warning": "#FFA000",
+                    "on-surface": "#271816",
+                    "brand-soft": "#FFEBEE",
+                    "on-secondary-fixed": "#001c3a",
+                    "on-tertiary-container": "#e9f7ff",
+                    "surface-container-low": "#fff0ef",
+                    "surface-container": "#ffe9e7",
+                    "on-secondary-container": "#003567",
+                    "on-surface-variant": "#5b403d",
+                    "secondary-fixed": "#d4e3ff",
+                    "on-primary": "#ffffff",
+                    "surface-l1": "#FFFFFF",
+                    "on-primary-fixed-variant": "#930010",
+                    "on-secondary": "#ffffff",
+                    "secondary": "#005faf",
+                    "on-error": "#ffffff",
+                    "surface-l2": "#F0F3F5",
+                    "on-background": "#271816",
+                    "primary-fixed": "#ffdad6",
+                    "inverse-surface": "#3e2c2a",
+                    "surface-container-high": "#ffe2de",
+                    "surface-bright": "#fff8f7",
+                    "on-primary-fixed": "#410003",
+                    "surface-variant": "#f9dcd9",
+                    "info": "#0288D1",
+                    "secondary-fixed-dim": "#a5c8ff",
+                    "outline": "#8f6f6c",
+                    "inverse-primary": "#ffb3ac",
+                    "surface-container-highest": "#f9dcd9",
+                    "outline-variant": "#e4beba"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "gutter-phone": "16px",
+                    "xl": "32px",
+                    "target-min": "48px",
+                    "md": "16px",
+                    "base": "4px",
+                    "xs": "8px",
+                    "gutter-tablet": "24px",
+                    "lg": "24px",
+                    "sm": "12px"
+            },
+            "fontFamily": {
+                    "section-title": [
+                            "Hanken Grotesk"
+                    ],
+                    "metadata": [
+                            "Inter"
+                    ],
+                    "body-lg": [
+                            "Inter"
+                    ],
+                    "hero-title-mobile": [
+                            "Hanken Grotesk"
+                    ],
+                    "headline-lg": [
+                            "Hanken Grotesk"
+                    ],
+                    "body-md": [
+                            "Inter"
+                    ],
+                    "headline-md": [
+                            "Hanken Grotesk"
+                    ],
+                    "hero-title": [
+                            "Hanken Grotesk"
+                    ],
+                    "label-md": [
+                            "JetBrains Mono"
+                    ]
+            },
+            "fontSize": {
+                    "section-title": [
+                            "18px",
+                            {
+                                    "lineHeight": "24px",
+                                    "fontWeight": "700"
+                            }
+                    ],
+                    "metadata": [
+                            "12px",
+                            {
+                                    "lineHeight": "16px",
+                                    "fontWeight": "500"
+                            }
+                    ],
+                    "body-lg": [
+                            "17px",
+                            {
+                                    "lineHeight": "26px",
+                                    "fontWeight": "400"
+                            }
+                    ],
+                    "hero-title-mobile": [
+                            "28px",
+                            {
+                                    "lineHeight": "32px",
+                                    "fontWeight": "900"
+                            }
+                    ],
+                    "headline-lg": [
+                            "24px",
+                            {
+                                    "lineHeight": "32px",
+                                    "fontWeight": "800"
+                            }
+                    ],
+                    "body-md": [
+                            "15px",
+                            {
+                                    "lineHeight": "22px",
+                                    "fontWeight": "400"
+                            }
+                    ],
+                    "headline-md": [
+                            "20px",
+                            {
+                                    "lineHeight": "28px",
+                                    "fontWeight": "750"
+                            }
+                    ],
+                    "hero-title": [
+                            "32px",
+                            {
+                                    "lineHeight": "36px",
+                                    "letterSpacing": "-0.02em",
+                                    "fontWeight": "900"
+                            }
+                    ],
+                    "label-md": [
+                            "13px",
+                            {
+                                    "lineHeight": "16px",
+                                    "fontWeight": "500"
+                            }
+                    ]
+            }
+    },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .material-symbols-outlined.fill {
+            font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        
+        /* Subtle scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background-color: theme('colors.outline-variant');
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body class="bg-canvas-l0 text-on-surface min-h-screen flex flex-col md:flex-row overflow-x-hidden font-body-md text-body-md">
+<!-- SIDE NAVIGATION (Desktop Only) -->
+<nav class="hidden lg:flex flex-col h-full py-lg bg-surface-container-low dark:bg-surface-container-lowest border-r border-outline-variant h-screen w-80 rounded-r-xl fixed top-0 left-0 z-40">
+<div class="px-lg mb-xl">
+<h1 class="font-headline-lg text-headline-lg font-extrabold text-primary">RC SOW Command</h1>
+</div>
+<div class="flex-1 flex flex-col gap-base overflow-y-auto px-sm">
+<a class="text-on-surface-variant hover:bg-surface-variant rounded-lg mx-2 my-1 px-4 py-3 flex items-center gap-md transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span class="font-label-md text-label-md">Production Hub</span>
+</a>
+<a class="text-on-surface-variant hover:bg-surface-variant rounded-lg mx-2 my-1 px-4 py-3 flex items-center gap-md transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="fact_check">fact_check</span>
+<span class="font-label-md text-label-md">Evidence Audit</span>
+</a>
+<a class="text-on-surface-variant hover:bg-surface-variant rounded-lg mx-2 my-1 px-4 py-3 flex items-center gap-md transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="inventory_2">inventory_2</span>
+<span class="font-label-md text-label-md">Inventory</span>
+</a>
+<a class="bg-primary-container text-on-primary-container rounded-lg mx-2 my-1 px-4 py-3 flex items-center gap-md translate-x-1 transition-transform" href="#">
+<span class="material-symbols-outlined fill" data-icon="payments">payments</span>
+<span class="font-label-md text-label-md">Financials</span>
+</a>
+<a class="text-on-surface-variant hover:bg-surface-variant rounded-lg mx-2 my-1 px-4 py-3 flex items-center gap-md transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="group">group</span>
+<span class="font-label-md text-label-md">Team Performance</span>
+</a>
+</div>
+<div class="mt-auto px-lg pt-lg border-t border-outline-variant">
+<div class="flex items-center gap-sm">
+<img class="w-10 h-10 rounded-full object-cover" data-alt="A close up, professional headshot of a middle-aged woman with short grey hair wearing a high visibility vest over a crisp white button down shirt. The lighting is bright, clear, and modern, casting very soft shadows suitable for a clean light-mode user interface. The background is a stark, smooth white to ensure the focus remains purely on her dependable expression." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBd3jN0q_-50C15l55TXwVIgXhXNULqRVPcELKLqDLwEuZTdckS8Od8tohBsSFXPBNiFV8OUHUHCOQBoxKi8nuE-eRda1WXixdvp39l97fn2YmWKhTNxT0rP7qbSHVNRZuFTRNzaQWtvEb34b_4g6G4ChOoO2YuzpdAY_m33LgrxZzkHqm66tsk0vSpDuylOp6P3fDFJmgU9BDUIV09yokIF225aDlAQB_lmNC7Am8pAUTCmPbkNnBlSA"/>
+<div>
+<p class="font-section-title text-section-title text-sm">Elena Rostova</p>
+<p class="font-metadata text-metadata text-on-surface-variant">Regional Commander</p>
+</div>
+</div>
+</div>
+</nav>
+<!-- TOP APP BAR (Mobile Only) -->
+<header class="flex justify-between items-center w-full px-gutter-phone h-target-min z-50 bg-surface dark:bg-surface-dim shadow-sm docked full-width top-0 lg:hidden fixed top-0">
+<div class="flex items-center gap-sm">
+<span class="material-symbols-outlined text-primary" data-icon="roofing">roofing</span>
+<span class="font-hero-title text-hero-title-mobile font-black text-primary dark:text-primary-fixed-dim tracking-tight">RC SOW Operations</span>
+</div>
+<img class="w-8 h-8 rounded-full object-cover" data-alt="A close up, professional headshot of a middle-aged woman with short grey hair wearing a high visibility vest over a crisp white button down shirt. The lighting is bright, clear, and modern, casting very soft shadows suitable for a clean light-mode user interface. The background is a stark, smooth white to ensure the focus remains purely on her dependable expression." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAAv6eqvUsKdptRtrryWCA0Yc8OOkCmTpZrY_Z7ybMDq4GoTEyXagCMjCf7TnDysL-F70B5ajQ474Q49H60QA-Tt3fiahjUW46v96uwc5hxCIdYZ8vn2LEskdyCKCjkfBHBhb0kHLXPD0EbEDjbXKqH_84wHOf1-luObJbT6ICllS6qr5qdoDrRVCFj1GYcEt4hF8qZYoC1DPyJ9FLtadehwQWvTTBlAN9mujd4XkG1_T57pp1YQ-sx1A"/>
+</header>
+<!-- MAIN CONTENT -->
+<main class="flex-1 w-full lg:ml-80 pt-[60px] lg:pt-0 pb-24 lg:pb-0 min-h-screen">
+<!-- Header Section -->
+<div class="px-gutter-phone md:px-gutter-tablet py-xl bg-surface-l1 shadow-[0_4px_16px_rgba(0,0,0,0.02)] relative overflow-hidden">
+<!-- Decorative Subtle Roof Cut -->
+<div class="absolute -top-20 -right-20 w-64 h-64 bg-brand-soft rounded-full opacity-50 blur-3xl -z-10 pointer-events-none"></div>
+<div class="flex flex-col md:flex-row md:items-end justify-between gap-md max-w-[1600px] mx-auto">
+<div>
+<div class="flex items-center gap-xs mb-1">
+<span class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">Dashboard</span>
+<span class="material-symbols-outlined text-on-surface-variant text-sm">chevron_right</span>
+<span class="font-label-md text-label-md text-primary font-bold">Finance &amp; Admin</span>
+</div>
+<h2 class="font-hero-title text-hero-title text-on-surface">Financial Command Center</h2>
+<p class="font-body-lg text-body-lg text-on-surface-variant mt-2 max-w-2xl">Real-time overview of project budgets, administrative logs, and team attendance metrics.</p>
+</div>
+<div class="flex gap-sm mt-4 md:mt-0">
+<button class="h-target-min px-6 rounded-lg border-2 border-outline text-on-surface font-label-md text-label-md font-bold uppercase hover:bg-surface-variant transition-colors flex items-center gap-xs">
+<span class="material-symbols-outlined" data-icon="download">download</span>
+                        Export Report
+                    </button>
+<button class="h-target-min px-6 rounded-lg bg-brand-red text-on-primary font-label-md text-label-md font-bold uppercase hover:bg-primary transition-colors shadow-sm flex items-center gap-xs">
+<span class="material-symbols-outlined" data-icon="add">add</span>
+                        New Payment Req
+                    </button>
+</div>
+</div>
+</div>
+<div class="px-gutter-phone md:px-gutter-tablet py-xl max-w-[1600px] mx-auto flex flex-col gap-xl">
+<!-- 1. Finance Depth (Summary Tiles) -->
+<section class="grid grid-cols-1 md:grid-cols-3 gap-md">
+<!-- Budget Tile -->
+<div class="bg-surface-l1 rounded-xl p-lg border border-outline-variant shadow-sm relative overflow-hidden group hover:shadow-md transition-shadow">
+<div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+<span class="material-symbols-outlined text-6xl text-primary">account_balance</span>
+</div>
+<div class="flex justify-between items-start mb-4">
+<h3 class="font-section-title text-section-title text-on-surface-variant">Total Project Budget</h3>
+<span class="bg-surface-variant text-on-surface-variant px-2 py-1 rounded font-metadata text-metadata">Q3 2024</span>
+</div>
+<div class="mb-4">
+<p class="font-hero-title text-hero-title text-on-surface">$2,450,000</p>
+<p class="font-metadata text-metadata text-success flex items-center gap-1 mt-1">
+<span class="material-symbols-outlined text-sm">trending_up</span>
+                            +5.2% vs last quarter
+                        </p>
+</div>
+<div class="w-full bg-surface-container h-2 rounded-full overflow-hidden">
+<div class="bg-primary h-full rounded-full" style="width: 65%;"></div>
+</div>
+<div class="flex justify-between mt-2 font-metadata text-metadata text-on-surface-variant">
+<span>$1.6M Allocated</span>
+<span>$850K Remaining</span>
+</div>
+</div>
+<!-- Payments Tile -->
+<div class="bg-surface-l1 rounded-xl p-lg border border-outline-variant shadow-sm relative overflow-hidden group hover:shadow-md transition-shadow">
+<div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+<span class="material-symbols-outlined text-6xl text-warning">receipt_long</span>
+</div>
+<div class="flex justify-between items-start mb-4">
+<h3 class="font-section-title text-section-title text-on-surface-variant">Disbursed vs Pending</h3>
+<a class="text-secondary font-metadata text-metadata hover:underline flex items-center" href="#">View All <span class="material-symbols-outlined text-sm">arrow_forward</span></a>
+</div>
+<div class="flex gap-4 mb-4">
+<div class="flex-1">
+<p class="font-metadata text-metadata text-on-surface-variant mb-1">Disbursed</p>
+<p class="font-headline-lg text-headline-lg text-on-surface">$845,200</p>
+</div>
+<div class="w-px bg-outline-variant"></div>
+<div class="flex-1">
+<p class="font-metadata text-metadata text-on-surface-variant mb-1">Pending</p>
+<p class="font-headline-lg text-headline-lg text-warning">$124,500</p>
+</div>
+</div>
+<div class="flex gap-1 h-2 rounded-full overflow-hidden">
+<div class="bg-success h-full" style="width: 87%;"></div>
+<div class="bg-warning h-full" style="width: 13%;"></div>
+</div>
+<div class="mt-4 flex gap-2">
+<span class="bg-surface-variant text-on-surface-variant px-2 py-1 rounded font-metadata text-metadata">42 Paid</span>
+<span class="bg-warning/20 text-warning px-2 py-1 rounded font-metadata text-metadata">8 Pending Approvals</span>
+</div>
+</div>
+<!-- Safety Bonus Tile -->
+<div class="bg-surface-l1 rounded-xl p-lg border border-outline-variant shadow-sm relative overflow-hidden group hover:shadow-md transition-shadow">
+<div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+<span class="material-symbols-outlined text-6xl text-success">health_and_safety</span>
+</div>
+<div class="flex justify-between items-start mb-4">
+<h3 class="font-section-title text-section-title text-on-surface-variant">Safety Bonus Accruals</h3>
+<span class="bg-success/10 text-success px-2 py-1 rounded font-metadata text-metadata flex items-center gap-1">
+<span class="material-symbols-outlined text-sm">check_circle</span> On Track
+                        </span>
+</div>
+<div class="mb-4">
+<p class="font-hero-title text-hero-title text-on-surface">$45,000</p>
+<p class="font-metadata text-metadata text-on-surface-variant mt-1">Accrued across 12 active teams</p>
+</div>
+<div class="space-y-3 mt-6">
+<div class="flex justify-between items-center text-sm">
+<span class="font-body-md text-on-surface flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-success"></span> Sector A (Alpha)</span>
+<span class="font-label-md text-label-md">$15,000</span>
+</div>
+<div class="flex justify-between items-center text-sm">
+<span class="font-body-md text-on-surface flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-success"></span> Sector B (Bravo)</span>
+<span class="font-label-md text-label-md">$18,500</span>
+</div>
+<div class="flex justify-between items-center text-sm opacity-60">
+<span class="font-body-md text-on-surface flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-warning"></span> Sector C (Charlie)</span>
+<span class="font-label-md text-label-md">$11,500</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Middle Section: Bento Grid Layout -->
+<section class="grid grid-cols-1 lg:grid-cols-3 gap-md">
+<!-- 2. Admin Logs Connection (Takes up 2 columns) -->
+<div class="lg:col-span-2 bg-surface-l1 rounded-xl border border-outline-variant shadow-sm flex flex-col h-[500px]">
+<div class="p-lg border-b border-outline-variant flex justify-between items-center bg-surface-l2/50 rounded-t-xl">
+<div class="flex items-center gap-sm">
+<span class="material-symbols-outlined text-primary">history</span>
+<h3 class="font-section-title text-section-title text-on-surface">Recent Administrative Actions</h3>
+</div>
+<a class="text-secondary font-label-md text-label-md hover:underline uppercase flex items-center gap-1" href="#">
+                            Full Audit Log <span class="material-symbols-outlined text-sm">open_in_new</span>
+</a>
+</div>
+<div class="flex-1 overflow-y-auto p-0">
+<table class="w-full text-left border-collapse">
+<thead class="bg-surface-l2 sticky top-0 z-10">
+<tr>
+<th class="px-4 py-3 font-metadata text-metadata text-on-surface-variant font-semibold border-b border-outline-variant">Timestamp</th>
+<th class="px-4 py-3 font-metadata text-metadata text-on-surface-variant font-semibold border-b border-outline-variant">Action</th>
+<th class="px-4 py-3 font-metadata text-metadata text-on-surface-variant font-semibold border-b border-outline-variant">User</th>
+<th class="px-4 py-3 font-metadata text-metadata text-on-surface-variant font-semibold border-b border-outline-variant">Status</th>
+</tr>
+</thead>
+<tbody class="font-body-md text-body-md">
+<tr class="hover:bg-surface-container-lowest transition-colors border-b border-outline-variant/50">
+<td class="px-4 py-3 font-label-md text-label-md text-on-surface-variant">10:42 AM, Today</td>
+<td class="px-4 py-3">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-sm text-info">edit_document</span>
+<span>Template 'SOW-Phase2' updated</span>
+</div>
+</td>
+<td class="px-4 py-3 flex items-center gap-2">
+<img class="w-6 h-6 rounded-full object-cover" data-alt="A small thumbnail profile picture of a young male administrator wearing glasses and a neat blue polo shirt, shot against a bright white background. Soft, diffused lighting, modern corporate style." src="https://lh3.googleusercontent.com/aida-public/AB6AXuD39P8Qv265er9WigMLDD_x37PQWG2BZpgIa_hIrQR9deyaCc6qyr3qyma0M1WgyHB5VAr9ja4QNVT_7wJCtBFFFnxBQFgJUdUKIJUoGO-euS5Pb9Bn-JepwMf3arUj0nI-EK-p1gv9R8KVokvcLBrMYmRXx0arWrd0FVljhzLdMj8_yyhVnjfLUKAEdwIv-nsJgU54uJvaBPp7OiB97QmHJbjPb9qvUX0ecH7z-St-lNRUN6ExyQUjDA"/>
+                                        M. Chen
+                                    </td>
+<td class="px-4 py-3"><span class="bg-success/10 text-success px-2 py-1 rounded font-metadata text-metadata">Completed</span></td>
+</tr>
+<tr class="hover:bg-surface-container-lowest transition-colors border-b border-outline-variant/50">
+<td class="px-4 py-3 font-label-md text-label-md text-on-surface-variant">09:15 AM, Today</td>
+<td class="px-4 py-3">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-sm text-warning">verified_user</span>
+<span>Role change: S. Davis to 'Inspector'</span>
+</div>
+</td>
+<td class="px-4 py-3 flex items-center gap-2">
+<img class="w-6 h-6 rounded-full object-cover" data-alt="A close up, professional headshot of a middle-aged woman with short grey hair wearing a high visibility vest over a crisp white button down shirt. The lighting is bright, clear, and modern, casting very soft shadows suitable for a clean light-mode user interface. The background is a stark, smooth white to ensure the focus remains purely on her dependable expression." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBK_1w-j8dBn9L9wUgnsujjhQogRDFwDf8uWMe0UduOb-Ghsvd_4Z16Uk9BC11ZnyxFAAc7AD2CIAvn60scElTZaFTMh6md2NILGhS6-zpM682ZJZ87j53rSAf0eZCx5ogAUpAlgm6eEBD6yUIoxRgMco-Q9nOWeCtrahqPAz9FHYvGp7XQIp4AvWMBCP7w86zrCVfxcvn89jM7-hwtUbvYipHIiynG5YWb9IhIhTtn2-G5_SsG1e5R7A"/>
+                                        E. Rostova
+                                    </td>
+<td class="px-4 py-3"><span class="bg-success/10 text-success px-2 py-1 rounded font-metadata text-metadata">Approved</span></td>
+</tr>
+<tr class="hover:bg-surface-container-lowest transition-colors border-b border-outline-variant/50">
+<td class="px-4 py-3 font-label-md text-label-md text-on-surface-variant">16:30 PM, Yesterday</td>
+<td class="px-4 py-3">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-sm text-brand-red">payments</span>
+<span>Payment Req #REQ-8892</span>
+</div>
+</td>
+<td class="px-4 py-3 flex items-center gap-2">
+<div class="w-6 h-6 rounded-full bg-surface-variant flex items-center justify-center text-xs font-bold text-on-surface-variant">JD</div>
+                                        J. Doe
+                                    </td>
+<td class="px-4 py-3"><span class="bg-warning/20 text-warning px-2 py-1 rounded font-metadata text-metadata">Pending Sec. Auth</span></td>
+</tr>
+<tr class="hover:bg-surface-container-lowest transition-colors border-b border-outline-variant/50">
+<td class="px-4 py-3 font-label-md text-label-md text-on-surface-variant">14:20 PM, Yesterday</td>
+<td class="px-4 py-3">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-sm text-info">settings</span>
+<span>System configuration sync</span>
+</div>
+</td>
+<td class="px-4 py-3 flex items-center gap-2">
+<span class="material-symbols-outlined text-on-surface-variant">memory</span>
+                                        System
+                                    </td>
+<td class="px-4 py-3"><span class="bg-success/10 text-success px-2 py-1 rounded font-metadata text-metadata">Completed</span></td>
+</tr>
+<tr class="hover:bg-surface-container-lowest transition-colors">
+<td class="px-4 py-3 font-label-md text-label-md text-on-surface-variant">11:05 AM, Yesterday</td>
+<td class="px-4 py-3">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-sm text-error">cancel</span>
+<span>Rejected vendor invoice #INV-221</span>
+</div>
+</td>
+<td class="px-4 py-3 flex items-center gap-2">
+<img class="w-6 h-6 rounded-full object-cover" data-alt="A small thumbnail profile picture of a young male administrator wearing glasses and a neat blue polo shirt, shot against a bright white background. Soft, diffused lighting, modern corporate style." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBg1boQwse7f4VZunadVMTyum6Gi-xg-LWMpBHtCckU-m2nfWOl2ytXG1S1PO1ugkMJ9OvwM7tWMv96XeH5mTUNz0DXLgauccMaWuWKKRgtfJ2s828DDYoHdcXY9ylgcOQ6RA56Nha6haoA229EX3ki-yRaVxufQql8dyozf_AZZuUExtPgQaL0op0VVjerCYwOGG60pr_6S1uELcvB0Oa3lAn1yfo3VCpYaNG5QevN1ccU74xUJYEeow"/>
+                                        M. Chen
+                                    </td>
+<td class="px-4 py-3"><span class="bg-error/10 text-error px-2 py-1 rounded font-metadata text-metadata">Rejected</span></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<!-- 3. Work Clock-in & Attendance -->
+<div class="bg-surface-l1 rounded-xl border border-outline-variant shadow-sm p-lg flex flex-col h-[500px]">
+<div class="flex justify-between items-center mb-6">
+<div class="flex items-center gap-sm">
+<span class="material-symbols-outlined text-primary">schedule</span>
+<h3 class="font-section-title text-section-title text-on-surface">Workforce Pulse</h3>
+</div>
+<button class="text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</div>
+<div class="grid grid-cols-2 gap-4 mb-6">
+<div class="bg-surface p-4 rounded-lg border border-outline-variant/50">
+<p class="font-metadata text-metadata text-on-surface-variant mb-1">Total Hours (Wk)</p>
+<p class="font-headline-md text-headline-md text-on-surface">1,420</p>
+</div>
+<div class="bg-surface p-4 rounded-lg border border-outline-variant/50">
+<p class="font-metadata text-metadata text-on-surface-variant mb-1">Avg Attendance</p>
+<p class="font-headline-md text-headline-md text-success">94%</p>
+</div>
+</div>
+<h4 class="font-metadata text-metadata text-on-surface-variant uppercase tracking-wider mb-3">Attendance by Sector</h4>
+<div class="space-y-4 flex-1 overflow-y-auto pr-2">
+<!-- Sector Item -->
+<div>
+<div class="flex justify-between items-center mb-1">
+<span class="font-body-md text-on-surface">Alpha Sector</span>
+<span class="font-label-md text-label-md font-bold">98%</span>
+</div>
+<div class="w-full bg-surface-container h-2 rounded-full overflow-hidden">
+<div class="bg-success h-full rounded-full" style="width: 98%;"></div>
+</div>
+</div>
+<!-- Sector Item -->
+<div>
+<div class="flex justify-between items-center mb-1">
+<span class="font-body-md text-on-surface">Bravo Sector</span>
+<span class="font-label-md text-label-md font-bold">92%</span>
+</div>
+<div class="w-full bg-surface-container h-2 rounded-full overflow-hidden">
+<div class="bg-success h-full rounded-full" style="width: 92%;"></div>
+</div>
+</div>
+<!-- Sector Item -->
+<div>
+<div class="flex justify-between items-center mb-1">
+<span class="font-body-md text-on-surface">Charlie Sector</span>
+<span class="font-label-md text-label-md font-bold text-warning">84%</span>
+</div>
+<div class="w-full bg-surface-container h-2 rounded-full overflow-hidden">
+<div class="bg-warning h-full rounded-full" style="width: 84%;"></div>
+</div>
+<p class="font-metadata text-metadata text-warning mt-1 flex items-center gap-1">
+<span class="material-symbols-outlined text-[12px]">warning</span> Alert: Below 90% threshold
+                            </p>
+</div>
+<!-- Sector Item -->
+<div>
+<div class="flex justify-between items-center mb-1">
+<span class="font-body-md text-on-surface">Delta Sector</span>
+<span class="font-label-md text-label-md font-bold">96%</span>
+</div>
+<div class="w-full bg-surface-container h-2 rounded-full overflow-hidden">
+<div class="bg-success h-full rounded-full" style="width: 96%;"></div>
+</div>
+</div>
+</div>
+<a class="mt-4 pt-4 border-t border-outline-variant text-center w-full text-secondary font-label-md text-label-md hover:underline uppercase block" href="#">
+                        View Team Performance
+                    </a>
+</div>
+</section>
+<!-- Bottom Section -->
+<section class="grid grid-cols-1 lg:grid-cols-3 gap-md">
+<!-- 4. Project Projections (Gantt/Timeline visualization) -->
+<div class="lg:col-span-2 bg-surface-l1 rounded-xl border border-outline-variant shadow-sm p-lg">
+<div class="flex justify-between items-center mb-6">
+<div class="flex items-center gap-sm">
+<span class="material-symbols-outlined text-primary">timeline</span>
+<h3 class="font-section-title text-section-title text-on-surface">Project Projections</h3>
+</div>
+<div class="flex gap-2">
+<span class="flex items-center gap-1 font-metadata text-metadata"><span class="w-3 h-3 rounded bg-primary opacity-30"></span> Baseline</span>
+<span class="flex items-center gap-1 font-metadata text-metadata"><span class="w-3 h-3 rounded bg-primary"></span> Actual</span>
+</div>
+</div>
+<!-- Simplified CSS Gantt Chart representation -->
+<div class="relative pt-6 pb-2 border-b border-outline-variant">
+<!-- Timeline Markers -->
+<div class="absolute top-0 left-32 right-0 flex justify-between text-metadata text-on-surface-variant px-2">
+<span>Sep</span>
+<span>Oct</span>
+<span>Nov</span>
+<span>Dec</span>
+</div>
+<div class="space-y-6 mt-4">
+<!-- Track 1 -->
+<div class="flex items-center">
+<div class="w-32 font-body-md text-sm shrink-0">Site Prep</div>
+<div class="flex-1 relative h-6 bg-surface-container-highest rounded border-x border-outline-variant/30">
+<!-- Baseline -->
+<div class="absolute top-1 left-[0%] w-[30%] h-4 bg-primary opacity-30 rounded-sm"></div>
+<!-- Actual -->
+<div class="absolute top-1 left-[0%] w-[35%] h-4 bg-primary rounded-sm shadow-sm flex items-center px-2">
+<span class="text-[10px] text-white font-bold">100%</span>
+</div>
+</div>
+</div>
+<!-- Track 2 -->
+<div class="flex items-center">
+<div class="w-32 font-body-md text-sm shrink-0">Foundation</div>
+<div class="flex-1 relative h-6 bg-surface-container-highest rounded border-x border-outline-variant/30">
+<div class="absolute top-1 left-[30%] w-[20%] h-4 bg-primary opacity-30 rounded-sm"></div>
+<div class="absolute top-1 left-[35%] w-[25%] h-4 bg-warning rounded-sm shadow-sm flex items-center px-2">
+<span class="text-[10px] text-white font-bold">In Progress</span>
+</div>
+</div>
+</div>
+<!-- Track 3 -->
+<div class="flex items-center">
+<div class="w-32 font-body-md text-sm shrink-0 text-on-surface-variant">Framing</div>
+<div class="flex-1 relative h-6 bg-surface-container-highest rounded border-x border-outline-variant/30">
+<div class="absolute top-1 left-[50%] w-[40%] h-4 bg-primary opacity-30 rounded-sm"></div>
+<!-- Not started -->
+</div>
+</div>
+</div>
+<!-- Current Date Line -->
+<div class="absolute top-6 bottom-0 left-[45%] w-px bg-brand-red z-10">
+<div class="absolute -top-6 -translate-x-1/2 bg-brand-red text-white text-[10px] px-2 py-0.5 rounded font-bold">TODAY</div>
+</div>
+</div>
+</div>
+<!-- 5. Community Board -->
+<div class="bg-surface-l1 rounded-xl border border-outline-variant shadow-sm p-lg bg-gradient-to-br from-surface-l1 to-brand-soft/20">
+<div class="flex items-center gap-sm mb-6">
+<span class="material-symbols-outlined text-primary">campaign</span>
+<h3 class="font-section-title text-section-title text-on-surface">Community Board</h3>
+</div>
+<div class="space-y-4">
+<!-- Event Card -->
+<div class="bg-surface rounded-lg p-4 border border-outline-variant shadow-sm hover:-translate-y-1 transition-transform cursor-pointer">
+<div class="flex justify-between items-start mb-2">
+<span class="bg-tertiary-container/20 text-tertiary-container px-2 py-0.5 rounded text-xs font-bold uppercase tracking-wider">Site Visit</span>
+<span class="text-on-surface-variant text-sm font-label-md">Oct 12</span>
+</div>
+<h4 class="font-body-md font-bold text-on-surface mb-1">UNHCR Delegation Tour</h4>
+<p class="font-metadata text-metadata text-on-surface-variant line-clamp-2">Briefing required for Alpha and Bravo sector supervisors prior to 0900hrs.</p>
+</div>
+<!-- Event Card -->
+<div class="bg-surface rounded-lg p-4 border border-outline-variant shadow-sm hover:-translate-y-1 transition-transform cursor-pointer">
+<div class="flex justify-between items-start mb-2">
+<span class="bg-warning/20 text-warning px-2 py-0.5 rounded text-xs font-bold uppercase tracking-wider">Meeting</span>
+<span class="text-on-surface-variant text-sm font-label-md">Oct 15</span>
+</div>
+<h4 class="font-body-md font-bold text-on-surface mb-1">Local Stakeholder Alignment</h4>
+<p class="font-metadata text-metadata text-on-surface-variant line-clamp-2">Town hall discussion regarding Phase 3 material staging zones.</p>
+</div>
+</div>
+<button class="w-full mt-4 h-target-min rounded-lg border border-outline-variant text-on-surface-variant font-label-md text-label-md font-bold uppercase hover:bg-surface-variant transition-colors flex items-center justify-center gap-xs">
+<span class="material-symbols-outlined text-sm">add</span> Add Event
+                    </button>
+</div>
+</section>
+</div>
+</main>
+<!-- BOTTOM NAV BAR (Mobile Only) -->
+<nav class="lg:hidden fixed bottom-0 w-full flex justify-around items-center px-4 py-2 pb-safe bg-surface dark:bg-surface-dim border-t border-outline-variant shadow-lg z-50">
+<a class="flex flex-col items-center justify-center bg-primary-container text-on-primary-container rounded-xl px-4 py-1 scale-95 transition-transform duration-150" href="#">
+<span class="material-symbols-outlined fill" data-icon="analytics">analytics</span>
+<span class="font-label-md-mobile text-label-md-mobile">Dashboard</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant hover:bg-surface-variant rounded-xl px-4 py-1 transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="alt_route">alt_route</span>
+<span class="font-label-md-mobile text-label-md-mobile">Lifecycle</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant hover:bg-surface-variant rounded-xl px-4 py-1 transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="warehouse">warehouse</span>
+<span class="font-label-md-mobile text-label-md-mobile">Inventory</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant hover:bg-surface-variant rounded-xl px-4 py-1 transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="badge">badge</span>
+<span class="font-label-md-mobile text-label-md-mobile">Teams</span>
+</a>
+</nav>
+</body></html>

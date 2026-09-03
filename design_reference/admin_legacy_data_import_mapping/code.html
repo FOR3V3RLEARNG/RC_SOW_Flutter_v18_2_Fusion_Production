@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Legacy Data Import - HQ Command</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;700;800;900&amp;family=Inter:wght@400;500&amp;family=JetBrains+Mono:wght@500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "secondary-fixed-dim": "#a5c8ff",
+                      "on-primary-container": "#fff2f0",
+                      "surface-bright": "#fff8f7",
+                      "inverse-surface": "#3e2c2a",
+                      "tertiary-fixed": "#bee9ff",
+                      "outline-variant": "#e4beba",
+                      "on-secondary-fixed-variant": "#004786",
+                      "background": "#fff8f7",
+                      "on-secondary-fixed": "#001c3a",
+                      "primary-fixed": "#ffdad6",
+                      "on-secondary-container": "#003567",
+                      "surface-container": "#ffe9e7",
+                      "on-tertiary-fixed-variant": "#004d65",
+                      "primary-fixed-dim": "#ffb3ac",
+                      "surface-l1": "#FFFFFF",
+                      "warning": "#FFA000",
+                      "on-secondary": "#ffffff",
+                      "primary-container": "#d32f2f",
+                      "success": "#2E7D32",
+                      "brand-red": "#D32F2F",
+                      "on-surface-variant": "#5b403d",
+                      "on-primary-fixed-variant": "#930010",
+                      "on-tertiary": "#ffffff",
+                      "on-error-container": "#93000a",
+                      "surface-l2": "#F0F3F5",
+                      "error": "#C62828",
+                      "surface": "#fff8f7",
+                      "secondary": "#005faf",
+                      "secondary-fixed": "#d4e3ff",
+                      "tertiary": "#005f7b",
+                      "surface-dim": "#f1d3d0",
+                      "on-error": "#ffffff",
+                      "canvas-l0": "#F5F7F9",
+                      "outline": "#8f6f6c",
+                      "primary": "#af101a",
+                      "on-tertiary-container": "#e9f7ff",
+                      "inverse-on-surface": "#ffedeb",
+                      "on-primary-fixed": "#410003",
+                      "surface-variant": "#f9dcd9",
+                      "surface-tint": "#ba1a20",
+                      "on-primary": "#ffffff",
+                      "tertiary-fixed-dim": "#7bd1f8",
+                      "surface-container-lowest": "#ffffff",
+                      "info": "#0288D1",
+                      "on-surface": "#271816",
+                      "on-background": "#271816",
+                      "error-container": "#ffdad6",
+                      "surface-container-low": "#fff0ef",
+                      "surface-container-high": "#ffe2de",
+                      "on-tertiary-fixed": "#001f2a",
+                      "surface-container-highest": "#f9dcd9",
+                      "brand-strong": "#B71C1C",
+                      "tertiary-container": "#00799c",
+                      "secondary-container": "#54a0fe",
+                      "inverse-primary": "#ffb3ac",
+                      "brand-soft": "#FFEBEE"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "xl": "32px",
+                      "sm": "12px",
+                      "lg": "24px",
+                      "md": "16px",
+                      "xs": "8px",
+                      "gutter-phone": "16px",
+                      "base": "4px",
+                      "gutter-tablet": "24px",
+                      "target-min": "48px"
+              },
+              "fontFamily": {
+                      "headline-md": ["Hanken Grotesk"],
+                      "body-md": ["Inter"],
+                      "body-lg": ["Inter"],
+                      "hero-title": ["Hanken Grotesk"],
+                      "section-title": ["Hanken Grotesk"],
+                      "headline-lg": ["Hanken Grotesk"],
+                      "label-md": ["JetBrains Mono"],
+                      "hero-title-mobile": ["Hanken Grotesk"],
+                      "metadata": ["Inter"]
+              },
+              "fontSize": {
+                      "headline-md": ["20px", {"lineHeight": "28px", "fontWeight": "750"}],
+                      "body-md": ["15px", {"lineHeight": "22px", "fontWeight": "400"}],
+                      "body-lg": ["17px", {"lineHeight": "26px", "fontWeight": "400"}],
+                      "hero-title": ["32px", {"lineHeight": "36px", "letterSpacing": "-0.02em", "fontWeight": "900"}],
+                      "section-title": ["18px", {"lineHeight": "24px", "fontWeight": "700"}],
+                      "headline-lg": ["24px", {"lineHeight": "32px", "fontWeight": "800"}],
+                      "label-md": ["13px", {"lineHeight": "16px", "fontWeight": "500"}],
+                      "hero-title-mobile": ["28px", {"lineHeight": "32px", "fontWeight": "900"}],
+                      "metadata": ["12px", {"lineHeight": "16px", "fontWeight": "500"}]
+              }
+            }
+          }
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .icon-fill {
+            font-variation-settings: 'FILL' 1;
+        }
+    </style>
+</head>
+<body class="bg-canvas-l0 text-on-background font-body-md min-h-screen flex">
+<!-- Shared Component: SideNavBar -->
+<aside class="hidden md:flex flex-col py-lg z-40 bg-surface-container-low dark:bg-surface-dim docked left-0 h-screen w-64 border-r border-outline-variant dark:border-outline flat no shadows fixed left-0 top-0 h-full">
+<div class="px-lg mb-xl">
+<div class="flex items-center gap-sm mb-xs">
+<div class="w-8 h-8 rounded bg-primary flex items-center justify-center text-on-primary">
+<span class="material-symbols-outlined text-[20px]">domain</span>
+</div>
+<div>
+<h1 class="font-headline-sm text-headline-sm font-extrabold text-on-surface tracking-tight">HQ COMMAND</h1>
+<p class="font-metadata text-metadata text-on-surface-variant">Global Operations</p>
+</div>
+</div>
+</div>
+<nav class="flex-1 flex flex-col gap-xs">
+<a class="flex items-center gap-md px-lg py-sm w-full transition-all text-on-surface-variant dark:text-surface-variant hover:bg-surface-container-high hover:translate-x-1 duration-200" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-section-title text-section-title">Dashboard</span>
+</a>
+<a class="flex items-center gap-md px-lg py-sm w-full transition-all text-on-surface-variant dark:text-surface-variant hover:bg-surface-container-high hover:translate-x-1 duration-200" href="#">
+<span class="material-symbols-outlined">payments</span>
+<span class="font-section-title text-section-title">Finance</span>
+</a>
+<a class="flex items-center gap-md px-lg py-sm w-full transition-all text-on-surface-variant dark:text-surface-variant hover:bg-surface-container-high hover:translate-x-1 duration-200" href="#">
+<span class="material-symbols-outlined">assignment_ind</span>
+<span class="font-section-title text-section-title">Attendance</span>
+</a>
+<a class="flex items-center gap-md px-lg py-sm w-full transition-all bg-brand-soft dark:bg-primary-container text-brand-strong dark:text-on-primary-container font-bold border-r-4 border-primary hover:translate-x-1 duration-200" href="#">
+<span class="material-symbols-outlined icon-fill">inventory_2</span>
+<span class="font-section-title text-section-title">Logistics</span>
+</a>
+<a class="flex items-center gap-md px-lg py-sm w-full transition-all text-on-surface-variant dark:text-surface-variant hover:bg-surface-container-high hover:translate-x-1 duration-200" href="#">
+<span class="material-symbols-outlined">history_edu</span>
+<span class="font-section-title text-section-title">Audit Logs</span>
+</a>
+</nav>
+<div class="mt-auto flex flex-col gap-xs pt-lg border-t border-outline-variant px-xs">
+<a class="flex items-center gap-md px-lg py-sm w-full transition-all text-on-surface-variant dark:text-surface-variant hover:bg-surface-container-high hover:translate-x-1 duration-200" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-section-title text-section-title">Settings</span>
+</a>
+<a class="flex items-center gap-md px-lg py-sm w-full transition-all text-on-surface-variant dark:text-surface-variant hover:bg-surface-container-high hover:translate-x-1 duration-200" href="#">
+<span class="material-symbols-outlined">help</span>
+<span class="font-section-title text-section-title">Support</span>
+</a>
+</div>
+</aside>
+<!-- Main Content Canvas -->
+<main class="flex-1 md:ml-64 p-gutter-phone md:p-gutter-tablet max-w-7xl mx-auto w-full flex flex-col gap-lg">
+<!-- Header -->
+<header class="flex flex-col sm:flex-row sm:items-end justify-between gap-md border-b border-outline-variant pb-md">
+<div>
+<p class="font-metadata text-metadata text-on-surface-variant uppercase tracking-wider mb-base">Admin • Data Migration</p>
+<h2 class="font-hero-title-mobile md:font-hero-title text-hero-title-mobile md:text-hero-title text-on-surface">Legacy Data Import</h2>
+</div>
+<button class="flex items-center justify-center gap-xs px-md h-[48px] bg-surface-l1 border border-outline-variant rounded-lg text-on-surface hover:bg-surface-l2 transition-colors font-label-md text-label-md">
+<span class="material-symbols-outlined text-[18px]">download</span>
+                Download Template
+            </button>
+</header>
+<!-- Upload Zone -->
+<section class="border-2 border-dashed border-outline-variant rounded-lg p-xl flex flex-col items-center justify-center bg-surface-l1 hover:bg-surface-container-low transition-colors cursor-pointer group min-h-[200px]">
+<div class="w-16 h-16 rounded-full bg-surface-container flex items-center justify-center mb-md group-hover:scale-110 transition-transform duration-300">
+<span class="material-symbols-outlined text-3xl text-primary icon-fill">upload_file</span>
+</div>
+<h3 class="font-section-title text-section-title text-on-surface mb-xs">Drag &amp; drop XLSX file here</h3>
+<p class="font-body-md text-body-md text-on-surface-variant mb-md text-center max-w-md">Supported formats: .xlsx, .csv. Maximum file size: 50MB. First row should contain column headers.</p>
+<div class="flex items-center gap-sm">
+<span class="h-[1px] w-12 bg-outline-variant"></span>
+<span class="font-metadata text-metadata text-outline">OR</span>
+<span class="h-[1px] w-12 bg-outline-variant"></span>
+</div>
+<button class="mt-md px-lg h-[40px] border border-primary text-primary rounded-lg font-label-md text-label-md hover:bg-brand-soft transition-colors">
+                Browse Files
+            </button>
+</section>
+<!-- Bento Grid: Mapping & Validation -->
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-lg flex-1">
+<!-- Data Mapping Preview (Spans 2 columns) -->
+<section class="lg:col-span-2 bg-surface-l1 rounded-lg shadow-[0_4px_12px_rgba(0,0,0,0.03)] border border-surface-container-high flex flex-col overflow-hidden">
+<div class="p-md border-b border-surface-container-high bg-surface-bright flex justify-between items-center">
+<h3 class="font-section-title text-section-title text-on-surface flex items-center gap-sm">
+<span class="material-symbols-outlined text-tertiary-container icon-fill">schema</span>
+                        Data Mapping Preview
+                    </h3>
+<span class="font-metadata text-metadata bg-surface-container-high text-on-surface px-sm py-base rounded-full">File: district_b_legacy_2023.xlsx</span>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-surface-l2 border-b border-surface-container-high">
+<th class="p-md font-label-md text-label-md text-on-surface-variant font-semibold">System Field <span class="text-error">*</span></th>
+<th class="p-md font-label-md text-label-md text-on-surface-variant font-semibold">Source Column (Excel)</th>
+<th class="p-md font-label-md text-label-md text-on-surface-variant font-semibold">Sample Data (Row 1)</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-surface-container-high">
+<tr class="hover:bg-surface-bright transition-colors">
+<td class="p-md font-body-md text-body-md text-on-surface flex items-center gap-xs">
+<span class="material-symbols-outlined text-[16px] text-outline">person</span> Beneficiary Name
+                                </td>
+<td class="p-md">
+<select class="w-full bg-surface-l1 border border-outline-variant rounded px-sm py-xs font-body-md text-body-md text-on-surface focus:ring-primary focus:border-primary">
+<option selected="">Head_of_Household</option>
+<option>Family_Name</option>
+<option>-- Ignore --</option>
+</select>
+</td>
+<td class="p-md font-label-md text-label-md text-on-surface-variant truncate max-w-[150px]">Maria Gonzalez</td>
+</tr>
+<tr class="hover:bg-surface-bright transition-colors">
+<td class="p-md font-body-md text-body-md text-on-surface flex items-center gap-xs">
+<span class="material-symbols-outlined text-[16px] text-outline">location_city</span> Parish / District
+                                </td>
+<td class="p-md">
+<select class="w-full bg-surface-l1 border border-outline-variant rounded px-sm py-xs font-body-md text-body-md text-on-surface focus:ring-primary focus:border-primary">
+<option selected="">Location_Parish</option>
+<option>Region_Code</option>
+<option>-- Ignore --</option>
+</select>
+</td>
+<td class="p-md font-label-md text-label-md text-on-surface-variant truncate max-w-[150px]">San Miguel</td>
+</tr>
+<tr class="hover:bg-surface-bright transition-colors bg-brand-soft/30">
+<td class="p-md font-body-md text-body-md text-on-surface flex items-center gap-xs">
+<span class="material-symbols-outlined text-[16px] text-outline">share_location</span> GIS Coordinates
+                                </td>
+<td class="p-md">
+<select class="w-full bg-surface-l1 border border-warning rounded px-sm py-xs font-body-md text-body-md text-on-surface focus:ring-primary focus:border-primary">
+<option>Select Match...</option>
+<option selected="">GPS_String</option>
+<option>Lat_Long</option>
+</select>
+</td>
+<td class="p-md font-label-md text-label-md text-warning flex items-center gap-xs">
+<span class="material-symbols-outlined text-[16px]">warning</span> Format mismatch
+                                </td>
+</tr>
+<tr class="hover:bg-surface-bright transition-colors">
+<td class="p-md font-body-md text-body-md text-on-surface flex items-center gap-xs">
+<span class="material-symbols-outlined text-[16px] text-outline">home_work</span> Cluster ID
+                                </td>
+<td class="p-md">
+<select class="w-full bg-surface-l1 border border-outline-variant rounded px-sm py-xs font-body-md text-body-md text-on-surface focus:ring-primary focus:border-primary">
+<option selected="">Sector_Group</option>
+<option>Camp_ID</option>
+</select>
+</td>
+<td class="p-md font-label-md text-label-md text-on-surface-variant truncate max-w-[150px]">CL-8821-A</td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<!-- Validation Log -->
+<section class="bg-surface-l1 rounded-lg shadow-[0_4px_12px_rgba(0,0,0,0.03)] border border-surface-container-high flex flex-col h-full">
+<div class="p-md border-b border-surface-container-high bg-surface-bright">
+<h3 class="font-section-title text-section-title text-on-surface flex items-center gap-sm">
+<span class="material-symbols-outlined text-warning icon-fill">rule</span>
+                        Validation Log
+                    </h3>
+</div>
+<div class="p-md flex flex-col gap-md flex-1 overflow-y-auto max-h-[300px]">
+<!-- Error Item -->
+<div class="flex gap-sm p-sm rounded bg-error-container/30 border border-error-container">
+<span class="material-symbols-outlined text-error mt-xs">error</span>
+<div>
+<p class="font-label-md text-label-md text-on-error-container font-bold mb-base">Missing Technical Data</p>
+<p class="font-metadata text-metadata text-on-surface-variant">42 rows are missing GIS coordinates. These records will be flagged for field verification.</p>
+</div>
+</div>
+<!-- Warning Item -->
+<div class="flex gap-sm p-sm rounded bg-surface-container-high border border-outline-variant">
+<span class="material-symbols-outlined text-warning mt-xs">warning</span>
+<div>
+<p class="font-label-md text-label-md text-on-surface font-bold mb-base">Potential Duplicates</p>
+<p class="font-metadata text-metadata text-on-surface-variant">3 Beneficiary names closely match existing records in Sector 4.</p>
+</div>
+</div>
+<!-- Info Item -->
+<div class="flex gap-sm p-sm rounded bg-tertiary-fixed/30 border border-tertiary-fixed-dim">
+<span class="material-symbols-outlined text-tertiary-container mt-xs">info</span>
+<div>
+<p class="font-label-md text-label-md text-on-surface font-bold mb-base">Auto-formatting Applied</p>
+<p class="font-metadata text-metadata text-on-surface-variant">Dates in 'Assessment_Date' column converted to ISO-8601 standard.</p>
+</div>
+</div>
+</div>
+<div class="p-md border-t border-surface-container-high bg-surface-bright mt-auto">
+<div class="flex justify-between items-center mb-sm">
+<span class="font-metadata text-metadata text-on-surface-variant">Ready to import</span>
+<span class="font-label-md text-label-md text-success font-bold">1,204 rows</span>
+</div>
+<div class="w-full bg-surface-container-highest rounded-full h-2 overflow-hidden">
+<div class="bg-success h-full" style="width: 95%"></div>
+</div>
+</div>
+</section>
+</div>
+<!-- Sticky Bottom Action Bar -->
+<div class="sticky bottom-0 bg-surface-l1 border-t border-outline-variant p-md -mx-gutter-phone px-gutter-phone md:-mx-gutter-tablet md:px-gutter-tablet mt-auto flex justify-end items-center shadow-[0_-4px_12px_rgba(0,0,0,0.05)] z-10">
+<div class="flex items-center gap-md">
+<button class="px-lg h-[48px] rounded-lg font-label-md text-label-md text-on-surface hover:bg-surface-container-low transition-colors">
+                    Cancel
+                </button>
+<button class="flex items-center gap-sm px-xl h-[48px] bg-primary text-on-primary rounded-lg font-label-md text-label-md uppercase tracking-wider hover:bg-brand-strong transition-colors shadow-sm">
+<span class="material-symbols-outlined">publish</span>
+                    Import to Production
+                </button>
+</div>
+</div>
+</main>
+</body></html>

@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+
+<html class="h-full" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Payment Analytics - Humanitarian Command</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;700;800;900&amp;family=Inter:wght@400;500;700&amp;family=JetBrains+Mono:wght@500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "secondary-fixed-dim": "#a5c8ff",
+                      "on-primary-container": "#fff2f0",
+                      "surface-bright": "#fff8f7",
+                      "inverse-surface": "#3e2c2a",
+                      "tertiary-fixed": "#bee9ff",
+                      "outline-variant": "#e4beba",
+                      "on-secondary-fixed-variant": "#004786",
+                      "background": "#fff8f7",
+                      "on-secondary-fixed": "#001c3a",
+                      "primary-fixed": "#ffdad6",
+                      "on-secondary-container": "#003567",
+                      "surface-container": "#ffe9e7",
+                      "on-tertiary-fixed-variant": "#004d65",
+                      "primary-fixed-dim": "#ffb3ac",
+                      "surface-l1": "#FFFFFF",
+                      "warning": "#FFA000",
+                      "on-secondary": "#ffffff",
+                      "primary-container": "#d32f2f",
+                      "success": "#2E7D32",
+                      "brand-red": "#D32F2F",
+                      "on-surface-variant": "#5b403d",
+                      "on-primary-fixed-variant": "#930010",
+                      "on-tertiary": "#ffffff",
+                      "on-error-container": "#93000a",
+                      "surface-l2": "#F0F3F5",
+                      "error": "#C62828",
+                      "surface": "#fff8f7",
+                      "secondary": "#005faf",
+                      "secondary-fixed": "#d4e3ff",
+                      "tertiary": "#005f7b",
+                      "surface-dim": "#f1d3d0",
+                      "on-error": "#ffffff",
+                      "canvas-l0": "#F5F7F9",
+                      "outline": "#8f6f6c",
+                      "primary": "#af101a",
+                      "on-tertiary-container": "#e9f7ff",
+                      "inverse-on-surface": "#ffedeb",
+                      "on-primary-fixed": "#410003",
+                      "surface-variant": "#f9dcd9",
+                      "surface-tint": "#ba1a20",
+                      "on-primary": "#ffffff",
+                      "tertiary-fixed-dim": "#7bd1f8",
+                      "surface-container-lowest": "#ffffff",
+                      "info": "#0288D1",
+                      "on-surface": "#271816",
+                      "on-background": "#271816",
+                      "error-container": "#ffdad6",
+                      "surface-container-low": "#fff0ef",
+                      "surface-container-high": "#ffe2de",
+                      "on-tertiary-fixed": "#001f2a",
+                      "surface-container-highest": "#f9dcd9",
+                      "brand-strong": "#B71C1C",
+                      "tertiary-container": "#00799c",
+                      "secondary-container": "#54a0fe",
+                      "inverse-primary": "#ffb3ac",
+                      "brand-soft": "#FFEBEE"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "xl": "32px",
+                      "sm": "12px",
+                      "lg": "24px",
+                      "md": "16px",
+                      "xs": "8px",
+                      "gutter-phone": "16px",
+                      "base": "4px",
+                      "gutter-tablet": "24px",
+                      "target-min": "48px"
+              },
+              "fontFamily": {
+                      "headline-md": [
+                              "Hanken Grotesk"
+                      ],
+                      "body-md": [
+                              "Inter"
+                      ],
+                      "body-lg": [
+                              "Inter"
+                      ],
+                      "hero-title": [
+                              "Hanken Grotesk"
+                      ],
+                      "section-title": [
+                              "Hanken Grotesk"
+                      ],
+                      "headline-lg": [
+                              "Hanken Grotesk"
+                      ],
+                      "label-md": [
+                              "JetBrains Mono"
+                      ],
+                      "hero-title-mobile": [
+                              "Hanken Grotesk"
+                      ],
+                      "metadata": [
+                              "Inter"
+                      ]
+              },
+              "fontSize": {
+                      "headline-md": [
+                              "20px",
+                              {
+                                      "lineHeight": "28px",
+                                      "fontWeight": "750"
+                              }
+                      ],
+                      "body-md": [
+                              "15px",
+                              {
+                                      "lineHeight": "22px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "body-lg": [
+                              "17px",
+                              {
+                                      "lineHeight": "26px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "hero-title": [
+                              "32px",
+                              {
+                                      "lineHeight": "36px",
+                                      "letterSpacing": "-0.02em",
+                                      "fontWeight": "900"
+                              }
+                      ],
+                      "section-title": [
+                              "18px",
+                              {
+                                      "lineHeight": "24px",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "headline-lg": [
+                              "24px",
+                              {
+                                      "lineHeight": "32px",
+                                      "fontWeight": "800"
+                              }
+                      ],
+                      "label-md": [
+                              "13px",
+                              {
+                                      "lineHeight": "16px",
+                                      "fontWeight": "500"
+                              }
+                      ],
+                      "hero-title-mobile": [
+                              "28px",
+                              {
+                                      "lineHeight": "32px",
+                                      "fontWeight": "900"
+                              }
+                      ],
+                      "metadata": [
+                              "12px",
+                              {
+                                      "lineHeight": "16px",
+                                      "fontWeight": "500"
+                              }
+                      ]
+              }
+      },
+          },
+        }
+      </script>
+<style>
+          .material-symbols-outlined {
+              font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+          }
+      </style>
+</head>
+<body class="bg-canvas-l0 text-on-surface h-full flex font-body-md">
+<!-- TopNavBar -->
+<nav class="hidden md:flex justify-between items-center w-full px-gutter-tablet h-16 z-50 bg-surface-container-lowest dark:bg-inverse-surface border-b border-outline-variant dark:border-outline fixed top-0 w-full shadow-none">
+<div class="flex items-center gap-md">
+<span class="font-headline-md text-headline-md font-black text-brand-strong dark:text-primary-fixed-dim">HUMANITARIAN COMMAND</span>
+</div>
+<div class="flex-1 flex justify-center max-w-lg mx-md">
+<div class="relative w-full">
+<span class="material-symbols-outlined absolute left-sm top-1/2 -translate-y-1/2 text-on-surface-variant">search</span>
+<input class="w-full h-target-min pl-10 pr-4 rounded-full border border-outline-variant bg-surface-l1 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-body-md text-on-surface" placeholder="Search..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-sm">
+<button class="h-10 w-10 flex items-center justify-center rounded-full text-primary dark:text-inverse-primary hover:bg-surface-container-high dark:hover:bg-surface-variant transition-colors cursor-pointer active:opacity-80"><span class="material-symbols-outlined" data-icon="notifications" data-weight="fill">notifications</span></button>
+<button class="h-10 w-10 flex items-center justify-center rounded-full text-primary dark:text-inverse-primary hover:bg-surface-container-high dark:hover:bg-surface-variant transition-colors cursor-pointer active:opacity-80"><span class="material-symbols-outlined" data-icon="sync" data-weight="fill">sync</span></button>
+<button class="h-10 w-10 flex items-center justify-center rounded-full text-primary dark:text-inverse-primary hover:bg-surface-container-high dark:hover:bg-surface-variant transition-colors cursor-pointer active:opacity-80"><span class="material-symbols-outlined" data-icon="account_circle" data-weight="fill">account_circle</span></button>
+</div>
+</nav>
+<!-- SideNavBar -->
+<aside class="hidden md:flex fixed left-0 top-16 h-[calc(100vh-4rem)] flex-col py-lg z-40 bg-surface-container-low dark:bg-surface-dim border-r border-outline-variant dark:border-outline w-64 shadow-none">
+<div class="px-lg pb-md mb-md border-b border-outline-variant">
+<h2 class="font-headline-sm text-headline-sm font-extrabold text-on-surface">HQ COMMAND</h2>
+<p class="font-metadata text-metadata text-on-surface-variant">Global Operations</p>
+</div>
+<nav class="flex-1 flex flex-col gap-sm px-sm">
+<a class="flex items-center gap-md px-lg py-sm w-full transition-all text-on-surface-variant dark:text-surface-variant hover:bg-surface-container-high hover:translate-x-1 duration-200 rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span class="font-section-title text-section-title">Dashboard</span>
+</a>
+<a class="flex items-center gap-md px-lg py-sm w-full transition-all bg-brand-soft dark:bg-primary-container text-brand-strong dark:text-on-primary-container font-bold border-r-4 border-primary rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="payments">payments</span>
+<span class="font-section-title text-section-title">Finance</span>
+</a>
+<a class="flex items-center gap-md px-lg py-sm w-full transition-all text-on-surface-variant dark:text-surface-variant hover:bg-surface-container-high hover:translate-x-1 duration-200 rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="assignment_ind">assignment_ind</span>
+<span class="font-section-title text-section-title">Attendance</span>
+</a>
+<a class="flex items-center gap-md px-lg py-sm w-full transition-all text-on-surface-variant dark:text-surface-variant hover:bg-surface-container-high hover:translate-x-1 duration-200 rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="inventory_2">inventory_2</span>
+<span class="font-section-title text-section-title">Logistics</span>
+</a>
+<a class="flex items-center gap-md px-lg py-sm w-full transition-all text-on-surface-variant dark:text-surface-variant hover:bg-surface-container-high hover:translate-x-1 duration-200 rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="history_edu">history_edu</span>
+<span class="font-section-title text-section-title">Audit Logs</span>
+</a>
+</nav>
+<div class="mt-auto flex flex-col gap-sm px-sm pt-md border-t border-outline-variant">
+<a class="flex items-center gap-md px-lg py-sm w-full transition-all text-on-surface-variant dark:text-surface-variant hover:bg-surface-container-high hover:translate-x-1 duration-200 rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+<span class="font-section-title text-section-title">Settings</span>
+</a>
+<a class="flex items-center gap-md px-lg py-sm w-full transition-all text-on-surface-variant dark:text-surface-variant hover:bg-surface-container-high hover:translate-x-1 duration-200 rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="help">help</span>
+<span class="font-section-title text-section-title">Support</span>
+</a>
+</div>
+</aside>
+<!-- Main Content -->
+<main class="flex-1 md:ml-64 mt-16 p-gutter-tablet md:p-xl overflow-y-auto">
+<div class="max-w-7xl mx-auto space-y-lg">
+<!-- Page Header -->
+<div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-md">
+<div>
+<h1 class="font-hero-title text-hero-title text-on-surface">Payment Analytics</h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant mt-1">Finance • Operational Audit</p>
+</div>
+<div class="flex gap-sm">
+<button class="h-target-min px-lg border border-outline rounded-full text-on-surface font-label-md text-label-md hover:bg-surface-container-low transition-colors flex items-center gap-xs">
+<span class="material-symbols-outlined">filter_list</span>
+                        Filters
+                    </button>
+<button class="h-target-min px-lg bg-brand-red text-on-primary rounded-full font-label-md text-label-md uppercase tracking-wider hover:bg-brand-strong transition-colors shadow-sm flex items-center gap-xs">
+<span class="material-symbols-outlined">download</span>
+                        Export Report
+                    </button>
+</div>
+</div>
+<!-- Financial Summary Rail -->
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-md">
+<div class="bg-surface-l1 p-md rounded-xl border border-outline-variant shadow-sm flex flex-col justify-between h-32">
+<p class="font-metadata text-metadata text-on-surface-variant uppercase tracking-wider">Total Committed</p>
+<div>
+<p class="font-headline-lg text-headline-lg text-on-surface">$2,450,000</p>
+<p class="font-metadata text-metadata text-success mt-1 flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">arrow_upward</span> +5.2% vs last period</p>
+</div>
+</div>
+<div class="bg-surface-l1 p-md rounded-xl border border-outline-variant shadow-sm flex flex-col justify-between h-32">
+<p class="font-metadata text-metadata text-on-surface-variant uppercase tracking-wider">Total Paid</p>
+<div>
+<p class="font-headline-lg text-headline-lg text-on-surface">$1,820,500</p>
+<div class="w-full bg-surface-l2 rounded-full h-1.5 mt-2">
+<div class="bg-success h-1.5 rounded-full" style="width: 74%"></div>
+</div>
+</div>
+</div>
+<div class="bg-surface-l2 p-md rounded-xl border border-outline-variant flex flex-col justify-between h-32">
+<p class="font-metadata text-metadata text-on-surface-variant uppercase tracking-wider">Pending Approval</p>
+<div>
+<p class="font-headline-lg text-headline-lg text-warning">$145,200</p>
+<p class="font-metadata text-metadata text-on-surface-variant mt-1">42 batches awaiting review</p>
+</div>
+</div>
+<div class="bg-surface-l1 p-md rounded-xl border border-outline-variant shadow-sm flex flex-col justify-between h-32">
+<p class="font-metadata text-metadata text-on-surface-variant uppercase tracking-wider">Budget Remaining</p>
+<div>
+<p class="font-headline-lg text-headline-lg text-on-surface">$484,300</p>
+<p class="font-metadata text-metadata text-on-surface-variant mt-1">19.7% of allocated funds</p>
+</div>
+</div>
+</div>
+<!-- Main Data Section -->
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-lg">
+<!-- Ledger Table -->
+<div class="lg:col-span-2 bg-surface-l1 border border-outline-variant rounded-xl shadow-sm overflow-hidden flex flex-col">
+<div class="p-md border-b border-outline-variant flex justify-between items-center bg-surface-container-lowest">
+<h3 class="font-section-title text-section-title text-on-surface">Payment Ledger</h3>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-sm top-1/2 -translate-y-1/2 text-on-surface-variant text-[18px]">search</span>
+<input class="h-8 pl-8 pr-3 rounded border border-outline-variant bg-surface-l2 focus:outline-none focus:ring-1 focus:ring-primary text-metadata text-on-surface w-48" placeholder="Search ID or Beneficiary..." type="text"/>
+</div>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-surface-l2 border-b border-outline-variant font-metadata text-metadata text-on-surface-variant uppercase tracking-wider">
+<th class="p-sm font-medium">House ID</th>
+<th class="p-sm font-medium">Beneficiary</th>
+<th class="p-sm font-medium">Total Amount</th>
+<th class="p-sm font-medium">Allocation</th>
+<th class="p-sm font-medium">Status</th>
+</tr>
+</thead>
+<tbody class="font-body-md text-body-md text-on-surface divide-y divide-outline-variant">
+<tr class="hover:bg-surface-container-lowest transition-colors">
+<td class="p-sm font-label-md text-label-md text-primary">HC-9821</td>
+<td class="p-sm">Maria Gonzalez</td>
+<td class="p-sm font-medium">$4,500</td>
+<td class="p-sm text-on-surface-variant">46/31/23%</td>
+<td class="p-sm"><span class="inline-flex items-center gap-1 px-2 py-1 rounded bg-success/10 text-success text-metadata font-medium"><span class="material-symbols-outlined text-[14px]">check_circle</span> Paid</span></td>
+</tr>
+<tr class="hover:bg-surface-container-lowest transition-colors">
+<td class="p-sm font-label-md text-label-md text-primary">HC-9822</td>
+<td class="p-sm">Juan Perez</td>
+<td class="p-sm font-medium">$3,200</td>
+<td class="p-sm text-on-surface-variant">50/50/0%</td>
+<td class="p-sm"><span class="inline-flex items-center gap-1 px-2 py-1 rounded bg-warning/10 text-warning text-metadata font-medium"><span class="material-symbols-outlined text-[14px]">pending</span> Pending</span></td>
+</tr>
+<tr class="hover:bg-surface-container-lowest transition-colors bg-brand-soft/30">
+<td class="p-sm font-label-md text-label-md text-primary">HC-9825</td>
+<td class="p-sm">Elena Rodriguez</td>
+<td class="p-sm font-medium">$5,100</td>
+<td class="p-sm text-on-surface-variant">33/33/34%</td>
+<td class="p-sm"><span class="inline-flex items-center gap-1 px-2 py-1 rounded bg-error/10 text-error text-metadata font-medium"><span class="material-symbols-outlined text-[14px]">error</span> Review</span></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<!-- Trend Chart Placeholder -->
+<div class="bg-surface-l1 border border-outline-variant rounded-xl shadow-sm p-md flex flex-col">
+<h3 class="font-section-title text-section-title text-on-surface mb-sm">Weekly Payout Volume</h3>
+<div class="flex-1 bg-surface-l2 rounded-lg border border-dashed border-outline-variant flex items-center justify-center min-h-[200px]">
+<span class="font-metadata text-metadata text-on-surface-variant">[ Chart Visualization Area ]</span>
+</div>
+</div>
+</div>
+</div>
+</main>
+</body></html>

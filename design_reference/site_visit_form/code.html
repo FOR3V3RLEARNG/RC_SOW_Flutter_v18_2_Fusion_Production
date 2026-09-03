@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>H12 | Delivery - Site Visit</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;700;800;900&amp;family=Inter:wght@400;500&amp;family=JetBrains+Mono:wght@500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "secondary": "#005faf",
+                      "surface-container-high": "#ffe2de",
+                      "on-secondary-fixed": "#001c3a",
+                      "on-tertiary-fixed-variant": "#004d65",
+                      "on-error": "#ffffff",
+                      "secondary-fixed-dim": "#a5c8ff",
+                      "on-surface-variant": "#5b403d",
+                      "canvas-l0": "#F5F7F9",
+                      "on-primary-fixed-variant": "#930010",
+                      "tertiary-fixed": "#bee9ff",
+                      "primary": "#af101a",
+                      "error-container": "#ffdad6",
+                      "on-secondary-container": "#003567",
+                      "surface-container-lowest": "#ffffff",
+                      "on-surface": "#271816",
+                      "surface-tint": "#ba1a20",
+                      "outline-variant": "#e4beba",
+                      "surface-container-highest": "#f9dcd9",
+                      "background": "#fff8f7",
+                      "surface": "#fff8f7",
+                      "secondary-fixed": "#d4e3ff",
+                      "surface-container-low": "#fff0ef",
+                      "info": "#0288D1",
+                      "brand-red": "#D32F2F",
+                      "on-tertiary": "#ffffff",
+                      "surface-container": "#ffe9e7",
+                      "outline": "#8f6f6c",
+                      "primary-fixed-dim": "#ffb3ac",
+                      "on-primary-container": "#fff2f0",
+                      "surface-bright": "#fff8f7",
+                      "tertiary-fixed-dim": "#7bd1f8",
+                      "success": "#2E7D32",
+                      "inverse-primary": "#ffb3ac",
+                      "tertiary": "#005f7b",
+                      "primary-fixed": "#ffdad6",
+                      "brand-soft": "#FFEBEE",
+                      "brand-strong": "#B71C1C",
+                      "error": "#C62828",
+                      "on-background": "#271816",
+                      "surface-variant": "#f9dcd9",
+                      "inverse-on-surface": "#ffedeb",
+                      "on-tertiary-fixed": "#001f2a",
+                      "on-tertiary-container": "#e9f7ff",
+                      "warning": "#FFA000",
+                      "surface-l1": "#FFFFFF",
+                      "on-secondary-fixed-variant": "#004786",
+                      "primary-container": "#d32f2f",
+                      "on-primary": "#ffffff",
+                      "inverse-surface": "#3e2c2a",
+                      "on-error-container": "#93000a",
+                      "tertiary-container": "#00799c",
+                      "surface-l2": "#F0F3F5",
+                      "on-secondary": "#ffffff",
+                      "secondary-container": "#54a0fe",
+                      "surface-dim": "#f1d3d0",
+                      "on-primary-fixed": "#410003"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "sm": "12px",
+                      "lg": "24px",
+                      "md": "16px",
+                      "gutter-phone": "16px",
+                      "xs": "8px",
+                      "gutter-tablet": "24px",
+                      "target-min": "48px",
+                      "xl": "32px",
+                      "base": "4px"
+              },
+              "fontFamily": {
+                      "hero-title-mobile": [
+                              "Hanken Grotesk"
+                      ],
+                      "body-lg": [
+                              "Inter"
+                      ],
+                      "body-md": [
+                              "Inter"
+                      ],
+                      "metadata": [
+                              "Inter"
+                      ],
+                      "label-md": [
+                              "JetBrains Mono"
+                      ],
+                      "headline-lg": [
+                              "Hanken Grotesk"
+                      ],
+                      "section-title": [
+                              "Hanken Grotesk"
+                      ],
+                      "headline-md": [
+                              "Hanken Grotesk"
+                      ],
+                      "hero-title": [
+                              "Hanken Grotesk"
+                      ]
+              },
+              "fontSize": {
+                      "hero-title-mobile": [
+                              "28px",
+                              {
+                                      "lineHeight": "32px",
+                                      "fontWeight": "900"
+                              }
+                      ],
+                      "body-lg": [
+                              "17px",
+                              {
+                                      "lineHeight": "26px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "body-md": [
+                              "15px",
+                              {
+                                      "lineHeight": "22px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "metadata": [
+                              "12px",
+                              {
+                                      "lineHeight": "16px",
+                                      "fontWeight": "500"
+                              }
+                      ],
+                      "label-md": [
+                              "13px",
+                              {
+                                      "lineHeight": "16px",
+                                      "fontWeight": "500"
+                              }
+                      ],
+                      "headline-lg": [
+                              "24px",
+                              {
+                                      "lineHeight": "32px",
+                                      "fontWeight": "800"
+                              }
+                      ],
+                      "section-title": [
+                              "18px",
+                              {
+                                      "lineHeight": "24px",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "headline-md": [
+                              "20px",
+                              {
+                                      "lineHeight": "28px",
+                                      "fontWeight": "750"
+                              }
+                      ],
+                      "hero-title": [
+                              "32px",
+                              {
+                                      "lineHeight": "36px",
+                                      "letterSpacing": "-0.02em",
+                                      "fontWeight": "900"
+                              }
+                      ]
+              }
+      },
+          },
+        }
+    </script>
+<style>
+        body { background-color: #F5F7F9; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        .fill-icon { font-variation-settings: 'FILL' 1; }
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="text-on-background font-body-md antialiased pb-24 max-w-2xl mx-auto bg-canvas-l0 min-h-screen">
+<!-- TopAppBar -->
+<header class="bg-surface dark:bg-surface shadow-sm text-primary dark:text-primary-fixed-dim font-headline-md text-headline-md dark:text-on-surface font-headline-md text-headline-md font-black text-primary dark:text-primary-fixed-dim w-full sticky top-0 z-50 flex items-center justify-between px-md w-full h-target-min">
+<button class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-container-low dark:hover:bg-surface-container-high active:scale-95 transition-transform duration-200">
+<span class="material-symbols-outlined" data-icon="close">close</span>
+</button>
+<h1 class="flex-1 text-center">H12 | Delivery</h1>
+<button class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-container-low dark:hover:bg-surface-container-high active:scale-95 transition-transform duration-200">
+<span class="material-symbols-outlined" data-icon="cloud_sync">cloud_sync</span>
+</button>
+</header>
+<main class="px-gutter-phone pt-lg flex flex-col gap-lg">
+<div class="mb-sm">
+<h2 class="font-hero-title-mobile text-hero-title-mobile text-on-surface">Site Visit</h2>
+<p class="font-body-md text-body-md text-on-surface-variant mt-xs">Record details for field delivery operations.</p>
+</div>
+<!-- Primary Form Card -->
+<div class="bg-surface-l1 rounded-xl p-md shadow-sm border border-outline-variant flex flex-col gap-lg">
+<!-- Date & Type Row -->
+<div class="grid grid-cols-2 gap-md">
+<div class="flex flex-col gap-xs">
+<label class="font-label-md text-label-md text-on-surface-variant">Date of Visit</label>
+<div class="relative">
+<input class="w-full h-target-min rounded-lg border-outline-variant bg-surface-l2 text-on-surface px-md font-body-md focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-colors" type="date" value="2024-05-14"/>
+</div>
+</div>
+<div class="flex flex-col gap-xs">
+<label class="font-label-md text-label-md text-on-surface-variant">Type</label>
+<div class="flex h-target-min rounded-lg bg-surface-l2 p-1">
+<button class="flex-1 rounded-md bg-surface shadow-sm text-on-surface font-label-md text-label-md flex items-center justify-center">Visit</button>
+<button class="flex-1 rounded-md text-on-surface-variant font-label-md text-label-md flex items-center justify-center hover:bg-surface-container-low">Call</button>
+</div>
+</div>
+</div>
+<!-- Technical Team -->
+<div class="flex flex-col gap-xs">
+<label class="font-label-md text-label-md text-on-surface-variant">Technical Team Participants</label>
+<div class="flex flex-wrap gap-sm">
+<span class="inline-flex items-center gap-xs px-sm h-8 rounded-full bg-brand-soft text-brand-strong font-label-md text-label-md border border-brand-strong/20">
+                        Sarah Jenkins
+                        <span class="material-symbols-outlined text-[16px] cursor-pointer">close</span>
+</span>
+<span class="inline-flex items-center gap-xs px-sm h-8 rounded-full bg-brand-soft text-brand-strong font-label-md text-label-md border border-brand-strong/20">
+                        Mike Ross
+                        <span class="material-symbols-outlined text-[16px] cursor-pointer">close</span>
+</span>
+<button class="inline-flex items-center justify-center h-8 w-8 rounded-full bg-surface-l2 border border-outline-variant text-on-surface-variant hover:bg-surface-container-low">
+<span class="material-symbols-outlined text-[18px]">add</span>
+</button>
+</div>
+</div>
+<hr class="border-outline-variant border-t-1"/>
+<!-- Progress & Status Row -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-md">
+<div class="flex flex-col gap-xs">
+<div class="flex justify-between items-center">
+<label class="font-label-md text-label-md text-on-surface-variant">Estimated Completion</label>
+<span class="font-label-md text-label-md text-primary font-bold">65%</span>
+</div>
+<input class="w-full h-2 bg-surface-l2 rounded-lg appearance-none cursor-pointer accent-primary mt-2" max="100" min="0" type="range" value="65"/>
+</div>
+<div class="flex flex-col gap-xs">
+<label class="font-label-md text-label-md text-on-surface-variant">Status</label>
+<select class="w-full h-target-min rounded-lg border-outline-variant bg-surface-l2 text-on-surface px-md font-body-md focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-colors appearance-none">
+<option>On Track</option>
+<option>Delayed</option>
+<option>Blocked</option>
+<option>Complete</option>
+</select>
+</div>
+</div>
+<!-- Numbers Row -->
+<div class="grid grid-cols-2 gap-md">
+<div class="flex flex-col gap-xs">
+<label class="font-label-md text-label-md text-on-surface-variant"># Work Days</label>
+<input class="w-full h-target-min rounded-lg border-outline-variant bg-surface-l2 text-on-surface px-md font-body-md focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-colors" placeholder="e.g. 3" type="number"/>
+</div>
+<div class="flex flex-col gap-xs">
+<label class="font-label-md text-label-md text-on-surface-variant">Days Active</label>
+<input class="w-full h-target-min rounded-lg border-outline-variant bg-surface-l2 text-on-surface px-md font-body-md focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-colors" disabled="" type="number" value="14"/>
+</div>
+</div>
+<!-- Comments -->
+<div class="flex flex-col gap-xs">
+<label class="font-label-md text-label-md text-on-surface-variant">Issues / Comments</label>
+<textarea class="w-full rounded-lg border-outline-variant bg-surface-l2 text-on-surface p-md font-body-md focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-colors resize-none" placeholder="Note any field observations or delays..." rows="3"></textarea>
+</div>
+</div>
+<!-- Evidence Section -->
+<div class="bg-surface-l1 rounded-xl p-md shadow-sm border border-outline-variant flex flex-col gap-md">
+<div class="flex items-center justify-between">
+<div>
+<h3 class="font-section-title text-section-title text-on-surface">Evidence</h3>
+<p class="font-metadata text-metadata text-on-surface-variant">Attach field photos</p>
+</div>
+<button class="h-10 px-md rounded-full bg-brand-soft text-brand-strong font-label-md text-label-md flex items-center gap-xs hover:bg-brand-red hover:text-white transition-colors">
+<span class="material-symbols-outlined text-[18px]">add_a_photo</span>
+                    Capture
+                </button>
+</div>
+<div class="flex gap-sm overflow-x-auto hide-scrollbar pb-xs">
+<div class="flex-shrink-0 w-24 h-24 rounded-lg bg-surface-l2 border border-outline-variant flex items-center justify-center flex-col gap-1 text-on-surface-variant cursor-pointer hover:bg-surface-container-low border-dashed">
+<span class="material-symbols-outlined">upload</span>
+<span class="font-metadata text-metadata">Upload</span>
+</div>
+<div class="relative flex-shrink-0 w-24 h-24 rounded-lg overflow-hidden border border-outline-variant">
+<img class="w-full h-full object-cover" data-alt="A detailed, modern UI placeholder image showing a close-up of a residential roof under construction, featuring exposed wooden beams and partially installed roofing sheets. Bright daylight, clear blue sky, realistic construction context. Humanitarian field operations style, neutral tones with natural wood and grey metallic colors." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAvLCFMoQD7u03rAWlMEJTQm4XEh3-ePthQkS8pi-YIdwiaLAE4uMI__-Yhc5rgp9ZhAoFj_V_AN8g9UlQHjf4GfJJeWe2yTgFogJ-KcbtUVg4_KuxfEto0TlLTypnC4NYzg40tPT8vTHBJQiQV7UOo6-zJsrjp7tJq_q4N_8cSMqyzkA_RwS6W_roxCEkaTxXSsbg0-XXUvNZa8AJmdbZwrMQj0JPkgFm8L6P7o4-xicNw98HmEETELA"/>
+<button class="absolute top-1 right-1 w-6 h-6 rounded-full bg-black/50 text-white flex items-center justify-center hover:bg-black/70">
+<span class="material-symbols-outlined text-[14px]">close</span>
+</button>
+</div>
+<div class="relative flex-shrink-0 w-24 h-24 rounded-lg overflow-hidden border border-outline-variant">
+<img class="w-full h-full object-cover" data-alt="A detailed, modern UI placeholder image showing a wide shot of a small residential house structure in a rural setting, showing cinderblock walls and a partially finished roof. Daytime, sunny, humanitarian field operations context. Professional, verifiable evidence aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDYXdzWudSjX9yC_vAab8fYSEM4CsR8Lp4mz4a5XqJP-VVlb8yRP7uPea-ikxQUyiAau_DQVrWMlOiR02P711q3Ks-HY0LsRYuiHO_1Dk9OHZwxYocDOC3kbeVV0x9RBqluQrNccwVfx6WxEitycqToTkpYVE9kKz6-SPtiWWKyMBUnwoD79GVOenUBYjGmCAlgFZ1BHnrVto39s6y6LbeEOyJ1gaNWGY8y-kMIrdgYcRWQVmJR3-eg4A"/>
+<button class="absolute top-1 right-1 w-6 h-6 rounded-full bg-black/50 text-white flex items-center justify-center hover:bg-black/70">
+<span class="material-symbols-outlined text-[14px]">close</span>
+</button>
+</div>
+</div>
+</div>
+</main>
+<!-- Bottom Actions -->
+<div class="fixed bottom-0 left-0 w-full bg-surface shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)] border-t border-outline-variant p-md flex gap-md max-w-2xl mx-auto right-0">
+<button class="flex-1 h-target-min rounded-full border border-outline text-on-surface font-label-md text-label-md uppercase tracking-wider flex items-center justify-center hover:bg-surface-container-low transition-colors">
+            Save Draft
+        </button>
+<button class="flex-1 h-target-min rounded-full bg-brand-red text-white font-label-md text-label-md uppercase tracking-wider flex items-center justify-center hover:bg-brand-strong transition-colors shadow-sm">
+            Submit Visit
+        </button>
+</div>
+</body></html>

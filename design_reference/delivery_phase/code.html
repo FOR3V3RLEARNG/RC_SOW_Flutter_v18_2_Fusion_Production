@@ -1,0 +1,320 @@
+<!DOCTYPE html><html class="light" lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport">
+<title>RC SOW - Delivery Phase</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@700;800;900&amp;family=Inter:wght@400;500&amp;family=JetBrains+Mono:wght@500&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-container-highest": "#f9dcd9",
+                        "warning": "#FFA000",
+                        "primary-container": "#d32f2f",
+                        "inverse-surface": "#3e2c2a",
+                        "primary-fixed-dim": "#ffb3ac",
+                        "on-primary-fixed": "#410003",
+                        "surface-dim": "#f1d3d0",
+                        "on-tertiary-fixed-variant": "#004d65",
+                        "on-error-container": "#93000a",
+                        "on-secondary-fixed": "#001c3a",
+                        "surface": "#fff8f7",
+                        "on-secondary": "#ffffff",
+                        "on-background": "#271816",
+                        "brand-strong": "#B71C1C",
+                        "error-container": "#ffdad6",
+                        "secondary-fixed-dim": "#a5c8ff",
+                        "secondary-container": "#54a0fe",
+                        "outline": "#8f6f6c",
+                        "background": "#fff8f7",
+                        "secondary-fixed": "#d4e3ff",
+                        "tertiary": "#005f7b",
+                        "info": "#0288D1",
+                        "primary-fixed": "#ffdad6",
+                        "surface-l1": "#FFFFFF",
+                        "brand-soft": "#FFEBEE",
+                        "surface-container-low": "#fff0ef",
+                        "on-error": "#ffffff",
+                        "tertiary-fixed": "#bee9ff",
+                        "on-surface-variant": "#5b403d",
+                        "surface-l2": "#F0F3F5",
+                        "on-secondary-fixed-variant": "#004786",
+                        "on-tertiary-container": "#e9f7ff",
+                        "inverse-primary": "#ffb3ac",
+                        "on-surface": "#271816",
+                        "surface-container": "#ffe9e7",
+                        "on-secondary-container": "#003567",
+                        "primary": "#af101a",
+                        "success": "#2E7D32",
+                        "on-tertiary-fixed": "#001f2a",
+                        "surface-variant": "#f9dcd9",
+                        "on-primary-container": "#fff2f0",
+                        "surface-tint": "#ba1a20",
+                        "tertiary-fixed-dim": "#7bd1f8",
+                        "on-primary-fixed-variant": "#930010",
+                        "on-primary": "#ffffff",
+                        "surface-container-lowest": "#ffffff",
+                        "tertiary-container": "#00799c",
+                        "canvas-l0": "#F5F7F9",
+                        "on-tertiary": "#ffffff",
+                        "secondary": "#005faf",
+                        "inverse-on-surface": "#ffedeb",
+                        "outline-variant": "#e4beba",
+                        "error": "#C62828",
+                        "surface-container-high": "#ffe2de",
+                        "brand-red": "#D32F2F",
+                        "surface-bright": "#fff8f7"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "2xl": "1.125rem",
+                        "3xl": "1.5rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "base": "4px",
+                        "md": "16px",
+                        "gutter-phone": "16px",
+                        "gutter-tablet": "24px",
+                        "xs": "8px",
+                        "sm": "12px",
+                        "target-min": "48px",
+                        "xl": "32px",
+                        "lg": "24px"
+                    },
+                    "fontFamily": {
+                        "hero-title-mobile": ["Hanken Grotesk"],
+                        "section-title": ["Hanken Grotesk"],
+                        "headline-lg": ["Hanken Grotesk"],
+                        "body-lg": ["Inter"],
+                        "metadata": ["Inter"],
+                        "body-md": ["Inter"],
+                        "label-md": ["JetBrains Mono"],
+                        "hero-title": ["Hanken Grotesk"],
+                        "headline-md": ["Hanken Grotesk"]
+                    },
+                    "fontSize": {
+                        "hero-title-mobile": ["28px", { "lineHeight": "32px", "fontWeight": "900" }],
+                        "section-title": ["18px", { "lineHeight": "24px", "fontWeight": "700" }],
+                        "headline-lg": ["24px", { "lineHeight": "32px", "fontWeight": "800" }],
+                        "body-lg": ["17px", { "lineHeight": "26px", "fontWeight": "400" }],
+                        "metadata": ["12px", { "lineHeight": "16px", "fontWeight": "500" }],
+                        "body-md": ["15px", { "lineHeight": "22px", "fontWeight": "400" }],
+                        "label-md": ["13px", { "lineHeight": "16px", "fontWeight": "500" }],
+                        "hero-title": ["32px", { "lineHeight": "36px", "letterSpacing": "-0.02em", "fontWeight": "900" }],
+                        "headline-md": ["20px", { "lineHeight": "28px", "fontWeight": "750" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body { -webkit-tap-highlight-color: transparent; }
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        .house-roof-cut {
+            clip-path: polygon(0 8px, 8px 0, 100% 0, 100% 100%, 0 100%);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-canvas-l0 text-on-surface font-body-md min-h-screen pb-[96px] md:pb-0">
+<!-- TopAppBar -->
+<header class="sticky top-0 z-40 bg-surface dark:bg-surface flex justify-between items-center px-gutter-phone h-16 w-full shadow-sm">
+<div class="flex items-center gap-xs">
+<span class="material-symbols-outlined text-primary dark:text-inverse-primary" style="font-variation-settings: 'FILL' 0;">home_work</span>
+<div class="flex flex-col">
+<span class="text-headline-md font-headline-md font-black text-brand-red dark:text-inverse-primary leading-tight">RC SOW</span>
+<span class="text-metadata font-metadata text-on-surface-variant flex items-center gap-1">H12 <span class="w-1 h-1 rounded-full bg-outline-variant"></span> Delivery</span>
+</div>
+</div>
+<div class="flex items-center gap-sm">
+<span aria-label="Sync Status" class="material-symbols-outlined text-success" style="font-variation-settings: 'FILL' 1;">cloud_done</span>
+<button aria-label="Notifications" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-container-low transition-colors">
+<span class="material-symbols-outlined text-primary dark:text-inverse-primary" style="font-variation-settings: 'FILL' 0;">notifications</span>
+</button>
+</div>
+</header>
+<main class="max-w-7xl mx-auto md:px-gutter-tablet">
+<!-- Delivery Context Header -->
+<section class="px-gutter-phone pt-sm pb-md">
+<h1 class="text-hero-title-mobile font-hero-title-mobile md:text-hero-title md:font-hero-title text-on-surface">Active Delivery</h1>
+</section>
+<!-- Lifecycle Rail -->
+<section class="px-gutter-phone mb-lg overflow-x-auto hide-scrollbar">
+<div class="flex gap-xs items-center min-w-max">
+<div class="flex items-center">
+<div class="px-3 py-1.5 rounded-full bg-success/10 text-success text-metadata font-metadata flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">check_circle</span> Scope
+                    </div>
+<div class="w-4 h-px bg-outline-variant mx-1"></div>
+</div>
+<div class="flex items-center">
+<div class="px-3 py-1.5 rounded-full bg-success/10 text-success text-metadata font-metadata flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">check_circle</span> Plan
+                    </div>
+<div class="w-4 h-px bg-primary mx-1"></div>
+</div>
+<div class="flex items-center">
+<div class="px-3 py-1.5 rounded-full bg-brand-soft border border-primary text-primary font-bold text-label-md font-label-md">
+                        Delivery
+                    </div>
+<div class="w-4 h-px bg-outline-variant mx-1"></div>
+</div>
+<div class="flex items-center">
+<div class="px-3 py-1.5 rounded-full bg-surface-l2 text-on-surface-variant text-metadata font-metadata">
+                        Quality
+                    </div>
+<div class="w-4 h-px bg-outline-variant mx-1"></div>
+</div>
+<div class="flex items-center">
+<div class="px-3 py-1.5 rounded-full bg-surface-l2 text-on-surface-variant text-metadata font-metadata">
+                        Close-out
+                    </div>
+</div>
+</div>
+</section>
+<!-- Primary Action -->
+<section class="px-gutter-phone mb-xl">
+<button class="w-full h-target-min bg-brand-red text-on-primary rounded-xl flex items-center justify-center gap-sm font-label-md text-label-md shadow-md active:scale-[0.98] transition-transform">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">edit_document</span>
+                LOG TODAY'S WORK
+            </button>
+</section>
+<!-- Workflow Modules Grid -->
+<section class="px-gutter-phone mb-xl grid grid-cols-1 md:grid-cols-2 gap-sm"><div class="bg-surface-l1 rounded-2xl p-sm shadow-[0_2px_8px_rgba(0,0,0,0.05)] border border-surface-container-highest house-roof-cut relative overflow-hidden"><div class="absolute top-0 right-0 w-16 h-16 bg-surface-container-low rounded-bl-full -mr-8 -mt-8"></div><div class="flex justify-between items-start mb-sm relative z-10"><div class="flex items-center gap-xs"><span class="material-symbols-outlined text-tertiary">location_on</span><h3 class="text-section-title font-section-title text-on-surface">Technical Logs</h3></div><span class="px-2 py-1 rounded-md bg-tertiary-container/10 text-tertiary text-metadata font-metadata">3 Active Logs</span></div><p class="text-metadata font-metadata text-on-surface-variant mb-md">Review and manage technical site inspection logs.</p><a href="{{DATA:SCREEN:SCREEN_73}}" class="w-full h-10 bg-primary text-on-primary rounded-lg text-label-md font-label-md flex items-center justify-center gap-1 hover:brightness-95 transition-all"><span class="material-symbols-outlined text-[18px]">visibility</span> VIEW LOGS</a></div>
+<!-- Site Visits -->
+<div class="bg-surface-l1 rounded-2xl p-sm shadow-[0_2px_8px_rgba(0,0,0,0.05)] border border-surface-container-highest house-roof-cut relative overflow-hidden"><div class="absolute top-0 right-0 w-16 h-16 bg-surface-container-low rounded-bl-full -mr-8 -mt-8"></div><div class="flex justify-between items-start mb-sm relative z-10"><div class="flex items-center gap-xs"><span class="material-symbols-outlined text-tertiary">engineering</span><h3 class="text-section-title font-section-title text-on-surface">Daily Site Log</h3></div><span class="px-2 py-1 rounded-md bg-success/10 text-success text-metadata font-metadata">Updated Today</span></div><p class="text-metadata font-metadata text-on-surface-variant mb-md">Last entry: Foundation check completed at 14:30.</p><button class="w-full h-10 border border-outline-variant text-primary rounded-lg text-label-md font-label-md flex items-center justify-center gap-1 hover:bg-surface-container-low transition-colors"><span class="material-symbols-outlined text-[18px]">history</span> VIEW HISTORY</button></div>
+<!-- Material Request -->
+<div class="bg-surface-l1 rounded-2xl p-sm shadow-[0_2px_8px_rgba(0,0,0,0.05)] border border-surface-container-highest house-roof-cut relative overflow-hidden">
+<div class="absolute top-0 right-0 w-16 h-16 bg-warning/10 rounded-bl-full -mr-8 -mt-8"></div>
+<div class="flex justify-between items-start mb-sm relative z-10">
+<div class="flex items-center gap-xs">
+<span class="material-symbols-outlined text-warning">local_shipping</span>
+<h3 class="text-section-title font-section-title text-on-surface">Material Req</h3>
+</div>
+<span class="px-2 py-1 rounded-md bg-warning/20 text-warning text-metadata font-metadata font-bold flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]" style="font-variation-settings: 'FILL' 1;">error</span> Attention
+                    </span>
+</div>
+<p class="text-metadata font-metadata text-on-surface-variant mb-md">Wood, zinc, screws logistics.</p>
+<div class="flex gap-xs">
+<button class="flex-1 h-10 border border-outline-variant text-on-surface rounded-lg text-label-md font-label-md flex items-center justify-center hover:bg-surface-container-low transition-colors">
+                        VIEW (2)
+                    </button>
+<a href="{{DATA:SCREEN:SCREEN_72}}" class="flex-1 h-10 bg-primary-container text-on-primary-container rounded-lg text-label-md font-label-md flex items-center justify-center gap-1 hover:brightness-95 transition-all">
+<span class="material-symbols-outlined text-[18px]">add</span> NEW
+</a>
+</div>
+</div>
+<!-- Inventory / COM -->
+<div class="bg-surface-l1 rounded-2xl p-sm shadow-[0_2px_8px_rgba(0,0,0,0.05)] border border-surface-container-highest house-roof-cut relative overflow-hidden md:col-span-2">
+<div class="flex justify-between items-start mb-sm relative z-10">
+<div class="flex items-center gap-xs">
+<span class="material-symbols-outlined text-secondary">inventory_2</span>
+<h3 class="text-section-title font-section-title text-on-surface hover:underline" onclick="window.location.href='{{DATA:SCREEN:SCREEN_14}}'">Inventory / COM</h3>
+</div>
+<span class="px-2 py-1 rounded-md bg-surface-l2 text-on-surface-variant text-metadata font-metadata">Reconciled: 85%</span>
+</div>
+<div class="bg-canvas-l0 rounded-xl p-3 mb-sm">
+<div class="flex justify-between text-metadata font-metadata text-on-surface-variant mb-1">
+<span class="">Overall BOQ Progress</span>
+<span class="text-on-surface font-medium">85%</span>
+</div>
+<div class="w-full bg-outline-variant/30 h-2 rounded-full overflow-hidden">
+<div class="bg-secondary h-full rounded-full" style="width: 85%"></div>
+</div>
+</div>
+<div class="flex gap-2 mt-2">
+<div class="flex-1 bg-surface-container-lowest border border-outline-variant rounded-lg p-2 flex flex-col items-center justify-center text-center">
+<span class="text-headline-md font-headline-md text-on-surface">12</span>
+<span class="text-[10px] font-metadata text-on-surface-variant uppercase tracking-wider">Wood Pcs</span>
+</div>
+<div class="flex-1 bg-surface-container-lowest border border-outline-variant rounded-lg p-2 flex flex-col items-center justify-center text-center">
+<span class="text-headline-md font-headline-md text-on-surface">4</span>
+<span class="text-[10px] font-metadata text-on-surface-variant uppercase tracking-wider">Zinc shts</span>
+</div>
+<div class="flex-1 bg-surface-container-lowest border border-outline-variant rounded-lg p-2 flex flex-col items-center justify-center text-center">
+<button class="w-full h-full flex flex-col items-center justify-center text-primary hover:bg-surface-container-low rounded transition-colors">
+<span class="material-symbols-outlined">qr_code_scanner</span>
+<span class="text-[10px] font-metadata font-bold mt-1">SCAN</span>
+</button>
+</div>
+</div>
+</div>
+</section>
+<!-- Evidence Strip -->
+<section class="mb-xl">
+<div class="px-gutter-phone flex justify-between items-center mb-sm">
+<h3 class="text-section-title font-section-title text-on-surface">Recent Evidence</h3>
+<button class="text-primary text-label-md font-label-md hover:underline">See All</button>
+</div>
+<div class="flex overflow-x-auto hide-scrollbar gap-sm px-gutter-phone pb-4">
+<!-- Add Evidence Button -->
+<button class="flex-shrink-0 w-24 h-24 rounded-xl border-2 border-dashed border-primary text-primary flex flex-col items-center justify-center bg-brand-soft/50 hover:bg-brand-soft transition-colors active:scale-95">
+<span class="material-symbols-outlined text-[28px]">add_a_photo</span>
+<span class="text-metadata font-metadata mt-1">Capture</span>
+</button>
+<!-- Photo Cards -->
+<div class="flex-shrink-0 w-24 h-24 rounded-xl overflow-hidden relative border border-outline-variant shadow-sm">
+<img alt="Wall Frame" class="w-full h-full object-cover" data-alt="A detailed close up of a newly constructed wooden wall frame under bright natural daylight, showing precise humanitarian construction standards in a field setting. High contrast, realistic textures." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDPDOVpOpkb-_pzVT1EoA-c859N_9kwd3eA31p_Y57fhfo7rWp_qoLpnInizReS0YfMixY3FzQRHYC1ebPjjWo9B2S34gkBjRldKw7XvY0NLn0DNhLrYxPUctq-jEbSvtaTJAX0BAkw-EludYn8HrtxEiw_eTeT_JkerCqK2VJE5ERhTIG93zE8_IVW2lqJbYNd7LWweDW8vfnzpozD1BPrAuBiuACRbCJHPJJEe2d_MTHv78GjtBNvlQ">
+<div class="absolute bottom-0 w-full bg-gradient-to-t from-black/70 to-transparent p-1">
+<span class="text-[10px] font-label-md text-white">Today, 09:30</span>
+</div>
+</div>
+<div class="flex-shrink-0 w-24 h-24 rounded-xl overflow-hidden relative border border-outline-variant shadow-sm">
+<img alt="Roof Progress" class="w-full h-full object-cover" data-alt="A wide angle shot of a partially built shelter roof structure with zinc sheets being laid down, clear blue sky background, professional field operations documenting progress. Crisp lighting." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBnRCS8FqW-uHmiHhlBa7Mp28waeb-wuLC_QK1Fu8V4eEEgC0pXP-NkSAiX530VrRxmJsGOWzLdvDL7X-qyWxUb8E7Z_1tp2ZMl5cDm4EagDTmPpxjWCjjCFPuhNGwQKfHoUUwTMNaC0fXqPcGwPCIZrtJOBC7NNgeAvhMUqUgBV5fVCvdOufCaV3Q6hxDEZZa18lhhoNQe_HLq5uOPhVY_PkjovIryGtiOfB0H3RdqmLh5aFMwnmyFFQ">
+<div class="absolute bottom-0 w-full bg-gradient-to-t from-black/70 to-transparent p-1">
+<span class="text-[10px] font-label-md text-white">Yesterday</span>
+</div>
+</div>
+<div class="flex-shrink-0 w-24 h-24 rounded-xl overflow-hidden relative border border-outline-variant shadow-sm">
+<img alt="Materials" class="w-full h-full object-cover" data-alt="A detailed shot of construction materials, specifically screws and metal brackets, neatly organized on a wooden surface at a field site, demonstrating precise inventory management. Bright, natural lighting." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBzoF0OMJjOuO0Rzz1MYJEa2tpp5vOKp_crctI9n3jT6S3k-lFo626WDasPd1CxcaaIIjT9T9IaLXSGFs3e6HNsmea9zAQzTnirIJGtCeUECrnbJlZLCjysmN_XJGxn2Hs8jGjvgKKm7FZJdL73p6aUthjyirCS713T9F3G8Fd9CRFQajlSJ5ZMp-KW1HmgDb9_sraruae_4nSB-wP7r1oC3N1jlS-JYY-nc0ixFbLbu3-2tjlUL2uznA">
+<div class="absolute bottom-0 w-full bg-gradient-to-t from-black/70 to-transparent p-1">
+<span class="text-[10px] font-label-md text-white">Yesterday</span>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- BottomNavBar -->
+<nav class="md:hidden fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-2 py-3 pb-safe bg-surface-container-lowest dark:bg-inverse-surface border-t border-outline-variant dark:border-none shadow-lg rounded-t-xl">
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-surface-variant px-4 py-1.5 hover:bg-surface-container-high dark:hover:bg-surface-variant transition-colors rounded-xl" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="text-label-md font-label-md mt-1 text-[11px]">Dashboard</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-surface-variant px-4 py-1.5 hover:bg-surface-container-high dark:hover:bg-surface-variant transition-colors rounded-xl" href="#">
+<span class="material-symbols-outlined">assignment</span>
+<span class="text-label-md font-label-md mt-1 text-[11px]">Scope</span>
+</a>
+<!-- Active Tab: Control maps to active construction/delivery command center -->
+<a class="flex flex-col items-center justify-center bg-primary-container dark:bg-primary text-on-primary-container dark:text-on-primary rounded-xl px-4 py-1.5 transition-all scale-95 duration-100" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">settings_suggest</span>
+<span class="text-label-md font-label-md mt-1 text-[11px]">Control</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-surface-variant px-4 py-1.5 hover:bg-surface-container-high dark:hover:bg-surface-variant transition-colors rounded-xl" href="#">
+<span class="material-symbols-outlined">home</span>
+<span class="text-label-md font-label-md mt-1 text-[11px]">Houses</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-surface-variant px-4 py-1.5 hover:bg-surface-container-high dark:hover:bg-surface-variant transition-colors rounded-xl" href="#">
+<span class="material-symbols-outlined">more_horiz</span>
+<span class="text-label-md font-label-md mt-1 text-[11px]">More</span>
+</a>
+</nav>
+
+
+
+
+
+
+</body></html>
