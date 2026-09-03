@@ -45,6 +45,17 @@ void main() {
     await tester.pumpAndSettle();
     expect(workLogObserver.lastName, RcRoutes.workLogs);
 
+    for (final shortcut in <String, String>{
+      'Transfers (1)': RcRoutes.transfers,
+      'Team community': RcRoutes.teamCommunity,
+      'HQ command': RcRoutes.hqCommand,
+    }.entries) {
+      final observer = _RecordingNavigatorObserver();
+      await _pumpRoute(tester, RcRoutes.home, observer: observer);
+      await _tapScrollableText(tester, shortcut.key);
+      expect(observer.lastName, shortcut.value, reason: shortcut.key);
+    }
+
     final houseObserver = _RecordingNavigatorObserver();
     await _pumpRoute(tester, RcRoutes.home, observer: houseObserver);
     final houseCard = find.byType(RcHouseCard).first;
@@ -99,13 +110,18 @@ void main() {
     const modules = <String, String>{
       'Work Plan': RcRoutes.workPlan,
       'Document Checklist': RcRoutes.documentChecklist,
+      'Construction Schedule': RcRoutes.schedule,
+      'Team Resource Manager': RcRoutes.teamResources,
+      'Transfer Management': RcRoutes.transfers,
       'Site Visits': RcRoutes.siteVisits,
       'Daily Site Log': RcRoutes.dailyLog,
       'Material Request': RcRoutes.materialRequest,
       'Consumables': RcRoutes.consumableRequest,
       'Inventory Reconciliation': RcRoutes.inventory,
+      'Live Team Briefing': RcRoutes.liveBriefing,
       'Monitoring Checklist': RcRoutes.monitoring,
       'Final Inspection': RcRoutes.finalInspection,
+      'Production Review': RcRoutes.productionCommand,
       'Notice of Completion': RcRoutes.completion,
       'Payment Submission': RcRoutes.payment,
     };
@@ -124,6 +140,9 @@ void main() {
     await _useViewport(tester, const Size(390, 844));
     const links = <String, String>{
       'Work Logs': RcRoutes.workLogs,
+      'Transfer Management': RcRoutes.transfers,
+      'Construction Schedule': RcRoutes.schedule,
+      'Live Team Briefing': RcRoutes.liveBriefing,
       'Inventory Tracker': RcRoutes.inventory,
       'Evidence Viewer': RcRoutes.evidence,
       'Operational Map': RcRoutes.operationalMap,
@@ -131,8 +150,21 @@ void main() {
       'Notifications': RcRoutes.notifications,
       'Users Online': RcRoutes.usersOnline,
       'Gmail': RcRoutes.gmail,
+      'Team Excellence Community': RcRoutes.teamCommunity,
+      'Team Performance': RcRoutes.teamPerformance,
+      'Team Resource Manager': RcRoutes.teamResources,
+      'Promotion Routing': RcRoutes.promotionRouting,
+      'Production Command': RcRoutes.productionCommand,
+      'Finance Command': RcRoutes.financeCommand,
+      'Connected Approval Queue': RcRoutes.approvalQueue,
+      'HQ Command Centre': RcRoutes.hqCommand,
+      'Institutional Report': RcRoutes.institutionalReport,
       'Production Analytics': RcRoutes.analytics,
       'Activity History': RcRoutes.activity,
+      'Administration Command': RcRoutes.adminCommand,
+      'Control Layout': RcRoutes.controlLayout,
+      'Transfer Logic': RcRoutes.transferAutomation,
+      'Awards & Incentives': RcRoutes.awardsIncentives,
       'User Access': RcRoutes.adminUsers,
       'Templates': RcRoutes.adminTemplates,
       'SETTINGS & ACCESSIBILITY': RcRoutes.settings,

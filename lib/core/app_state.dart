@@ -305,6 +305,244 @@ class AppState extends ChangeNotifier {
   final List<TeamMember> team;
   final List<WorkLogEntry> workLogs;
 
+  final List<TransferRecord> transfers = <TransferRecord>[
+    TransferRecord(
+      id: 'TRF-8924A',
+      category: 'Personnel',
+      resource: '1 Master Carpenter, 2 Assistants',
+      quantity: 3,
+      origin: 'Hanover Central Hub',
+      destination: 'Thornton Cluster A3',
+      houseCode: 'H12',
+      urgency: 'Priority',
+      reason: 'Roof framing and structural reinforcement.',
+      startDate: DateTime(2026, 9, 3),
+      endDate: DateTime(2026, 9, 6),
+      budgetImpact: 1200,
+      status: 'Pending approval',
+    ),
+    TransferRecord(
+      id: 'TRF-8930B',
+      category: 'Materials',
+      resource: '12 zinc sheets • 14 ft',
+      quantity: 12,
+      origin: 'Hanover Central Depot',
+      destination: 'Thornton Site Store',
+      houseCode: 'H12',
+      urgency: 'Critical',
+      reason: 'Resolve active roofing-material blocker.',
+      startDate: DateTime(2026, 9, 3),
+      budgetImpact: 450,
+      status: 'In transit',
+    ),
+    TransferRecord(
+      id: 'TRF-8912C',
+      category: 'Personnel',
+      resource: '1 Carpenter',
+      quantity: 1,
+      origin: 'Haughton Grove Cluster 1',
+      destination: 'Miles Town Cluster 2',
+      houseCode: 'H18',
+      urgency: 'Routine',
+      reason: 'Temporary scope-verification support.',
+      startDate: DateTime(2026, 8, 29),
+      endDate: DateTime(2026, 8, 30),
+      budgetImpact: 250,
+      status: 'Completed',
+    ),
+  ];
+
+  final List<CrewRecord> crews = <CrewRecord>[
+    CrewRecord(
+      id: 'CREW-A',
+      name: 'Alpha Crew',
+      lead: 'Andre Brown',
+      parish: 'Hanover',
+      cluster: 'Thornton Cluster A3',
+      currentHouse: 'H12',
+      currentPhase: 'Roof framing',
+      members: <String>['Andre Brown', 'Michael Grant', 'Jason Reid'],
+      housesCompleted: 14,
+      incidents: 0,
+      qualityScore: .96,
+      efficiency: 1.12,
+      payoutVelocity: 3.1,
+      availability: 'Deployed',
+    ),
+    CrewRecord(
+      id: 'CREW-B',
+      name: 'Bravo Squad',
+      lead: 'David Clarke',
+      parish: 'Hanover',
+      cluster: 'Haughton Grove Cluster 1',
+      currentHouse: 'H2',
+      currentPhase: 'Close-out',
+      members: <String>['David Clarke', 'Ian Smith', 'Maria Green'],
+      housesCompleted: 9,
+      incidents: 1,
+      qualityScore: .92,
+      efficiency: 1.04,
+      payoutVelocity: 3.8,
+      availability: 'Deployed',
+    ),
+    CrewRecord(
+      id: 'CREW-C',
+      name: 'Charlie Team',
+      lead: 'Kim Ross',
+      parish: 'Hanover',
+      cluster: 'Miles Town Cluster 2',
+      currentHouse: 'H18',
+      currentPhase: 'Technical scope',
+      members: <String>['Kim Ross', 'Samuel Reid'],
+      housesCompleted: 11,
+      incidents: 0,
+      qualityScore: .94,
+      efficiency: 1.08,
+      payoutVelocity: 3.4,
+      availability: 'Available',
+    ),
+  ];
+
+  final List<CommunityEventRecord> communityEvents =
+      <CommunityEventRecord>[
+    CommunityEventRecord(
+      id: 'EVT-1',
+      title: 'Technical workshop: roof anchors',
+      location: 'Hanover Site HQ',
+      startsAt: DateTime(2026, 9, 4, 8),
+      kind: 'Training',
+    ),
+    CommunityEventRecord(
+      id: 'EVT-2',
+      title: 'Field supervisor synchronization',
+      location: 'Virtual command room',
+      startsAt: DateTime(2026, 9, 5, 10),
+      kind: 'Meeting',
+    ),
+    CommunityEventRecord(
+      id: 'EVT-3',
+      title: 'Community outreach: Miles Town',
+      location: 'Miles Town Community Centre',
+      startsAt: DateTime(2026, 9, 7, 13),
+      kind: 'Community',
+    ),
+  ];
+
+  final List<ShoutOutRecord> shoutOuts = <ShoutOutRecord>[
+    ShoutOutRecord(
+      id: 'SH-1',
+      message:
+          'Thanks to David Clarke for supporting the H12 material delivery when transport was delayed.',
+      author: 'Maria Green',
+      crew: 'Bravo Squad',
+      createdAt: DateTime(2026, 9, 2, 15, 30),
+    ),
+    ShoutOutRecord(
+      id: 'SH-2',
+      message:
+          'Excellent framing solution by Alpha Crew while preserving the approved roof geometry.',
+      author: 'Construction Specialist',
+      crew: 'Alpha Crew',
+      createdAt: DateTime(2026, 9, 1, 11),
+    ),
+  ];
+
+  final List<IncentiveRecord> incentives = <IncentiveRecord>[
+    IncentiveRecord(
+      id: 'INC-SAFE',
+      title: 'Safety Bonus',
+      description: 'Quarterly reward for zero verified safety incidents.',
+      qualification: '0 incidents • evidence verified',
+      active: true,
+    ),
+    IncentiveRecord(
+      id: 'INC-QUALITY',
+      title: 'Quality Payout',
+      description: 'Recognizes teams maintaining a 95% or higher quality score.',
+      qualification: '95% quality threshold',
+      active: true,
+    ),
+    IncentiveRecord(
+      id: 'INC-EFFICIENCY',
+      title: 'Efficiency Reward',
+      description: 'Recognizes safe completion ahead of the baseline schedule.',
+      qualification: 'On time • no quality regression',
+      active: true,
+    ),
+  ];
+
+  final List<PromotionCandidate> promotionCandidates = <PromotionCandidate>[
+    PromotionCandidate(
+      id: 'PC-8842-A',
+      name: 'David Clarke',
+      currentRole: 'Carpenter Lead',
+      targetRole: 'Master Carpenter',
+      qualityScore: .98,
+      speedIndex: 1.2,
+      attendance: 1,
+      routingTarget: 'Thornton Cluster A3',
+    ),
+    PromotionCandidate(
+      id: 'PC-8848-B',
+      name: 'Jason Reid',
+      currentRole: 'Assistant Carpenter',
+      targetRole: 'Carpenter',
+      qualityScore: .96,
+      speedIndex: 1.1,
+      attendance: .98,
+      routingTarget: 'Miles Town Cluster 2',
+    ),
+  ];
+
+  final List<String> controlTileOrder = <String>[
+    'work-plan',
+    'documents',
+    'schedule',
+    'team-resources',
+    'transfers',
+    'site-visits',
+    'daily-log',
+    'materials',
+    'consumables',
+    'inventory',
+    'live-briefing',
+    'monitoring',
+    'final-inspection',
+    'production-review',
+    'completion',
+    'payment',
+  ];
+  final Set<String> hiddenControlTiles = <String>{};
+  final Map<String, bool> adminFeatures = <String, bool>{
+    'Automated transfers': true,
+    'Centralized parish and cluster control': true,
+    'Cluster geography management': true,
+    'Parish location management': true,
+    'Multi-parish inventory': true,
+    'Storage health alerts': true,
+    'Notification priorities': true,
+    'Manual override approvals': true,
+    'Payment payout logic': true,
+    'Safety bonus logic': true,
+    'Construction schedule policy': true,
+    'Repair details library': true,
+    'Legacy data import': false,
+    'AI paper mapping review': true,
+    'Automatic cloud synchronization': true,
+  };
+
+  String selectedTransferId = 'TRF-8924A';
+  String controlGrouping = 'Lifecycle';
+  String controlDensity = 'Comfortable';
+  bool controlShowHero = true;
+  bool controlShowInsights = true;
+  bool autoRoutingEnabled = true;
+  bool autoTransferEnabled = true;
+  int safetyIncidentThreshold = 0;
+  String safetyCalculationPeriod = 'Quarterly';
+  bool safetyAutoApply = true;
+  bool hqReportApproved = false;
+
   final Map<String, Map<String, String>> formDrafts =
       <String, Map<String, String>>{};
   final Map<String, Set<String>> completedDocuments = <String, Set<String>>{
@@ -353,6 +591,19 @@ class AppState extends ChangeNotifier {
             house.status != RecordStatus.paid,
       )
       .length;
+  int get pendingTransfers => transfers
+      .where((transfer) => transfer.status == 'Pending approval')
+      .length;
+  int get crewsDeployed =>
+      crews.where((crew) => crew.availability == 'Deployed').length;
+  double get averageCrewQuality => crews.isEmpty
+      ? 0
+      : crews.fold<double>(0, (sum, crew) => sum + crew.qualityScore) /
+          crews.length;
+  TransferRecord get selectedTransfer => transfers.firstWhere(
+        (transfer) => transfer.id == selectedTransferId,
+        orElse: () => transfers.first,
+      );
   double get evidenceReadiness {
     final required = houses.fold<int>(
       0,
@@ -614,6 +865,49 @@ class AppState extends ChangeNotifier {
     _markChanged();
   }
 
+  void approveCompletion(String houseCode) {
+    final house = houseByCode(houseCode);
+    house.phase = LifecyclePhase.closeOut;
+    house.status = RecordStatus.approved;
+    house.progress = 1;
+    house.nextAction = 'Prepare payment submission';
+    _recordActivity(
+      houseCode: houseCode,
+      title: 'Completion approved',
+      detail: 'Close-out evidence and signatures passed review.',
+      icon: Icons.verified_outlined,
+    );
+    _markChanged();
+  }
+
+  void approvePayment(String houseCode) {
+    final house = houseByCode(houseCode);
+    house.phase = LifecyclePhase.finance;
+    house.status = RecordStatus.approved;
+    house.nextAction = 'Release approved payment';
+    _recordActivity(
+      houseCode: houseCode,
+      title: 'Payment approved',
+      detail: 'Finance review passed and the payout is ready to release.',
+      icon: Icons.price_check_outlined,
+    );
+    _markChanged();
+  }
+
+  void markPaymentPaid(String houseCode) {
+    final house = houseByCode(houseCode);
+    house.phase = LifecyclePhase.finance;
+    house.status = RecordStatus.paid;
+    house.nextAction = 'Archive the complete production record';
+    _recordActivity(
+      houseCode: houseCode,
+      title: 'Payment released',
+      detail: 'The payment status is now paid.',
+      icon: Icons.payments_outlined,
+    );
+    _markChanged();
+  }
+
   void markNotificationRead(String id) {
     notifications.firstWhere((item) => item.id == id).read = true;
     notifyListeners();
@@ -661,6 +955,323 @@ class AppState extends ChangeNotifier {
       title: 'Work log saved',
       detail: '$category • ${hours.toStringAsFixed(1)} hours',
       icon: Icons.schedule_outlined,
+    );
+    _markChanged();
+  }
+
+  String createTransfer({
+    required String category,
+    required String resource,
+    required int quantity,
+    required String origin,
+    required String destination,
+    required String houseCode,
+    required String urgency,
+    required String reason,
+    required bool temporary,
+  }) {
+    final id = 'TRF-${DateTime.now().millisecondsSinceEpoch}';
+    transfers.insert(
+      0,
+      TransferRecord(
+        id: id,
+        category: category,
+        resource: resource,
+        quantity: quantity,
+        origin: origin,
+        destination: destination,
+        houseCode: houseCode,
+        urgency: urgency,
+        reason: reason,
+        startDate: DateTime.now(),
+        endDate: temporary ? DateTime.now().add(const Duration(days: 3)) : null,
+        budgetImpact: category == 'Personnel' ? quantity * 400 : quantity * 35,
+        status: 'Pending approval',
+      ),
+    );
+    selectedTransferId = id;
+    notifications.insert(
+      0,
+      AppNotification(
+        id: 'N-$id',
+        title: 'Transfer request needs approval',
+        detail: '$resource requested for $houseCode from $origin.',
+        time: DateTime.now(),
+        priority: urgency == 'Critical' ? 'High' : 'Action',
+        houseCode: houseCode,
+      ),
+    );
+    _recordActivity(
+      houseCode: houseCode,
+      title: 'Transfer request created',
+      detail: '$resource • $origin to $destination • $urgency',
+      icon: Icons.swap_horiz_outlined,
+    );
+    _markChanged();
+    return id;
+  }
+
+  void selectTransfer(String id) {
+    selectedTransferId = id;
+    notifyListeners();
+  }
+
+  void updateTransferStatus(String id, String status) {
+    final transfer = transfers.firstWhere((item) => item.id == id);
+    transfer.status = status;
+    _recordActivity(
+      houseCode: transfer.houseCode,
+      title: 'Transfer $status',
+      detail: '${transfer.id} • ${transfer.resource}',
+      icon: status == 'Declined'
+          ? Icons.cancel_outlined
+          : Icons.local_shipping_outlined,
+    );
+    if (status == 'Approved') {
+      notifications.insert(
+        0,
+        AppNotification(
+          id: 'N-${DateTime.now().microsecondsSinceEpoch}',
+          title: 'Transfer approved',
+          detail: '${transfer.resource} approved for ${transfer.houseCode}.',
+          time: DateTime.now(),
+          priority: 'Info',
+          houseCode: transfer.houseCode,
+        ),
+      );
+    }
+    _markChanged();
+  }
+
+  void assignCrew(String crewId, String houseCode) {
+    final crew = crews.firstWhere((item) => item.id == crewId);
+    final house = houseByCode(houseCode);
+    crew.currentHouse = houseCode;
+    crew.cluster = house.cluster;
+    crew.parish = house.parish;
+    crew.currentPhase = house.phase.label;
+    crew.availability = 'Deployed';
+    _recordActivity(
+      houseCode: houseCode,
+      title: '${crew.name} assigned',
+      detail: '${crew.members.length} team members routed to ${house.cluster}.',
+      icon: Icons.groups_outlined,
+    );
+    _markChanged();
+  }
+
+  void addShoutOut({required String crew, required String message}) {
+    shoutOuts.insert(
+      0,
+      ShoutOutRecord(
+        id: 'SH-${DateTime.now().microsecondsSinceEpoch}',
+        message: message,
+        author: 'Andre Brown',
+        crew: crew,
+        createdAt: DateTime.now(),
+      ),
+    );
+    _recordActivity(
+      houseCode: selectedHouseCode,
+      title: 'Team shout-out published',
+      detail: '$crew • $message',
+      icon: Icons.campaign_outlined,
+    );
+    _markChanged();
+  }
+
+  void publishAward({required String crew, required String reason}) {
+    addShoutOut(
+      crew: crew,
+      message: '$crew received Team of the Month recognition: $reason',
+    );
+    notifications.insert(
+      0,
+      AppNotification(
+        id: 'N-AWARD-${DateTime.now().microsecondsSinceEpoch}',
+        title: 'Team award published',
+        detail: '$crew is now featured in Team Excellence.',
+        time: DateTime.now(),
+        priority: 'Info',
+      ),
+    );
+    notifyListeners();
+  }
+
+  void toggleIncentive(String id) {
+    final incentive = incentives.firstWhere((item) => item.id == id);
+    incentive.active = !incentive.active;
+    _recordActivity(
+      houseCode: selectedHouseCode,
+      title: 'Incentive configuration updated',
+      detail: '${incentive.title}: ${incentive.active ? 'Active' : 'Paused'}',
+      icon: Icons.workspace_premium_outlined,
+    );
+    _markChanged();
+  }
+
+  void promoteCandidate(String id) {
+    final candidate = promotionCandidates.firstWhere((item) => item.id == id);
+    candidate.promoted = true;
+    for (final member in team.where((item) => item.name == candidate.name)) {
+      member.role = candidate.targetRole;
+    }
+    _recordActivity(
+      houseCode: selectedHouseCode,
+      title: 'Promotion approved',
+      detail:
+          '${candidate.name}: ${candidate.currentRole} to ${candidate.targetRole}; routed to ${candidate.routingTarget}.',
+      icon: Icons.military_tech_outlined,
+    );
+    _markChanged();
+  }
+
+  void updateSafetyPolicy({
+    required int incidentThreshold,
+    required String calculationPeriod,
+    required bool autoApply,
+  }) {
+    safetyIncidentThreshold = incidentThreshold;
+    safetyCalculationPeriod = calculationPeriod;
+    safetyAutoApply = autoApply;
+    _recordActivity(
+      houseCode: selectedHouseCode,
+      title: 'Safety incentive policy updated',
+      detail:
+          '$calculationPeriod • $incidentThreshold incident threshold • auto apply ${autoApply ? 'on' : 'off'}.',
+      icon: Icons.health_and_safety_outlined,
+    );
+    _markChanged();
+  }
+
+  void setAutoTransfer(bool enabled) {
+    autoTransferEnabled = enabled;
+    _recordActivity(
+      houseCode: selectedHouseCode,
+      title: 'Transfer automation updated',
+      detail: enabled
+          ? 'Automated transfer proposals are enabled; approval remains required.'
+          : 'Automated transfer proposals are paused.',
+      icon: Icons.swap_horiz_outlined,
+    );
+    _markChanged();
+  }
+
+  void setAutoRouting(bool enabled) {
+    autoRoutingEnabled = enabled;
+    _recordActivity(
+      houseCode: selectedHouseCode,
+      title: 'Promotion routing updated',
+      detail: enabled
+          ? 'Qualified promotion candidates can be routed automatically.'
+          : 'Promotion routing now requires a manual destination.',
+      icon: Icons.route_outlined,
+    );
+    _markChanged();
+  }
+
+  void toggleAdminFeature(String name) {
+    adminFeatures[name] = !(adminFeatures[name] ?? false);
+    _recordActivity(
+      houseCode: selectedHouseCode,
+      title: 'System configuration updated',
+      detail: '$name: ${adminFeatures[name]! ? 'Enabled' : 'Disabled'}',
+      icon: Icons.settings_suggest_outlined,
+    );
+    _markChanged();
+  }
+
+  void toggleControlTile(String id) {
+    if (!hiddenControlTiles.add(id)) hiddenControlTiles.remove(id);
+    notifyListeners();
+  }
+
+  void moveControlTile(String id, int offset) {
+    final oldIndex = controlTileOrder.indexOf(id);
+    if (oldIndex < 0) return;
+    final newIndex = (oldIndex + offset)
+        .clamp(0, controlTileOrder.length - 1)
+        .toInt();
+    if (oldIndex == newIndex) return;
+    controlTileOrder
+      ..removeAt(oldIndex)
+      ..insert(newIndex, id);
+    notifyListeners();
+  }
+
+  void setControlGrouping(String grouping) {
+    controlGrouping = grouping;
+    notifyListeners();
+  }
+
+  void setControlDensity(String density) {
+    controlDensity = density;
+    notifyListeners();
+  }
+
+  void setControlSectionVisibility({
+    bool? showHero,
+    bool? showInsights,
+  }) {
+    if (showHero != null) controlShowHero = showHero;
+    if (showInsights != null) controlShowInsights = showInsights;
+    notifyListeners();
+  }
+
+  void resetControlLayout() {
+    controlTileOrder
+      ..clear()
+      ..addAll(<String>[
+        'work-plan',
+        'documents',
+        'schedule',
+        'team-resources',
+        'transfers',
+        'site-visits',
+        'daily-log',
+        'materials',
+        'consumables',
+        'inventory',
+        'live-briefing',
+        'monitoring',
+        'final-inspection',
+        'production-review',
+        'completion',
+        'payment',
+      ]);
+    hiddenControlTiles.clear();
+    controlGrouping = 'Lifecycle';
+    controlDensity = 'Comfortable';
+    controlShowHero = true;
+    controlShowInsights = true;
+    notifyListeners();
+  }
+
+  void advanceSchedule(String houseCode) {
+    final house = houseByCode(houseCode);
+    final index = LifecyclePhase.values.indexOf(house.phase);
+    if (index < LifecyclePhase.values.length - 1) {
+      house.phase = LifecyclePhase.values[index + 1];
+      house.progress = (house.progress + .15).clamp(0, 1).toDouble();
+      house.status = RecordStatus.active;
+      house.nextAction = 'Complete ${house.phase.label} requirements';
+    }
+    _recordActivity(
+      houseCode: houseCode,
+      title: 'Construction schedule advanced',
+      detail: '${house.code} moved to ${house.phase.label}.',
+      icon: Icons.event_available_outlined,
+    );
+    _markChanged();
+  }
+
+  void approveHqReport() {
+    hqReportApproved = true;
+    _recordActivity(
+      houseCode: selectedHouseCode,
+      title: 'Institutional report approved',
+      detail: 'HQ verification and sign-off recorded.',
+      icon: Icons.verified_user_outlined,
     );
     _markChanged();
   }

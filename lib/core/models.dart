@@ -238,3 +238,143 @@ class FormSectionSpec {
   final IconData icon;
   final List<FormFieldSpec> fields;
 }
+
+class TransferRecord {
+  TransferRecord({
+    required this.id,
+    required this.category,
+    required this.resource,
+    required this.quantity,
+    required this.origin,
+    required this.destination,
+    required this.houseCode,
+    required this.urgency,
+    required this.reason,
+    required this.startDate,
+    required this.budgetImpact,
+    required this.status,
+    this.endDate,
+  });
+
+  final String id;
+  final String category;
+  final String resource;
+  final int quantity;
+  final String origin;
+  final String destination;
+  final String houseCode;
+  final String urgency;
+  final String reason;
+  final DateTime startDate;
+  final DateTime? endDate;
+  final double budgetImpact;
+  String status;
+
+  bool get temporary => endDate != null;
+}
+
+class CrewRecord {
+  CrewRecord({
+    required this.id,
+    required this.name,
+    required this.lead,
+    required this.parish,
+    required this.cluster,
+    required this.currentHouse,
+    required this.currentPhase,
+    required this.members,
+    required this.housesCompleted,
+    required this.incidents,
+    required this.qualityScore,
+    required this.efficiency,
+    required this.payoutVelocity,
+    required this.availability,
+  });
+
+  final String id;
+  final String name;
+  String lead;
+  String parish;
+  String cluster;
+  String currentHouse;
+  String currentPhase;
+  final List<String> members;
+  int housesCompleted;
+  int incidents;
+  double qualityScore;
+  double efficiency;
+  double payoutVelocity;
+  String availability;
+}
+
+class CommunityEventRecord {
+  const CommunityEventRecord({
+    required this.id,
+    required this.title,
+    required this.location,
+    required this.startsAt,
+    required this.kind,
+  });
+
+  final String id;
+  final String title;
+  final String location;
+  final DateTime startsAt;
+  final String kind;
+}
+
+class ShoutOutRecord {
+  const ShoutOutRecord({
+    required this.id,
+    required this.message,
+    required this.author,
+    required this.crew,
+    required this.createdAt,
+  });
+
+  final String id;
+  final String message;
+  final String author;
+  final String crew;
+  final DateTime createdAt;
+}
+
+class IncentiveRecord {
+  IncentiveRecord({
+    required this.id,
+    required this.title,
+    required this.description,
+    required this.qualification,
+    required this.active,
+  });
+
+  final String id;
+  final String title;
+  final String description;
+  String qualification;
+  bool active;
+}
+
+class PromotionCandidate {
+  PromotionCandidate({
+    required this.id,
+    required this.name,
+    required this.currentRole,
+    required this.targetRole,
+    required this.qualityScore,
+    required this.speedIndex,
+    required this.attendance,
+    required this.routingTarget,
+    this.promoted = false,
+  });
+
+  final String id;
+  final String name;
+  final String currentRole;
+  final String targetRole;
+  final double qualityScore;
+  final double speedIndex;
+  final double attendance;
+  final String routingTarget;
+  bool promoted;
+}

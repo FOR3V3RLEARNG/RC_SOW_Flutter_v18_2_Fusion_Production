@@ -36,6 +36,24 @@ abstract final class RcRoutes {
   static const String adminUsers = '/admin/users';
   static const String adminTemplates = '/admin/templates';
   static const String gmail = '/gmail';
+  static const String transfers = '/transfers';
+  static const String newTransfer = '/transfers/new';
+  static const String transferDetail = '/transfers/detail';
+  static const String transferAutomation = '/admin/transfers';
+  static const String teamCommunity = '/teams/community';
+  static const String teamPerformance = '/teams/performance';
+  static const String teamResources = '/teams/resources';
+  static const String awardsIncentives = '/admin/awards';
+  static const String promotionRouting = '/teams/promotions';
+  static const String schedule = '/schedule';
+  static const String liveBriefing = '/briefing/live';
+  static const String productionCommand = '/management/production';
+  static const String financeCommand = '/management/finance';
+  static const String hqCommand = '/management/hq';
+  static const String institutionalReport = '/management/report';
+  static const String adminCommand = '/admin/command';
+  static const String approvalQueue = '/management/approvals';
+  static const String controlLayout = '/control/layout';
 
   static const List<String> all = <String>[
     splash,
@@ -75,5 +93,23 @@ abstract final class RcRoutes {
     adminUsers,
     adminTemplates,
     gmail,
+    transfers,
+    newTransfer,
+    transferDetail,
+    transferAutomation,
+    teamCommunity,
+    teamPerformance,
+    teamResources,
+    awardsIncentives,
+    promotionRouting,
+    schedule,
+    liveBriefing,
+    productionCommand,
+    financeCommand,
+    hqCommand,
+    institutionalReport,
+    adminCommand,
+    approvalQueue,
+    controlLayout,
   ];
 }

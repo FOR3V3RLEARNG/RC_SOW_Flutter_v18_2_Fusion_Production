@@ -2,7 +2,7 @@
 
 Production-oriented Flutter reconstruction of the supplied Stitch screen system for Red Cross shelter/roof-repair operations.
 
-The application consolidates 163 visual variants into 35 canonical, connected product screens. Every workflow resolves to the same selected house and updates shared lifecycle, evidence, inventory, notification, work-log, sync and audit state.
+The application consolidates 163 supplied visual references into 53 canonical, connected product screens across 55 registered routes. Every workflow resolves to shared house, lifecycle, evidence, inventory, transfer, team, finance, notification, work-log, sync and audit state.
 
 ## What is connected
 
@@ -16,6 +16,12 @@ The application consolidates 163 visual variants into 35 canonical, connected pr
 - Work Plan, Daily Site Log, Site Visit, Material and Consumable forms
 - Document and Monitoring checklists
 - Inventory BOQ / Delivered / Additions / Leftovers reconciliation
+- Personnel and material transfers from request through approval and arrival
+- Construction schedule, team resource assignments and live briefings
+- Team performance, community recognition, awards, incentives and promotions
+- Unified Production, Finance, Approval and HQ command workspaces
+- Institutional report review and HQ sign-off
+- Configurable Control divisions, tile order, visibility and density
 - Completion readiness, final inspection and Payment 46/31/23 allocation
 - Evidence, activity history, notifications, users online and messages
 - Work Logs, operational analytics, map, settings and accessibility
@@ -36,28 +42,28 @@ flutter run
 
 Or run `bash tool/bootstrap_and_verify.sh`.
 
-## Verified interaction coverage
+## Automated interaction coverage
 
-Release 19.0.1 passes 170 automated checks on Flutter 3.47.2:
+Release 19.1 includes a Green Gate for:
 
-- 74 route-render checks across phone and desktop viewports
-- 36 exhaustive enabled-control suites across every non-splash route
-- 38 real-pointer navigation journeys with fatal hit-test warnings
-- 14 state-dependent workflows covering dialogs, sheets, compose, approvals,
-  submission, reconciliation, logout and successful saves
-- State transitions, route registration and the splash-to-login-to-dashboard
-  entry journey
+- Every registered route on phone and desktop viewports
+- Every enabled button, tile, switch, choice and navigation destination
+- Real-pointer navigation journeys with fatal hit-test warnings
+- Transfer, assignment, recognition, promotion, schedule, approval, finance,
+  Control customization and HQ-report state transitions
+- Route registration and the splash-to-login-to-dashboard entry journey
 
 Run the complete gate with `flutter analyze && flutter test`.
 
 ## Architecture
 
-- `lib/core/models.dart` — house, lifecycle, inventory, evidence and collaboration contracts
+- `lib/core/models.dart` — house, lifecycle, inventory, transfer, team, evidence and collaboration contracts
 - `lib/core/app_state.dart` — connected state, transitions, audit and offline queue
 - `lib/core/widgets.dart` — RC SOW design-system components
 - `lib/screens/` — responsive canonical screens and operational workflows
 - `test/` — state, route and entry-journey contracts
 - `docs/ROUTE_MATRIX.md` — canonical screen/route coverage
+- `docs/STITCH_CONCEPT_COVERAGE.md` — 163-reference concept audit and consolidation map
 - `docs/BACKEND_CONTRACT.md` — production integration boundary
 - `supabase/migrations/` — optional protected schema starter
 - `design_reference/` — original Stitch assets retained for visual comparison

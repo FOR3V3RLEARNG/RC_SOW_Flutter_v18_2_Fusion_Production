@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../core/app_state.dart';
+import '../core/control_modules.dart';
 import '../core/models.dart';
 import '../core/routes.dart';
 import '../core/theme.dart';
@@ -336,6 +337,25 @@ class DashboardScreen extends StatelessWidget {
                     onPressed: () =>
                         Navigator.pushNamed(context, RcRoutes.workLogs),
                   ),
+                  ActionChip(
+                    avatar: const Icon(Icons.swap_horiz_outlined, size: 18),
+                    label: Text('Transfers (${state.pendingTransfers})'),
+                    onPressed: () =>
+                        Navigator.pushNamed(context, RcRoutes.transfers),
+                  ),
+                  ActionChip(
+                    avatar: const Icon(Icons.diversity_3_outlined, size: 18),
+                    label: const Text('Team community'),
+                    onPressed: () =>
+                        Navigator.pushNamed(context, RcRoutes.teamCommunity),
+                  ),
+                  ActionChip(
+                    avatar:
+                        const Icon(Icons.account_balance_outlined, size: 18),
+                    label: const Text('HQ command'),
+                    onPressed: () =>
+                        Navigator.pushNamed(context, RcRoutes.hqCommand),
+                  ),
                 ],
               ),
               const SizedBox(height: 28),
@@ -447,92 +467,22 @@ class ControlOfWorksScreen extends StatefulWidget {
 class _ControlOfWorksScreenState extends State<ControlOfWorksScreen> {
   LifecyclePhase? _filter;
 
-  static const _modules = <_ControlModule>[
-    _ControlModule(
-      'Work Plan',
-      'Plan sequence, owners, dates and crew.',
-      LifecyclePhase.plan,
-      Icons.event_note_outlined,
-      RcRoutes.workPlan,
-    ),
-    _ControlModule(
-      'Document Checklist',
-      'Keep required documents visible and complete.',
-      LifecyclePhase.plan,
-      Icons.library_books_outlined,
-      RcRoutes.documentChecklist,
-    ),
-    _ControlModule(
-      'Site Visits',
-      'Record technical visits, calls and findings.',
-      LifecyclePhase.delivery,
-      Icons.location_on_outlined,
-      RcRoutes.siteVisits,
-    ),
-    _ControlModule(
-      'Daily Site Log',
-      'Capture attendance, work progress and issues.',
-      LifecyclePhase.delivery,
-      Icons.edit_note_outlined,
-      RcRoutes.dailyLog,
-    ),
-    _ControlModule(
-      'Material Request',
-      'Request house-level materials against inventory.',
-      LifecyclePhase.delivery,
-      Icons.local_shipping_outlined,
-      RcRoutes.materialRequest,
-    ),
-    _ControlModule(
-      'Consumables',
-      'Track tools and consumable field requests.',
-      LifecyclePhase.delivery,
-      Icons.handyman_outlined,
-      RcRoutes.consumableRequest,
-    ),
-    _ControlModule(
-      'Inventory Reconciliation',
-      'Connect BOQ, delivered, additions and leftovers.',
-      LifecyclePhase.delivery,
-      Icons.inventory_2_outlined,
-      RcRoutes.inventory,
-    ),
-    _ControlModule(
-      'Monitoring Checklist',
-      'Inspect technical criteria with evidence.',
-      LifecyclePhase.quality,
-      Icons.fact_check_outlined,
-      RcRoutes.monitoring,
-    ),
-    _ControlModule(
-      'Final Inspection',
-      'Confirm safety, workmanship and close-out readiness.',
-      LifecyclePhase.quality,
-      Icons.verified_outlined,
-      RcRoutes.finalInspection,
-    ),
-    _ControlModule(
-      'Notice of Completion',
-      'Complete signatures and evidence readiness.',
-      LifecyclePhase.closeOut,
-      Icons.task_alt_outlined,
-      RcRoutes.completion,
-    ),
-    _ControlModule(
-      'Payment Submission',
-      'Review allocation, approvals and finance state.',
-      LifecyclePhase.finance,
-      Icons.payments_outlined,
-      RcRoutes.payment,
-    ),
-  ];
-
   @override
   Widget build(BuildContext context) {
     final state = AppScope.of(context);
-    final modules = _modules
+    final modulesById = <String, ControlModuleDefinition>{
+      for (final module in ControlModules.all) module.id: module,
+    };
+    final modules = state.controlTileOrder
+        .where(modulesById.containsKey)
+        .map((id) => modulesById[id]!)
+        .where((module) => !state.hiddenControlTiles.contains(module.id))
         .where((module) => _filter == null || module.phase == _filter)
         .toList();
+    if (state.controlGrouping == 'Priority') {
+      modules.sort((a, b) => a.priority.compareTo(b.priority));
+    }
+    final compact = state.controlDensity == 'Compact';
     return SingleChildScrollView(
       padding: const EdgeInsets.fromLTRB(16, 20, 16, 32),
       child: Center(
@@ -546,57 +496,98 @@ class _ControlOfWorksScreenState extends State<ControlOfWorksScreen> {
                 title: 'Control of Works',
                 description:
                     'Plan, deliver, inspect, close and pay while preserving a complete evidence trail.',
-                action: FilledButton.icon(
-                  onPressed: () =>
-                      Navigator.pushNamed(context, RcRoutes.newControl),
-                  icon: const Icon(Icons.add),
-                  label: const Text('NEW CONTROL'),
-                ),
+              ),
+              const SizedBox(height: 16),
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: <Widget>[
+                  FilledButton.icon(
+                    onPressed: () =>
+                        Navigator.pushNamed(context, RcRoutes.newControl),
+                    icon: const Icon(Icons.add),
+                    label: const Text('NEW CONTROL'),
+                  ),
+                  OutlinedButton.icon(
+                    onPressed: () =>
+                        Navigator.pushNamed(context, RcRoutes.controlLayout),
+                    icon: const Icon(Icons.dashboard_customize_outlined),
+                    label: const Text('CUSTOMIZE DIVISIONS & TILES'),
+                  ),
+                ],
               ),
               const SizedBox(height: 24),
-              Container(
-                padding: const EdgeInsets.all(20),
-                decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.primaryContainer,
-                  borderRadius: BorderRadius.circular(26),
+              if (state.controlShowHero) ...<Widget>[
+                Container(
+                  padding: const EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).colorScheme.primaryContainer,
+                    borderRadius: BorderRadius.circular(26),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      Text(
+                        'Controlled delivery chain',
+                        style: Theme.of(context).textTheme.titleLarge,
+                      ),
+                      const SizedBox(height: 6),
+                      Text(
+                        'Every field action remains traceable to a house, parish, status and production stage.',
+                        style: Theme.of(context).textTheme.bodyMedium,
+                      ),
+                      const SizedBox(height: 20),
+                      const RcLifecycleRail(phase: LifecyclePhase.delivery),
+                    ],
+                  ),
                 ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                const SizedBox(height: 18),
+              ],
+              if (state.controlShowInsights) ...<Widget>[
+                RcResponsiveGrid(
+                  minItemWidth: 190,
+                  childAspectRatio: 1.35,
                   children: <Widget>[
-                    Text(
-                      'Controlled delivery chain',
-                      style: Theme.of(context).textTheme.titleLarge,
+                    RcMetricTile(
+                      label: 'Open production',
+                      value: '${state.activeHouses}',
+                      icon: Icons.home_work_outlined,
+                      color: RcColors.brand,
+                      onTap: () =>
+                          Navigator.pushNamed(context, RcRoutes.houses),
                     ),
-                    const SizedBox(height: 6),
-                    Text(
-                      'Every field action remains traceable to a house, parish, status and production stage.',
-                      style: Theme.of(context).textTheme.bodyMedium,
+                    RcMetricTile(
+                      label: 'Needs attention',
+                      value: '${state.attentionHouses}',
+                      icon: Icons.report_problem_outlined,
+                      color: RcColors.warning,
+                      onTap: () => Navigator.pushNamed(
+                        context,
+                        RcRoutes.productionCommand,
+                      ),
                     ),
-                    const SizedBox(height: 16),
-                    Wrap(
-                      spacing: 8,
-                      runSpacing: 8,
-                      children: <Widget>[
-                        RcStatusChip(
-                          label: '${state.activeHouses} OPEN',
-                          tone: RcStatusTone.brand,
-                        ),
-                        RcStatusChip(
-                          label: '${state.attentionHouses} ATTENTION',
-                          tone: RcStatusTone.warning,
-                        ),
-                        RcStatusChip(
-                          label: '${state.closeOutReady} CLOSE-OUT',
-                          tone: RcStatusTone.success,
-                        ),
-                      ],
+                    RcMetricTile(
+                      label: 'Pending transfers',
+                      value: '${state.pendingTransfers}',
+                      icon: Icons.swap_horiz_outlined,
+                      color: RcColors.info,
+                      onTap: () =>
+                          Navigator.pushNamed(context, RcRoutes.transfers),
                     ),
-                    const SizedBox(height: 20),
-                    const RcLifecycleRail(phase: LifecyclePhase.delivery),
+                    RcMetricTile(
+                      label: 'Crews deployed',
+                      value: '${state.crewsDeployed}',
+                      icon: Icons.groups_2_outlined,
+                      color: RcColors.success,
+                      onTap: () => Navigator.pushNamed(
+                        context,
+                        RcRoutes.teamResources,
+                      ),
+                    ),
                   ],
                 ),
-              ),
-              const SizedBox(height: 18),
+                const SizedBox(height: 18),
+              ],
               Wrap(
                 spacing: 8,
                 runSpacing: 8,
@@ -617,17 +608,73 @@ class _ControlOfWorksScreenState extends State<ControlOfWorksScreen> {
               ),
               const SizedBox(height: 24),
               RcSectionHeader(
-                title: 'Workflow modules',
-                subtitle: '${modules.length} connected operational modules',
+                title: switch (state.controlGrouping) {
+                  'Priority' => 'Priority workflow',
+                  'Custom' => 'Custom tile sequence',
+                  _ => 'Lifecycle divisions',
+                },
+                subtitle:
+                    '${modules.length} visible connected operational modules • ${state.controlDensity.toLowerCase()}',
+                trailing: TextButton.icon(
+                  onPressed: () =>
+                      Navigator.pushNamed(context, RcRoutes.controlLayout),
+                  icon: const Icon(Icons.tune_outlined),
+                  label: const Text('EDIT'),
+                ),
               ),
               const SizedBox(height: 12),
-              RcResponsiveGrid(
-                minItemWidth: 320,
-                childAspectRatio: 1.65,
-                children: modules
-                    .map((module) => _ControlModuleCard(module: module))
-                    .toList(),
-              ),
+              if (modules.isEmpty)
+                RcEmptyState(
+                  icon: Icons.dashboard_customize_outlined,
+                  title: 'No visible modules in this division',
+                  message:
+                      'Adjust the phase filter or restore tiles in Customize Control.',
+                  action: FilledButton.tonal(
+                    onPressed: () =>
+                        Navigator.pushNamed(context, RcRoutes.controlLayout),
+                    child: const Text('CUSTOMIZE CONTROL'),
+                  ),
+                )
+              else if (state.controlGrouping == 'Lifecycle' &&
+                  _filter == null)
+                for (final phase in LifecyclePhase.values)
+                  if (modules.any((module) => module.phase == phase)) ...<Widget>[
+                    Padding(
+                      padding: const EdgeInsets.only(top: 8, bottom: 10),
+                      child: RcSectionHeader(
+                        title: phase.label,
+                        subtitle:
+                            '${modules.where((module) => module.phase == phase).length} modules',
+                      ),
+                    ),
+                    RcResponsiveGrid(
+                      minItemWidth: compact ? 260 : 320,
+                      childAspectRatio: compact ? 2.05 : 1.65,
+                      children: modules
+                          .where((module) => module.phase == phase)
+                          .map(
+                            (module) => _ControlModuleCard(
+                              module: module,
+                              compact: compact,
+                            ),
+                          )
+                          .toList(),
+                    ),
+                    const SizedBox(height: 16),
+                  ]
+              else
+                RcResponsiveGrid(
+                  minItemWidth: compact ? 260 : 320,
+                  childAspectRatio: compact ? 2.05 : 1.65,
+                  children: modules
+                      .map(
+                        (module) => _ControlModuleCard(
+                          module: module,
+                          compact: compact,
+                        ),
+                      )
+                      .toList(),
+                ),
             ],
           ),
         ),
@@ -636,25 +683,11 @@ class _ControlOfWorksScreenState extends State<ControlOfWorksScreen> {
   }
 }
 
-class _ControlModule {
-  const _ControlModule(
-    this.title,
-    this.description,
-    this.phase,
-    this.icon,
-    this.route,
-  );
-  final String title;
-  final String description;
-  final LifecyclePhase phase;
-  final IconData icon;
-  final String route;
-}
-
 class _ControlModuleCard extends StatelessWidget {
-  const _ControlModuleCard({required this.module});
+  const _ControlModuleCard({required this.module, required this.compact});
 
-  final _ControlModule module;
+  final ControlModuleDefinition module;
+  final bool compact;
 
   @override
   Widget build(BuildContext context) {
@@ -694,16 +727,19 @@ class _ControlModuleCard extends StatelessWidget {
                       module.title,
                       style: Theme.of(context).textTheme.titleMedium,
                     ),
-                    const SizedBox(height: 4),
-                    Text(
-                      module.description,
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                            color:
-                                Theme.of(context).colorScheme.onSurfaceVariant,
-                          ),
-                    ),
+                    if (!compact) ...<Widget>[
+                      const SizedBox(height: 4),
+                      Text(
+                        module.description,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .onSurfaceVariant,
+                            ),
+                      ),
+                    ],
                   ],
                 ),
               ),
@@ -843,6 +879,21 @@ class MoreScreen extends StatelessWidget {
       const _MoreGroup('Field operations', <_MoreItem>[
         _MoreItem('Work Logs', Icons.edit_note_outlined, RcRoutes.workLogs),
         _MoreItem(
+          'Transfer Management',
+          Icons.swap_horiz_outlined,
+          RcRoutes.transfers,
+        ),
+        _MoreItem(
+          'Construction Schedule',
+          Icons.event_available_outlined,
+          RcRoutes.schedule,
+        ),
+        _MoreItem(
+          'Live Team Briefing',
+          Icons.video_camera_front_outlined,
+          RcRoutes.liveBriefing,
+        ),
+        _MoreItem(
           'Inventory Tracker',
           Icons.inventory_2_outlined,
           RcRoutes.inventory,
@@ -868,13 +919,82 @@ class MoreScreen extends StatelessWidget {
         _MoreItem('Users Online', Icons.group_outlined, RcRoutes.usersOnline),
         _MoreItem('Gmail', Icons.mail_outline, RcRoutes.gmail),
       ]),
-      const _MoreGroup('Review and management', <_MoreItem>[
+      const _MoreGroup('Team and community', <_MoreItem>[
+        _MoreItem(
+          'Team Excellence Community',
+          Icons.diversity_3_outlined,
+          RcRoutes.teamCommunity,
+        ),
+        _MoreItem(
+          'Team Performance',
+          Icons.insights_outlined,
+          RcRoutes.teamPerformance,
+        ),
+        _MoreItem(
+          'Team Resource Manager',
+          Icons.groups_2_outlined,
+          RcRoutes.teamResources,
+        ),
+        _MoreItem(
+          'Promotion Routing',
+          Icons.military_tech_outlined,
+          RcRoutes.promotionRouting,
+        ),
+      ]),
+      const _MoreGroup('Command and review', <_MoreItem>[
+        _MoreItem(
+          'Production Command',
+          Icons.precision_manufacturing_outlined,
+          RcRoutes.productionCommand,
+        ),
+        _MoreItem(
+          'Finance Command',
+          Icons.account_balance_wallet_outlined,
+          RcRoutes.financeCommand,
+        ),
+        _MoreItem(
+          'Connected Approval Queue',
+          Icons.approval_outlined,
+          RcRoutes.approvalQueue,
+        ),
+        _MoreItem(
+          'HQ Command Centre',
+          Icons.account_balance_outlined,
+          RcRoutes.hqCommand,
+        ),
+        _MoreItem(
+          'Institutional Report',
+          Icons.summarize_outlined,
+          RcRoutes.institutionalReport,
+        ),
         _MoreItem(
           'Production Analytics',
           Icons.analytics_outlined,
           RcRoutes.analytics,
         ),
         _MoreItem('Activity History', Icons.history, RcRoutes.activity),
+      ]),
+      const _MoreGroup('Administration', <_MoreItem>[
+        _MoreItem(
+          'Administration Command',
+          Icons.settings_suggest_outlined,
+          RcRoutes.adminCommand,
+        ),
+        _MoreItem(
+          'Control Layout',
+          Icons.dashboard_customize_outlined,
+          RcRoutes.controlLayout,
+        ),
+        _MoreItem(
+          'Transfer Logic',
+          Icons.alt_route_outlined,
+          RcRoutes.transferAutomation,
+        ),
+        _MoreItem(
+          'Awards & Incentives',
+          Icons.workspace_premium_outlined,
+          RcRoutes.awardsIncentives,
+        ),
         _MoreItem(
           'User Access',
           Icons.admin_panel_settings_outlined,

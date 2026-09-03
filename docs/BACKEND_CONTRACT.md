@@ -1,6 +1,6 @@
 # Production Backend Contract
 
-The UI depends on one durable operational object: `house`. Every form, evidence item, material movement, work log, notification and activity event must carry `house_id` (except system-wide events).
+The UI depends on one durable operational object: `house`. Every form, evidence item, material movement, transfer, crew assignment, briefing, approval, payment, work log, notification and activity event must carry `house_id` (except explicitly system-wide team/community and policy events).
 
 ## Required adapters
 
@@ -11,6 +11,8 @@ The UI depends on one durable operational object: `house`. Every form, evidence 
 5. **Exports** — server-side PDF/XLSX generation with template version and immutable output reference.
 6. **Gmail** — least-privilege OAuth; send/read access only for authorized roles and explicit user actions.
 7. **Maps** — organization-approved tiles/geocoding; GPS access only after field-user consent.
+8. **Approvals** — append-only decisions with actor, role, timestamp, source version and reason; transfer, close-out and finance states must not be advanced by a client-only flag.
+9. **Configuration** — Control tile preferences may be user-scoped, while transfer, incentive, routing, storage and payout policies remain administrator-owned and versioned.
 
 ## Client write sequence
 
@@ -33,4 +35,3 @@ The UI depends on one durable operational object: `house`. Every form, evidence 
 - Every approval, permission change and export is auditable.
 
 The migration is a starter contract, not an instruction to modify a live database without review and backup.
-

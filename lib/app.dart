@@ -5,10 +5,14 @@ import 'core/routes.dart';
 import 'core/theme.dart';
 import 'screens/admin_screens.dart';
 import 'screens/auth_screens.dart';
+import 'screens/command_screens.dart';
+import 'screens/control_layout_screen.dart';
 import 'screens/form_screens.dart';
 import 'screens/operation_screens.dart';
 import 'screens/shell.dart';
 import 'screens/scope_screens.dart';
+import 'screens/team_screens.dart';
+import 'screens/transfer_screens.dart';
 
 class RcSowApp extends StatelessWidget {
   const RcSowApp({required this.state, super.key});
@@ -88,6 +92,24 @@ Route<dynamic> buildRcRoute(RouteSettings settings) {
     RcRoutes.adminUsers => const AdminUsersScreen(),
     RcRoutes.adminTemplates => const AdminTemplatesScreen(),
     RcRoutes.gmail => const GmailScreen(),
+    RcRoutes.transfers => const TransferHubScreen(),
+    RcRoutes.newTransfer => const NewTransferScreen(),
+    RcRoutes.transferDetail => const TransferDetailScreen(),
+    RcRoutes.transferAutomation => const TransferAutomationScreen(),
+    RcRoutes.teamCommunity => const TeamCommunityScreen(),
+    RcRoutes.teamPerformance => const TeamPerformanceScreen(),
+    RcRoutes.teamResources => const TeamResourceScreen(),
+    RcRoutes.awardsIncentives => const AwardsIncentivesScreen(),
+    RcRoutes.promotionRouting => const PromotionRoutingScreen(),
+    RcRoutes.schedule => const ConstructionScheduleScreen(),
+    RcRoutes.liveBriefing => const LiveBriefingScreen(),
+    RcRoutes.productionCommand => const ProductionCommandScreen(),
+    RcRoutes.financeCommand => const FinanceCommandScreen(),
+    RcRoutes.hqCommand => const HqCommandScreen(),
+    RcRoutes.institutionalReport => const InstitutionalReportScreen(),
+    RcRoutes.adminCommand => const AdminCommandScreen(),
+    RcRoutes.approvalQueue => const ApprovalQueueScreen(),
+    RcRoutes.controlLayout => const ControlLayoutScreen(),
     _ => UnknownRouteScreen(routeName: settings.name ?? 'unknown'),
   };
   return MaterialPageRoute<dynamic>(builder: (_) => screen, settings: settings);

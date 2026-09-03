@@ -1,7 +1,7 @@
 name: rc_sow_connected
 description: Connected RC SOW humanitarian field-operations application.
 publish_to: none
-version: 19.0.1+1901
+version: 19.1.0+1910
 
 environment:
   sdk: '>=3.5.0 <4.0.0'
