@@ -351,8 +351,9 @@ Future<void> _tapBottomDestination(
 }
 
 Future<void> _tapScrollableText(WidgetTester tester, String text) async {
-  final target = find.text(text);
-  expect(target, findsOneWidget, reason: text);
+  final matches = find.text(text);
+  expect(matches, findsWidgets, reason: text);
+  final target = matches.last;
   await tester.ensureVisible(target);
   await tester.pumpAndSettle();
   await tester.tap(target.hitTestable());
