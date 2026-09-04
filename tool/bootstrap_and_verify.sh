@@ -6,7 +6,7 @@ if ! command -v flutter >/dev/null 2>&1; then
   exit 1
 fi
 
-flutter create --platforms=android,web --project-name=rc_sow_connected .
+flutter create --platforms=android,web --project-name=rc_sow_connected --org=org.jamaicaredcross .
 flutter pub get
 dart format lib test
 flutter analyze

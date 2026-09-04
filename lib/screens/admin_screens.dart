@@ -32,7 +32,7 @@ class _AdminUsersScreenState extends State<AdminUsersScreen> {
         )
         .toList();
     return Scaffold(
-      appBar: AppBar(
+      appBar: RcAppBar(
         title: const Text('Access Management'),
         actions: <Widget>[
           FilledButton.tonalIcon(
@@ -367,7 +367,7 @@ class AdminTemplatesScreen extends StatelessWidget {
       ),
     ];
     return Scaffold(
-      appBar: AppBar(
+      appBar: RcAppBar(
         title: const Text('Template Management'),
         actions: <Widget>[
           FilledButton.tonalIcon(
@@ -511,7 +511,7 @@ class _GmailScreenState extends State<GmailScreen> {
     if (_subject.text.isEmpty)
       _subject.text = '${house.code} — Operational update';
     return Scaffold(
-      appBar: AppBar(
+      appBar: RcAppBar(
         title: Text(
           _compose ? 'Compose institutional email' : 'Institutional Gmail',
         ),

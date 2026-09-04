@@ -7,6 +7,7 @@ abstract final class RcRoutes {
   static const String scopeRoof = '/scope/roof';
   static const String scopePrint = '/scope/print';
   static const String scopeFiles = '/scope/files';
+  static const String scopeImport = '/scope/import';
   static const String control = '/control';
   static const String houses = '/houses';
   static const String houseCommand = '/house-command';
@@ -21,6 +22,7 @@ abstract final class RcRoutes {
   static const String consumableRequest = '/forms/consumable-request';
   static const String inventory = '/inventory';
   static const String addInventory = '/inventory/add';
+  static const String inventoryTransfer = '/inventory/transfer';
   static const String completion = '/completion';
   static const String finalInspection = '/final-inspection';
   static const String payment = '/payment';
@@ -31,6 +33,9 @@ abstract final class RcRoutes {
   static const String messages = '/messages';
   static const String settings = '/settings';
   static const String workLogs = '/work-logs';
+  static const String workProjections = '/work-projections';
+  static const String productionBoard = '/production/board';
+  static const String syncMonitor = '/sync-monitor';
   static const String analytics = '/analytics';
   static const String operationalMap = '/map';
   static const String adminUsers = '/admin/users';
@@ -64,6 +69,7 @@ abstract final class RcRoutes {
     scopeRoof,
     scopePrint,
     scopeFiles,
+    scopeImport,
     control,
     houses,
     houseCommand,
@@ -78,6 +84,7 @@ abstract final class RcRoutes {
     consumableRequest,
     inventory,
     addInventory,
+    inventoryTransfer,
     completion,
     finalInspection,
     payment,
@@ -88,6 +95,9 @@ abstract final class RcRoutes {
     messages,
     settings,
     workLogs,
+    workProjections,
+    productionBoard,
+    syncMonitor,
     analytics,
     operationalMap,
     adminUsers,

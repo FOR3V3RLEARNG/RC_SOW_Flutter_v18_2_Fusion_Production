@@ -6,6 +6,7 @@ import '../core/app_state.dart';
 import '../core/routes.dart';
 import '../core/theme.dart';
 import '../core/widgets.dart';
+import 'roof_drawing_studio.dart';
 
 class ScopeWorkspace extends StatefulWidget {
   const ScopeWorkspace({
@@ -53,7 +54,7 @@ class _ScopeWorkspaceState extends State<ScopeWorkspace> {
     );
     if (!widget.standalone) return body;
     return Scaffold(
-      appBar: AppBar(
+      appBar: RcAppBar(
         title: Text('${state.selectedHouse.code} • Scope of Work'),
         actions: <Widget>[
           IconButton(
@@ -511,6 +512,9 @@ class _RoofScopeStepState extends State<_RoofScopeStep> {
 
   @override
   Widget build(BuildContext context) {
+    if (Theme.of(context).useMaterial3) {
+      return const RoofDrawingStudio();
+    }
     final state = AppScope.of(context);
     final house = state.selectedHouse;
     const tools = <String>[

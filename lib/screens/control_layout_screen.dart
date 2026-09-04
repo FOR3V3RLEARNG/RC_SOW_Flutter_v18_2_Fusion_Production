@@ -19,7 +19,7 @@ class ControlLayoutScreen extends StatelessWidget {
         .map((id) => modulesById[id]!)
         .toList();
     return Scaffold(
-      appBar: AppBar(
+      appBar: RcAppBar(
         title: const Text('Customize Control'),
         actions: <Widget>[
           TextButton.icon(

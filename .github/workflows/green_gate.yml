@@ -16,7 +16,7 @@ jobs:
           channel: stable
           cache: true
       - name: Generate platform scaffolding
-        run: flutter create --platforms=android,web --project-name=rc_sow_connected .
+        run: flutter create --platforms=android,web --project-name=rc_sow_connected --org=org.jamaicaredcross .
       - name: Resolve dependencies
         run: flutter pub get
       - name: Format source
@@ -30,7 +30,7 @@ jobs:
       - name: Upload web preview
         uses: actions/upload-artifact@v7
         with:
-          name: RC-SOW-v19.1.0-Web-Preview
+          name: RC-SOW-v20.0.0-Web-Preview
           path: build/web
           if-no-files-found: error
           retention-days: 30
@@ -39,7 +39,7 @@ jobs:
       - name: Upload Android APK
         uses: actions/upload-artifact@v7
         with:
-          name: RC-SOW-v19.1.0-Android-APK
+          name: RC-SOW-v20.0.0-Android-APK
           path: build/app/outputs/flutter-apk/app-release.apk
           if-no-files-found: error
           retention-days: 30

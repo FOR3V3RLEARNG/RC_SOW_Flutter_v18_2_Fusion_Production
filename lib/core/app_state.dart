@@ -1,6 +1,11 @@
+import 'dart:async';
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 
 import 'models.dart';
+import 'production_models.dart';
+import '../services/production_backend.dart';
 
 class AppState extends ChangeNotifier {
   AppState._({
@@ -11,9 +16,13 @@ class AppState extends ChangeNotifier {
     required this.notifications,
     required this.team,
     required this.workLogs,
+    required this.stockLedger,
+    required this.workProjections,
+    required this.productionIssues,
+    required this.backend,
   });
 
-  factory AppState.seeded() {
+  factory AppState.seeded({ProductionBackend? backend}) {
     final now = DateTime.now();
     return AppState._(
       houses: <HouseRecord>[
@@ -294,6 +303,211 @@ class AppState extends ChangeNotifier {
           createdAt: now.subtract(const Duration(hours: 6)),
         ),
       ],
+      stockLedger: <StockLedgerItem>[
+        StockLedgerItem(
+          id: 'STK-HAN-RIDGE',
+          materialCode: 'MAT-001',
+          name: 'Ridge beam 2×8×20',
+          unit: 'lengths',
+          tier: InventoryTier.parish,
+          parish: 'Hanover',
+          location: 'Hanover Central Depot',
+          zone: 'Zone A • Lumber',
+          opening: 40,
+          received: 20,
+          issued: 15,
+          adjustments: 0,
+          minimumStock: 18,
+          unitCostJmd: 9800,
+          updatedAt: now.subtract(const Duration(minutes: 18)),
+        ),
+        StockLedgerItem(
+          id: 'STK-HAN-RAFTER',
+          materialCode: 'MAT-002',
+          name: 'Rafters / Collars 2×6×14',
+          unit: 'lengths',
+          tier: InventoryTier.parish,
+          parish: 'Hanover',
+          location: 'Hanover Central Depot',
+          zone: 'Zone A • Lumber',
+          opening: 110,
+          received: 50,
+          issued: 40,
+          adjustments: 0,
+          minimumStock: 45,
+          unitCostJmd: 6200,
+          updatedAt: now.subtract(const Duration(minutes: 18)),
+        ),
+        StockLedgerItem(
+          id: 'STK-HAN-ZINC',
+          materialCode: 'MAT-042',
+          name: 'Zinc 26 gauge 36 in × 14 ft',
+          unit: 'sheets',
+          tier: InventoryTier.parish,
+          parish: 'Hanover',
+          location: 'Hanover Central Depot',
+          zone: 'Zone B • Roofing',
+          opening: 470,
+          received: 180,
+          issued: 300,
+          adjustments: 0,
+          minimumStock: 400,
+          unitCostJmd: 7400,
+          updatedAt: now.subtract(const Duration(minutes: 18)),
+        ),
+        StockLedgerItem(
+          id: 'STK-SEL-ZINC',
+          materialCode: 'MAT-042',
+          name: 'Zinc 26 gauge 36 in × 14 ft',
+          unit: 'sheets',
+          tier: InventoryTier.parish,
+          parish: 'St. Elizabeth',
+          location: 'St. Elizabeth Depot',
+          zone: 'Zone B • Roofing',
+          opening: 520,
+          received: 220,
+          issued: 190,
+          adjustments: 4,
+          minimumStock: 300,
+          unitCostJmd: 7400,
+          updatedAt: now.subtract(const Duration(minutes: 29)),
+        ),
+        StockLedgerItem(
+          id: 'STK-WES-ZINC',
+          materialCode: 'MAT-042',
+          name: 'Zinc 26 gauge 36 in × 14 ft',
+          unit: 'sheets',
+          tier: InventoryTier.parish,
+          parish: 'Westmoreland',
+          location: 'Savanna-la-Mar Depot',
+          zone: 'Zone B • Roofing',
+          opening: 250,
+          received: 80,
+          issued: 205,
+          adjustments: -3,
+          minimumStock: 160,
+          unitCostJmd: 7400,
+          updatedAt: now.subtract(const Duration(hours: 2)),
+          liveSynced: false,
+        ),
+        StockLedgerItem(
+          id: 'STK-THO-ZINC',
+          materialCode: 'MAT-042',
+          name: 'Zinc 26 gauge 36 in × 14 ft',
+          unit: 'sheets',
+          tier: InventoryTier.cluster,
+          parish: 'Hanover',
+          cluster: 'Thornton Cluster A3',
+          location: 'Thornton Site Store',
+          zone: 'Roofing rack',
+          opening: 60,
+          received: 20,
+          issued: 68,
+          adjustments: 0,
+          minimumStock: 24,
+          unitCostJmd: 7400,
+          updatedAt: now.subtract(const Duration(minutes: 41)),
+        ),
+        StockLedgerItem(
+          id: 'STK-H12-ZINC',
+          materialCode: 'MAT-042',
+          name: 'Zinc 26 gauge 36 in × 14 ft',
+          unit: 'sheets',
+          tier: InventoryTier.house,
+          parish: 'Hanover',
+          cluster: 'Thornton Cluster A3',
+          houseCode: 'H12',
+          location: 'H12 secured site store',
+          opening: 0,
+          received: 16,
+          issued: 12,
+          adjustments: 0,
+          minimumStock: 12,
+          unitCostJmd: 7400,
+          updatedAt: now.subtract(const Duration(hours: 1)),
+        ),
+        StockLedgerItem(
+          id: 'STK-H12-STRAP',
+          materialCode: 'MAT-063',
+          name: 'Hurricane straps H3',
+          unit: 'pieces',
+          tier: InventoryTier.house,
+          parish: 'Hanover',
+          cluster: 'Thornton Cluster A3',
+          houseCode: 'H12',
+          location: 'H12 secured site store',
+          opening: 0,
+          received: 100,
+          issued: 88,
+          adjustments: 0,
+          minimumStock: 8,
+          unitCostJmd: 620,
+          updatedAt: now.subtract(const Duration(hours: 1)),
+        ),
+      ],
+      workProjections: <WorkProjection>[
+        WorkProjection(
+          id: 'PRJ-42-H12',
+          weekStarting: DateTime(2026, 9, 7),
+          parish: 'Hanover',
+          cluster: 'Thornton Cluster A3',
+          houseCode: 'H12',
+          milestone: 'Roofing complete',
+          estimatedHours: 120,
+          actualHours: 76,
+          crewNeeded: 3,
+          materialNeeds: '12 zinc sheets; 1 roll coiled strap',
+          risks: 'Zinc transfer approval required by Monday 08:00.',
+          status: ProjectionStatus.atRisk,
+        ),
+        WorkProjection(
+          id: 'PRJ-42-H2',
+          weekStarting: DateTime(2026, 9, 7),
+          parish: 'Hanover',
+          cluster: 'Haughton Grove Cluster 1',
+          houseCode: 'H2',
+          milestone: 'Final inspection and handover',
+          estimatedHours: 32,
+          actualHours: 22,
+          crewNeeded: 2,
+          materialNeeds: 'Gutter end caps; certificate pack',
+          risks: 'Homeowner signature appointment not confirmed.',
+          status: ProjectionStatus.submitted,
+        ),
+        WorkProjection(
+          id: 'PRJ-42-H18',
+          weekStarting: DateTime(2026, 9, 7),
+          parish: 'Hanover',
+          cluster: 'Miles Town Cluster 2',
+          houseCode: 'H18',
+          milestone: 'Scope and work plan approved',
+          estimatedHours: 24,
+          actualHours: 8,
+          crewNeeded: 1,
+          materialNeeds: 'Measurement kit; beneficiary printout',
+          risks: 'Secondary structure dimensions need verification.',
+          status: ProjectionStatus.draft,
+        ),
+      ],
+      productionIssues: <ProductionIssue>[
+        ProductionIssue(
+          id: 'ISS-H12-ZINC',
+          houseCode: 'H12',
+          title: '12 sheets of 14 ft zinc awaiting transfer',
+          owner: 'Maria Green',
+          dueAt: now.add(const Duration(hours: 18)),
+          severity: ProductionIssueSeverity.critical,
+        ),
+        ProductionIssue(
+          id: 'ISS-H2-SIGN',
+          houseCode: 'H2',
+          title: 'Confirm homeowner handover signature time',
+          owner: 'Andre Brown',
+          dueAt: now.add(const Duration(days: 2)),
+          severity: ProductionIssueSeverity.warning,
+        ),
+      ],
+      backend: backend ?? const LocalProductionBackend(),
     );
   }
 
@@ -304,6 +518,14 @@ class AppState extends ChangeNotifier {
   final List<AppNotification> notifications;
   final List<TeamMember> team;
   final List<WorkLogEntry> workLogs;
+  final List<StockLedgerItem> stockLedger;
+  final List<WorkProjection> workProjections;
+  final List<ProductionIssue> productionIssues;
+  final List<LegacyImportBatch> importBatches = <LegacyImportBatch>[];
+  final Map<String, RoofDrawingDocument> roofDrawings =
+      <String, RoofDrawingDocument>{};
+  final ProductionBackend backend;
+  final List<BackendWrite> pendingBackendWrites = <BackendWrite>[];
 
   final List<TransferRecord> transfers = <TransferRecord>[
     TransferRecord(
@@ -495,16 +717,21 @@ class AppState extends ChangeNotifier {
   ];
 
   final List<String> controlTileOrder = <String>[
+    'production-board',
     'work-plan',
+    'work-projections',
     'documents',
     'schedule',
     'team-resources',
     'transfers',
     'site-visits',
     'daily-log',
+    'control-work-log',
     'materials',
     'consumables',
     'inventory',
+    'inventory-transfer',
+    'sync-monitor',
     'live-briefing',
     'monitoring',
     'final-inspection',
@@ -616,8 +843,80 @@ class AppState extends ChangeNotifier {
     return required == 0 ? 0 : complete / required;
   }
 
+  bool get remoteConnected => backend.connected;
+  String get backendConnectionLabel => backend.connectionLabel;
+  int get unresolvedProductionIssues =>
+      productionIssues.where((issue) => !issue.resolved).length;
+  int get atRiskProjections => workProjections
+      .where((projection) => projection.status == ProjectionStatus.atRisk)
+      .length;
+  double get projectedHours => workProjections.fold<double>(
+        0,
+        (sum, projection) => sum + projection.estimatedHours,
+      );
+  double get recordedProjectionHours => workProjections.fold<double>(
+        0,
+        (sum, projection) => sum + projection.actualHours,
+      );
+  double get parishStockValueJmd => stockLedger
+      .where((item) => item.tier == InventoryTier.parish)
+      .fold<double>(0, (sum, item) => sum + item.stockValueJmd);
+
+  List<StockLedgerItem> inventoryFor({
+    InventoryTier? tier,
+    String? parish,
+    String? cluster,
+    String? houseCode,
+  }) =>
+      stockLedger.where((item) {
+        if (tier != null && item.tier != tier) return false;
+        if (parish != null && item.parish != parish) return false;
+        if (cluster != null && item.cluster != cluster) return false;
+        if (houseCode != null && item.houseCode != houseCode) return false;
+        return true;
+      }).toList();
+
   HouseRecord houseByCode(String code) =>
       houses.firstWhere((house) => house.code == code);
+
+  Future<void> bootstrapSession() async {
+    if (!backend.connected) return;
+    try {
+      final profile = await backend.currentProfile();
+      if (profile == null || !profile.approved) return;
+      authenticated = true;
+      role = _displayRole(profile.role);
+      if (profile.assignedParishes.isNotEmpty) {
+        selectedParish = profile.assignedParishes.first;
+      }
+      syncCondition = SyncCondition.synced;
+      notifyListeners();
+    } catch (_) {
+      syncCondition = SyncCondition.failed;
+      notifyListeners();
+    }
+  }
+
+  Future<bool> requestSecureEmailSignIn({
+    required String email,
+    required String selectedRole,
+  }) async {
+    if (!backend.connected) {
+      login(selectedRole: selectedRole);
+      return true;
+    }
+    await backend.requestMagicLink(email);
+    return false;
+  }
+
+  Future<bool> signInWithGoogle({required String selectedRole}) async {
+    if (!backend.connected) {
+      login(selectedRole: selectedRole);
+      return true;
+    }
+    await backend.signInWithGoogle();
+    return false;
+  }
 
   void login({required String selectedRole}) {
     authenticated = true;
@@ -626,6 +925,7 @@ class AppState extends ChangeNotifier {
   }
 
   void logout() {
+    unawaited(backend.signOut());
     authenticated = false;
     notifyListeners();
   }
@@ -681,10 +981,35 @@ class AppState extends ChangeNotifier {
 
   void toggleOffline() {
     offline = !offline;
-    syncCondition = offline
-        ? (queuedChanges > 0 ? SyncCondition.waiting : SyncCondition.savedLocal)
-        : SyncCondition.synced;
-    if (!offline) queuedChanges = 0;
+    if (offline) {
+      syncCondition =
+          queuedChanges > 0 ? SyncCondition.waiting : SyncCondition.savedLocal;
+    } else if (pendingBackendWrites.isNotEmpty && backend.connected) {
+      syncCondition = SyncCondition.syncing;
+      unawaited(_flushPendingWrites());
+    } else {
+      queuedChanges = 0;
+      syncCondition = SyncCondition.synced;
+    }
+    notifyListeners();
+  }
+
+  Future<void> retrySync() async {
+    if (offline) {
+      syncCondition = queuedChanges > 0
+          ? SyncCondition.waiting
+          : SyncCondition.savedLocal;
+      notifyListeners();
+      return;
+    }
+    if (backend.connected && pendingBackendWrites.isNotEmpty) {
+      syncCondition = SyncCondition.syncing;
+      notifyListeners();
+      await _flushPendingWrites();
+      return;
+    }
+    queuedChanges = 0;
+    syncCondition = SyncCondition.synced;
     notifyListeners();
   }
 
@@ -726,6 +1051,21 @@ class AppState extends ChangeNotifier {
       icon: submit ? Icons.send_outlined : Icons.save_outlined,
     );
     _markChanged();
+    _dispatchWrite(
+      BackendWrite(
+        houseCode: houseCode,
+        parish: house.parish,
+        recordType: type,
+        status: submit ? 'submitted' : 'draft',
+        payload: <String, dynamic>{
+          ...values,
+          'house_code': houseCode,
+          'lifecycle_phase': house.phase.name,
+        },
+        idempotencyKey:
+            '$houseCode-${type.toLowerCase().replaceAll(' ', '-')}-${DateTime.now().microsecondsSinceEpoch}',
+      ),
+    );
   }
 
   void _applyLifecycleUpdate(HouseRecord house, String type, bool submit) {
@@ -935,7 +1275,13 @@ class AppState extends ChangeNotifier {
     required String category,
     required String detail,
     required double hours,
+    double progress = 0,
+    List<String> crewPresent = const <String>[],
+    String materialsUsed = '',
+    String blocker = '',
+    String nextAction = '',
   }) {
+    final house = houseByCode(houseCode);
     workLogs.insert(
       0,
       WorkLogEntry(
@@ -948,13 +1294,340 @@ class AppState extends ChangeNotifier {
         detail: detail,
         hours: hours,
         createdAt: DateTime.now(),
+        progress: progress,
+        crewPresent: List<String>.from(crewPresent),
+        materialsUsed: materialsUsed,
+        blocker: blocker,
+        nextAction: nextAction,
       ),
     );
+    if (progress > 0) {
+      house.progress = (progress / 100).clamp(0, 1).toDouble();
+    }
+    if (blocker.trim().isNotEmpty) {
+      house.blocker = blocker.trim();
+      house.status = RecordStatus.attention;
+    }
+    if (nextAction.trim().isNotEmpty) house.nextAction = nextAction.trim();
     _recordActivity(
       houseCode: houseCode,
       title: 'Work log saved',
       detail: '$category • ${hours.toStringAsFixed(1)} hours',
       icon: Icons.schedule_outlined,
+    );
+    _markChanged();
+    _dispatchWrite(
+      BackendWrite(
+        houseCode: houseCode,
+        parish: house.parish,
+        recordType: 'Control of Work Log',
+        payload: <String, dynamic>{
+          'category': category,
+          'detail': detail,
+          'hours': hours,
+          'progress_percent': progress,
+          'crew_present': crewPresent,
+          'materials_used': materialsUsed,
+          'blocker': blocker,
+          'next_action': nextAction,
+        },
+        idempotencyKey:
+            '$houseCode-work-log-${DateTime.now().microsecondsSinceEpoch}',
+      ),
+    );
+  }
+
+  RoofDrawingDocument roofDrawingFor(String houseCode) {
+    return roofDrawings.putIfAbsent(houseCode, () {
+      final section = defaultRoofSection();
+      final house = houseByCode(houseCode);
+      section
+        ..roofType = house.roofType
+        ..lengthFt = house.roofArea > 0 ? 24 : 24.5
+        ..widthFt = house.roofArea > 0
+            ? (house.roofArea / 24).clamp(8, 60).toDouble()
+            : 18;
+      return RoofDrawingDocument(
+        houseCode: houseCode,
+        sections: <RoofSection>[section],
+        selectedSectionId: section.id,
+        updatedAt: DateTime.now(),
+      );
+    });
+  }
+
+  void saveRoofDrawing(RoofDrawingDocument document, {bool submit = false}) {
+    final copy = document.deepCopy()..updatedAt = DateTime.now();
+    roofDrawings[document.houseCode] = copy;
+    final house = houseByCode(document.houseCode);
+    house
+      ..roofType = copy.selectedSection.roofType
+      ..roofArea = copy.totalPlanAreaSqFt;
+    saveForm(
+      type: 'Scope Roof Drawing',
+      houseCode: document.houseCode,
+      submit: submit,
+      values: <String, String>{
+        'roofType': copy.selectedSection.roofType,
+        'structures': '${copy.sections.length}',
+        'areaSqFt': copy.totalPlanAreaSqFt.toStringAsFixed(1),
+        'source': copy.source,
+        'sourceFile': copy.sourceFileName ?? '',
+        'aiConfidence': copy.aiConfidence?.toStringAsFixed(3) ?? '',
+        'drawing': copy.toMap().toString(),
+      },
+    );
+  }
+
+  Future<AiRoofSuggestion> analyzeRoofImage({
+    required String fileName,
+    required Uint8List bytes,
+  }) async {
+    try {
+      return await backend.analyzeRoofImage(
+        houseCode: selectedHouseCode,
+        fileName: fileName,
+        bytes: bytes,
+      );
+    } on Object {
+      syncCondition = SyncCondition.failed;
+      notifyListeners();
+      return const LocalProductionBackend().analyzeRoofImage(
+        houseCode: selectedHouseCode,
+        fileName: fileName,
+        bytes: bytes,
+      );
+    }
+  }
+
+  Future<LegacyImportBatch> previewLegacyImport({
+    required String fileName,
+    required Uint8List bytes,
+  }) async {
+    LegacyImportBatch batch;
+    try {
+      batch = await backend.previewLegacyImport(
+        fileName: fileName,
+        bytes: bytes,
+      );
+    } on Object {
+      syncCondition = SyncCondition.failed;
+      batch = await const LocalProductionBackend().previewLegacyImport(
+        fileName: fileName,
+        bytes: bytes,
+      );
+    }
+    importBatches.insert(0, batch);
+    notifyListeners();
+    return batch;
+  }
+
+  Future<void> commitLegacyImport(LegacyImportBatch batch) async {
+    if (!batch.canImport) {
+      throw StateError('Map every required field before importing.');
+    }
+    batch.status = offline || !backend.connected
+        ? LegacyImportStatus.queued
+        : LegacyImportStatus.imported;
+    _recordActivity(
+      houseCode: selectedHouseCode,
+      title: 'Legacy import ${batch.status.label.toLowerCase()}',
+      detail: '${batch.fileName} • ${batch.rowCount} rows • '
+          '${batch.mappedFields} fields mapped.',
+      icon: Icons.upload_file_outlined,
+    );
+    _markChanged();
+    if (backend.connected && !offline) {
+      try {
+        await backend.commitLegacyImport(batch);
+      } on Object {
+        batch.status = LegacyImportStatus.queued;
+        syncCondition = SyncCondition.failed;
+        notifyListeners();
+      }
+    }
+  }
+
+  String addWorkProjection({
+    required DateTime weekStarting,
+    required String houseCode,
+    required String milestone,
+    required double estimatedHours,
+    required int crewNeeded,
+    required String materialNeeds,
+    required String risks,
+    bool submit = false,
+  }) {
+    final house = houseByCode(houseCode);
+    final id = 'PRJ-${DateTime.now().microsecondsSinceEpoch}';
+    final projection = WorkProjection(
+      id: id,
+      weekStarting: weekStarting,
+      parish: house.parish,
+      cluster: house.cluster,
+      houseCode: houseCode,
+      milestone: milestone,
+      estimatedHours: estimatedHours,
+      actualHours: 0,
+      crewNeeded: crewNeeded,
+      materialNeeds: materialNeeds,
+      risks: risks,
+      status: submit ? ProjectionStatus.submitted : ProjectionStatus.draft,
+    );
+    workProjections.insert(0, projection);
+    _recordActivity(
+      houseCode: houseCode,
+      title: submit ? 'Weekly projection submitted' : 'Weekly projection saved',
+      detail:
+          '$milestone • ${estimatedHours.toStringAsFixed(1)} hours • $crewNeeded people.',
+      icon: Icons.trending_up_outlined,
+    );
+    _markChanged();
+    _dispatchWrite(
+      BackendWrite(
+        houseCode: houseCode,
+        parish: house.parish,
+        recordType: 'Weekly Projection',
+        status: projection.status.name,
+        payload: <String, dynamic>{
+          'week_starting': weekStarting.toIso8601String(),
+          'cluster': house.cluster,
+          'milestone': milestone,
+          'estimated_hours': estimatedHours,
+          'crew_needed': crewNeeded,
+          'material_needs': materialNeeds,
+          'risks': risks,
+        },
+        idempotencyKey: id,
+      ),
+    );
+    return id;
+  }
+
+  void updateProjectionActual(String id, double hours) {
+    final projection = workProjections.firstWhere((item) => item.id == id);
+    projection.actualHours = hours.clamp(0, 500).toDouble();
+    if (projection.actualHours > projection.estimatedHours * 1.2) {
+      projection.status = ProjectionStatus.atRisk;
+    } else if (projection.actualHours >= projection.estimatedHours) {
+      projection.status = ProjectionStatus.complete;
+    }
+    _markChanged();
+  }
+
+  void approveProjection(String id) {
+    final projection = workProjections.firstWhere((item) => item.id == id);
+    projection.status = ProjectionStatus.approved;
+    _recordActivity(
+      houseCode: projection.houseCode,
+      title: 'Weekly projection approved',
+      detail: '${projection.milestone} • ${projection.estimatedHours} hours.',
+      icon: Icons.fact_check_outlined,
+    );
+    _markChanged();
+  }
+
+  void updateStockLedger({
+    required String id,
+    required double received,
+    required double issued,
+    required double adjustments,
+  }) {
+    final item = stockLedger.firstWhere((record) => record.id == id);
+    item
+      ..received = received
+      ..issued = issued
+      ..adjustments = adjustments
+      ..updatedAt = DateTime.now()
+      ..liveSynced = !offline;
+    _recordActivity(
+      houseCode: item.houseCode ?? selectedHouseCode,
+      title: '${item.tier.label} stock reconciled',
+      detail: '${item.name} • ${item.onHand.toStringAsFixed(0)} ${item.unit} '
+          'on hand at ${item.location}.',
+      icon: Icons.inventory_2_outlined,
+    );
+    _markChanged();
+    _dispatchWrite(
+      BackendWrite(
+        houseCode: item.houseCode ?? selectedHouseCode,
+        parish: item.parish,
+        recordType: 'Inventory Ledger',
+        payload: <String, dynamic>{
+          'stock_id': item.id,
+          'material_code': item.materialCode,
+          'tier': item.tier.name,
+          'cluster': item.cluster,
+          'location': item.location,
+          'opening': item.opening,
+          'received': item.received,
+          'issued': item.issued,
+          'adjustments': item.adjustments,
+          'on_hand': item.onHand,
+        },
+        idempotencyKey:
+            '${item.id}-stock-${DateTime.now().microsecondsSinceEpoch}',
+      ),
+    );
+  }
+
+  bool transferStock({
+    required String sourceId,
+    required String destinationId,
+    required double quantity,
+  }) {
+    if (quantity <= 0 || sourceId == destinationId) return false;
+    final source = stockLedger.firstWhere((item) => item.id == sourceId);
+    final destination =
+        stockLedger.firstWhere((item) => item.id == destinationId);
+    if (source.materialCode != destination.materialCode ||
+        source.onHand < quantity) {
+      return false;
+    }
+    source
+      ..issued += quantity
+      ..updatedAt = DateTime.now()
+      ..liveSynced = !offline;
+    destination
+      ..received += quantity
+      ..updatedAt = DateTime.now()
+      ..liveSynced = !offline;
+    _recordActivity(
+      houseCode: destination.houseCode ?? selectedHouseCode,
+      title: 'Inventory transfer recorded',
+      detail: '${quantity.toStringAsFixed(0)} ${source.unit} of '
+          '${source.name}: ${source.scopeLabel} → ${destination.scopeLabel}.',
+      icon: Icons.swap_horiz_outlined,
+    );
+    _markChanged();
+    _dispatchWrite(
+      BackendWrite(
+        houseCode: destination.houseCode ?? selectedHouseCode,
+        parish: destination.parish,
+        recordType: 'Inventory Transfer',
+        status: 'completed',
+        payload: <String, dynamic>{
+          'source_stock_id': sourceId,
+          'destination_stock_id': destinationId,
+          'material_code': source.materialCode,
+          'quantity': quantity,
+          'unit': source.unit,
+        },
+        idempotencyKey:
+            'stock-transfer-${DateTime.now().microsecondsSinceEpoch}',
+      ),
+    );
+    return true;
+  }
+
+  void resolveProductionIssue(String id) {
+    final issue = productionIssues.firstWhere((item) => item.id == id);
+    issue.resolved = true;
+    _recordActivity(
+      houseCode: issue.houseCode,
+      title: 'Production issue resolved',
+      detail: issue.title,
+      icon: Icons.task_alt_outlined,
     );
     _markChanged();
   }
@@ -1222,16 +1895,21 @@ class AppState extends ChangeNotifier {
     controlTileOrder
       ..clear()
       ..addAll(<String>[
+        'production-board',
         'work-plan',
+        'work-projections',
         'documents',
         'schedule',
         'team-resources',
         'transfers',
         'site-visits',
         'daily-log',
+        'control-work-log',
         'materials',
         'consumables',
         'inventory',
+        'inventory-transfer',
+        'sync-monitor',
         'live-briefing',
         'monitoring',
         'final-inspection',
@@ -1274,6 +1952,59 @@ class AppState extends ChangeNotifier {
       icon: Icons.verified_user_outlined,
     );
     _markChanged();
+  }
+
+  void _dispatchWrite(BackendWrite write) {
+    if (!backend.connected) return;
+    if (offline) {
+      pendingBackendWrites.add(write);
+      return;
+    }
+    syncCondition = SyncCondition.syncing;
+    notifyListeners();
+    unawaited(
+      backend.writeRecord(write).then((_) {
+        syncCondition = SyncCondition.synced;
+        notifyListeners();
+      }).catchError((Object _) {
+        if (!pendingBackendWrites.any(
+          (pending) => pending.idempotencyKey == write.idempotencyKey,
+        )) {
+          pendingBackendWrites.add(write);
+        }
+        queuedChanges = pendingBackendWrites.length;
+        syncCondition = SyncCondition.failed;
+        notifyListeners();
+      }),
+    );
+  }
+
+  Future<void> _flushPendingWrites() async {
+    final writes = List<BackendWrite>.from(pendingBackendWrites);
+    for (final write in writes) {
+      try {
+        await backend.writeRecord(write);
+        pendingBackendWrites.removeWhere(
+          (pending) => pending.idempotencyKey == write.idempotencyKey,
+        );
+      } catch (_) {
+        queuedChanges = pendingBackendWrites.length;
+        syncCondition = SyncCondition.failed;
+        notifyListeners();
+        return;
+      }
+    }
+    queuedChanges = 0;
+    syncCondition = SyncCondition.synced;
+    notifyListeners();
+  }
+
+  String _displayRole(String value) {
+    final words = value.replaceAll('_', ' ').split(' ');
+    return words
+        .where((word) => word.isNotEmpty)
+        .map((word) => '${word[0].toUpperCase()}${word.substring(1)}')
+        .join(' ');
   }
 
   void _recordActivity({

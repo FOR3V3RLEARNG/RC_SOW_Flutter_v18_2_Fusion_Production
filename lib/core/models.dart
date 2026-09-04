@@ -194,6 +194,11 @@ class WorkLogEntry {
     required this.detail,
     required this.hours,
     required this.createdAt,
+    this.progress = 0,
+    this.crewPresent = const <String>[],
+    this.materialsUsed = '',
+    this.blocker = '',
+    this.nextAction = '',
   });
 
   final String id;
@@ -205,6 +210,11 @@ class WorkLogEntry {
   final String detail;
   final double hours;
   final DateTime createdAt;
+  final double progress;
+  final List<String> crewPresent;
+  final String materialsUsed;
+  final String blocker;
+  final String nextAction;
 }
 
 class FormFieldSpec {

@@ -2,7 +2,74 @@ import 'package:flutter/material.dart';
 
 import 'app_state.dart';
 import 'models.dart';
+import 'routes.dart';
 import 'theme.dart';
+
+class RcAppBar extends AppBar {
+  RcAppBar({
+    Key? key,
+    Widget? title,
+    Widget? leading,
+    bool automaticallyImplyLeading = true,
+    double? titleSpacing,
+    List<Widget>? actions,
+    bool showGlobalActions = true,
+  }) : super(
+          key: key,
+          title: title == null
+              ? null
+              : DefaultTextStyle.merge(
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  child: title,
+                ),
+          leading: leading,
+          automaticallyImplyLeading: automaticallyImplyLeading,
+          titleSpacing: titleSpacing,
+          actions: <Widget>[
+            ...?actions,
+            if (showGlobalActions) const RcGlobalActions(),
+          ],
+        );
+}
+
+class RcGlobalActions extends StatelessWidget {
+  const RcGlobalActions({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final state = AppScope.of(context);
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: <Widget>[
+        IconButton(
+          tooltip: 'Live tracker map',
+          visualDensity: VisualDensity.compact,
+          onPressed: () =>
+              Navigator.pushNamed(context, RcRoutes.operationalMap),
+          icon: const Icon(Icons.location_on_outlined),
+        ),
+        IconButton(
+          tooltip: 'Messages',
+          visualDensity: VisualDensity.compact,
+          onPressed: () => Navigator.pushNamed(context, RcRoutes.messages),
+          icon: Badge(
+            isLabelVisible: state.unreadNotifications > 0,
+            label: Text('${state.unreadNotifications}'),
+            child: const Icon(Icons.chat_bubble_outline),
+          ),
+        ),
+        IconButton(
+          tooltip: 'Settings',
+          visualDensity: VisualDensity.compact,
+          onPressed: () => Navigator.pushNamed(context, RcRoutes.settings),
+          icon: const Icon(Icons.settings_outlined),
+        ),
+        const SizedBox(width: 4),
+      ],
+    );
+  }
+}
 
 class RcBrand extends StatelessWidget {
   const RcBrand({this.compact = false, super.key});
@@ -120,38 +187,53 @@ class RcPageHeading extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: <Widget>[
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              Text(
-                eyebrow.toUpperCase(),
-                style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                      color: Theme.of(context).colorScheme.primary,
-                      fontWeight: FontWeight.w900,
-                      letterSpacing: 1.2,
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final copy = Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            Text(
+              eyebrow.toUpperCase(),
+              style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                    color: Theme.of(context).colorScheme.primary,
+                    fontWeight: FontWeight.w900,
+                    letterSpacing: 1.2,
+                  ),
+            ),
+            const SizedBox(height: 7),
+            Text(title, style: Theme.of(context).textTheme.headlineLarge),
+            const SizedBox(height: 8),
+            ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 620),
+              child: Text(
+                description,
+                style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
                     ),
               ),
-              const SizedBox(height: 7),
-              Text(title, style: Theme.of(context).textTheme.headlineLarge),
-              const SizedBox(height: 8),
-              ConstrainedBox(
-                constraints: const BoxConstraints(maxWidth: 620),
-                child: Text(
-                  description,
-                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                        color: Theme.of(context).colorScheme.onSurfaceVariant,
-                      ),
-                ),
-              ),
+            ),
+          ],
+        );
+        if (action == null) return copy;
+        if (constraints.maxWidth < 720) {
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: <Widget>[
+              copy,
+              const SizedBox(height: 14),
+              Align(alignment: Alignment.centerLeft, child: action!),
             ],
-          ),
-        ),
-        if (action != null) ...<Widget>[const SizedBox(width: 16), action!],
-      ],
+          );
+        }
+        return Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            Expanded(child: copy),
+            const SizedBox(width: 16),
+            action!,
+          ],
+        );
+      },
     );
   }
 }
@@ -313,6 +395,10 @@ class RcMetricTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
+      color: Color.alphaBlend(
+        color.withOpacity(.035),
+        Theme.of(context).colorScheme.surface,
+      ),
       clipBehavior: Clip.antiAlias,
       child: InkWell(
         onTap: onTap,
@@ -321,17 +407,38 @@ class RcMetricTile extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
-              Container(
-                width: 38,
-                height: 38,
-                decoration: BoxDecoration(
-                  color: color.withOpacity(.12),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Icon(icon, size: 21, color: color),
+              Row(
+                children: <Widget>[
+                  Container(
+                    width: 38,
+                    height: 38,
+                    decoration: BoxDecoration(
+                      color: color.withOpacity(.12),
+                      borderRadius: const BorderRadius.only(
+                        topLeft: Radius.circular(16),
+                        topRight: Radius.circular(9),
+                        bottomLeft: Radius.circular(9),
+                        bottomRight: Radius.circular(16),
+                      ),
+                    ),
+                    child: Icon(icon, size: 21, color: color),
+                  ),
+                  const Spacer(),
+                  if (onTap != null)
+                    Icon(
+                      Icons.arrow_outward_rounded,
+                      size: 19,
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                    ),
+                ],
               ),
               const Spacer(),
-              Text(value, style: Theme.of(context).textTheme.headlineMedium),
+              Text(
+                value,
+                style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                      color: color,
+                    ),
+              ),
               const SizedBox(height: 3),
               Text(
                 label,
@@ -363,28 +470,43 @@ class RcSectionHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.end,
+    final copy = Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
-        Expanded(
-          child: Column(
+        Text(title, style: Theme.of(context).textTheme.titleLarge),
+        if (subtitle != null) ...<Widget>[
+          const SizedBox(height: 3),
+          Text(
+            subtitle!,
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                ),
+          ),
+        ],
+      ],
+    );
+    if (trailing == null) return copy;
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        if (constraints.maxWidth < 520) {
+          return Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
-              Text(title, style: Theme.of(context).textTheme.titleLarge),
-              if (subtitle != null) ...<Widget>[
-                const SizedBox(height: 3),
-                Text(
-                  subtitle!,
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: Theme.of(context).colorScheme.onSurfaceVariant,
-                      ),
-                ),
-              ],
+              copy,
+              const SizedBox(height: 8),
+              trailing!,
             ],
-          ),
-        ),
-        if (trailing != null) trailing!,
-      ],
+          );
+        }
+        return Row(
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: <Widget>[
+            Expanded(child: copy),
+            const SizedBox(width: 12),
+            trailing!,
+          ],
+        );
+      },
     );
   }
 }
@@ -506,12 +628,16 @@ class RcHouseCard extends StatelessWidget {
                     width: 44,
                     height: 44,
                     decoration: BoxDecoration(
-                      color: RcColors.brandSoft,
-                      borderRadius: BorderRadius.circular(14),
+                      color: Theme.of(context).colorScheme.primaryContainer,
+                      borderRadius: const BorderRadius.only(
+                        topLeft: Radius.circular(18),
+                        topRight: Radius.circular(10),
+                        bottomLeft: Radius.circular(10),
+                        bottomRight: Radius.circular(18),
+                      ),
                     ),
                     child: const Icon(
                       Icons.house_outlined,
-                      color: RcColors.brand,
                     ),
                   ),
                   const SizedBox(width: 12),

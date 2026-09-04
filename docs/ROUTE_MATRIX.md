@@ -6,10 +6,11 @@
 | Login | `/login` | Role selection → authenticated shell |
 | Dashboard | `/home`, `/dashboard` | Metrics, recent houses, activity and primary destinations |
 | Scope — House | `/scope/house` | Beneficiary lookup → shared house record |
-| Scope — Roof | `/scope/roof` | Measurements/type → house technical state |
+| Scope — Roof | `/scope/roof` | Touch drawing, structures, geometry, measurements and submit → house technical state |
 | Scope — Print | `/scope/print` | House summary, roof diagram and signatures |
 | Scope — Files | `/scope/files` | Evidence and generated file state |
-| Control | `/control` | Configurable lifecycle/priority/custom divisions → 16 operational modules |
+| Drawing & Legacy Import | `/scope/import` | Photo/PDF drawing proposal or staged Kobo/CSV/JSON/XLSX mapping → human review |
+| Control | `/control` | Configurable lifecycle/priority/custom divisions → 21 operational modules |
 | Control Layout | `/control/layout` | Tile visibility/order, division style, density, hero/insights and reset |
 | Houses | `/houses` | Search/filter → selected House Command |
 | House Command | `/house-command` | Lifecycle, blockers, next action and audit |
@@ -22,8 +23,9 @@
 | Daily Log | `/forms/daily-log` | Attendance/progress/issues → audit |
 | Material Request | `/forms/material-request` | House request → inventory/logistics trail |
 | Consumable Request | `/forms/consumable-request` | Request/receipt → delivery trail |
-| Inventory | `/inventory` | Live reconciliation → edit record |
+| Inventory | `/inventory` | Parish/cluster/house stock health and reconciliation → edit record |
 | Inventory Edit | `/inventory/add` | Delivered/additions/leftovers → audit |
+| Inventory Transfer | `/inventory/transfer` | Two-sided parish → cluster → house stock movement and validation |
 | Completion | `/completion` | Readiness gate → close-out submission |
 | Final Inspection | `/final-inspection` | Technical pass gate → close-out readiness |
 | Payment | `/payment` | Readiness, 46/31/23 allocation → finance submission |
@@ -33,7 +35,10 @@
 | Users Online | `/users-online` | Profile → message/call actions |
 | Messages | `/messages` | Linked-house conversation and replies |
 | Settings | `/settings` | Offline, density, themes, accessibility and logout |
-| Work Logs | `/work-logs` | Fast entry → hours and activity |
+| Work Logs | `/work-logs` | Control of work: progress, crew, work, materials, blocker, next action → audit |
+| Work Projections | `/work-projections` | Weekly milestone, capacity, materials and risk → actual variance |
+| Production Board | `/production/board` | Busy-person view of blockers, work, stock, people, approvals and next actions |
+| Sync Monitor | `/sync-monitor` | Device queue, Supabase health, stock sync and retry controls |
 | Analytics | `/analytics` | Parish filters, operational metrics and export feedback |
 | Operational Map | `/map` | House pins → House Command |
 | Admin Users | `/admin/users` | Role/parish/status changes → audit |
@@ -57,4 +62,4 @@
 | Administration Command | `/admin/command` | Features, policies, users, templates and workspace controls |
 | Approval Queue | `/management/approvals` | Transfer, close-out and finance decisions in one queue |
 
-All 55 declared routes are covered by the route, render, interaction and real-pointer navigation test suites.
+All 60 declared routes are covered by the route, render, interaction and real-pointer navigation test suites.
