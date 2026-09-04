@@ -2,8 +2,12 @@ import 'package:flutter/material.dart';
 
 import 'app.dart';
 import 'core/app_state.dart';
+import 'services/production_backend.dart';
 
-void main() {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  runApp(RcSowApp(state: AppState.seeded()));
+  final backend = await ProductionBackendFactory.create();
+  final state = AppState.seeded(backend: backend);
+  await state.bootstrapSession();
+  runApp(RcSowApp(state: state));
 }

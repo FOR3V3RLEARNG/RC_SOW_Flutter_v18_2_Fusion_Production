@@ -26,6 +26,15 @@ class ControlModuleDefinition {
 abstract final class ControlModules {
   static const List<ControlModuleDefinition> all = <ControlModuleDefinition>[
     ControlModuleDefinition(
+      id: 'production-board',
+      title: 'Production Command Board',
+      description: 'See today’s blockers, capacity, stock and approvals.',
+      phase: LifecyclePhase.plan,
+      icon: Icons.space_dashboard_outlined,
+      route: RcRoutes.productionBoard,
+      priority: 1,
+    ),
+    ControlModuleDefinition(
       id: 'work-plan',
       title: 'Work Plan',
       description: 'Plan sequence, owners, dates and crew.',
@@ -33,6 +42,15 @@ abstract final class ControlModules {
       icon: Icons.event_note_outlined,
       route: RcRoutes.workPlan,
       priority: 1,
+    ),
+    ControlModuleDefinition(
+      id: 'work-projections',
+      title: 'Work Projection Log',
+      description: 'Plan weekly milestones, crew hours, materials and risks.',
+      phase: LifecyclePhase.plan,
+      icon: Icons.trending_up_outlined,
+      route: RcRoutes.workProjections,
+      priority: 2,
     ),
     ControlModuleDefinition(
       id: 'documents',
@@ -89,6 +107,15 @@ abstract final class ControlModules {
       priority: 2,
     ),
     ControlModuleDefinition(
+      id: 'control-work-log',
+      title: 'Control of Work Log',
+      description: 'Record crew, progress, work, materials and blockers.',
+      phase: LifecyclePhase.delivery,
+      icon: Icons.playlist_add_check_circle_outlined,
+      route: RcRoutes.workLogs,
+      priority: 1,
+    ),
+    ControlModuleDefinition(
       id: 'materials',
       title: 'Material Request',
       description: 'Request house-level materials against inventory.',
@@ -114,6 +141,24 @@ abstract final class ControlModules {
       icon: Icons.inventory_2_outlined,
       route: RcRoutes.inventory,
       priority: 5,
+    ),
+    ControlModuleDefinition(
+      id: 'inventory-transfer',
+      title: 'Parish / House Stock Transfer',
+      description: 'Move materials between depot, cluster and house ledgers.',
+      phase: LifecyclePhase.delivery,
+      icon: Icons.move_down_outlined,
+      route: RcRoutes.inventoryTransfer,
+      priority: 4,
+    ),
+    ControlModuleDefinition(
+      id: 'sync-monitor',
+      title: 'Offline Sync Monitor',
+      description: 'Inspect device queues, backend health and retry status.',
+      phase: LifecyclePhase.delivery,
+      icon: Icons.sync_outlined,
+      route: RcRoutes.syncMonitor,
+      priority: 8,
     ),
     ControlModuleDefinition(
       id: 'live-briefing',

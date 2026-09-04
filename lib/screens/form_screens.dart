@@ -123,7 +123,7 @@ class _OperationalFormScreenState extends State<OperationalFormScreen> {
     final state = AppScope.of(context);
     final house = state.selectedHouse;
     return Scaffold(
-      appBar: AppBar(
+      appBar: RcAppBar(
         title: Text(widget.title),
         actions: <Widget>[
           Padding(
@@ -782,7 +782,7 @@ class DocumentChecklistScreen extends StatelessWidget {
     final house = state.selectedHouse;
     final complete = state.completedDocuments[house.code] ?? <String>{};
     return Scaffold(
-      appBar: AppBar(title: const Text('Document Checklist')),
+      appBar: RcAppBar(title: const Text('Document Checklist')),
       body: Column(
         children: <Widget>[
           const RcSyncBanner(),
@@ -897,7 +897,7 @@ class MonitoringChecklistScreen extends StatelessWidget {
     final completed =
         statuses.values.where((value) => value != 'Pending').length;
     return Scaffold(
-      appBar: AppBar(
+      appBar: RcAppBar(
         title: Text('${house.code} • Monitoring Checklist'),
         actions: <Widget>[
           IconButton(

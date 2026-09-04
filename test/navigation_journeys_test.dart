@@ -41,8 +41,7 @@ void main() {
 
     final workLogObserver = _RecordingNavigatorObserver();
     await _pumpRoute(tester, RcRoutes.home, observer: workLogObserver);
-    await tester.tap(find.text('Work logs').hitTestable());
-    await tester.pumpAndSettle();
+    await _tapScrollableText(tester, 'Work logs');
     expect(workLogObserver.lastName, RcRoutes.workLogs);
 
     for (final shortcut in <String, String>{
@@ -108,16 +107,21 @@ void main() {
   ) async {
     await _useViewport(tester, const Size(390, 844));
     const modules = <String, String>{
+      'Production Command Board': RcRoutes.productionBoard,
       'Work Plan': RcRoutes.workPlan,
+      'Work Projection Log': RcRoutes.workProjections,
       'Document Checklist': RcRoutes.documentChecklist,
       'Construction Schedule': RcRoutes.schedule,
       'Team Resource Manager': RcRoutes.teamResources,
       'Transfer Management': RcRoutes.transfers,
       'Site Visits': RcRoutes.siteVisits,
       'Daily Site Log': RcRoutes.dailyLog,
+      'Control of Work Log': RcRoutes.workLogs,
       'Material Request': RcRoutes.materialRequest,
       'Consumables': RcRoutes.consumableRequest,
       'Inventory Reconciliation': RcRoutes.inventory,
+      'Parish / House Stock Transfer': RcRoutes.inventoryTransfer,
+      'Offline Sync Monitor': RcRoutes.syncMonitor,
       'Live Team Briefing': RcRoutes.liveBriefing,
       'Monitoring Checklist': RcRoutes.monitoring,
       'Final Inspection': RcRoutes.finalInspection,
@@ -140,10 +144,13 @@ void main() {
     await _useViewport(tester, const Size(390, 844));
     const links = <String, String>{
       'Work Logs': RcRoutes.workLogs,
+      'Work Projection Log': RcRoutes.workProjections,
+      'Production Command Board': RcRoutes.productionBoard,
       'Transfer Management': RcRoutes.transfers,
       'Construction Schedule': RcRoutes.schedule,
       'Live Team Briefing': RcRoutes.liveBriefing,
       'Inventory Tracker': RcRoutes.inventory,
+      'Parish / House Stock Transfer': RcRoutes.inventoryTransfer,
       'Evidence Viewer': RcRoutes.evidence,
       'Operational Map': RcRoutes.operationalMap,
       'Messages': RcRoutes.messages,
@@ -162,6 +169,8 @@ void main() {
       'Production Analytics': RcRoutes.analytics,
       'Activity History': RcRoutes.activity,
       'Administration Command': RcRoutes.adminCommand,
+      'Offline Sync Monitor': RcRoutes.syncMonitor,
+      'Image & Legacy Import': RcRoutes.scopeImport,
       'Control Layout': RcRoutes.controlLayout,
       'Transfer Logic': RcRoutes.transferAutomation,
       'Awards & Incentives': RcRoutes.awardsIncentives,

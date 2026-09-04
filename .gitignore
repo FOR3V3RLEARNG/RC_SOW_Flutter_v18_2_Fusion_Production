@@ -8,4 +8,4 @@ android/.gradle/
 android/local.properties
 ios/Pods/
 macos/Pods/
-
+supabase/.temp/

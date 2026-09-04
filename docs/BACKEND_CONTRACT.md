@@ -13,6 +13,8 @@ The UI depends on one durable operational object: `house`. Every form, evidence 
 7. **Maps** — organization-approved tiles/geocoding; GPS access only after field-user consent.
 8. **Approvals** — append-only decisions with actor, role, timestamp, source version and reason; transfer, close-out and finance states must not be advanced by a client-only flag.
 9. **Configuration** — Control tile preferences may be user-scoped, while transfer, incentive, routing, storage and payout policies remain administrator-owned and versioned.
+10. **Drawing assistance** — image extraction runs only through an authenticated Edge Function, returns an unverified proposal and cannot mark field measurements as approved.
+11. **Legacy imports** — file previews are staged, column mappings remain editable, duplicates and missing identity fields are blocked, and final commit is auditable.
 
 ## Client write sequence
 
@@ -31,6 +33,8 @@ The UI depends on one durable operational object: `house`. Every form, evidence 
 - Users see houses only in assigned parishes or explicit house assignments.
 - Admin/all-parish access is a server-owned privilege.
 - Evidence storage is private.
+- AI/image requests enforce authenticated users and payload limits; provider keys remain server-side.
+- Imported records remain staged until required fields and beneficiary identity are reviewed.
 - Normal users never receive raw database exceptions.
 - Every approval, permission change and export is auditable.
 

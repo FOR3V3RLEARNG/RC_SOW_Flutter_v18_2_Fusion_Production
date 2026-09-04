@@ -104,6 +104,11 @@ class _AppShellState extends State<AppShell> {
               ),
             ),
             IconButton(
+              tooltip: 'Messages',
+              onPressed: () => Navigator.pushNamed(context, RcRoutes.messages),
+              icon: const Icon(Icons.chat_bubble_outline),
+            ),
+            IconButton(
               tooltip: 'Notifications',
               onPressed: () =>
                   Navigator.pushNamed(context, RcRoutes.notifications),
@@ -112,13 +117,11 @@ class _AppShellState extends State<AppShell> {
                 count: state.unreadNotifications,
               ),
             ),
-            if (wide)
-              IconButton(
-                tooltip: 'Settings',
-                onPressed: () =>
-                    Navigator.pushNamed(context, RcRoutes.settings),
-                icon: const Icon(Icons.settings_outlined),
-              ),
+            IconButton(
+              tooltip: 'Settings',
+              onPressed: () => Navigator.pushNamed(context, RcRoutes.settings),
+              icon: const Icon(Icons.settings_outlined),
+            ),
             const SizedBox(width: 6),
           ],
         );
@@ -136,6 +139,11 @@ class _AppShellState extends State<AppShell> {
           return Scaffold(
             appBar: appBar,
             body: content,
+            floatingActionButton: _FieldCommsDock(
+              onlineCount: state.team.where((person) => person.online).length,
+            ),
+            floatingActionButtonLocation:
+                FloatingActionButtonLocation.endFloat,
             bottomNavigationBar: NavigationBar(
               selectedIndex: _index,
               destinations: _destinations,
@@ -233,6 +241,34 @@ class _CountedIcon extends StatelessWidget {
   }
 }
 
+class _FieldCommsDock extends StatelessWidget {
+  const _FieldCommsDock({required this.onlineCount});
+
+  final int onlineCount;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.end,
+      children: <Widget>[
+        ActionChip(
+          avatar: const Icon(Icons.circle, size: 10, color: RcColors.success),
+          label: Text('$onlineCount users online'),
+          onPressed: () => Navigator.pushNamed(context, RcRoutes.usersOnline),
+        ),
+        const SizedBox(height: 8),
+        FloatingActionButton.small(
+          heroTag: 'field-comms',
+          tooltip: 'Open field communications',
+          onPressed: () => Navigator.pushNamed(context, RcRoutes.messages),
+          child: const Icon(Icons.chat_bubble_outline),
+        ),
+      ],
+    );
+  }
+}
+
 class DashboardScreen extends StatelessWidget {
   const DashboardScreen({required this.onDestination, super.key});
 
@@ -241,6 +277,13 @@ class DashboardScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final state = AppScope.of(context);
+    final colorScheme = Theme.of(context).colorScheme;
+    final dark = Theme.of(context).brightness == Brightness.dark;
+    final completedHouses =
+        state.houses.where((house) => house.progress >= 1).length;
+    final closureRatio = state.houses.isEmpty
+        ? 0.0
+        : completedHouses / state.houses.length;
     return SingleChildScrollView(
       padding: const EdgeInsets.fromLTRB(16, 18, 16, 32),
       child: Center(
@@ -255,57 +298,85 @@ class DashboardScreen extends StatelessWidget {
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
                     colors: <Color>[
-                      Theme.of(context).colorScheme.primaryContainer,
-                      Theme.of(context).colorScheme.surface,
+                      colorScheme.primaryContainer,
+                      dark
+                          ? Color.alphaBlend(
+                              RcColors.sunshine.withOpacity(.18),
+                              colorScheme.surface,
+                            )
+                          : RcColors.sunshineSoft,
                     ],
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                   ),
-                  borderRadius: BorderRadius.circular(28),
+                  borderRadius: const BorderRadius.only(
+                    topLeft: Radius.circular(38),
+                    topRight: Radius.circular(22),
+                    bottomLeft: Radius.circular(22),
+                    bottomRight: Radius.circular(38),
+                  ),
                   border: Border.all(
                     color:
                         Theme.of(context).colorScheme.primary.withOpacity(.15),
                   ),
                 ),
-                child: Wrap(
-                  alignment: WrapAlignment.spaceBetween,
-                  crossAxisAlignment: WrapCrossAlignment.center,
-                  runSpacing: 18,
-                  children: <Widget>[
-                    ConstrainedBox(
-                      constraints: const BoxConstraints(maxWidth: 650),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                child: LayoutBuilder(
+                  builder: (context, constraints) {
+                    final copy = Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        const RcStatusChip(
+                          label: 'LIVE PRODUCTION',
+                          icon: Icons.bolt,
+                          tone: RcStatusTone.brand,
+                        ),
+                        const SizedBox(height: 16),
+                        Text(
+                          'From assessment to paid completion',
+                          style: Theme.of(context).textTheme.headlineLarge,
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          '${state.activeHouses} active houses • ${state.attentionHouses} need attention. Keep approvals, field evidence, materials, completion and payment connected.',
+                          style:
+                              Theme.of(context).textTheme.bodyLarge?.copyWith(
+                                    color: colorScheme.onSurfaceVariant,
+                                  ),
+                        ),
+                        const SizedBox(height: 18),
+                        FilledButton.icon(
+                          onPressed: () => onDestination(2),
+                          icon: const Icon(Icons.construction_outlined),
+                          label: const Text('OPEN PRODUCTION CONTROL'),
+                        ),
+                      ],
+                    );
+                    final progress = _DashboardProgressOrb(
+                      value: closureRatio,
+                      complete: completedHouses,
+                      total: state.houses.length,
+                    );
+                    if (constraints.maxWidth < 720) {
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: <Widget>[
-                          const RcStatusChip(
-                            label: 'LIVE PRODUCTION',
-                            icon: Icons.bolt,
-                            tone: RcStatusTone.brand,
-                          ),
-                          const SizedBox(height: 16),
-                          Text(
-                            'From assessment to paid completion',
-                            style: Theme.of(context).textTheme.headlineLarge,
-                          ),
-                          const SizedBox(height: 8),
-                          Text(
-                            '${state.activeHouses} active houses • ${state.attentionHouses} need attention. Keep approvals, field evidence, materials, completion and payment connected.',
-                            style:
-                                Theme.of(context).textTheme.bodyLarge?.copyWith(
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .onSurfaceVariant,
-                                    ),
+                          copy,
+                          const SizedBox(height: 18),
+                          Align(
+                            alignment: Alignment.centerRight,
+                            child: progress,
                           ),
                         ],
-                      ),
-                    ),
-                    FilledButton.icon(
-                      onPressed: () => onDestination(2),
-                      icon: const Icon(Icons.construction_outlined),
-                      label: const Text('OPEN PRODUCTION CONTROL'),
-                    ),
-                  ],
+                      );
+                    }
+                    return Row(
+                      children: <Widget>[
+                        Expanded(child: copy),
+                        const SizedBox(width: 28),
+                        progress,
+                      ],
+                    );
+                  },
                 ),
               ),
               const SizedBox(height: 18),
@@ -338,6 +409,14 @@ class DashboardScreen extends StatelessWidget {
                         Navigator.pushNamed(context, RcRoutes.workLogs),
                   ),
                   ActionChip(
+                    avatar: const Icon(Icons.space_dashboard_outlined, size: 18),
+                    label: const Text('Production board'),
+                    onPressed: () => Navigator.pushNamed(
+                      context,
+                      RcRoutes.productionBoard,
+                    ),
+                  ),
+                  ActionChip(
                     avatar: const Icon(Icons.swap_horiz_outlined, size: 18),
                     label: Text('Transfers (${state.pendingTransfers})'),
                     onPressed: () =>
@@ -365,8 +444,8 @@ class DashboardScreen extends StatelessWidget {
               ),
               const SizedBox(height: 12),
               RcResponsiveGrid(
-                minItemWidth: 190,
-                childAspectRatio: 1.25,
+                minItemWidth: 160,
+                childAspectRatio: 1.05,
                 children: <Widget>[
                   RcMetricTile(
                     label: 'Active houses',
@@ -457,6 +536,70 @@ class DashboardScreen extends StatelessWidget {
   }
 }
 
+class _DashboardProgressOrb extends StatelessWidget {
+  const _DashboardProgressOrb({
+    required this.value,
+    required this.complete,
+    required this.total,
+  });
+
+  final double value;
+  final int complete;
+  final int total;
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final reducedMotion = AppScope.of(context).reducedMotion;
+    return Semantics(
+      label: '$complete of $total houses complete',
+      child: TweenAnimationBuilder<double>(
+        tween: Tween<double>(begin: 0, end: value),
+        duration: Duration(milliseconds: reducedMotion ? 0 : 750),
+        curve: Curves.easeOutCubic,
+        builder: (context, animatedValue, _) {
+          return SizedBox(
+            width: 116,
+            height: 116,
+            child: Stack(
+              alignment: Alignment.center,
+              children: <Widget>[
+                SizedBox.expand(
+                  child: CircularProgressIndicator(
+                    value: animatedValue.clamp(0, 1).toDouble(),
+                    strokeWidth: 11,
+                    strokeCap: StrokeCap.round,
+                    color: colorScheme.primary,
+                    backgroundColor: colorScheme.primary.withOpacity(.14),
+                  ),
+                ),
+                Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: <Widget>[
+                    Text(
+                      '${(animatedValue * 100).round()}%',
+                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                            color: colorScheme.primary,
+                            fontWeight: FontWeight.w900,
+                          ),
+                    ),
+                    Text(
+                      'closed',
+                      style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                            color: colorScheme.onSurfaceVariant,
+                          ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          );
+        },
+      ),
+    );
+  }
+}
+
 class ControlOfWorksScreen extends StatefulWidget {
   const ControlOfWorksScreen({super.key});
 
@@ -470,6 +613,8 @@ class _ControlOfWorksScreenState extends State<ControlOfWorksScreen> {
   @override
   Widget build(BuildContext context) {
     final state = AppScope.of(context);
+    final colorScheme = Theme.of(context).colorScheme;
+    final dark = Theme.of(context).brightness == Brightness.dark;
     final modulesById = <String, ControlModuleDefinition>{
       for (final module in ControlModules.all) module.id: module,
     };
@@ -521,8 +666,25 @@ class _ControlOfWorksScreenState extends State<ControlOfWorksScreen> {
                 Container(
                   padding: const EdgeInsets.all(20),
                   decoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.primaryContainer,
-                    borderRadius: BorderRadius.circular(26),
+                    gradient: LinearGradient(
+                      colors: <Color>[
+                        colorScheme.primaryContainer,
+                        dark
+                            ? Color.alphaBlend(
+                                RcColors.sunshine.withOpacity(.18),
+                                colorScheme.surface,
+                              )
+                            : RcColors.sunshineSoft,
+                      ],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+                    borderRadius: const BorderRadius.only(
+                      topLeft: Radius.circular(34),
+                      topRight: Radius.circular(20),
+                      bottomLeft: Radius.circular(20),
+                      bottomRight: Radius.circular(34),
+                    ),
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -545,8 +707,8 @@ class _ControlOfWorksScreenState extends State<ControlOfWorksScreen> {
               ],
               if (state.controlShowInsights) ...<Widget>[
                 RcResponsiveGrid(
-                  minItemWidth: 190,
-                  childAspectRatio: 1.35,
+                  minItemWidth: 160,
+                  childAspectRatio: 1.05,
                   children: <Widget>[
                     RcMetricTile(
                       label: 'Open production',
@@ -691,6 +853,14 @@ class _ControlModuleCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final moduleColor = switch (module.phase) {
+      LifecyclePhase.scope => RcColors.brand,
+      LifecyclePhase.plan => RcColors.plum,
+      LifecyclePhase.delivery => RcColors.info,
+      LifecyclePhase.quality => RcColors.mint,
+      LifecyclePhase.closeOut => RcColors.success,
+      LifecyclePhase.finance => RcColors.sunshine,
+    };
     return Card(
       clipBehavior: Clip.antiAlias,
       child: InkWell(
@@ -704,12 +874,17 @@ class _ControlModuleCard extends StatelessWidget {
                 width: 46,
                 height: 46,
                 decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.primaryContainer,
-                  borderRadius: BorderRadius.circular(14),
+                  color: moduleColor.withOpacity(.13),
+                  borderRadius: const BorderRadius.only(
+                    topLeft: Radius.circular(18),
+                    topRight: Radius.circular(10),
+                    bottomLeft: Radius.circular(10),
+                    bottomRight: Radius.circular(18),
+                  ),
                 ),
                 child: Icon(
                   module.icon,
-                  color: Theme.of(context).colorScheme.primary,
+                  color: moduleColor,
                 ),
               ),
               const SizedBox(width: 13),
@@ -879,6 +1054,16 @@ class MoreScreen extends StatelessWidget {
       const _MoreGroup('Field operations', <_MoreItem>[
         _MoreItem('Work Logs', Icons.edit_note_outlined, RcRoutes.workLogs),
         _MoreItem(
+          'Work Projection Log',
+          Icons.trending_up_outlined,
+          RcRoutes.workProjections,
+        ),
+        _MoreItem(
+          'Production Command Board',
+          Icons.space_dashboard_outlined,
+          RcRoutes.productionBoard,
+        ),
+        _MoreItem(
           'Transfer Management',
           Icons.swap_horiz_outlined,
           RcRoutes.transfers,
@@ -897,6 +1082,11 @@ class MoreScreen extends StatelessWidget {
           'Inventory Tracker',
           Icons.inventory_2_outlined,
           RcRoutes.inventory,
+        ),
+        _MoreItem(
+          'Parish / House Stock Transfer',
+          Icons.move_down_outlined,
+          RcRoutes.inventoryTransfer,
         ),
         _MoreItem(
           'Evidence Viewer',
@@ -975,6 +1165,16 @@ class MoreScreen extends StatelessWidget {
         _MoreItem('Activity History', Icons.history, RcRoutes.activity),
       ]),
       const _MoreGroup('Administration', <_MoreItem>[
+        _MoreItem(
+          'Offline Sync Monitor',
+          Icons.sync_outlined,
+          RcRoutes.syncMonitor,
+        ),
+        _MoreItem(
+          'Image & Legacy Import',
+          Icons.auto_awesome_outlined,
+          RcRoutes.scopeImport,
+        ),
         _MoreItem(
           'Administration Command',
           Icons.settings_suggest_outlined,

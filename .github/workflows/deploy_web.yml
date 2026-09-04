@@ -31,7 +31,7 @@ jobs:
           cache: true
 
       - name: Generate web platform
-        run: flutter create --platforms=web --project-name=rc_sow_connected .
+        run: flutter create --platforms=web --project-name=rc_sow_connected --org=org.jamaicaredcross .
 
       - name: Resolve dependencies
         run: flutter pub get

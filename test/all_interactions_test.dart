@@ -6,9 +6,28 @@ import 'package:rc_sow_connected/core/routes.dart';
 import 'package:rc_sow_connected/core/theme.dart';
 
 void main() {
-  final routes = RcRoutes.all.where((route) => route != RcRoutes.splash);
+  const shardIndex = int.fromEnvironment(
+    'INTERACTION_SHARD_INDEX',
+    defaultValue: 0,
+  );
+  const shardCount = int.fromEnvironment(
+    'INTERACTION_SHARD_COUNT',
+    defaultValue: 1,
+  );
 
-  for (final routeName in routes) {
+  if (shardCount < 1 || shardIndex < 0 || shardIndex >= shardCount) {
+    throw ArgumentError(
+      'Invalid interaction shard $shardIndex of $shardCount',
+    );
+  }
+
+  final routes = RcRoutes.all
+      .where((route) => route != RcRoutes.splash)
+      .toList(growable: false);
+
+  for (var routeIndex = 0; routeIndex < routes.length; routeIndex++) {
+    if (routeIndex % shardCount != shardIndex) continue;
+    final routeName = routes[routeIndex];
     testWidgets('$routeName enabled interactions execute without errors', (
       tester,
     ) async {
@@ -45,7 +64,7 @@ void main() {
         );
 
         await tester.pump();
-        await tester.pump(const Duration(milliseconds: 500));
+        await tester.pump(const Duration(milliseconds: 120));
         _expectNoExceptions(
           tester,
           '$routeName action $index (${action.label})',

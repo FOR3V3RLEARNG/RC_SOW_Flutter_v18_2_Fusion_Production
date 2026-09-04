@@ -28,7 +28,12 @@ class _RcSplashScreenState extends State<RcSplashScreen> {
   }
 
   void _continue() {
-    if (mounted) Navigator.pushReplacementNamed(context, RcRoutes.login);
+    if (!mounted) return;
+    final state = AppScope.of(context);
+    Navigator.pushReplacementNamed(
+      context,
+      state.authenticated ? RcRoutes.home : RcRoutes.login,
+    );
   }
 
   @override
@@ -208,117 +213,254 @@ class _LoginScreenState extends State<LoginScreen> {
     super.dispose();
   }
 
-  void _signIn() {
-    AppScope.of(context).login(selectedRole: _role);
-    Navigator.pushNamedAndRemoveUntil(context, RcRoutes.home, (_) => false);
+  bool _busy = false;
+
+  Future<void> _signIn() async {
+    if (_busy) return;
+    final email = _emailController.text.trim();
+    if (!email.contains('@')) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Enter a valid work email.')),
+      );
+      return;
+    }
+    setState(() => _busy = true);
+    try {
+      final entered = await AppScope.of(context).requestSecureEmailSignIn(
+        email: email,
+        selectedRole: _role,
+      );
+      if (!mounted) return;
+      if (entered) {
+        Navigator.pushNamedAndRemoveUntil(context, RcRoutes.home, (_) => false);
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Secure sign-in link sent. Check your work email.'),
+          ),
+        );
+      }
+    } catch (_) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Secure sign-in is unavailable. Check connectivity.'),
+          ),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _busy = false);
+    }
+  }
+
+  Future<void> _googleSignIn() async {
+    if (_busy) return;
+    setState(() => _busy = true);
+    try {
+      final entered =
+          await AppScope.of(context).signInWithGoogle(selectedRole: _role);
+      if (!mounted) return;
+      if (entered) {
+        Navigator.pushNamedAndRemoveUntil(context, RcRoutes.home, (_) => false);
+      }
+    } catch (_) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Google sign-in could not be started.')),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _busy = false);
+    }
   }
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Scaffold(
       body: SafeArea(
-        child: Center(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.all(24),
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 470),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: <Widget>[
-                  const Align(
-                    alignment: Alignment.centerLeft,
-                    child: RcBrand(),
-                  ),
-                  const SizedBox(height: 38),
-                  Text(
-                    'Welcome back',
-                    style: Theme.of(context).textTheme.headlineLarge,
-                  ),
-                  const SizedBox(height: 9),
-                  Text(
-                    'Sign in to continue the verified evidence chain for every house.',
-                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                          color: Theme.of(context).colorScheme.onSurfaceVariant,
-                        ),
-                  ),
-                  const SizedBox(height: 28),
-                  TextField(
-                    controller: _emailController,
-                    keyboardType: TextInputType.emailAddress,
-                    autofillHints: const <String>[AutofillHints.email],
-                    decoration: const InputDecoration(
-                      labelText: 'Work email',
-                      prefixIcon: Icon(Icons.alternate_email),
-                    ),
-                  ),
-                  const SizedBox(height: 14),
-                  DropdownButtonFormField<String>(
-                    value: _role,
-                    isExpanded: true,
-                    decoration: const InputDecoration(
-                      labelText: 'Operational role',
-                      prefixIcon: Icon(Icons.badge_outlined),
-                    ),
-                    items: const <String>[
-                      'Site Supervisor',
-                      'Regional Site Supervisor',
-                      'Construction Specialist',
-                      'Technical Admin',
-                      'Community Admin',
-                      'Admin',
-                    ]
-                        .map(
-                          (role) => DropdownMenuItem<String>(
-                            value: role,
-                            child: Text(
-                              role,
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
+        child: Stack(
+          children: <Widget>[
+            Positioned(
+              top: -90,
+              right: -70,
+              child: _ComfortShape(
+                size: 230,
+                color: colorScheme.primaryContainer.withOpacity(.72),
+              ),
+            ),
+            Positioned(
+              bottom: -105,
+              left: -80,
+              child: _ComfortShape(
+                size: 250,
+                color: colorScheme.secondaryContainer.withOpacity(.6),
+              ),
+            ),
+            Center(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.all(20),
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 500),
+                  child: Card(
+                    color: colorScheme.surface.withOpacity(.96),
+                    child: Padding(
+                      padding: const EdgeInsets.all(24),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: <Widget>[
+                          const Align(
+                            alignment: Alignment.centerLeft,
+                            child: RcBrand(),
+                          ),
+                          const SizedBox(height: 28),
+                          const Align(
+                            alignment: Alignment.centerLeft,
+                            child: RcStatusChip(
+                              label: 'FIELD READY',
+                              icon: Icons.wb_sunny_outlined,
+                              tone: RcStatusTone.success,
                             ),
                           ),
-                        )
-                        .toList(),
-                    onChanged: (value) =>
-                        setState(() => _role = value ?? _role),
-                  ),
-                  const SizedBox(height: 20),
-                  FilledButton.icon(
-                    onPressed: _signIn,
-                    icon: const Icon(Icons.login),
-                    label: const Text('SIGN IN SECURELY'),
-                  ),
-                  const SizedBox(height: 12),
-                  OutlinedButton.icon(
-                    onPressed: _signIn,
-                    icon: const Icon(Icons.g_mobiledata, size: 25),
-                    label: const Text('CONTINUE WITH GOOGLE'),
-                  ),
-                  const SizedBox(height: 22),
-                  Card(
-                    color: Theme.of(context).colorScheme.surfaceContainerLow,
-                    child: Padding(
-                      padding: const EdgeInsets.all(16),
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: <Widget>[
-                          const Icon(
-                            Icons.shield_outlined,
-                            color: RcColors.success,
+                          const SizedBox(height: 14),
+                          Text(
+                            'Welcome back',
+                            style: Theme.of(context).textTheme.headlineLarge,
                           ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: Text(
-                              'Role and parish access are enforced throughout the connected workflow.',
-                              style: Theme.of(context).textTheme.bodyMedium,
+                          const SizedBox(height: 9),
+                          Text(
+                            'Continue the verified evidence chain for every house, from scope to payment.',
+                            style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                                  color: colorScheme.onSurfaceVariant,
+                                ),
+                          ),
+                          const SizedBox(height: 26),
+                          TextField(
+                            controller: _emailController,
+                            keyboardType: TextInputType.emailAddress,
+                            autofillHints: const <String>[AutofillHints.email],
+                            decoration: const InputDecoration(
+                              labelText: 'Work email',
+                              prefixIcon: Icon(Icons.alternate_email),
+                            ),
+                          ),
+                          const SizedBox(height: 14),
+                          DropdownButtonFormField<String>(
+                            value: _role,
+                            isExpanded: true,
+                            decoration: const InputDecoration(
+                              labelText: 'Operational role',
+                              prefixIcon: Icon(Icons.badge_outlined),
+                            ),
+                            items: const <String>[
+                              'Site Supervisor',
+                              'Regional Site Supervisor',
+                              'Construction Specialist',
+                              'Technical Admin',
+                              'Community Admin',
+                              'Admin',
+                            ]
+                                .map(
+                                  (role) => DropdownMenuItem<String>(
+                                    value: role,
+                                    child: Text(
+                                      role,
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
+                                )
+                                .toList(),
+                            onChanged: (value) =>
+                                setState(() => _role = value ?? _role),
+                          ),
+                          const SizedBox(height: 20),
+                          FilledButton.icon(
+                            onPressed: _busy ? null : _signIn,
+                            icon: _busy
+                                ? const SizedBox.square(
+                                    dimension: 18,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2.4,
+                                    ),
+                                  )
+                                : const Icon(Icons.login),
+                            label: const Text('SIGN IN SECURELY'),
+                          ),
+                          const SizedBox(height: 12),
+                          OutlinedButton.icon(
+                            onPressed: _busy ? null : _googleSignIn,
+                            icon: const Icon(Icons.g_mobiledata, size: 25),
+                            label: const Text('CONTINUE WITH GOOGLE'),
+                          ),
+                          const SizedBox(height: 20),
+                          Container(
+                            padding: const EdgeInsets.all(16),
+                            decoration: BoxDecoration(
+                              color: colorScheme.tertiaryContainer,
+                              borderRadius: const BorderRadius.only(
+                                topLeft: Radius.circular(22),
+                                topRight: Radius.circular(12),
+                                bottomLeft: Radius.circular(12),
+                                bottomRight: Radius.circular(22),
+                              ),
+                            ),
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: <Widget>[
+                                Icon(
+                                  Icons.shield_outlined,
+                                  color: colorScheme.onTertiaryContainer,
+                                ),
+                                const SizedBox(width: 12),
+                                Expanded(
+                                  child: Text(
+                                    'Role and parish access stay enforced across every connected workflow.',
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .bodyMedium
+                                        ?.copyWith(
+                                          color:
+                                              colorScheme.onTertiaryContainer,
+                                        ),
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
                         ],
                       ),
                     ),
                   ),
-                ],
+                ),
               ),
             ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _ComfortShape extends StatelessWidget {
+  const _ComfortShape({required this.size, required this.color});
+
+  final double size;
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) {
+    return IgnorePointer(
+      child: Container(
+        width: size,
+        height: size,
+        decoration: BoxDecoration(
+          color: color,
+          borderRadius: const BorderRadius.only(
+            topLeft: Radius.circular(110),
+            topRight: Radius.circular(54),
+            bottomLeft: Radius.circular(54),
+            bottomRight: Radius.circular(110),
           ),
         ),
       ),

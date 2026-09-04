@@ -23,7 +23,7 @@ class _TransferHubScreenState extends State<TransferHubScreen> {
       return _filter == 'All' || transfer.status == _filter;
     }).toList();
     return Scaffold(
-      appBar: AppBar(
+      appBar: RcAppBar(
         title: const Text('Transfer Management'),
         actions: <Widget>[
           IconButton(
@@ -372,7 +372,7 @@ class _NewTransferScreenState extends State<NewTransferScreen> {
             'Framing packs',
           ];
     return Scaffold(
-      appBar: AppBar(title: const Text('Request Transfer')),
+      appBar: RcAppBar(title: const Text('Request Transfer')),
       body: Column(
         children: <Widget>[
           const RcSyncBanner(),
@@ -680,7 +680,7 @@ class TransferDetailScreen extends StatelessWidget {
     final state = AppScope.of(context);
     final transfer = state.selectedTransfer;
     return Scaffold(
-      appBar: AppBar(title: Text('${transfer.id} • Transfer Detail')),
+      appBar: RcAppBar(title: Text('${transfer.id} • Transfer Detail')),
       body: Column(
         children: <Widget>[
           const RcSyncBanner(),
@@ -880,7 +880,7 @@ class _TransferAutomationScreenState extends State<TransferAutomationScreen> {
         .where((transfer) => transfer.status == 'Pending approval')
         .toList();
     return Scaffold(
-      appBar: AppBar(title: const Text('Automated Transfer Configuration')),
+      appBar: RcAppBar(title: const Text('Automated Transfer Configuration')),
       body: Column(
         children: <Widget>[
           const RcSyncBanner(),

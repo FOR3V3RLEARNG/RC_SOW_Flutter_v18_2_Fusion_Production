@@ -1,0 +1,7 @@
+project_id = "rc-sow-connected"
+
+[functions.rc-sow-roof-extract]
+verify_jwt = true
+
+[functions.rc-sow-legacy-import-preview]
+verify_jwt = true
