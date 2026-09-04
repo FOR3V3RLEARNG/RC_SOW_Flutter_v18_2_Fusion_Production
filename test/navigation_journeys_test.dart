@@ -41,8 +41,7 @@ void main() {
 
     final workLogObserver = _RecordingNavigatorObserver();
     await _pumpRoute(tester, RcRoutes.home, observer: workLogObserver);
-    await tester.tap(find.text('Work logs').hitTestable());
-    await tester.pumpAndSettle();
+    await _tapScrollableText(tester, 'Work logs');
     expect(workLogObserver.lastName, RcRoutes.workLogs);
 
     for (final shortcut in <String, String>{

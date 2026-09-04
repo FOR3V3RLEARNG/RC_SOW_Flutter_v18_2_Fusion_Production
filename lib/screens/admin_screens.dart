@@ -370,14 +370,14 @@ class AdminTemplatesScreen extends StatelessWidget {
       appBar: RcAppBar(
         title: const Text('Template Management'),
         actions: <Widget>[
-          FilledButton.tonalIcon(
+          IconButton.filledTonal(
+            tooltip: 'New template',
             onPressed: () => ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(content: Text('New template draft created.')),
             ),
             icon: const Icon(Icons.add),
-            label: const Text('NEW TEMPLATE'),
           ),
-          const SizedBox(width: 10),
+          const SizedBox(width: 6),
         ],
       ),
       body: ListView(
