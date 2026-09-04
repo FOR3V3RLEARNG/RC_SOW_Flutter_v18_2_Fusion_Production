@@ -45,7 +45,7 @@ void main() {
         );
 
         await tester.pump();
-        await tester.pump(const Duration(milliseconds: 500));
+        await tester.pump(const Duration(milliseconds: 120));
         _expectNoExceptions(
           tester,
           '$routeName action $index (${action.label})',
