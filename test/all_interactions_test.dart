@@ -16,9 +16,7 @@ void main() {
   );
 
   if (shardCount < 1 || shardIndex < 0 || shardIndex >= shardCount) {
-    throw ArgumentError(
-      'Invalid interaction shard $shardIndex of $shardCount',
-    );
+    throw ArgumentError('Invalid interaction shard $shardIndex of $shardCount');
   }
 
   final routes = RcRoutes.all
@@ -64,6 +62,9 @@ void main() {
         );
 
         await tester.pump();
+        // The callback is the contract under test. A short frame window is
+        // enough to surface route/build errors without adding several minutes
+        // of artificial waiting across the full interaction inventory.
         await tester.pump(const Duration(milliseconds: 120));
         _expectNoExceptions(
           tester,

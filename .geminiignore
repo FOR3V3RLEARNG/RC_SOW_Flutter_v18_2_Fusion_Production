@@ -1,0 +1,25 @@
+# Credentials / local environment
+.env
+.env.*
+*.jks
+*.keystore
+*.p12
+*.pem
+*.key
+**/google-services.json
+**/GoogleService-Info.plist
+
+# Generated output
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+build/
+coverage/
+android/.gradle/
+android/local.properties
+
+# VCS internals
+.git/
+
+# Gemini session output
+gemini-build-session.jsonl

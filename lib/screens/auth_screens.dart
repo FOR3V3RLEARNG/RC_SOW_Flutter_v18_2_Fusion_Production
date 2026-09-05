@@ -23,13 +23,22 @@ class _RcSplashScreenState extends State<RcSplashScreen> {
     super.didChangeDependencies();
     _timer ??= Timer(
       Duration(milliseconds: AppScope.of(context).reducedMotion ? 500 : 1700),
-      _continue,
+      () => unawaited(_continue()),
     );
   }
 
-  void _continue() {
-    if (!mounted) return;
+  bool _continuing = false;
+
+  Future<void> _continue() async {
+    if (!mounted || _continuing) return;
+    _continuing = true;
     final state = AppScope.of(context);
+
+    if (!state.authenticated && state.backend.connected) {
+      await state.bootstrapSession();
+    }
+
+    if (!mounted) return;
     Navigator.pushReplacementNamed(
       context,
       state.authenticated ? RcRoutes.home : RcRoutes.login,
@@ -47,7 +56,7 @@ class _RcSplashScreenState extends State<RcSplashScreen> {
     final reducedMotion = AppScope.of(context).reducedMotion;
     return Scaffold(
       body: InkWell(
-        onTap: _continue,
+        onTap: () => unawaited(_continue()),
         child: Center(
           child: TweenAnimationBuilder<double>(
             duration: Duration(milliseconds: reducedMotion ? 250 : 1200),

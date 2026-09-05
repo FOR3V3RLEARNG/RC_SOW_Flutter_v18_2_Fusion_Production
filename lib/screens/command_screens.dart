@@ -255,9 +255,9 @@ class _LiveBriefingScreenState extends State<LiveBriefingScreen> {
 
   static const _agenda = <String>[
     'Safety moment and attendance',
-    'H12 zinc shortage and transfer ETA',
-    'H2 close-out evidence review',
-    'Crew allocation for tomorrow',
+    'Priority production blockers',
+    'Close-out and evidence review',
+    'Crew allocation and next actions',
   ];
 
   @override

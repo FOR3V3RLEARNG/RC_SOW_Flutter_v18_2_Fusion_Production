@@ -102,53 +102,33 @@ class LocalProductionBackend extends ProductionBackend {
     required String fileName,
     required Uint8List bytes,
   }) async {
-    final section = defaultRoofSection(
-      id: 'ai-main',
-      name: 'AI proposal • Main roof',
-      left: 205,
-      top: 175,
-      width: 410,
-      height: 285,
-    );
-    section
-      ..lengthFt = 24.5
-      ..widthFt = 18
-      ..wallHeightFt = 8
-      ..pitchRisePer12 = 6;
-    final document = RoofDrawingDocument(
-      houseCode: houseCode,
-      sections: <RoofSection>[section],
-      selectedSectionId: section.id,
-      source: 'Image-assisted proposal',
-      sourceFileName: fileName,
-      aiConfidence: .78,
-      updatedAt: DateTime.now(),
+    final section = RoofSection(
+      id: 'review-required',
+      name: 'Review required',
+      structure: 'Unverified image import',
+      roofType: 'Custom',
+      nodes: <RoofNode>[],
+      lines: <RoofLine>[],
+      lengthFt: 0,
+      widthFt: 0,
+      wallHeightFt: 0,
+      pitchRisePer12: 0,
+      drainEnabled: false,
     );
     return AiRoofSuggestion(
       fileName: fileName,
-      document: document,
-      overallConfidence: .78,
-      engineLabel: 'Offline review proposal',
-      measurements: const <AiMeasurementSuggestion>[
-        AiMeasurementSuggestion(
-          label: 'Rafter length',
-          value: 14.5,
-          unit: 'ft',
-          confidence: .89,
-        ),
-        AiMeasurementSuggestion(
-          label: 'Zinc area',
-          value: 441,
-          unit: 'sq ft',
-          confidence: .54,
-        ),
-        AiMeasurementSuggestion(
-          label: 'Wall height',
-          value: 8,
-          unit: 'ft',
-          confidence: .92,
-        ),
-      ],
+      document: RoofDrawingDocument(
+        houseCode: houseCode,
+        sections: <RoofSection>[section],
+        selectedSectionId: section.id,
+        source: 'Image awaiting secure extraction',
+        sourceFileName: fileName,
+        aiConfidence: 0,
+        updatedAt: DateTime.now(),
+      ),
+      overallConfidence: 0,
+      engineLabel: 'Manual review required',
+      measurements: const <AiMeasurementSuggestion>[],
     );
   }
 
