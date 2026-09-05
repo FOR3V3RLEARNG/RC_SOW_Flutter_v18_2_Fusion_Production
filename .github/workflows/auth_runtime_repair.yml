@@ -1,0 +1,289 @@
+name: RC SOW v20.1 Auth Runtime Repair
+
+on:
+  push:
+    branches: [rc-sow-connected-v20.1.0]
+    paths:
+      - .github/workflows/auth_runtime_repair.yml
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: rc-sow-v20-auth-runtime-repair
+  cancel-in-progress: false
+
+jobs:
+  repair:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: rc-sow-connected-v20.1.0
+          fetch-depth: 0
+          persist-credentials: true
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Resolve dependencies
+        run: flutter pub get
+
+      - name: Repair auth runtime
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+
+          # backend adapter: deployed profile schema + migration schema fallback
+          p = Path('lib/services/production_backend.dart')
+          s = p.read_text()
+          a = s.find("  @override\n  Future<BackendProfile?> currentProfile() async {")
+          b = s.find("\n\n  @override\n  Future<void> signInWithGoogle() async {", a)
+          if a < 0 or b < 0:
+              raise SystemExit('currentProfile block not found')
+          block = """  @override
+          Future<BackendProfile?> currentProfile() async {
+            final user = client.auth.currentUser;
+            if (user == null) return null;
+
+            Map<String, dynamic>? row;
+            try {
+              row = await client
+                  .from('profiles')
+                  .select()
+                  .eq('user_id', user.id)
+                  .maybeSingle();
+            } on PostgrestException {
+              row = await client
+                  .from('profiles')
+                  .select()
+                  .eq('id', user.id)
+                  .maybeSingle();
+            }
+            if (row == null) return null;
+
+            final assignedRaw = row['assigned_parishes'];
+            final deployedParish =
+                '${row['parish'] ?? row['requested_parish'] ?? ''}'.trim();
+            final parishes = assignedRaw is List
+                ? assignedRaw
+                    .map((value) => '$value'.trim())
+                    .where((value) => value.isNotEmpty)
+                    .toList()
+                : deployedParish.isEmpty
+                    ? <String>[]
+                    : <String>[deployedParish];
+
+            final rawRole =
+                '${row['role'] ?? row['requested_role'] ?? ''}'.trim();
+            final role = rawRole.isEmpty ? 'site_supervisor' : rawRole;
+            final status =
+                '${row['registration_status'] ?? ''}'.trim().toLowerCase();
+            final approved = row.containsKey('approved')
+                ? row['approved'] == true &&
+                    row['active'] == true &&
+                    (status.isEmpty || status == 'approved')
+                : row['active'] == true;
+
+            return BackendProfile(
+              userId: user.id,
+              email: user.email ?? '',
+              fullName: '${row['full_name'] ?? user.email ?? 'RC SOW user'}',
+              role: role,
+              assignedParishes: parishes,
+              approved: approved,
+            );
+          }"""
+          p.write_text(s[:a] + block + s[b:])
+
+          # app state: distinguish signed-out from authenticated/pending approval
+          p = Path('lib/core/app_state.dart')
+          s = p.read_text()
+          if 'bool pendingApproval = false;' not in s:
+              s = s.replace(
+                  '  bool authenticated = false;\n',
+                  '  bool authenticated = false;\n  bool pendingApproval = false;\n',
+                  1,
+              )
+          old = """  Future<void> bootstrapSession() async {
+            if (!backend.connected) return;
+            try {
+              final profile = await backend.currentProfile();
+              if (profile == null || !profile.approved) return;
+              authenticated = true;
+              role = _displayRole(profile.role);
+              if (profile.assignedParishes.isNotEmpty) {
+                selectedParish = profile.assignedParishes.first;
+              }
+              syncCondition = SyncCondition.synced;
+              notifyListeners();
+            } catch (_) {
+              syncCondition = SyncCondition.failed;
+              notifyListeners();
+            }
+          }"""
+          new = """  Future<void> bootstrapSession() async {
+            if (!backend.connected) return;
+            try {
+              final profile = await backend.currentProfile();
+              if (profile == null) {
+                authenticated = false;
+                pendingApproval = false;
+                syncCondition = SyncCondition.synced;
+                notifyListeners();
+                return;
+              }
+              role = _displayRole(profile.role);
+              if (profile.assignedParishes.isNotEmpty) {
+                selectedParish = profile.assignedParishes.first;
+              }
+              authenticated = profile.approved;
+              pendingApproval = !profile.approved;
+              syncCondition = SyncCondition.synced;
+              notifyListeners();
+            } catch (_) {
+              authenticated = false;
+              pendingApproval = false;
+              syncCondition = SyncCondition.failed;
+              notifyListeners();
+            }
+          }"""
+          if old in s:
+              s = s.replace(old, new, 1)
+          elif 'pendingApproval = !profile.approved;' not in s:
+              raise SystemExit('bootstrapSession block not found')
+          s = s.replace(
+              "  void login({required String selectedRole}) {\n    authenticated = true;\n    role = selectedRole;",
+              "  void login({required String selectedRole}) {\n    authenticated = true;\n    pendingApproval = false;\n    role = selectedRole;",
+              1,
+          )
+          s = s.replace(
+              "  void logout() {\n    unawaited(backend.signOut());\n    authenticated = false;\n    notifyListeners();\n  }",
+              "  void logout() {\n    unawaited(backend.signOut());\n    authenticated = false;\n    pendingApproval = false;\n    notifyListeners();\n  }",
+              1,
+          )
+          p.write_text(s)
+
+          # Login screen: show pending approval instead of bouncing to sign-in
+          p = Path('lib/screens/auth_screens.dart')
+          s = p.read_text()
+          if "'Access awaiting approval'" not in s:
+              needle = """  @override
+            Widget build(BuildContext context) {
+              final colorScheme = Theme.of(context).colorScheme;
+              return Scaffold("""
+              repl = """  @override
+            Widget build(BuildContext context) {
+              final state = AppScope.of(context);
+              final colorScheme = Theme.of(context).colorScheme;
+              if (state.pendingApproval) {
+                return Scaffold(
+                  body: SafeArea(
+                    child: Center(
+                      child: Padding(
+                        padding: const EdgeInsets.all(24),
+                        child: ConstrainedBox(
+                          constraints: const BoxConstraints(maxWidth: 520),
+                          child: Card(
+                            child: Padding(
+                              padding: const EdgeInsets.all(28),
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: <Widget>[
+                                  Icon(
+                                    Icons.verified_user_outlined,
+                                    size: 58,
+                                    color: colorScheme.primary,
+                                  ),
+                                  const SizedBox(height: 20),
+                                  Text(
+                                    'Access awaiting approval',
+                                    textAlign: TextAlign.center,
+                                    style: Theme.of(context).textTheme.headlineSmall,
+                                  ),
+                                  const SizedBox(height: 12),
+                                  const Text(
+                                    'Your secure account is signed in. An authorized RC SOW administrator must approve operational access before production records can be opened.',
+                                    textAlign: TextAlign.center,
+                                  ),
+                                  const SizedBox(height: 24),
+                                  FilledButton.icon(
+                                    onPressed: _busy ? null : () async {
+                                      setState(() => _busy = true);
+                                      await state.bootstrapSession();
+                                      if (!mounted) return;
+                                      if (state.authenticated) {
+                                        Navigator.pushNamedAndRemoveUntil(
+                                          context,
+                                          RcRoutes.home,
+                                          (_) => false,
+                                        );
+                                        return;
+                                      }
+                                      setState(() => _busy = false);
+                                    },
+                                    icon: const Icon(Icons.refresh),
+                                    label: const Text('CHECK ACCESS'),
+                                  ),
+                                  const SizedBox(height: 8),
+                                  TextButton.icon(
+                                    onPressed: _busy ? null : state.logout,
+                                    icon: const Icon(Icons.logout),
+                                    label: const Text('SIGN OUT'),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                );
+              }
+              return Scaffold("""
+              if needle not in s:
+                  raise SystemExit('LoginScreen build block not found')
+              s = s.replace(needle, repl, 1)
+          p.write_text(s)
+          PY
+
+      - name: Format
+        run: |
+          dart format lib/services/production_backend.dart lib/core/app_state.dart lib/screens/auth_screens.dart
+          git diff --check
+
+      - name: Analyze
+        run: flutter analyze
+
+      - name: Test
+        run: flutter test
+
+      - name: Commit repaired source
+        shell: bash
+        run: |
+          if git diff --quiet; then
+            echo "Source already repaired."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add lib/services/production_backend.dart lib/core/app_state.dart lib/screens/auth_screens.dart
+          git commit -m "fix: stop Supabase authentication login loop"
+          BRANCH=rc-sow-connected-v20.1.0
+          git fetch origin "$BRANCH"
+          if ! git merge-base --is-ancestor "origin/$BRANCH" HEAD; then
+            git rebase "origin/$BRANCH"
+          fi
+          git push origin "HEAD:$BRANCH"
+
+      - name: Summary
+        run: |
+          echo "### Auth runtime repair complete" >> "$GITHUB_STEP_SUMMARY"
+          echo "GitHub repaired source, formatted, analyzed and tested it." >> "$GITHUB_STEP_SUMMARY"
+          echo "The existing Green Gate will build APK, AAB and web from the repair commit." >> "$GITHUB_STEP_SUMMARY"
