@@ -655,8 +655,7 @@ class AppState extends ChangeNotifier {
     ),
   ];
 
-  final List<CommunityEventRecord> communityEvents =
-      <CommunityEventRecord>[
+  final List<CommunityEventRecord> communityEvents = <CommunityEventRecord>[
     CommunityEventRecord(
       id: 'EVT-1',
       title: 'Technical workshop: roof anchors',
@@ -710,7 +709,8 @@ class AppState extends ChangeNotifier {
     IncentiveRecord(
       id: 'INC-QUALITY',
       title: 'Quality Payout',
-      description: 'Recognizes teams maintaining a 95% or higher quality score.',
+      description:
+          'Recognizes teams maintaining a 95% or higher quality score.',
       qualification: '95% quality threshold',
       active: true,
     ),
@@ -823,6 +823,7 @@ class AppState extends ChangeNotifier {
       <String, Map<String, String>>{};
 
   bool authenticated = false;
+  bool pendingApproval = false;
   bool offline = false;
   bool reviewMode = false;
   bool darkMode = false;
@@ -877,6 +878,7 @@ class AppState extends ChangeNotifier {
       status: 'Draft',
     );
   }
+
   double get evidenceReadiness {
     final required = houses.fold<int>(
       0,
@@ -944,17 +946,30 @@ class AppState extends ChangeNotifier {
 
   Future<void> bootstrapSession() async {
     if (!backend.connected) return;
+
     try {
       final profile = await backend.currentProfile();
-      if (profile == null || !profile.approved) return;
-      authenticated = true;
+
+      if (profile == null) {
+        authenticated = false;
+        pendingApproval = false;
+        syncCondition = SyncCondition.synced;
+        notifyListeners();
+        return;
+      }
+
       role = _displayRole(profile.role);
       if (profile.assignedParishes.isNotEmpty) {
         selectedParish = profile.assignedParishes.first;
       }
+
+      authenticated = profile.approved;
+      pendingApproval = !profile.approved;
       syncCondition = SyncCondition.synced;
       notifyListeners();
     } catch (_) {
+      authenticated = false;
+      pendingApproval = false;
       syncCondition = SyncCondition.failed;
       notifyListeners();
     }
@@ -983,6 +998,7 @@ class AppState extends ChangeNotifier {
 
   void login({required String selectedRole}) {
     authenticated = true;
+    pendingApproval = false;
     role = selectedRole;
     notifyListeners();
   }
@@ -990,6 +1006,7 @@ class AppState extends ChangeNotifier {
   void logout() {
     unawaited(backend.signOut());
     authenticated = false;
+    pendingApproval = false;
     notifyListeners();
   }
 
@@ -1059,9 +1076,8 @@ class AppState extends ChangeNotifier {
 
   Future<void> retrySync() async {
     if (offline) {
-      syncCondition = queuedChanges > 0
-          ? SyncCondition.waiting
-          : SyncCondition.savedLocal;
+      syncCondition =
+          queuedChanges > 0 ? SyncCondition.waiting : SyncCondition.savedLocal;
       notifyListeners();
       return;
     }
@@ -2036,9 +2052,8 @@ class AppState extends ChangeNotifier {
   void moveControlTile(String id, int offset) {
     final oldIndex = controlTileOrder.indexOf(id);
     if (oldIndex < 0) return;
-    final newIndex = (oldIndex + offset)
-        .clamp(0, controlTileOrder.length - 1)
-        .toInt();
+    final newIndex =
+        (oldIndex + offset).clamp(0, controlTileOrder.length - 1).toInt();
     if (oldIndex == newIndex) return;
     controlTileOrder
       ..removeAt(oldIndex)

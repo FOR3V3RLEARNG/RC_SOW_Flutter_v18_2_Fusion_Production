@@ -285,7 +285,96 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final state = AppScope.of(context);
     final colorScheme = Theme.of(context).colorScheme;
+
+    if (state.pendingApproval) {
+      return Scaffold(
+        body: SafeArea(
+          child: Center(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.all(24),
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 520),
+                child: Card(
+                  child: Padding(
+                    padding: const EdgeInsets.all(28),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: <Widget>[
+                        Icon(
+                          Icons.verified_user_outlined,
+                          size: 58,
+                          color: colorScheme.primary,
+                        ),
+                        const SizedBox(height: 20),
+                        Text(
+                          'Access awaiting approval',
+                          textAlign: TextAlign.center,
+                          style: Theme.of(context).textTheme.headlineSmall,
+                        ),
+                        const SizedBox(height: 12),
+                        Text(
+                          'Your secure Google/Supabase session is active. '
+                          'Operational access will open after an authorized '
+                          'RC SOW administrator approves this account.',
+                          textAlign: TextAlign.center,
+                          style: Theme.of(context).textTheme.bodyLarge,
+                        ),
+                        const SizedBox(height: 24),
+                        FilledButton.icon(
+                          onPressed: _busy
+                              ? null
+                              : () async {
+                                  setState(() => _busy = true);
+                                  await state.bootstrapSession();
+                                  if (!context.mounted) return;
+
+                                  if (state.authenticated) {
+                                    Navigator.pushNamedAndRemoveUntil(
+                                      context,
+                                      RcRoutes.home,
+                                      (_) => false,
+                                    );
+                                    return;
+                                  }
+
+                                  setState(() => _busy = false);
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                      content: Text(
+                                        'Access is still awaiting administrator approval.',
+                                      ),
+                                    ),
+                                  );
+                                },
+                          icon: _busy
+                              ? const SizedBox.square(
+                                  dimension: 18,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2.4,
+                                  ),
+                                )
+                              : const Icon(Icons.refresh),
+                          label: const Text('CHECK ACCESS'),
+                        ),
+                        const SizedBox(height: 8),
+                        TextButton.icon(
+                          onPressed: _busy ? null : state.logout,
+                          icon: const Icon(Icons.logout),
+                          label: const Text('SIGN OUT'),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+    }
+
     return Scaffold(
       body: SafeArea(
         child: Stack(
@@ -339,9 +428,10 @@ class _LoginScreenState extends State<LoginScreen> {
                           const SizedBox(height: 9),
                           Text(
                             'Continue the verified evidence chain for every house, from scope to payment.',
-                            style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                                  color: colorScheme.onSurfaceVariant,
-                                ),
+                            style:
+                                Theme.of(context).textTheme.bodyLarge?.copyWith(
+                                      color: colorScheme.onSurfaceVariant,
+                                    ),
                           ),
                           const SizedBox(height: 26),
                           TextField(

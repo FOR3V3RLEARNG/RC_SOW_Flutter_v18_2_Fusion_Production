@@ -176,7 +176,8 @@ class LocalProductionBackend extends ProductionBackend {
       rowCount: mathMax(0, rows.length - 1),
       mappings: _defaultMappings(headers, sample),
       warnings: <String>[
-        if (rows.length < 2) 'No data rows were found in the selected CSV file.',
+        if (rows.length < 2)
+          'No data rows were found in the selected CSV file.',
         'Potential duplicate beneficiaries will remain blocked until reviewed.',
       ],
       createdAt: DateTime.now(),
@@ -220,9 +221,19 @@ class LocalProductionBackend extends ProductionBackend {
         'head_of_household',
         'family_name',
       ],
-      'Parish': <String>['parish', 'location_parish', 'district', 'region_code'],
+      'Parish': <String>[
+        'parish',
+        'location_parish',
+        'district',
+        'region_code'
+      ],
       'Cluster': <String>['cluster', 'cluster_id', 'sector_group', 'camp_id'],
-      'GPS coordinates': <String>['gps', 'gps_string', 'lat_long', 'coordinates'],
+      'GPS coordinates': <String>[
+        'gps',
+        'gps_string',
+        'lat_long',
+        'coordinates'
+      ],
       'Assessment date': <String>['assessment_date', 'date', 'created_at'],
     };
     return targets.entries.map((target) {
@@ -233,8 +244,7 @@ class LocalProductionBackend extends ProductionBackend {
       return ImportFieldMapping(
         systemField: target.key,
         sourceColumn: index < 0 ? '' : headers[index],
-        sampleValue:
-            index < 0 || index >= sample.length ? '—' : sample[index],
+        sampleValue: index < 0 || index >= sample.length ? '—' : sample[index],
         confidence: index < 0 ? 0 : .92,
         required: const <String>{
           'House code',
@@ -291,22 +301,59 @@ class SupabaseProductionBackend extends ProductionBackend {
   Future<BackendProfile?> currentProfile() async {
     final user = client.auth.currentUser;
     if (user == null) return null;
-    final row = await client
-        .from('profiles')
-        .select()
-        .eq('id', user.id)
-        .maybeSingle();
+
+    Map<String, dynamic>? row;
+
+    // The deployed RC SOW profile schema uses user_id/parish.
+    // Keep an id/assigned_parishes fallback for migrated environments.
+    try {
+      row = await client
+          .from('profiles')
+          .select()
+          .eq('user_id', user.id)
+          .maybeSingle();
+    } on PostgrestException {
+      row = await client
+          .from('profiles')
+          .select()
+          .eq('id', user.id)
+          .maybeSingle();
+    }
+
     if (row == null) return null;
-    final parishes = (row['assigned_parishes'] as List? ?? const <Object>[])
-        .map((value) => '$value')
-        .toList();
+
+    final assignedRaw = row['assigned_parishes'];
+    final deployedParish =
+        '${row['parish'] ?? row['requested_parish'] ?? ''}'.trim();
+
+    final parishes = assignedRaw is List
+        ? assignedRaw
+            .map((value) => '$value'.trim())
+            .where((value) => value.isNotEmpty)
+            .toList()
+        : deployedParish.isEmpty
+            ? <String>[]
+            : <String>[deployedParish];
+
+    final rawRole = '${row['role'] ?? row['requested_role'] ?? ''}'.trim();
+    final role = rawRole.isEmpty ? 'site_supervisor' : rawRole;
+
+    final registrationStatus =
+        '${row['registration_status'] ?? ''}'.trim().toLowerCase();
+
+    final approved = row.containsKey('approved')
+        ? row['approved'] == true &&
+            row['active'] == true &&
+            (registrationStatus.isEmpty || registrationStatus == 'approved')
+        : row['active'] == true;
+
     return BackendProfile(
       userId: user.id,
       email: user.email ?? '',
       fullName: '${row['full_name'] ?? user.email ?? 'RC SOW user'}',
-      role: '${row['role'] ?? ''}',
+      role: role,
       assignedParishes: parishes,
-      approved: row['active'] == true,
+      approved: approved,
     );
   }
 
@@ -362,8 +409,8 @@ class SupabaseProductionBackend extends ProductionBackend {
     final document = RoofDrawingDocument.fromMap(
       Map<String, dynamic>.from(payload['document'] as Map? ?? const {}),
     );
-    final measurements = (payload['measurements'] as List? ?? const <Object>[])
-        .map((raw) {
+    final measurements =
+        (payload['measurements'] as List? ?? const <Object>[]).map((raw) {
       final value = Map<String, dynamic>.from(raw as Map);
       return AiMeasurementSuggestion(
         label: '${value['label'] ?? 'Measurement'}',
@@ -395,8 +442,8 @@ class SupabaseProductionBackend extends ProductionBackend {
       },
     );
     final payload = Map<String, dynamic>.from(response.data as Map);
-    final mappings = (payload['mappings'] as List? ?? const <Object>[])
-        .map((raw) {
+    final mappings =
+        (payload['mappings'] as List? ?? const <Object>[]).map((raw) {
       final value = Map<String, dynamic>.from(raw as Map);
       return ImportFieldMapping(
         systemField: '${value['system_field'] ?? ''}',
