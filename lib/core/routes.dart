@@ -8,6 +8,7 @@ abstract final class RcRoutes {
   static const String scopePrint = '/scope/print';
   static const String scopeFiles = '/scope/files';
   static const String scopeImport = '/scope/import';
+  static const String boq = '/forms/boq';
   static const String control = '/control';
   static const String houses = '/houses';
   static const String houseCommand = '/house-command';
@@ -29,6 +30,7 @@ abstract final class RcRoutes {
   static const String evidence = '/evidence';
   static const String activity = '/activity';
   static const String notifications = '/notifications';
+  static const String notificationCompose = '/notifications/compose';
   static const String usersOnline = '/users-online';
   static const String messages = '/messages';
   static const String settings = '/settings';
@@ -70,6 +72,7 @@ abstract final class RcRoutes {
     scopePrint,
     scopeFiles,
     scopeImport,
+    boq,
     control,
     houses,
     houseCommand,
@@ -91,6 +94,7 @@ abstract final class RcRoutes {
     evidence,
     activity,
     notifications,
+    notificationCompose,
     usersOnline,
     messages,
     settings,

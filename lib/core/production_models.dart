@@ -340,7 +340,27 @@ class RoofSection {
   bool drainEnabled;
   bool locked;
 
-  double get planAreaSqFt => lengthFt * widthFt;
+  double get planAreaSqFt {
+    if (nodes.length < 3 || lengthFt <= 0 || widthFt <= 0) return 0;
+    var signedArea = 0.0;
+    var minX = nodes.first.x;
+    var maxX = nodes.first.x;
+    var minY = nodes.first.y;
+    var maxY = nodes.first.y;
+    for (var index = 0; index < nodes.length; index++) {
+      final current = nodes[index];
+      final next = nodes[(index + 1) % nodes.length];
+      signedArea += current.x * next.y - next.x * current.y;
+      minX = math.min(minX, current.x);
+      maxX = math.max(maxX, current.x);
+      minY = math.min(minY, current.y);
+      maxY = math.max(maxY, current.y);
+    }
+    final polygonArea = signedArea.abs() / 2;
+    final boundsArea = math.max(.0001, (maxX - minX) * (maxY - minY));
+    final shapeRatio = (polygonArea / boundsArea).clamp(0.0, 1.0);
+    return lengthFt * widthFt * shapeRatio;
+  }
   double get ridgeRiseFt => widthFt / 2 * pitchRisePer12 / 12;
   double get rafterLengthFt => math.sqrt(
         math.pow(widthFt / 2, 2) + math.pow(ridgeRiseFt, 2),
@@ -391,10 +411,10 @@ class RoofSection {
               ),
             )
             .toList(),
-        lengthFt: (map['lengthFt'] as num?)?.toDouble() ?? 24.5,
-        widthFt: (map['widthFt'] as num?)?.toDouble() ?? 18,
-        wallHeightFt: (map['wallHeightFt'] as num?)?.toDouble() ?? 9,
-        pitchRisePer12: (map['pitchRisePer12'] as num?)?.toDouble() ?? 6,
+        lengthFt: (map['lengthFt'] as num?)?.toDouble() ?? 0,
+        widthFt: (map['widthFt'] as num?)?.toDouble() ?? 0,
+        wallHeightFt: (map['wallHeightFt'] as num?)?.toDouble() ?? 0,
+        pitchRisePer12: (map['pitchRisePer12'] as num?)?.toDouble() ?? 0,
         rotationDegrees: (map['rotationDegrees'] as num?)?.toDouble() ?? 0,
         drainAngleDegrees:
             (map['drainAngleDegrees'] as num?)?.toDouble() ?? 180,
@@ -462,7 +482,7 @@ class RoofDrawingDocument {
       sections.add(defaultRoofSection());
     }
     return RoofDrawingDocument(
-      houseCode: '${map['houseCode'] ?? 'H12'}',
+      houseCode: '${map['houseCode'] ?? ''}',
       sections: sections,
       selectedSectionId:
           '${map['selectedSectionId'] ?? sections.first.id}',

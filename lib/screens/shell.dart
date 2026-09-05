@@ -642,6 +642,37 @@ class _ControlOfWorksScreenState extends State<ControlOfWorksScreen> {
                 description:
                     'Plan, deliver, inspect, close and pay while preserving a complete evidence trail.',
               ),
+              const SizedBox(height: 14),
+              RcSectionHeader(
+                title: 'House close-out',
+                subtitle: '${state.selectedHouseCode} • completion and finance stay one tap away',
+              ),
+              const SizedBox(height: 8),
+              Row(
+                children: <Widget>[
+                  Expanded(
+                    child: _PinnedControlAction(
+                      title: 'Completion',
+                      subtitle: 'Inspection • sign-off',
+                      icon: Icons.task_alt_outlined,
+                      onTap: state.houses.isEmpty
+                          ? null
+                          : () => Navigator.pushNamed(context, RcRoutes.completion),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: _PinnedControlAction(
+                      title: 'Payment',
+                      subtitle: '46 / 31 / 23',
+                      icon: Icons.payments_outlined,
+                      onTap: state.houses.isEmpty
+                          ? null
+                          : () => Navigator.pushNamed(context, RcRoutes.payment),
+                    ),
+                  ),
+                ],
+              ),
               const SizedBox(height: 16),
               Wrap(
                 spacing: 8,
@@ -810,8 +841,8 @@ class _ControlOfWorksScreenState extends State<ControlOfWorksScreen> {
                       ),
                     ),
                     RcResponsiveGrid(
-                      minItemWidth: compact ? 260 : 320,
-                      childAspectRatio: compact ? 2.05 : 1.65,
+                      minItemWidth: compact ? 190 : 250,
+                      childAspectRatio: compact ? 1.75 : 1.45,
                       children: modules
                           .where((module) => module.phase == phase)
                           .map(
@@ -826,8 +857,8 @@ class _ControlOfWorksScreenState extends State<ControlOfWorksScreen> {
                   ]
               else
                 RcResponsiveGrid(
-                  minItemWidth: compact ? 260 : 320,
-                  childAspectRatio: compact ? 2.05 : 1.65,
+                  minItemWidth: compact ? 190 : 250,
+                  childAspectRatio: compact ? 1.75 : 1.45,
                   children: modules
                       .map(
                         (module) => _ControlModuleCard(
@@ -837,6 +868,72 @@ class _ControlOfWorksScreenState extends State<ControlOfWorksScreen> {
                       )
                       .toList(),
                 ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _PinnedControlAction extends StatelessWidget {
+  const _PinnedControlAction({
+    required this.title,
+    required this.subtitle,
+    required this.icon,
+    required this.onTap,
+  });
+
+  final String title;
+  final String subtitle;
+  final IconData icon;
+  final VoidCallback? onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      margin: EdgeInsets.zero,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(18),
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 11),
+          child: Row(
+            children: <Widget>[
+              Container(
+                width: 34,
+                height: 34,
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.primaryContainer,
+                  borderRadius: BorderRadius.circular(11),
+                ),
+                child: Icon(
+                  icon,
+                  size: 19,
+                  color: Theme.of(context).colorScheme.primary,
+                ),
+              ),
+              const SizedBox(width: 9),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Text(
+                      title,
+                      style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                            fontWeight: FontWeight.w900,
+                          ),
+                    ),
+                    Text(
+                      subtitle,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: Theme.of(context).textTheme.labelSmall,
+                    ),
+                  ],
+                ),
+              ),
+              const Icon(Icons.chevron_right, size: 18),
             ],
           ),
         ),
@@ -1027,11 +1124,35 @@ class _HousesScreenState extends State<HousesScreen> {
                   minItemWidth: 300,
                   childAspectRatio: 1.48,
                   children: houses.map((house) {
+                    final evidence = state.evidence
+                        .where((item) => item.houseCode == house.code)
+                        .toList();
+                    String? photoUri;
+                    for (final item in evidence) {
+                      if (item.uri != null && item.uri!.isNotEmpty) {
+                        photoUri = item.uri;
+                        break;
+                      }
+                    }
+                    void select() => state.selectHouse(house.code);
                     return RcHouseCard(
                       house: house,
+                      photoUri: photoUri,
                       onOpen: () {
-                        state.selectHouse(house.code);
+                        select();
                         Navigator.pushNamed(context, RcRoutes.houseCommand);
+                      },
+                      onScope: () {
+                        select();
+                        Navigator.pushNamed(context, RcRoutes.scopeHouse);
+                      },
+                      onControl: () {
+                        select();
+                        Navigator.pushNamed(context, RcRoutes.houseCommand);
+                      },
+                      onCrew: () {
+                        select();
+                        Navigator.pushNamed(context, RcRoutes.teamResources);
                       },
                     );
                   }).toList(),
@@ -1047,168 +1168,88 @@ class _HousesScreenState extends State<HousesScreen> {
 class MoreScreen extends StatelessWidget {
   const MoreScreen({super.key});
 
+  void _openSettingsPopup(BuildContext context) {
+    showModalBottomSheet<void>(
+      context: context,
+      showDragHandle: true,
+      useSafeArea: true,
+      builder: (sheetContext) {
+        return Padding(
+          padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              const ListTile(
+                leading: Icon(Icons.tune_outlined),
+                title: Text('Quick settings'),
+                subtitle: Text('Keep field controls close without a long settings page.'),
+              ),
+              ListTile(
+                leading: const Icon(Icons.settings_outlined),
+                title: const Text('All settings'),
+                trailing: const Icon(Icons.chevron_right),
+                onTap: () {
+                  Navigator.pop(sheetContext);
+                  Navigator.pushNamed(context, RcRoutes.settings);
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.sync_outlined),
+                title: const Text('Offline & sync'),
+                trailing: const Icon(Icons.chevron_right),
+                onTap: () {
+                  Navigator.pop(sheetContext);
+                  Navigator.pushNamed(context, RcRoutes.syncMonitor);
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.dashboard_customize_outlined),
+                title: const Text('Control layout'),
+                trailing: const Icon(Icons.chevron_right),
+                onTap: () {
+                  Navigator.pop(sheetContext);
+                  Navigator.pushNamed(context, RcRoutes.controlLayout);
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.admin_panel_settings_outlined),
+                title: const Text('Users & access'),
+                trailing: const Icon(Icons.chevron_right),
+                onTap: () {
+                  Navigator.pop(sheetContext);
+                  Navigator.pushNamed(context, RcRoutes.adminUsers);
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final state = AppScope.of(context);
-    final groups = <_MoreGroup>[
-      const _MoreGroup('Field operations', <_MoreItem>[
-        _MoreItem('Work Logs', Icons.edit_note_outlined, RcRoutes.workLogs),
-        _MoreItem(
-          'Work Projection Log',
-          Icons.trending_up_outlined,
-          RcRoutes.workProjections,
-        ),
-        _MoreItem(
-          'Production Command Board',
-          Icons.space_dashboard_outlined,
-          RcRoutes.productionBoard,
-        ),
-        _MoreItem(
-          'Transfer Management',
-          Icons.swap_horiz_outlined,
-          RcRoutes.transfers,
-        ),
-        _MoreItem(
-          'Construction Schedule',
-          Icons.event_available_outlined,
-          RcRoutes.schedule,
-        ),
-        _MoreItem(
-          'Live Team Briefing',
-          Icons.video_camera_front_outlined,
-          RcRoutes.liveBriefing,
-        ),
-        _MoreItem(
-          'Inventory Tracker',
-          Icons.inventory_2_outlined,
-          RcRoutes.inventory,
-        ),
-        _MoreItem(
-          'Parish / House Stock Transfer',
-          Icons.move_down_outlined,
-          RcRoutes.inventoryTransfer,
-        ),
-        _MoreItem(
-          'Evidence Viewer',
-          Icons.photo_library_outlined,
-          RcRoutes.evidence,
-        ),
-        _MoreItem(
-          'Operational Map',
-          Icons.map_outlined,
-          RcRoutes.operationalMap,
-        ),
-      ]),
-      const _MoreGroup('Communication', <_MoreItem>[
-        _MoreItem('Messages', Icons.forum_outlined, RcRoutes.messages),
-        _MoreItem(
-          'Notifications',
-          Icons.notifications_outlined,
-          RcRoutes.notifications,
-        ),
-        _MoreItem('Users Online', Icons.group_outlined, RcRoutes.usersOnline),
-        _MoreItem('Gmail', Icons.mail_outline, RcRoutes.gmail),
-      ]),
-      const _MoreGroup('Team and community', <_MoreItem>[
-        _MoreItem(
-          'Team Excellence Community',
-          Icons.diversity_3_outlined,
-          RcRoutes.teamCommunity,
-        ),
-        _MoreItem(
-          'Team Performance',
-          Icons.insights_outlined,
-          RcRoutes.teamPerformance,
-        ),
-        _MoreItem(
-          'Team Resource Manager',
-          Icons.groups_2_outlined,
-          RcRoutes.teamResources,
-        ),
-        _MoreItem(
-          'Promotion Routing',
-          Icons.military_tech_outlined,
-          RcRoutes.promotionRouting,
-        ),
-      ]),
-      const _MoreGroup('Command and review', <_MoreItem>[
-        _MoreItem(
-          'Production Command',
-          Icons.precision_manufacturing_outlined,
-          RcRoutes.productionCommand,
-        ),
-        _MoreItem(
-          'Finance Command',
-          Icons.account_balance_wallet_outlined,
-          RcRoutes.financeCommand,
-        ),
-        _MoreItem(
-          'Connected Approval Queue',
-          Icons.approval_outlined,
-          RcRoutes.approvalQueue,
-        ),
-        _MoreItem(
-          'HQ Command Centre',
-          Icons.account_balance_outlined,
-          RcRoutes.hqCommand,
-        ),
-        _MoreItem(
-          'Institutional Report',
-          Icons.summarize_outlined,
-          RcRoutes.institutionalReport,
-        ),
-        _MoreItem(
-          'Production Analytics',
-          Icons.analytics_outlined,
-          RcRoutes.analytics,
-        ),
-        _MoreItem('Activity History', Icons.history, RcRoutes.activity),
-      ]),
-      const _MoreGroup('Administration', <_MoreItem>[
-        _MoreItem(
-          'Offline Sync Monitor',
-          Icons.sync_outlined,
-          RcRoutes.syncMonitor,
-        ),
-        _MoreItem(
-          'Image & Legacy Import',
-          Icons.auto_awesome_outlined,
-          RcRoutes.scopeImport,
-        ),
-        _MoreItem(
-          'Administration Command',
-          Icons.settings_suggest_outlined,
-          RcRoutes.adminCommand,
-        ),
-        _MoreItem(
-          'Control Layout',
-          Icons.dashboard_customize_outlined,
-          RcRoutes.controlLayout,
-        ),
-        _MoreItem(
-          'Transfer Logic',
-          Icons.alt_route_outlined,
-          RcRoutes.transferAutomation,
-        ),
-        _MoreItem(
-          'Awards & Incentives',
-          Icons.workspace_premium_outlined,
-          RcRoutes.awardsIncentives,
-        ),
-        _MoreItem(
-          'User Access',
-          Icons.admin_panel_settings_outlined,
-          RcRoutes.adminUsers,
-        ),
-        _MoreItem(
-          'Templates',
-          Icons.dashboard_customize_outlined,
-          RcRoutes.adminTemplates,
-        ),
-      ]),
+    final items = <_MoreItem>[
+      const _MoreItem('Map', Icons.map_outlined, RcRoutes.operationalMap),
+      const _MoreItem('Notifications', Icons.notifications_outlined, RcRoutes.notifications),
+      const _MoreItem('Messages', Icons.forum_outlined, RcRoutes.messages),
+      const _MoreItem('Schedule', Icons.event_available_outlined, RcRoutes.schedule),
+      const _MoreItem('Work Logs', Icons.edit_note_outlined, RcRoutes.workLogs),
+      const _MoreItem('Inventory', Icons.inventory_2_outlined, RcRoutes.inventory),
+      const _MoreItem('Transfers', Icons.swap_horiz_outlined, RcRoutes.transfers),
+      const _MoreItem('Evidence', Icons.photo_library_outlined, RcRoutes.evidence),
+      const _MoreItem('Analytics', Icons.analytics_outlined, RcRoutes.analytics),
+      const _MoreItem('Team', Icons.groups_2_outlined, RcRoutes.teamResources),
+      const _MoreItem('Approvals', Icons.approval_outlined, RcRoutes.approvalQueue),
+      const _MoreItem('Templates', Icons.description_outlined, RcRoutes.adminTemplates),
+      const _MoreItem('Import', Icons.upload_file_outlined, RcRoutes.scopeImport),
+      const _MoreItem('Gmail', Icons.mail_outline, RcRoutes.gmail),
+      const _MoreItem('Activity', Icons.history, RcRoutes.activity),
     ];
+
     return SingleChildScrollView(
-      padding: const EdgeInsets.fromLTRB(16, 20, 16, 32),
+      padding: const EdgeInsets.fromLTRB(16, 18, 16, 32),
       child: Center(
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 900),
@@ -1217,45 +1258,49 @@ class MoreScreen extends StatelessWidget {
             children: <Widget>[
               RcPageHeading(
                 eyebrow: state.role,
-                title: 'More operations',
+                title: 'More',
                 description:
-                    'Collaboration, review, administration and account controls.',
-              ),
-              const SizedBox(height: 20),
-              for (final group in groups) ...<Widget>[
-                RcSectionHeader(title: group.title),
-                const SizedBox(height: 10),
-                Card(
-                  child: Column(
-                    children: group.items.map((item) {
-                      return Material(
-                        color: Colors.transparent,
-                        child: ListTile(
-                          minLeadingWidth: 34,
-                          leading: Icon(
-                            item.icon,
-                            color: Theme.of(context).colorScheme.primary,
-                          ),
-                          title: Text(
-                            item.label,
-                            style: const TextStyle(
-                              fontWeight: FontWeight.w700,
-                            ),
-                          ),
-                          trailing: const Icon(Icons.chevron_right),
-                          onTap: () => Navigator.pushNamed(context, item.route),
-                        ),
-                      );
-                    }).toList(),
-                  ),
+                    'A compact operations menu for communication, maps, logistics and administration.',
+                action: IconButton.filledTonal(
+                  tooltip: 'Quick settings',
+                  onPressed: () => _openSettingsPopup(context),
+                  icon: const Icon(Icons.settings_outlined),
                 ),
-                const SizedBox(height: 22),
-              ],
-              FilledButton.tonalIcon(
-                onPressed: () =>
-                    Navigator.pushNamed(context, RcRoutes.settings),
-                icon: const Icon(Icons.settings_outlined),
-                label: const Text('SETTINGS & ACCESSIBILITY'),
+              ),
+              const SizedBox(height: 18),
+              RcResponsiveGrid(
+                minItemWidth: 125,
+                childAspectRatio: 1.12,
+                children: items.map((item) {
+                  return Card(
+                    margin: EdgeInsets.zero,
+                    child: InkWell(
+                      borderRadius: BorderRadius.circular(18),
+                      onTap: () => Navigator.pushNamed(context, item.route),
+                      child: Padding(
+                        padding: const EdgeInsets.all(12),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: <Widget>[
+                            Icon(
+                              item.icon,
+                              color: Theme.of(context).colorScheme.primary,
+                            ),
+                            const Spacer(),
+                            Text(
+                              item.label,
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                              style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                                    fontWeight: FontWeight.w900,
+                                  ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  );
+                }).toList(),
               ),
             ],
           ),

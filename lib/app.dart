@@ -11,6 +11,7 @@ import 'screens/command_screens.dart';
 import 'screens/control_layout_screen.dart';
 import 'screens/form_screens.dart';
 import 'screens/operation_screens.dart';
+import 'screens/notification_composer_screen.dart';
 import 'screens/production_system_screens.dart';
 import 'screens/shell.dart';
 import 'screens/scope_screens.dart';
@@ -50,8 +51,20 @@ class RcSowApp extends StatelessWidget {
   }
 }
 
+String normalizeRcRouteName(String? rawName) {
+  if (rawName == null || rawName.isEmpty) return RcRoutes.splash;
+  final uri = Uri.tryParse(rawName);
+  if (uri == null) return rawName;
+  if (uri.scheme == 'org.jamaicaredcross.rcsowflutter' &&
+      uri.host == 'login-callback') {
+    return RcRoutes.splash;
+  }
+  return uri.path.isEmpty ? RcRoutes.splash : uri.path;
+}
+
 Route<dynamic> buildRcRoute(RouteSettings settings) {
-  final screen = switch (settings.name) {
+  final normalizedName = normalizeRcRouteName(settings.name);
+  final screen = switch (normalizedName) {
     RcRoutes.splash => const RcSplashScreen(),
     RcRoutes.login => const LoginScreen(),
     RcRoutes.home || RcRoutes.dashboard => const AppShell(initialIndex: 0),
@@ -71,6 +84,7 @@ Route<dynamic> buildRcRoute(RouteSettings settings) {
         initialStep: 3,
         standalone: true,
       ),
+    RcRoutes.boq => const OperationalFormScreen.boq(),
     RcRoutes.scopeImport => ScopeImportScreen(
         seedDocument: settings.arguments is RoofDrawingDocument
             ? settings.arguments! as RoofDrawingDocument
@@ -98,6 +112,7 @@ Route<dynamic> buildRcRoute(RouteSettings settings) {
     RcRoutes.evidence => const EvidenceScreen(),
     RcRoutes.activity => const ActivityScreen(),
     RcRoutes.notifications => const NotificationsScreen(),
+    RcRoutes.notificationCompose => const NotificationComposerScreen(),
     RcRoutes.usersOnline => const UsersOnlineScreen(),
     RcRoutes.messages => const MessagesScreen(),
     RcRoutes.settings => const SettingsScreen(),

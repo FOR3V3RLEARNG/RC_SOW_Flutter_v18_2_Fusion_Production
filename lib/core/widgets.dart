@@ -606,110 +606,271 @@ class _PhaseNode extends StatelessWidget {
 }
 
 class RcHouseCard extends StatelessWidget {
-  const RcHouseCard({required this.house, required this.onOpen, super.key});
+  const RcHouseCard({
+    required this.house,
+    required this.onOpen,
+    this.photoUri,
+    this.onScope,
+    this.onControl,
+    this.onCrew,
+    super.key,
+  });
 
   final HouseRecord house;
   final VoidCallback onOpen;
+  final String? photoUri;
+  final VoidCallback? onScope;
+  final VoidCallback? onControl;
+  final VoidCallback? onCrew;
 
   @override
   Widget build(BuildContext context) {
+    final hasPhoto = photoUri != null && photoUri!.trim().isNotEmpty;
     return Card(
       clipBehavior: Clip.antiAlias,
       child: InkWell(
         onTap: onOpen,
-        child: Padding(
-          padding: const EdgeInsets.all(17),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              Row(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            AspectRatio(
+              aspectRatio: 2.1,
+              child: Stack(
+                fit: StackFit.expand,
                 children: <Widget>[
-                  Container(
-                    width: 44,
-                    height: 44,
-                    decoration: BoxDecoration(
-                      color: Theme.of(context).colorScheme.primaryContainer,
-                      borderRadius: const BorderRadius.only(
-                        topLeft: Radius.circular(18),
-                        topRight: Radius.circular(10),
-                        bottomLeft: Radius.circular(10),
-                        bottomRight: Radius.circular(18),
-                      ),
-                    ),
-                    child: const Icon(
-                      Icons.house_outlined,
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: <Widget>[
-                        Text(
-                          house.code,
-                          style: Theme.of(context).textTheme.titleLarge,
-                        ),
-                        Text(
-                          house.beneficiary,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: Theme.of(context).textTheme.bodyMedium,
-                        ),
-                      ],
+                  if (hasPhoto)
+                    Image.network(
+                      photoUri!,
+                      fit: BoxFit.cover,
+                      errorBuilder: (_, __, ___) => const _HousePhotoPlaceholder(),
+                    )
+                  else
+                    const _HousePhotoPlaceholder(),
+                  Positioned(
+                    left: 12,
+                    top: 12,
+                    child: RcStatusChip(
+                      label: house.code,
+                      compact: true,
+                      tone: house.needsAttention
+                          ? RcStatusTone.warning
+                          : RcStatusTone.brand,
                     ),
                   ),
-                  RcStatusChip(
-                    label: house.phase.label,
-                    compact: true,
-                    tone: house.needsAttention
-                        ? RcStatusTone.warning
-                        : RcStatusTone.info,
+                  Positioned(
+                    right: 12,
+                    top: 12,
+                    child: RcStatusChip(
+                      label: house.phase.label.toUpperCase(),
+                      compact: true,
+                      tone: RcStatusTone.info,
+                    ),
                   ),
                 ],
               ),
-              const SizedBox(height: 14),
-              Text(
-                '${house.community} • ${house.parish}',
-                style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                      color: Theme.of(context).colorScheme.onSurfaceVariant,
-                    ),
-              ),
-              const SizedBox(height: 12),
-              ClipRRect(
-                borderRadius: BorderRadius.circular(999),
-                child: LinearProgressIndicator(
-                  value: house.progress,
-                  minHeight: 7,
-                  color: house.needsAttention
-                      ? RcColors.warning
-                      : RcColors.success,
-                  backgroundColor:
-                      Theme.of(context).colorScheme.surfaceContainerHighest,
-                ),
-              ),
-              const SizedBox(height: 12),
-              Row(
+            ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(15, 14, 15, 15),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
-                  Icon(
-                    house.evidenceReady
-                        ? Icons.verified_outlined
-                        : Icons.photo_library_outlined,
-                    size: 17,
-                    color: house.evidenceReady
-                        ? RcColors.success
-                        : RcColors.warning,
-                  ),
-                  const SizedBox(width: 6),
                   Text(
-                    '${house.evidenceComplete}/${house.evidenceRequired} evidence',
-                    style: Theme.of(context).textTheme.labelMedium,
+                    house.beneficiary.isEmpty ? 'Beneficiary not assigned' : house.beneficiary,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: Theme.of(context).textTheme.titleMedium,
                   ),
-                  const Spacer(),
-                  const Icon(Icons.arrow_forward, size: 18),
+                  const SizedBox(height: 3),
+                  Text(
+                    '${house.community} • ${house.parish}',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: Theme.of(context).textTheme.bodySmall,
+                  ),
+                  const SizedBox(height: 10),
+                  LinearProgressIndicator(
+                    value: house.progress.clamp(0, 1),
+                    minHeight: 6,
+                    borderRadius: BorderRadius.circular(99),
+                  ),
+                  const SizedBox(height: 10),
+                  Row(
+                    children: <Widget>[
+                      _HouseMiniFact(
+                        icon: Icons.photo_library_outlined,
+                        label: '${house.evidenceComplete}/${house.evidenceRequired}',
+                        tooltip: 'Evidence',
+                      ),
+                      const SizedBox(width: 12),
+                      _HouseMiniFact(
+                        icon: Icons.groups_2_outlined,
+                        label: '${house.team.length}',
+                        tooltip: 'Crew',
+                      ),
+                      const SizedBox(width: 12),
+                      _HouseMiniFact(
+                        icon: Icons.roofing_outlined,
+                        label: house.roofArea > 0
+                            ? '${house.roofArea.toStringAsFixed(0)} ft²'
+                            : 'Roof',
+                        tooltip: 'Roof',
+                      ),
+                      const Spacer(),
+                      Text(
+                        '${(house.progress * 100).round()}%',
+                        style: const TextStyle(fontWeight: FontWeight.w900),
+                      ),
+                    ],
+                  ),
+                  if (house.team.isNotEmpty) ...<Widget>[
+                    const SizedBox(height: 10),
+                    Wrap(
+                      spacing: 5,
+                      runSpacing: 5,
+                      children: house.team
+                          .take(3)
+                          .map(
+                            (name) => Chip(
+                              visualDensity: VisualDensity.compact,
+                              avatar: const Icon(Icons.person_outline, size: 14),
+                              label: Text(
+                                name,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                          )
+                          .toList(),
+                    ),
+                  ],
+                  const SizedBox(height: 10),
+                  Row(
+                    children: <Widget>[
+                      Expanded(
+                        child: _HouseQuickButton(
+                          icon: Icons.architecture_outlined,
+                          label: 'Scope',
+                          onTap: onScope ?? onOpen,
+                        ),
+                      ),
+                      const SizedBox(width: 6),
+                      Expanded(
+                        child: _HouseQuickButton(
+                          icon: Icons.build_outlined,
+                          label: 'Control',
+                          onTap: onControl ?? onOpen,
+                        ),
+                      ),
+                      const SizedBox(width: 6),
+                      Expanded(
+                        child: _HouseQuickButton(
+                          icon: Icons.groups_outlined,
+                          label: 'Crew',
+                          onTap: onCrew ?? onOpen,
+                        ),
+                      ),
+                    ],
+                  ),
                 ],
               ),
-            ],
-          ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _HousePhotoPlaceholder extends StatelessWidget {
+  const _HousePhotoPlaceholder();
+
+  @override
+  Widget build(BuildContext context) {
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: <Color>[
+            Theme.of(context).colorScheme.primaryContainer,
+            Theme.of(context).colorScheme.surfaceContainerHighest,
+          ],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+      ),
+      child: Center(
+        child: Icon(
+          Icons.add_a_photo_outlined,
+          size: 40,
+          color: Theme.of(context).colorScheme.primary,
+        ),
+      ),
+    );
+  }
+}
+
+class _HouseMiniFact extends StatelessWidget {
+  const _HouseMiniFact({
+    required this.icon,
+    required this.label,
+    required this.tooltip,
+  });
+  final IconData icon;
+  final String label;
+  final String tooltip;
+
+  @override
+  Widget build(BuildContext context) {
+    return Tooltip(
+      message: tooltip,
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          Icon(icon, size: 15),
+          const SizedBox(width: 3),
+          Text(label, style: Theme.of(context).textTheme.labelSmall),
+        ],
+      ),
+    );
+  }
+}
+
+class _HouseQuickButton extends StatelessWidget {
+  const _HouseQuickButton({
+    required this.icon,
+    required this.label,
+    required this.onTap,
+  });
+  final IconData icon;
+  final String label;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(12),
+      child: Container(
+        height: 38,
+        padding: const EdgeInsets.symmetric(horizontal: 8),
+        decoration: BoxDecoration(
+          color: Theme.of(context).colorScheme.surfaceContainerLow,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: Theme.of(context).colorScheme.outlineVariant),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Icon(icon, size: 15),
+            const SizedBox(width: 5),
+            Flexible(
+              child: Text(
+                label,
+                overflow: TextOverflow.ellipsis,
+                style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                      fontWeight: FontWeight.w800,
+                    ),
+              ),
+            ),
+          ],
         ),
       ),
     );

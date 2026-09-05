@@ -11,6 +11,21 @@ void main() {
     }
   });
 
+
+  test('OAuth callback routes normalize to the splash route', () {
+    expect(normalizeRcRouteName('/?code=pkce-code'), RcRoutes.splash);
+    expect(
+      normalizeRcRouteName(
+        'org.jamaicaredcross.rcsowflutter://login-callback?code=pkce-code',
+      ),
+      RcRoutes.splash,
+    );
+    expect(
+      normalizeRcRouteName('/settings?source=notification'),
+      RcRoutes.settings,
+    );
+  });
+
   test('unknown route resolves to the recovery screen', () {
     final route = buildRcRoute(
       const RouteSettings(name: '/missing'),
