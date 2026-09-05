@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 
 import '../core/app_state.dart';
 import '../core/models.dart';
-import '../core/routes.dart';
 import '../core/widgets.dart';
 
 class NotificationComposerScreen extends StatefulWidget {
@@ -183,7 +182,7 @@ class _NotificationComposerScreenState extends State<NotificationComposerScreen>
                                   ),
                                 ),
                               ],
-                              onChanged: (value) => setState(() => _houseCode = value),
+                              onChanged: (value) => setState(() => _houseCode = value ?? ''),
                             ),
                           ],
                         ),

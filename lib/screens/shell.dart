@@ -1310,12 +1310,6 @@ class MoreScreen extends StatelessWidget {
   }
 }
 
-class _MoreGroup {
-  const _MoreGroup(this.title, this.items);
-  final String title;
-  final List<_MoreItem> items;
-}
-
 class _MoreItem {
   const _MoreItem(this.label, this.icon, this.route);
   final String label;
