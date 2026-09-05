@@ -7,7 +7,7 @@ import 'services/production_backend.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   final backend = await ProductionBackendFactory.create();
-  final state = AppState.seeded(backend: backend);
+  final state = AppState.production(backend: backend);
   await state.bootstrapSession();
   runApp(RcSowApp(state: state));
 }

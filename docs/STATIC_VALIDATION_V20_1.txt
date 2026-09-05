@@ -1,0 +1,45 @@
+RC SOW v20.1 — Final Static Production Validation
+
+PASS  Pubspec/workflow YAML parsing
+PASS  Dart structural delimiter scan across lib/ and test/
+PASS  Relative Dart import targets
+PASS  Package-import vs pubspec dependency scan
+PASS  Route-path uniqueness
+PASS  Production startup uses AppState.production()
+PASS  Seeded fixtures are not booted by production app
+PASS  Active-house cards include house/beneficiary/crew/progress/evidence context
+PASS  Completion and Payment pinned at top of House Workspace
+PASS  Technical & Scope organization
+PASS  Delivery & Crew organization
+PASS  Quality & Evidence organization
+PASS  Every house tile opens a real route/form/module
+PASS  BOQ route/form registered
+PASS  Management notification composer registered
+PASS  Notification targeting: individual / crew / parish / management combinations
+PASS  Broadcast notifications use backend/offline write queue
+PASS  Automatic production notifications generated from house activity
+PASS  Automatic alerts preserve house code, lifecycle, record status and progress
+PASS  Payment/finance alerts include Accounts audience
+PASS  Notification tap returns to linked House Workspace
+PASS  Beneficiary/house GPS map linkage present
+PASS  Transfer locations derive from live production data
+PASS  Offline image analysis does not fabricate roof measurements
+PASS  Custom/concave polygon area logic present
+PASS  OAuth callback normalization present
+PASS  OAuth Splash re-checks authenticated backend session
+PASS  No merge-conflict markers
+PASS  No obvious empty tap/press callbacks
+PASS  Live-screen demo-string sweep
+PASS  Private-key marker sweep
+PASS  Shell syntax
+
+NOT RUN LOCALLY
+- dart format
+- flutter analyze
+- flutter test
+- flutter build web --release
+- flutter build apk --release
+- flutter build appbundle --release
+
+Flutter/Dart SDK is not installed in this packaging environment.
+The included sharded GitHub Green Gate is the authoritative compile/test/APK/AAB/Web gate.

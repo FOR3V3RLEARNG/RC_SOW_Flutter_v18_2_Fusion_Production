@@ -28,6 +28,46 @@ class _ScopeWorkspaceState extends State<ScopeWorkspace> {
   @override
   Widget build(BuildContext context) {
     final state = AppScope.of(context);
+    if (state.houses.isEmpty) {
+      final empty = Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 620),
+          child: Padding(
+            padding: const EdgeInsets.all(24),
+            child: RcEmptyState(
+              icon: Icons.add_home_work_outlined,
+              title: 'Start with a real house',
+              message:
+                  'Create a new beneficiary house or import an approved legacy SOW / assessment before entering scope data.',
+              action: Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                alignment: WrapAlignment.center,
+                children: <Widget>[
+                  FilledButton.icon(
+                    onPressed: () =>
+                        Navigator.pushNamed(context, RcRoutes.newControl),
+                    icon: const Icon(Icons.add_home_work_outlined),
+                    label: const Text('CREATE HOUSE'),
+                  ),
+                  OutlinedButton.icon(
+                    onPressed: () =>
+                        Navigator.pushNamed(context, RcRoutes.scopeImport),
+                    icon: const Icon(Icons.upload_file_outlined),
+                    label: const Text('IMPORT LEGACY'),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      );
+      if (!widget.standalone) return empty;
+      return Scaffold(
+        appBar: RcAppBar(title: const Text('Scope of Work')),
+        body: empty,
+      );
+    }
     final body = Column(
       children: <Widget>[
         _ScopeStepper(

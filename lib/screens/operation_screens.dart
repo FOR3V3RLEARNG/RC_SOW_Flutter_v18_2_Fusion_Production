@@ -200,52 +200,153 @@ class HouseCommandScreen extends StatelessWidget {
                         ),
                         const SizedBox(height: 24),
                         RcSectionHeader(
-                          title: 'Operational modules',
+                          title: '${house.code} records',
                           subtitle:
-                              'Actions remain connected to ${house.code}.',
+                              'Every tile belongs to this house and opens its input form or working record.',
                         ),
                         const SizedBox(height: 10),
-                        Card(
-                          child: Column(
-                            children: <Widget>[
-                              _CommandTile(
-                                icon: Icons.architecture_outlined,
-                                title: 'Scope & roof drawing',
-                                subtitle:
-                                    '${house.roofType} • ${house.roofArea.toStringAsFixed(0)} sq ft',
-                                route: RcRoutes.scopeHouse,
-                              ),
-                              const Divider(height: 1),
-                              const _CommandTile(
-                                icon: Icons.event_note_outlined,
-                                title: 'Work Plan',
-                                subtitle: 'Schedule, crew and agreement',
-                                route: RcRoutes.workPlan,
-                              ),
-                              const Divider(height: 1),
-                              const _CommandTile(
-                                icon: Icons.location_on_outlined,
-                                title: 'Site Visits & Daily Logs',
-                                subtitle:
-                                    'Field monitoring and production progress',
-                                route: RcRoutes.siteVisits,
-                              ),
-                              const Divider(height: 1),
-                              const _CommandTile(
-                                icon: Icons.fact_check_outlined,
-                                title: 'Technical Quality',
-                                subtitle: 'Monitoring and final inspection',
-                                route: RcRoutes.monitoring,
-                              ),
-                              const Divider(height: 1),
-                              const _CommandTile(
+                        Row(
+                          children: <Widget>[
+                            Expanded(
+                              child: _HouseRecordTile(
+                                title: 'Completion',
+                                subtitle: 'Close-out',
                                 icon: Icons.task_alt_outlined,
-                                title: 'Close-out & Payment',
-                                subtitle: 'Completion readiness and finance',
                                 route: RcRoutes.completion,
+                                emphasized: true,
                               ),
-                            ],
-                          ),
+                            ),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: _HouseRecordTile(
+                                title: 'Payment',
+                                subtitle: 'Finance',
+                                icon: Icons.payments_outlined,
+                                route: RcRoutes.payment,
+                                emphasized: true,
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 16),
+                        const RcSectionHeader(
+                          title: 'Technical & scope',
+                          subtitle: 'Beneficiary, roof, quantities and document readiness.',
+                        ),
+                        const SizedBox(height: 8),
+                        RcResponsiveGrid(
+                          minItemWidth: 145,
+                          childAspectRatio: 1.25,
+                          children: const <Widget>[
+                            _HouseRecordTile(
+                              title: 'Beneficiary & Scope',
+                              subtitle: 'House input',
+                              icon: Icons.person_pin_circle_outlined,
+                              route: RcRoutes.scopeHouse,
+                            ),
+                            _HouseRecordTile(
+                              title: 'Roof Drawing',
+                              subtitle: 'Custom geometry',
+                              icon: Icons.architecture_outlined,
+                              route: RcRoutes.scopeRoof,
+                            ),
+                            _HouseRecordTile(
+                              title: 'BOQ',
+                              subtitle: 'Quantities',
+                              icon: Icons.calculate_outlined,
+                              route: RcRoutes.boq,
+                            ),
+                            _HouseRecordTile(
+                              title: 'Documents',
+                              subtitle: 'Readiness',
+                              icon: Icons.fact_check_outlined,
+                              route: RcRoutes.documentChecklist,
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 16),
+                        const RcSectionHeader(
+                          title: 'Delivery & crew',
+                          subtitle: 'Planning, visits, daily production, materials and house stock.',
+                        ),
+                        const SizedBox(height: 8),
+                        RcResponsiveGrid(
+                          minItemWidth: 145,
+                          childAspectRatio: 1.25,
+                          children: const <Widget>[
+                            _HouseRecordTile(
+                              title: 'Work Plan',
+                              subtitle: 'Plan & crew',
+                              icon: Icons.event_note_outlined,
+                              route: RcRoutes.workPlan,
+                            ),
+                            _HouseRecordTile(
+                              title: 'Site Visits',
+                              subtitle: 'Inspection',
+                              icon: Icons.location_on_outlined,
+                              route: RcRoutes.siteVisits,
+                            ),
+                            _HouseRecordTile(
+                              title: 'Daily Log',
+                              subtitle: 'Production',
+                              icon: Icons.menu_book_outlined,
+                              route: RcRoutes.dailyLog,
+                            ),
+                            _HouseRecordTile(
+                              title: 'Materials',
+                              subtitle: 'Request',
+                              icon: Icons.inventory_2_outlined,
+                              route: RcRoutes.materialRequest,
+                            ),
+                            _HouseRecordTile(
+                              title: 'Consumables',
+                              subtitle: 'Request',
+                              icon: Icons.handyman_outlined,
+                              route: RcRoutes.consumableRequest,
+                            ),
+                            _HouseRecordTile(
+                              title: 'Inventory',
+                              subtitle: 'House stock',
+                              icon: Icons.warehouse_outlined,
+                              route: RcRoutes.inventory,
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 16),
+                        const RcSectionHeader(
+                          title: 'Quality & evidence',
+                          subtitle: 'Monitoring, photo/file evidence, production hours and audit trail.',
+                        ),
+                        const SizedBox(height: 8),
+                        RcResponsiveGrid(
+                          minItemWidth: 145,
+                          childAspectRatio: 1.25,
+                          children: const <Widget>[
+                            _HouseRecordTile(
+                              title: 'Monitoring',
+                              subtitle: 'Quality',
+                              icon: Icons.rule_folder_outlined,
+                              route: RcRoutes.monitoring,
+                            ),
+                            _HouseRecordTile(
+                              title: 'Evidence',
+                              subtitle: 'Photos & files',
+                              icon: Icons.photo_library_outlined,
+                              route: RcRoutes.evidence,
+                            ),
+                            _HouseRecordTile(
+                              title: 'Work Logs',
+                              subtitle: 'Hours & work',
+                              icon: Icons.edit_note_outlined,
+                              route: RcRoutes.workLogs,
+                            ),
+                            _HouseRecordTile(
+                              title: 'Activity',
+                              subtitle: 'Audit trail',
+                              icon: Icons.history,
+                              route: RcRoutes.activity,
+                            ),
+                          ],
                         ),
                         const SizedBox(height: 24),
                         RcSectionHeader(
@@ -303,6 +404,74 @@ class HouseCommandScreen extends StatelessWidget {
       LifecyclePhase.finance => RcRoutes.payment,
     };
     Navigator.pushNamed(context, route);
+  }
+}
+
+class _HouseRecordTile extends StatelessWidget {
+  const _HouseRecordTile({
+    required this.title,
+    required this.subtitle,
+    required this.icon,
+    required this.route,
+    this.emphasized = false,
+  });
+
+  final String title;
+  final String subtitle;
+  final IconData icon;
+  final String route;
+  final bool emphasized;
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    return Card(
+      margin: EdgeInsets.zero,
+      color: emphasized ? scheme.primaryContainer : null,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(18),
+        onTap: () => Navigator.pushNamed(context, route),
+        child: Padding(
+          padding: const EdgeInsets.all(12),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              Container(
+                width: 36,
+                height: 36,
+                decoration: BoxDecoration(
+                  color: emphasized
+                      ? scheme.primary.withOpacity(.12)
+                      : scheme.surfaceContainerHighest,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Icon(
+                  icon,
+                  size: 19,
+                  color: emphasized ? scheme.primary : scheme.onSurfaceVariant,
+                ),
+              ),
+              const Spacer(),
+              Text(
+                title,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                      fontWeight: FontWeight.w900,
+                    ),
+              ),
+              const SizedBox(height: 2),
+              Text(
+                subtitle,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: Theme.of(context).textTheme.labelSmall,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 }
 
@@ -2561,6 +2730,12 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
         title: const Text('Operational Notifications'),
         actions: <Widget>[
           IconButton(
+            tooltip: 'Send notification',
+            onPressed: () =>
+                Navigator.pushNamed(context, RcRoutes.notificationCompose),
+            icon: const Icon(Icons.add_alert_outlined),
+          ),
+          IconButton(
             tooltip: _unreadOnly ? 'Show all' : 'Unread only',
             onPressed: () => setState(() => _unreadOnly = !_unreadOnly),
             icon: Icon(
@@ -2636,7 +2811,9 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                               ),
                             ),
                             subtitle: Text(
-                              '${item.detail}\n${_relativeTime(item.time)}',
+                              '${item.detail}\n'
+                              '${item.audiences.isEmpty ? '' : '${item.audiences.join(' • ')}\n'}'
+                              '${_relativeTime(item.time)}',
                             ),
                             isThreeLine: true,
                             trailing: RcStatusChip(
@@ -2903,24 +3080,13 @@ class _MessagesScreenState extends State<MessagesScreen> {
               children: <Widget>[
                 for (final message in _sent.reversed)
                   _MessageBubble(text: message, mine: true, label: 'You • now'),
-                const _MessageBubble(
-                  text:
-                      'I can approve the zinc transfer once the updated material request is linked to H12.',
-                  mine: false,
-                  label: 'Maria Green • 18 min ago',
-                ),
-                const _MessageBubble(
-                  text:
-                      'Site progress is 64%. Twelve 14 ft zinc sheets are still needed to keep tomorrow’s work on schedule.',
-                  mine: true,
-                  label: 'You • 24 min ago',
-                ),
-                const _MessageBubble(
-                  text:
-                      'Please send the H12 delivery gap and latest site evidence.',
-                  mine: false,
-                  label: 'Maria Green • 31 min ago',
-                ),
+                if (_sent.isEmpty)
+                  const Padding(
+                    padding: EdgeInsets.symmetric(vertical: 24),
+                    child: Center(
+                      child: Text('No messages in this house thread yet.'),
+                    ),
+                  ),
               ],
             ),
           ),
@@ -3108,10 +3274,10 @@ class SettingsScreen extends StatelessWidget {
                     child: Column(
                       children: <Widget>[
                         ListTile(
-                          leading: const CircleAvatar(child: Text('AB')),
-                          title: const Text(
-                            'Andre Brown',
-                            style: TextStyle(fontWeight: FontWeight.w700),
+                          leading: const CircleAvatar(child: Icon(Icons.person_outline)),
+                          title: Text(
+                            state.role,
+                            style: const TextStyle(fontWeight: FontWeight.w700),
                           ),
                           subtitle: Text(
                             '${state.role} • ${state.selectedParish}',
@@ -3129,7 +3295,7 @@ class SettingsScreen extends StatelessWidget {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: <Widget>[
                                     Text(
-                                      'Andre Brown',
+                                      state.role,
                                       style: Theme.of(sheetContext)
                                           .textTheme
                                           .headlineMedium,
@@ -3217,8 +3383,8 @@ class _WorkLogsScreenState extends State<WorkLogsScreen> {
   final _blocker = TextEditingController();
   final _nextAction = TextEditingController();
   String _category = 'Site monitoring';
-  double _progress = 64;
-  final Set<String> _crewPresent = <String>{'Andre Brown'};
+  double _progress = 0;
+  final Set<String> _crewPresent = <String>{};
 
   @override
   void dispose() {
@@ -3817,6 +3983,26 @@ class _EvidenceGauge extends StatelessWidget {
   }
 }
 
+class _HouseGeoPoint {
+  const _HouseGeoPoint({required this.house, required this.latitude, required this.longitude});
+  final HouseRecord house;
+  final double latitude;
+  final double longitude;
+}
+
+_HouseGeoPoint? _houseGeoPoint(HouseRecord house) {
+  final raw = house.gps.trim();
+  if (raw.isEmpty) return null;
+  final matches = RegExp(r'-?\d+(?:\.\d+)?').allMatches(raw).toList();
+  if (matches.length < 2) return null;
+  final lat = double.tryParse(matches[0].group(0)!);
+  final lng = double.tryParse(matches[1].group(0)!);
+  if (lat == null || lng == null || lat.abs() > 90 || lng.abs() > 180) {
+    return null;
+  }
+  return _HouseGeoPoint(house: house, latitude: lat, longitude: lng);
+}
+
 class OperationalMapScreen extends StatefulWidget {
   const OperationalMapScreen({super.key});
 
@@ -3838,9 +4024,13 @@ class _OperationalMapScreenState extends State<OperationalMapScreen> {
   @override
   Widget build(BuildContext context) {
     final state = AppScope.of(context);
+    final points = state.houses
+        .map(_houseGeoPoint)
+        .whereType<_HouseGeoPoint>()
+        .toList(growable: false);
     return Scaffold(
       appBar: RcAppBar(
-        title: const Text('Live Tracker Map'),
+        title: const Text('Beneficiary / House Map'),
         actions: <Widget>[
           IconButton(
             tooltip: 'Refresh live positions',
@@ -3861,54 +4051,56 @@ class _OperationalMapScreenState extends State<OperationalMapScreen> {
                   ),
                 ),
               ),
-              for (var index = 0; index < state.houses.length; index++)
-                Positioned(
-                  left: constraints.maxWidth * .5 +
-                      math.cos(
-                            (index / math.max(1, state.houses.length)) *
-                                    math.pi *
-                                    1.5 +
-                                .5,
-                          ) *
-                          constraints.maxWidth *
-                          .27 -
-                      24,
-                  top: constraints.maxHeight * .48 +
-                      math.sin(
-                            (index / math.max(1, state.houses.length)) *
-                                    math.pi *
-                                    1.5 +
-                                .5,
-                          ) *
-                          constraints.maxHeight *
-                          .25 -
-                      24,
-                  child: Semantics(
-                    label:
-                        '${state.houses[index].code}, ${state.houses[index].community}',
-                    button: true,
-                    child: IconButton.filled(
-                      tooltip: 'Open ${state.houses[index].code}',
-                      style: IconButton.styleFrom(
-                        backgroundColor: state.houses[index].needsAttention
-                            ? RcColors.warning
-                            : RcColors.brand,
-                        foregroundColor: Colors.white,
-                      ),
-                      onPressed: () {
-                        state.selectHouse(state.houses[index].code);
-                        Navigator.pushNamed(context, RcRoutes.houseCommand);
-                      },
-                      icon: Text(
-                        state.houses[index].code,
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 10,
-                          fontWeight: FontWeight.w900,
+              for (final point in points)
+                Builder(
+                  builder: (context) {
+                    final minLat = points.isEmpty
+                        ? 0.0
+                        : points.map((p) => p.latitude).reduce(math.min);
+                    final maxLat = points.isEmpty
+                        ? 1.0
+                        : points.map((p) => p.latitude).reduce(math.max);
+                    final minLng = points.isEmpty
+                        ? 0.0
+                        : points.map((p) => p.longitude).reduce(math.min);
+                    final maxLng = points.isEmpty
+                        ? 1.0
+                        : points.map((p) => p.longitude).reduce(math.max);
+                    final latSpan = math.max(.0001, maxLat - minLat);
+                    final lngSpan = math.max(.0001, maxLng - minLng);
+                    final x = .12 + ((point.longitude - minLng) / lngSpan) * .76;
+                    final y = .82 - ((point.latitude - minLat) / latSpan) * .64;
+                    return Positioned(
+                      left: constraints.maxWidth * x - 24,
+                      top: constraints.maxHeight * y - 24,
+                      child: Semantics(
+                        label:
+                            '${point.house.code}, ${point.house.beneficiary}, ${point.house.community}',
+                        button: true,
+                        child: IconButton.filled(
+                          tooltip: '${point.house.code} • ${point.house.beneficiary}',
+                          style: IconButton.styleFrom(
+                            backgroundColor: point.house.needsAttention
+                                ? RcColors.warning
+                                : RcColors.brand,
+                            foregroundColor: Colors.white,
+                          ),
+                          onPressed: () {
+                            state.selectHouse(point.house.code);
+                            Navigator.pushNamed(context, RcRoutes.houseCommand);
+                          },
+                          icon: Text(
+                            point.house.code,
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 10,
+                              fontWeight: FontWeight.w900,
+                            ),
+                          ),
                         ),
                       ),
-                    ),
-                  ),
+                    );
+                  },
                 ),
               Positioned(
                 left: 16,
@@ -3938,7 +4130,7 @@ class _OperationalMapScreenState extends State<OperationalMapScreen> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: <Widget>[
                                 Text(
-                                  '${state.selectedParish} • ${state.houses.length} tracked houses',
+                                  '${state.selectedParish} • ${points.length} GPS-linked houses',
                                   style: const TextStyle(
                                     fontWeight: FontWeight.w800,
                                   ),
@@ -3983,7 +4175,10 @@ class _OperationalMapScreenState extends State<OperationalMapScreen> {
                           final house = state.houses[index];
                           return ActionChip(
                             avatar: const Icon(Icons.house_outlined, size: 18),
-                            label: Text('${house.code}\n${house.community}'),
+                            label: Text(
+                              '${house.code} • ${house.beneficiary}\n'
+                              '${house.gps.isEmpty ? 'GPS required' : house.community}',
+                            ),
                             onPressed: () {
                               state.selectHouse(house.code);
                               Navigator.pushNamed(

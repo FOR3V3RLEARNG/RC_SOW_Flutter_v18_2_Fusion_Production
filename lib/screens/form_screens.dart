@@ -27,6 +27,17 @@ class OperationalFormScreen extends StatefulWidget {
           sections: _workPlanSections,
         );
 
+  const OperationalFormScreen.boq({Key? key})
+      : this._(
+          key: key,
+          title: 'Bill of Quantities',
+          type: 'BOQ',
+          phase: LifecyclePhase.scope,
+          description:
+              'Build and maintain the approved house material quantities against the submitted scope and roof geometry.',
+          sections: _boqSections,
+        );
+
   const OperationalFormScreen.dailyLog({Key? key})
       : this._(
           key: key,
@@ -87,7 +98,7 @@ class _OperationalFormScreenState extends State<OperationalFormScreen> {
       'parish': house.parish,
       'cluster': house.cluster,
       'community': house.community,
-      'supervisor': 'Andre Brown',
+      'supervisor': '',
     });
     _values.addAll(
       state.formDrafts['${house.code}:${widget.type}'] ??
@@ -365,6 +376,53 @@ class _OperationalFormScreenState extends State<OperationalFormScreen> {
   }
 }
 
+
+const List<FormSectionSpec> _boqSections = <FormSectionSpec>[
+  FormSectionSpec(
+    title: 'House & scope reference',
+    icon: Icons.home_work_outlined,
+    fields: <FormFieldSpec>[
+      FormFieldSpec(keyName: 'house', label: 'House code', required: true),
+      FormFieldSpec(keyName: 'parish', label: 'Parish', required: true, options: jamaicaParishes),
+      FormFieldSpec(keyName: 'cluster', label: 'Cluster', required: true),
+      FormFieldSpec(keyName: 'roofArea', label: 'Approved roof area (sq ft)', number: true),
+      FormFieldSpec(keyName: 'scopeReference', label: 'Scope reference'),
+    ],
+  ),
+  FormSectionSpec(
+    title: 'Roofing materials',
+    icon: Icons.roofing_outlined,
+    fields: <FormFieldSpec>[
+      FormFieldSpec(keyName: 'zincDescription', label: 'Zinc / roof covering description'),
+      FormFieldSpec(keyName: 'zincQty', label: 'Zinc quantity', number: true),
+      FormFieldSpec(keyName: 'ridgeQty', label: 'Ridge cap quantity', number: true),
+      FormFieldSpec(keyName: 'flashingQty', label: 'Flashing / verge quantity', number: true),
+      FormFieldSpec(keyName: 'screwQty', label: 'Roofing screw quantity', number: true),
+    ],
+  ),
+  FormSectionSpec(
+    title: 'Timber & structural',
+    icon: Icons.carpenter_outlined,
+    fields: <FormFieldSpec>[
+      FormFieldSpec(keyName: 'ridgeBeam', label: 'Ridge beam'),
+      FormFieldSpec(keyName: 'rafters', label: 'Rafters / collars'),
+      FormFieldSpec(keyName: 'battens', label: 'Battens / wall plate'),
+      FormFieldSpec(keyName: 'fascia', label: 'Fascia / blocking boards'),
+      FormFieldSpec(keyName: 'straps', label: 'Hurricane / flat straps'),
+      FormFieldSpec(keyName: 'plywood', label: 'Plywood / T1-11'),
+    ],
+  ),
+  FormSectionSpec(
+    title: 'Approval & remarks',
+    icon: Icons.verified_outlined,
+    fields: <FormFieldSpec>[
+      FormFieldSpec(keyName: 'preparedBy', label: 'Prepared by', required: true),
+      FormFieldSpec(keyName: 'approvedBy', label: 'Approved by'),
+      FormFieldSpec(keyName: 'remarks', label: 'BOQ notes / variations', multiline: true),
+    ],
+  ),
+];
+
 const List<FormSectionSpec> _workPlanSections = <FormSectionSpec>[
   FormSectionSpec(
     title: 'Identification',
@@ -374,12 +432,7 @@ const List<FormSectionSpec> _workPlanSections = <FormSectionSpec>[
         keyName: 'parish',
         label: 'Parish',
         required: true,
-        options: <String>[
-          'Hanover',
-          'St. Elizabeth',
-          'Westmoreland',
-          'St. James',
-        ],
+        options: jamaicaParishes,
       ),
       FormFieldSpec(
         keyName: 'community',
@@ -567,12 +620,7 @@ const List<FormSectionSpec> _materialSections = <FormSectionSpec>[
         keyName: 'parish',
         label: 'Parish',
         required: true,
-        options: <String>[
-          'Hanover',
-          'St. Elizabeth',
-          'Westmoreland',
-          'St. James',
-        ],
+        options: jamaicaParishes,
       ),
       FormFieldSpec(keyName: 'cluster', label: 'Cluster', required: true),
       FormFieldSpec(keyName: 'house', label: 'House', required: true),
@@ -673,12 +721,7 @@ const List<FormSectionSpec> _consumableSections = <FormSectionSpec>[
         keyName: 'parish',
         label: 'Parish',
         required: true,
-        options: <String>[
-          'Hanover',
-          'St. Elizabeth',
-          'Westmoreland',
-          'St. James',
-        ],
+        options: jamaicaParishes,
       ),
       FormFieldSpec(keyName: 'cluster', label: 'Cluster', required: true),
       FormFieldSpec(keyName: 'house', label: 'House', required: true),
@@ -924,7 +967,7 @@ class MonitoringChecklistScreen extends StatelessWidget {
                           eyebrow: '${house.parish} / ${house.cluster}',
                           title: 'Technical monitoring',
                           description:
-                              '${house.beneficiary} • ${house.roofArea.toStringAsFixed(0)} sq ft • Site Supervisor Andre Brown',
+                              '${house.beneficiary} • ${house.roofArea.toStringAsFixed(0)} sq ft • ${state.role}',
                           action: RcStatusChip(
                             label: '$completed/${criteria.length} REVIEWED',
                             tone: completed == criteria.length

@@ -22,6 +22,36 @@ class AppState extends ChangeNotifier {
     required this.backend,
   });
 
+  factory AppState.production({ProductionBackend? backend}) {
+    final state = AppState.seeded(backend: backend);
+    state.houses.clear();
+    state.inventory.clear();
+    state.evidence.clear();
+    state.activities.clear();
+    state.notifications.clear();
+    state.team.clear();
+    state.workLogs.clear();
+    state.stockLedger.clear();
+    state.workProjections.clear();
+    state.productionIssues.clear();
+    state.transfers.clear();
+    state.crews.clear();
+    state.communityEvents.clear();
+    state.shoutOuts.clear();
+    state.incentives.clear();
+    state.promotionCandidates.clear();
+    state.formDrafts.clear();
+    state.completedDocuments.clear();
+    state.monitoring.clear();
+    state.monitoringComments.clear();
+    state.roofDrawings.clear();
+    state.selectedHouseCode = '';
+    state.selectedTransferId = '';
+    state.syncCondition = SyncCondition.synced;
+    state.queuedChanges = 0;
+    return state;
+  }
+
   factory AppState.seeded({ProductionBackend? backend}) {
     final now = DateTime.now();
     return AppState._(
@@ -79,7 +109,7 @@ class AppState extends ChangeNotifier {
           evidenceComplete: 2,
           evidenceRequired: 6,
           nextAction: 'Complete work plan and crew assignment',
-          team: <String>['Andre Brown'],
+          team: <String>[],
         ),
         HouseRecord(
           code: 'H18',
@@ -176,7 +206,7 @@ class AppState extends ChangeNotifier {
           houseCode: 'H12',
           type: 'Before',
           caption: 'Damaged eastern roof slope',
-          capturedBy: 'Andre Brown',
+          capturedBy: role,
           capturedAt: now.subtract(const Duration(days: 9)),
           approved: true,
         ),
@@ -185,7 +215,7 @@ class AppState extends ChangeNotifier {
           houseCode: 'H12',
           type: 'During',
           caption: 'Wall plate and rafter installation',
-          capturedBy: 'Andre Brown',
+          capturedBy: role,
           capturedAt: now.subtract(const Duration(days: 3)),
           approved: true,
         ),
@@ -203,7 +233,7 @@ class AppState extends ChangeNotifier {
           houseCode: 'H2',
           type: 'Completion',
           caption: 'Final repaired roof inspection',
-          capturedBy: 'Andre Brown',
+          capturedBy: role,
           capturedAt: now.subtract(const Duration(days: 1)),
           approved: true,
         ),
@@ -827,10 +857,25 @@ class AppState extends ChangeNotifier {
       ? 0
       : crews.fold<double>(0, (sum, crew) => sum + crew.qualityScore) /
           crews.length;
-  TransferRecord get selectedTransfer => transfers.firstWhere(
-        (transfer) => transfer.id == selectedTransferId,
-        orElse: () => transfers.first,
-      );
+  TransferRecord get selectedTransfer {
+    for (final transfer in transfers) {
+      if (transfer.id == selectedTransferId) return transfer;
+    }
+    return TransferRecord(
+      id: 'UNASSIGNED',
+      category: '',
+      resource: '',
+      quantity: 0,
+      origin: '',
+      destination: '',
+      houseCode: '',
+      urgency: 'Routine',
+      reason: '',
+      startDate: DateTime.now(),
+      budgetImpact: 0,
+      status: 'Draft',
+    );
+  }
   double get evidenceReadiness {
     final required = houses.fold<int>(
       0,
@@ -876,8 +921,25 @@ class AppState extends ChangeNotifier {
         return true;
       }).toList();
 
-  HouseRecord houseByCode(String code) =>
-      houses.firstWhere((house) => house.code == code);
+  HouseRecord houseByCode(String code) {
+    for (final house in houses) {
+      if (house.code == code) return house;
+    }
+    return HouseRecord(
+      code: code.trim().isEmpty ? 'UNASSIGNED' : code,
+      beneficiary: '',
+      parish: selectedParish,
+      cluster: '',
+      community: '',
+      phase: LifecyclePhase.scope,
+      status: RecordStatus.draft,
+      progress: 0,
+      evidenceComplete: 0,
+      evidenceRequired: 0,
+      nextAction: 'Create or import a house before entering production records',
+      team: <String>[],
+    );
+  }
 
   Future<void> bootstrapSession() async {
     if (!backend.connected) return;
@@ -959,7 +1021,7 @@ class AppState extends ChangeNotifier {
         evidenceComplete: 0,
         evidenceRequired: 6,
         nextAction: 'Complete house and roof scope',
-        team: <String>['Andre Brown'],
+        team: <String>[],
       ),
     );
     selectedHouseCode = normalized;
@@ -1160,7 +1222,7 @@ class AppState extends ChangeNotifier {
         houseCode: house.code,
         type: type,
         caption: caption,
-        capturedBy: 'Andre Brown',
+        capturedBy: role,
         capturedAt: DateTime.now(),
         approved: false,
       ),
@@ -1248,6 +1310,60 @@ class AppState extends ChangeNotifier {
     _markChanged();
   }
 
+  void createOperationalNotification({
+    required String title,
+    required String detail,
+    required String priority,
+    required String kind,
+    required List<String> audiences,
+    String? houseCode,
+    DateTime? scheduledFor,
+  }) {
+    notifications.insert(
+      0,
+      AppNotification(
+        id: 'N-${DateTime.now().microsecondsSinceEpoch}',
+        title: title,
+        detail: detail,
+        time: DateTime.now(),
+        priority: priority,
+        houseCode: houseCode,
+        audiences: audiences,
+        sender: role,
+        scheduledFor: scheduledFor,
+        kind: kind,
+      ),
+    );
+    final notification = notifications.first;
+    final effectiveHouseCode = houseCode?.trim() ?? '';
+    final parish = _isProductionHouse(effectiveHouseCode)
+        ? houseByCode(effectiveHouseCode).parish
+        : selectedParish;
+    _dispatchWrite(
+      BackendWrite(
+        houseCode: effectiveHouseCode,
+        parish: parish,
+        recordType: 'Broadcast Notification',
+        status: scheduledFor == null ? 'sent' : 'scheduled',
+        payload: <String, dynamic>{
+          'notification_id': notification.id,
+          'title': title,
+          'detail': detail,
+          'priority': priority,
+          'kind': kind,
+          'audiences': audiences,
+          'sender': role,
+          'house_code': houseCode,
+          'scheduled_for': scheduledFor?.toIso8601String(),
+          'created_at': notification.time.toIso8601String(),
+        },
+        idempotencyKey: notification.id,
+      ),
+    );
+    syncCondition = offline ? SyncCondition.savedLocal : SyncCondition.synced;
+    notifyListeners();
+  }
+
   void markNotificationRead(String id) {
     notifications.firstWhere((item) => item.id == id).read = true;
     notifyListeners();
@@ -1286,7 +1402,7 @@ class AppState extends ChangeNotifier {
       0,
       WorkLogEntry(
         id: 'WL-${DateTime.now().millisecondsSinceEpoch}',
-        user: 'Andre Brown',
+        user: role,
         role: role,
         parish: selectedParish,
         houseCode: houseCode,
@@ -1506,12 +1622,24 @@ class AppState extends ChangeNotifier {
 
   void updateProjectionActual(String id, double hours) {
     final projection = workProjections.firstWhere((item) => item.id == id);
+    final previousStatus = projection.status;
     projection.actualHours = hours.clamp(0, 500).toDouble();
     if (projection.actualHours > projection.estimatedHours * 1.2) {
       projection.status = ProjectionStatus.atRisk;
     } else if (projection.actualHours >= projection.estimatedHours) {
       projection.status = ProjectionStatus.complete;
     }
+    _recordActivity(
+      houseCode: projection.houseCode,
+      title: previousStatus == projection.status
+          ? 'Production hours updated'
+          : 'Production status changed',
+      detail:
+          '${projection.milestone} • ${projection.actualHours.toStringAsFixed(1)} actual hours • ${projection.status.label}.',
+      icon: projection.status == ProjectionStatus.atRisk
+          ? Icons.warning_amber_outlined
+          : Icons.trending_up_outlined,
+    );
     _markChanged();
   }
 
@@ -1663,17 +1791,6 @@ class AppState extends ChangeNotifier {
       ),
     );
     selectedTransferId = id;
-    notifications.insert(
-      0,
-      AppNotification(
-        id: 'N-$id',
-        title: 'Transfer request needs approval',
-        detail: '$resource requested for $houseCode from $origin.',
-        time: DateTime.now(),
-        priority: urgency == 'Critical' ? 'High' : 'Action',
-        houseCode: houseCode,
-      ),
-    );
     _recordActivity(
       houseCode: houseCode,
       title: 'Transfer request created',
@@ -1739,7 +1856,7 @@ class AppState extends ChangeNotifier {
       ShoutOutRecord(
         id: 'SH-${DateTime.now().microsecondsSinceEpoch}',
         message: message,
-        author: 'Andre Brown',
+        author: role,
         crew: crew,
         createdAt: DateTime.now(),
       ),
@@ -2012,19 +2129,137 @@ class AppState extends ChangeNotifier {
     required String title,
     required String detail,
     required IconData icon,
+    bool createNotification = true,
   }) {
+    final now = DateTime.now();
     activities.insert(
       0,
       ActivityEntry(
-        id: 'ACT-${DateTime.now().microsecondsSinceEpoch}',
+        id: 'ACT-${now.microsecondsSinceEpoch}',
         houseCode: houseCode,
         title: title,
         detail: detail,
-        actor: 'Andre Brown',
-        time: DateTime.now(),
+        actor: role,
+        time: now,
         icon: icon,
       ),
     );
+
+    if (createNotification && _isProductionHouse(houseCode)) {
+      final house = houseByCode(houseCode);
+      final audiences = _productionAudiencesFor(house, title);
+      final priority = _productionPriority(title, house);
+      final notification = AppNotification(
+        id: 'AUTO-${now.microsecondsSinceEpoch}',
+        title: '${house.code} • $title',
+        detail: detail,
+        time: now,
+        priority: priority,
+        houseCode: house.code,
+        audiences: audiences,
+        sender: role,
+        kind: _productionNotificationKind(title),
+      );
+      notifications.insert(0, notification);
+
+      _dispatchWrite(
+        BackendWrite(
+          houseCode: house.code,
+          parish: house.parish,
+          recordType: 'Production Notification',
+          status: 'new',
+          payload: <String, dynamic>{
+            'notification_id': notification.id,
+            'title': notification.title,
+            'detail': notification.detail,
+            'priority': notification.priority,
+            'kind': notification.kind,
+            'audiences': notification.audiences,
+            'sender': notification.sender,
+            'house_code': house.code,
+            'lifecycle_phase': house.phase.name,
+            'record_status': house.status.name,
+            'progress_percent': (house.progress * 100).round(),
+            'created_at': now.toIso8601String(),
+          },
+          idempotencyKey: '${notification.id}-${house.code}',
+        ),
+      );
+    }
+  }
+
+  bool _isProductionHouse(String houseCode) {
+    final normalized = houseCode.trim().toUpperCase();
+    if (normalized.isEmpty || normalized == 'UNASSIGNED') return false;
+    return houses.any((house) => house.code == normalized);
+  }
+
+  List<String> _productionAudiencesFor(HouseRecord house, String title) {
+    final audiences = <String>{
+      'Crew • ${house.code}',
+      'Parish • ${house.parish}',
+      'Regional Supervisors',
+      'Construction Specialists',
+    };
+    for (final member in house.team) {
+      if (member.trim().isNotEmpty) {
+        audiences.add('Individual • ${member.trim()}');
+      }
+    }
+    final normalized = title.toLowerCase();
+    if (normalized.contains('payment') ||
+        normalized.contains('finance') ||
+        normalized.contains('completion approved')) {
+      audiences.add('Accounts');
+    }
+    return audiences.toList(growable: false);
+  }
+
+  String _productionPriority(String title, HouseRecord house) {
+    final normalized = title.toLowerCase();
+    if (house.needsAttention ||
+        normalized.contains('issue') ||
+        normalized.contains('blocker') ||
+        normalized.contains('at risk') ||
+        normalized.contains('failed')) {
+      return 'High';
+    }
+    if (normalized.contains('submitted') ||
+        normalized.contains('approval') ||
+        normalized.contains('transfer') ||
+        normalized.contains('completion') ||
+        normalized.contains('payment')) {
+      return 'Action';
+    }
+    return 'Info';
+  }
+
+  String _productionNotificationKind(String title) {
+    final normalized = title.toLowerCase();
+    if (normalized.contains('payment') || normalized.contains('finance')) {
+      return 'Finance';
+    }
+    if (normalized.contains('completion') ||
+        normalized.contains('inspection') ||
+        normalized.contains('monitoring')) {
+      return 'Quality / Close-out';
+    }
+    if (normalized.contains('material') ||
+        normalized.contains('inventory') ||
+        normalized.contains('transfer')) {
+      return 'Materials / Logistics';
+    }
+    if (normalized.contains('work plan') ||
+        normalized.contains('projection') ||
+        normalized.contains('work log')) {
+      return 'Production';
+    }
+    if (normalized.contains('scope') ||
+        normalized.contains('boq') ||
+        normalized.contains('roof')) {
+      return 'Scope / Technical';
+    }
+    return 'Operational';
   }
 
   void _markChanged() {

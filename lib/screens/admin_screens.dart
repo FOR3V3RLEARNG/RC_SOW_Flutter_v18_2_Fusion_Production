@@ -13,17 +13,15 @@ class AdminUsersScreen extends StatefulWidget {
 }
 
 class _AdminUsersScreenState extends State<AdminUsersScreen> {
-  final Map<String, bool> _active = <String, bool>{
-    'Maria Green': true,
-    'Andre Brown': true,
-    'Kim Ross': true,
-    'David Clarke': true,
-  };
+  final Map<String, bool> _active = <String, bool>{};
   String _query = '';
 
   @override
   Widget build(BuildContext context) {
     final state = AppScope.of(context);
+    for (final person in state.team) {
+      _active.putIfAbsent(person.name, () => true);
+    }
     final people = state.team
         .where(
           (person) =>
@@ -78,13 +76,14 @@ class _AdminUsersScreenState extends State<AdminUsersScreen> {
                       ),
                       RcMetricTile(
                         label: 'Admin roles',
-                        value: '2',
+                        value:
+                            '${state.team.where((person) => person.role.toLowerCase().contains('admin')).length}',
                         icon: Icons.admin_panel_settings_outlined,
                         color: RcColors.info,
                       ),
                       RcMetricTile(
                         label: 'Pending review',
-                        value: '1',
+                        value: '0',
                         icon: Icons.pending_actions_outlined,
                         color: RcColors.warning,
                       ),
@@ -529,28 +528,6 @@ class _GmailScreenState extends State<GmailScreen> {
   }
 
   Widget _buildInbox(BuildContext context) {
-    const messages = <(String, String, String)>[
-      (
-        'Maria Green',
-        'H12 material transfer approval',
-        'Please attach the latest request and inventory gap.',
-      ),
-      (
-        'Finance Operations',
-        'H2 payment package returned',
-        'Beneficiary signature needs a clearer scan.',
-      ),
-      (
-        'Technical Team',
-        'Hanover weekly production review',
-        'Meeting notes and action list attached.',
-      ),
-      (
-        'Logistics',
-        'Central depot stock synchronization',
-        'Inventory synchronization completed successfully.',
-      ),
-    ];
     return ListView(
       padding: const EdgeInsets.all(16),
       children: <Widget>[
@@ -564,26 +541,18 @@ class _GmailScreenState extends State<GmailScreen> {
                   eyebrow: 'Institutional Communication',
                   title: 'Inbox',
                   description:
-                      'Email remains linked to operational houses and records where appropriate.',
+                      'Only authenticated Gmail data should appear here. No demonstration messages are inserted into production.',
                 ),
                 const SizedBox(height: 18),
-                Card(
-                  child: Column(
-                    children: messages.map((message) {
-                      return ListTile(
-                        leading: CircleAvatar(child: Text(message.$1[0])),
-                        title: Text(
-                          message.$1,
-                          style: const TextStyle(fontWeight: FontWeight.w800),
-                        ),
-                        subtitle: Text('${message.$2}\n${message.$3}'),
-                        isThreeLine: true,
-                        trailing: const Icon(Icons.chevron_right),
-                        onTap: () => ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text('Opened: ${message.$2}')),
-                        ),
-                      );
-                    }).toList(),
+                RcEmptyState(
+                  icon: Icons.mark_email_unread_outlined,
+                  title: 'No inbox messages loaded',
+                  message:
+                      'Connect an authorized Google session with Gmail access to load institutional mail, or compose a new operational email.',
+                  action: FilledButton.icon(
+                    onPressed: () => setState(() => _compose = true),
+                    icon: const Icon(Icons.edit_outlined),
+                    label: const Text('COMPOSE EMAIL'),
                   ),
                 ),
               ],
