@@ -767,6 +767,7 @@ class AppState extends ChangeNotifier {
     'final-inspection',
     'production-review',
     'completion',
+    'completion-documents',
     'payment',
   ];
   final Set<String> hiddenControlTiles = <String>{};
@@ -1150,17 +1151,73 @@ class AppState extends ChangeNotifier {
     house.status = submit ? RecordStatus.submitted : RecordStatus.draft;
   }
 
+  void recordOperationalUpdate({
+    required String recordType,
+    required String houseCode,
+    required Map<String, String> values,
+    required String activityTitle,
+    required String activityDetail,
+    required IconData icon,
+    String status = 'updated',
+  }) {
+    final house = houseByCode(houseCode);
+    formDrafts['$houseCode:$recordType'] = Map<String, String>.from(values);
+    _recordActivity(
+      houseCode: houseCode,
+      title: activityTitle,
+      detail: activityDetail,
+      icon: icon,
+    );
+    _markChanged();
+    _dispatchWrite(
+      BackendWrite(
+        houseCode: houseCode,
+        parish: house.parish,
+        recordType: recordType,
+        status: status,
+        payload: <String, dynamic>{
+          ...values,
+          'house_code': houseCode,
+          'parish': house.parish,
+          'cluster': house.cluster,
+          'recorded_by': role,
+          'recorded_at': DateTime.now().toIso8601String(),
+        },
+        idempotencyKey:
+            '$houseCode-${recordType.toLowerCase().replaceAll(' ', '-')}-${DateTime.now().microsecondsSinceEpoch}',
+      ),
+    );
+  }
+
   void toggleDocument(String houseCode, String document) {
     final set = completedDocuments.putIfAbsent(houseCode, () => <String>{});
     if (!set.add(document)) set.remove(document);
+    final complete = set.contains(document);
+    final house = houseByCode(houseCode);
     _recordActivity(
       houseCode: houseCode,
       title: 'Document checklist updated',
-      detail:
-          '$document marked ${set.contains(document) ? 'complete' : 'incomplete'}.',
+      detail: '$document marked ${complete ? 'complete' : 'incomplete'}.',
       icon: Icons.description_outlined,
     );
     _markChanged();
+    _dispatchWrite(
+      BackendWrite(
+        houseCode: houseCode,
+        parish: house.parish,
+        recordType: 'Completion Document Update',
+        status: complete ? 'complete' : 'incomplete',
+        payload: <String, dynamic>{
+          'document': document,
+          'complete': complete,
+          'completed_documents': set.toList(),
+          'updated_by': role,
+          'updated_at': DateTime.now().toIso8601String(),
+        },
+        idempotencyKey:
+            '$houseCode-completion-document-${DateTime.now().microsecondsSinceEpoch}',
+      ),
+    );
   }
 
   void setMonitoringStatus(String houseCode, String criterion, String status) {
@@ -2198,6 +2255,7 @@ class AppState extends ChangeNotifier {
     final audiences = <String>{
       'Crew • ${house.code}',
       'Parish • ${house.parish}',
+      'Administrators',
       'Regional Supervisors',
       'Construction Specialists',
     };

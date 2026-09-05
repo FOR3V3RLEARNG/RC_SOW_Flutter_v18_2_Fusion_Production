@@ -8,6 +8,7 @@ import 'core/production_models.dart';
 import 'screens/admin_screens.dart';
 import 'screens/auth_screens.dart';
 import 'screens/command_screens.dart';
+import 'screens/control_intelligence_screens.dart';
 import 'screens/control_layout_screen.dart';
 import 'screens/form_screens.dart';
 import 'screens/operation_screens.dart';
@@ -108,6 +109,8 @@ Route<dynamic> buildRcRoute(RouteSettings settings) {
     RcRoutes.addInventory => const InventoryEditScreen(),
     RcRoutes.inventoryTransfer => const InventoryTransferScreen(),
     RcRoutes.completion => const CompletionScreen(),
+    RcRoutes.completionDocuments =>
+      const AllHouseCompletionDocumentsScreen(),
     RcRoutes.finalInspection => const FinalInspectionScreen(),
     RcRoutes.payment => const PaymentScreen(),
     RcRoutes.evidence => const EvidenceScreen(),
@@ -135,7 +138,7 @@ Route<dynamic> buildRcRoute(RouteSettings settings) {
     RcRoutes.teamResources => const TeamResourceScreen(),
     RcRoutes.awardsIncentives => const AwardsIncentivesScreen(),
     RcRoutes.promotionRouting => const PromotionRoutingScreen(),
-    RcRoutes.schedule => const ConstructionScheduleScreen(),
+    RcRoutes.schedule => const ProximityConstructionScheduleScreen(),
     RcRoutes.liveBriefing => const LiveBriefingScreen(),
     RcRoutes.productionCommand => const ProductionCommandScreen(),
     RcRoutes.financeCommand => const FinanceCommandScreen(),
