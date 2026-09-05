@@ -46,7 +46,7 @@ abstract final class ControlModules {
     ControlModuleDefinition(
       id: 'work-projections',
       title: 'Work Projection Log',
-      description: 'Plan weekly milestones, crew hours, materials and risks.',
+      description: 'One signed weekly file per admin staff member with daily 09:00–17:00 or custom hours and role-scoped review.',
       phase: LifecyclePhase.plan,
       icon: Icons.trending_up_outlined,
       route: RcRoutes.workProjections,
