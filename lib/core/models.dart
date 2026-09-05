@@ -1,5 +1,23 @@
 import 'package:flutter/material.dart';
 
+
+const List<String> jamaicaParishes = <String>[
+  'Clarendon',
+  'Hanover',
+  'Kingston',
+  'Manchester',
+  'Portland',
+  'St. Andrew',
+  'St. Ann',
+  'St. Catherine',
+  'St. Elizabeth',
+  'St. James',
+  'St. Mary',
+  'St. Thomas',
+  'Trelawny',
+  'Westmoreland',
+];
+
 enum LifecyclePhase {
   scope('Scope', Icons.architecture_outlined),
   plan('Plan', Icons.event_note_outlined),
@@ -138,6 +156,7 @@ class EvidenceItem {
     required this.capturedBy,
     required this.capturedAt,
     required this.approved,
+    this.uri,
   });
 
   final String id;
@@ -147,6 +166,7 @@ class EvidenceItem {
   final String capturedBy;
   final DateTime capturedAt;
   final bool approved;
+  final String? uri;
 }
 
 class AppNotification {
@@ -158,6 +178,10 @@ class AppNotification {
     required this.priority,
     this.houseCode,
     this.read = false,
+    this.audiences = const <String>[],
+    this.sender = '',
+    this.scheduledFor,
+    this.kind = 'Operational',
   });
 
   final String id;
@@ -167,6 +191,10 @@ class AppNotification {
   final String priority;
   final String? houseCode;
   bool read;
+  final List<String> audiences;
+  final String sender;
+  final DateTime? scheduledFor;
+  final String kind;
 }
 
 class TeamMember {
@@ -194,6 +222,11 @@ class WorkLogEntry {
     required this.detail,
     required this.hours,
     required this.createdAt,
+    this.progress = 0,
+    this.crewPresent = const <String>[],
+    this.materialsUsed = '',
+    this.blocker = '',
+    this.nextAction = '',
   });
 
   final String id;
@@ -205,6 +238,11 @@ class WorkLogEntry {
   final String detail;
   final double hours;
   final DateTime createdAt;
+  final double progress;
+  final List<String> crewPresent;
+  final String materialsUsed;
+  final String blocker;
+  final String nextAction;
 }
 
 class FormFieldSpec {

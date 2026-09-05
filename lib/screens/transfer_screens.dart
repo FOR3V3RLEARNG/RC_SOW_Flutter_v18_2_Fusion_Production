@@ -23,7 +23,7 @@ class _TransferHubScreenState extends State<TransferHubScreen> {
       return _filter == 'All' || transfer.status == _filter;
     }).toList();
     return Scaffold(
-      appBar: AppBar(
+      appBar: RcAppBar(
         title: const Text('Transfer Management'),
         actions: <Widget>[
           IconButton(
@@ -335,14 +335,12 @@ class NewTransferScreen extends StatefulWidget {
 
 class _NewTransferScreenState extends State<NewTransferScreen> {
   final _formKey = GlobalKey<FormState>();
-  final _reason = TextEditingController(
-    text: 'Required to maintain the approved construction schedule.',
-  );
+  final _reason = TextEditingController();
   String _category = 'Personnel';
   String _resource = 'Master Carpenter';
-  String _origin = 'Hanover Central Hub';
-  String _destination = 'Thornton Cluster A3';
-  String _houseCode = 'H12';
+  String _origin = '';
+  String _destination = '';
+  String _houseCode = '';
   String _urgency = 'Priority';
   int _quantity = 1;
   bool _temporary = true;
@@ -356,6 +354,12 @@ class _NewTransferScreenState extends State<NewTransferScreen> {
   @override
   Widget build(BuildContext context) {
     final state = AppScope.of(context);
+    final locations = <String>{
+      ...state.stockLedger.map((item) => item.location),
+      ...state.houses.map((house) => house.cluster),
+      ...state.houses.map((house) => house.community),
+    }.where((value) => value.trim().isNotEmpty).toList()
+      ..sort();
     final resources = _category == 'Personnel'
         ? const <String>[
             'Master Carpenter',
@@ -372,7 +376,7 @@ class _NewTransferScreenState extends State<NewTransferScreen> {
             'Framing packs',
           ];
     return Scaffold(
-      appBar: AppBar(title: const Text('Request Transfer')),
+      appBar: RcAppBar(title: const Text('Request Transfer')),
       body: Column(
         children: <Widget>[
           const RcSyncBanner(),
@@ -497,19 +501,15 @@ class _NewTransferScreenState extends State<NewTransferScreen> {
                               child: Column(
                                 children: <Widget>[
                                   DropdownButtonFormField<String>(
-                                    initialValue: _origin,
+                                    initialValue:
+                                        locations.contains(_origin) ? _origin : null,
                                     isExpanded: true,
                                     decoration: const InputDecoration(
                                       labelText: 'Origin',
                                       prefixIcon:
                                           Icon(Icons.outbound_outlined),
                                     ),
-                                    items: const <String>[
-                                      'Hanover Central Hub',
-                                      'Hanover Central Depot',
-                                      'Haughton Grove Cluster 1',
-                                      'Miles Town Cluster 2',
-                                    ]
+                                    items: locations
                                         .map(
                                           (value) => DropdownMenuItem<String>(
                                             value: value,
@@ -517,24 +517,25 @@ class _NewTransferScreenState extends State<NewTransferScreen> {
                                           ),
                                         )
                                         .toList(),
+                                    validator: (value) =>
+                                        value == null || value.isEmpty
+                                            ? 'Select a real origin location.'
+                                            : null,
                                     onChanged: (value) =>
-                                        setState(() => _origin = value!),
+                                        setState(() => _origin = value ?? ''),
                                   ),
                                   const SizedBox(height: 14),
                                   DropdownButtonFormField<String>(
-                                    initialValue: _destination,
+                                    initialValue: locations.contains(_destination)
+                                        ? _destination
+                                        : null,
                                     isExpanded: true,
                                     decoration: const InputDecoration(
                                       labelText: 'Target destination',
                                       prefixIcon:
                                           Icon(Icons.add_location_alt_outlined),
                                     ),
-                                    items: const <String>[
-                                      'Thornton Cluster A3',
-                                      'Thornton Site Store',
-                                      'Haughton Grove Cluster 1',
-                                      'Miles Town Cluster 2',
-                                    ]
+                                    items: locations
                                         .map(
                                           (value) => DropdownMenuItem<String>(
                                             value: value,
@@ -542,12 +543,20 @@ class _NewTransferScreenState extends State<NewTransferScreen> {
                                           ),
                                         )
                                         .toList(),
+                                    validator: (value) =>
+                                        value == null || value.isEmpty
+                                            ? 'Select a real destination.'
+                                            : null,
                                     onChanged: (value) =>
-                                        setState(() => _destination = value!),
+                                        setState(() => _destination = value ?? ''),
                                   ),
                                   const SizedBox(height: 14),
                                   DropdownButtonFormField<String>(
-                                    initialValue: _houseCode,
+                                    initialValue: state.houses.any(
+                                      (house) => house.code == _houseCode,
+                                    )
+                                        ? _houseCode
+                                        : null,
                                     isExpanded: true,
                                     decoration: const InputDecoration(
                                       labelText: 'Target house',
@@ -680,7 +689,7 @@ class TransferDetailScreen extends StatelessWidget {
     final state = AppScope.of(context);
     final transfer = state.selectedTransfer;
     return Scaffold(
-      appBar: AppBar(title: Text('${transfer.id} • Transfer Detail')),
+      appBar: RcAppBar(title: Text('${transfer.id} • Transfer Detail')),
       body: Column(
         children: <Widget>[
           const RcSyncBanner(),
@@ -879,8 +888,15 @@ class _TransferAutomationScreenState extends State<TransferAutomationScreen> {
     final pending = state.transfers
         .where((transfer) => transfer.status == 'Pending approval')
         .toList();
+    final scopes = <String>{
+      'All clusters',
+      ...state.houses.map((house) => house.cluster),
+      ...state.houses.map((house) => house.community),
+    }.where((value) => value.trim().isNotEmpty).toList()
+      ..sort();
+    if (!scopes.contains(_cluster)) _cluster = 'All clusters';
     return Scaffold(
-      appBar: AppBar(title: const Text('Automated Transfer Configuration')),
+      appBar: RcAppBar(title: const Text('Automated Transfer Configuration')),
       body: Column(
         children: <Widget>[
           const RcSyncBanner(),
@@ -922,12 +938,7 @@ class _TransferAutomationScreenState extends State<TransferAutomationScreen> {
                                   decoration: const InputDecoration(
                                     labelText: 'Parish / cluster scope',
                                   ),
-                                  items: const <String>[
-                                    'All clusters',
-                                    'Thornton Cluster A3',
-                                    'Haughton Grove Cluster 1',
-                                    'Miles Town Cluster 2',
-                                  ]
+                                  items: scopes
                                       .map(
                                         (value) => DropdownMenuItem<String>(
                                           value: value,
@@ -936,7 +947,7 @@ class _TransferAutomationScreenState extends State<TransferAutomationScreen> {
                                       )
                                       .toList(),
                                   onChanged: (value) =>
-                                      setState(() => _cluster = value!),
+                                      setState(() => _cluster = value ?? 'All clusters'),
                                 ),
                                 const SizedBox(height: 16),
                                 Row(

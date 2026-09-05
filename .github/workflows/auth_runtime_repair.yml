@@ -1,0 +1,311 @@
+name: RC SOW v20.1 Auth Repair + Green Build
+
+"on":
+  push:
+    branches:
+      - rc-sow-connected-v20.1.0
+    paths:
+      - .github/workflows/auth_runtime_repair.yml
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: rc-sow-v20-auth-runtime-repair-v3
+  cancel-in-progress: false
+
+env:
+  RC_BRANCH: rc-sow-connected-v20.1.0
+
+jobs:
+  repair:
+    name: repair-auth-source
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: rc-sow-connected-v20.1.0
+          fetch-depth: 0
+          persist-credentials: true
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Resolve dependencies
+        run: |
+          flutter pub get
+          git checkout -- analysis_options.yaml pubspec.lock 2>/dev/null || true
+
+      - name: Repair auth runtime
+        env:
+          REPAIR_B64: 'ZnJvbSBwYXRobGliIGltcG9ydCBQYXRoCgpkZWYgcmVwbGFjZV9iZXR3ZWVuKHRleHQsIHN0YXJ0X21hcmtlciwgZW5kX21hcmtlciwgcmVwbGFjZW1lbnQsICosIHN0YXJ0X2F0PTAsIGxhYmVsPSdibG9jaycpOgogICAgc3RhcnQgPSB0ZXh0LmZpbmQoc3RhcnRfbWFya2VyLCBzdGFydF9hdCkKICAgIGlmIHN0YXJ0IDwgMDoKICAgICAgICByYWlzZSBTeXN0ZW1FeGl0KGYne2xhYmVsfTogc3RhcnQgbWFya2VyIG5vdCBmb3VuZCcpCiAgICBlbmQgPSB0ZXh0LmZpbmQoZW5kX21hcmtlciwgc3RhcnQgKyBsZW4oc3RhcnRfbWFya2VyKSkKICAgIGlmIGVuZCA8IDA6CiAgICAgICAgcmFpc2UgU3lzdGVtRXhpdChmJ3tsYWJlbH06IGVuZCBtYXJrZXIgbm90IGZvdW5kJykKICAgIHJldHVybiB0ZXh0WzpzdGFydF0gKyByZXBsYWNlbWVudCArIHRleHRbZW5kOl0KCiMgMSkgU3VwYWJhc2UgYmFja2VuZCBhZGFwdGVyIOKAlCBjdXJyZW50IGRlcGxveWVkIHNjaGVtYSArIGZ1dHVyZSBtaWdyYXRpb24gZmFsbGJhY2suCnAgPSBQYXRoKCdsaWIvc2VydmljZXMvcHJvZHVjdGlvbl9iYWNrZW5kLmRhcnQnKQpzID0gcC5yZWFkX3RleHQoKQpjbHMgPSBzLmZpbmQoJ2NsYXNzIFN1cGFiYXNlUHJvZHVjdGlvbkJhY2tlbmQgZXh0ZW5kcyBQcm9kdWN0aW9uQmFja2VuZCB7JykKaWYgY2xzIDwgMDoKICAgIHJhaXNlIFN5c3RlbUV4aXQoJ1N1cGFiYXNlUHJvZHVjdGlvbkJhY2tlbmQgY2xhc3Mgbm90IGZvdW5kJykKCm1ldGhvZF9zdGFydCA9ICcgIEBvdmVycmlkZVxuICBGdXR1cmU8QmFja2VuZFByb2ZpbGU/PiBjdXJyZW50UHJvZmlsZSgpIGFzeW5jIHsnCm1ldGhvZF9lbmQgPSAnXG5cbiAgQG92ZXJyaWRlXG4gIEZ1dHVyZTx2b2lkPiBzaWduSW5XaXRoR29vZ2xlKCkgYXN5bmMgeycKCmlmICIuZXEoJ3VzZXJfaWQnLCB1c2VyLmlkKSIgbm90IGluIHNbY2xzOl06CiAgICBjdXJyZW50X3Byb2ZpbGUgPSByIiIiICBAb3ZlcnJpZGUKICBGdXR1cmU8QmFja2VuZFByb2ZpbGU/PiBjdXJyZW50UHJvZmlsZSgpIGFzeW5jIHsKICAgIGZpbmFsIHVzZXIgPSBjbGllbnQuYXV0aC5jdXJyZW50VXNlcjsKICAgIGlmICh1c2VyID09IG51bGwpIHJldHVybiBudWxsOwoKICAgIE1hcDxTdHJpbmcsIGR5bmFtaWM+PyByb3c7CgogICAgLy8gVGhlIGRlcGxveWVkIFJDIFNPVyBwcm9maWxlIHNjaGVtYSB1c2VzIHVzZXJfaWQvcGFyaXNoLgogICAgLy8gS2VlcCBhbiBpZC9hc3NpZ25lZF9wYXJpc2hlcyBmYWxsYmFjayBmb3IgbWlncmF0ZWQgZW52aXJvbm1lbnRzLgogICAgdHJ5IHsKICAgICAgcm93ID0gYXdhaXQgY2xpZW50CiAgICAgICAgICAuZnJvbSgncHJvZmlsZXMnKQogICAgICAgICAgLnNlbGVjdCgpCiAgICAgICAgICAuZXEoJ3VzZXJfaWQnLCB1c2VyLmlkKQogICAgICAgICAgLm1heWJlU2luZ2xlKCk7CiAgICB9IG9uIFBvc3RncmVzdEV4Y2VwdGlvbiB7CiAgICAgIHJvdyA9IGF3YWl0IGNsaWVudAogICAgICAgICAgLmZyb20oJ3Byb2ZpbGVzJykKICAgICAgICAgIC5zZWxlY3QoKQogICAgICAgICAgLmVxKCdpZCcsIHVzZXIuaWQpCiAgICAgICAgICAubWF5YmVTaW5nbGUoKTsKICAgIH0KCiAgICBpZiAocm93ID09IG51bGwpIHJldHVybiBudWxsOwoKICAgIGZpbmFsIGFzc2lnbmVkUmF3ID0gcm93Wydhc3NpZ25lZF9wYXJpc2hlcyddOwogICAgZmluYWwgZGVwbG95ZWRQYXJpc2ggPQogICAgICAgICcke3Jvd1sncGFyaXNoJ10gPz8gcm93WydyZXF1ZXN0ZWRfcGFyaXNoJ10gPz8gJyd9Jy50cmltKCk7CgogICAgZmluYWwgcGFyaXNoZXMgPSBhc3NpZ25lZFJhdyBpcyBMaXN0CiAgICAgICAgPyBhc3NpZ25lZFJhdwogICAgICAgICAgICAubWFwKCh2YWx1ZSkgPT4gJyR2YWx1ZScudHJpbSgpKQogICAgICAgICAgICAud2hlcmUoKHZhbHVlKSA9PiB2YWx1ZS5pc05vdEVtcHR5KQogICAgICAgICAgICAudG9MaXN0KCkKICAgICAgICA6IGRlcGxveWVkUGFyaXNoLmlzRW1wdHkKICAgICAgICAgICAgPyA8U3RyaW5nPltdCiAgICAgICAgICAgIDogPFN0cmluZz5bZGVwbG95ZWRQYXJpc2hdOwoKICAgIGZpbmFsIHJhd1JvbGUgPQogICAgICAgICcke3Jvd1sncm9sZSddID8/IHJvd1sncmVxdWVzdGVkX3JvbGUnXSA/PyAnJ30nLnRyaW0oKTsKICAgIGZpbmFsIHJvbGUgPSByYXdSb2xlLmlzRW1wdHkgPyAnc2l0ZV9zdXBlcnZpc29yJyA6IHJhd1JvbGU7CgogICAgZmluYWwgcmVnaXN0cmF0aW9uU3RhdHVzID0KICAgICAgICAnJHtyb3dbJ3JlZ2lzdHJhdGlvbl9zdGF0dXMnXSA/PyAnJ30nLnRyaW0oKS50b0xvd2VyQ2FzZSgpOwoKICAgIGZpbmFsIGFwcHJvdmVkID0gcm93LmNvbnRhaW5zS2V5KCdhcHByb3ZlZCcpCiAgICAgICAgPyByb3dbJ2FwcHJvdmVkJ10gPT0gdHJ1ZSAmJgogICAgICAgICAgICByb3dbJ2FjdGl2ZSddID09IHRydWUgJiYKICAgICAgICAgICAgKHJlZ2lzdHJhdGlvblN0YXR1cy5pc0VtcHR5IHx8CiAgICAgICAgICAgICAgICByZWdpc3RyYXRpb25TdGF0dXMgPT0gJ2FwcHJvdmVkJykKICAgICAgICA6IHJvd1snYWN0aXZlJ10gPT0gdHJ1ZTsKCiAgICByZXR1cm4gQmFja2VuZFByb2ZpbGUoCiAgICAgIHVzZXJJZDogdXNlci5pZCwKICAgICAgZW1haWw6IHVzZXIuZW1haWwgPz8gJycsCiAgICAgIGZ1bGxOYW1lOiAnJHtyb3dbJ2Z1bGxfbmFtZSddID8/IHVzZXIuZW1haWwgPz8gJ1JDIFNPVyB1c2VyJ30nLAogICAgICByb2xlOiByb2xlLAogICAgICBhc3NpZ25lZFBhcmlzaGVzOiBwYXJpc2hlcywKICAgICAgYXBwcm92ZWQ6IGFwcHJvdmVkLAogICAgKTsKICB9IiIiCiAgICBzID0gcmVwbGFjZV9iZXR3ZWVuKAogICAgICAgIHMsIG1ldGhvZF9zdGFydCwgbWV0aG9kX2VuZCwgY3VycmVudF9wcm9maWxlLAogICAgICAgIHN0YXJ0X2F0PWNscywgbGFiZWw9J1N1cGFiYXNlIGN1cnJlbnRQcm9maWxlJwogICAgKQogICAgcC53cml0ZV90ZXh0KHMpCiAgICBwcmludCgn4pyTIFN1cGFiYXNlIHByb2ZpbGUgYWRhcHRlciByZXBhaXJlZCcpCmVsc2U6CiAgICBwcmludCgn4pyTIFN1cGFiYXNlIHByb2ZpbGUgYWRhcHRlciBhbHJlYWR5IHJlcGFpcmVkJykKCiMgMikgQXBwIGF1dGggc3RhdGUg4oCUIGRpc3Rpbmd1aXNoIHNpZ25lZC1vdXQgZnJvbSBzaWduZWQtaW4vcGVuZGluZyBhcHByb3ZhbC4KcCA9IFBhdGgoJ2xpYi9jb3JlL2FwcF9zdGF0ZS5kYXJ0JykKcyA9IHAucmVhZF90ZXh0KCkKCmlmICcgIGJvb2wgcGVuZGluZ0FwcHJvdmFsID0gZmFsc2U7JyBub3QgaW4gczoKICAgIG1hcmtlciA9ICcgIGJvb2wgYXV0aGVudGljYXRlZCA9IGZhbHNlO1xuJwogICAgaWYgbWFya2VyIG5vdCBpbiBzOgogICAgICAgIHJhaXNlIFN5c3RlbUV4aXQoJ2F1dGhlbnRpY2F0ZWQgZmllbGQgbm90IGZvdW5kJykKICAgIHMgPSBzLnJlcGxhY2UobWFya2VyLCBtYXJrZXIgKyAnICBib29sIHBlbmRpbmdBcHByb3ZhbCA9IGZhbHNlO1xuJywgMSkKCmlmICdwZW5kaW5nQXBwcm92YWwgPSAhcHJvZmlsZS5hcHByb3ZlZDsnIG5vdCBpbiBzOgogICAgYm9vdHN0cmFwID0gciIiIiAgRnV0dXJlPHZvaWQ+IGJvb3RzdHJhcFNlc3Npb24oKSBhc3luYyB7CiAgICBpZiAoIWJhY2tlbmQuY29ubmVjdGVkKSByZXR1cm47CgogICAgdHJ5IHsKICAgICAgZmluYWwgcHJvZmlsZSA9IGF3YWl0IGJhY2tlbmQuY3VycmVudFByb2ZpbGUoKTsKCiAgICAgIGlmIChwcm9maWxlID09IG51bGwpIHsKICAgICAgICBhdXRoZW50aWNhdGVkID0gZmFsc2U7CiAgICAgICAgcGVuZGluZ0FwcHJvdmFsID0gZmFsc2U7CiAgICAgICAgc3luY0NvbmRpdGlvbiA9IFN5bmNDb25kaXRpb24uc3luY2VkOwogICAgICAgIG5vdGlmeUxpc3RlbmVycygpOwogICAgICAgIHJldHVybjsKICAgICAgfQoKICAgICAgcm9sZSA9IF9kaXNwbGF5Um9sZShwcm9maWxlLnJvbGUpOwogICAgICBpZiAocHJvZmlsZS5hc3NpZ25lZFBhcmlzaGVzLmlzTm90RW1wdHkpIHsKICAgICAgICBzZWxlY3RlZFBhcmlzaCA9IHByb2ZpbGUuYXNzaWduZWRQYXJpc2hlcy5maXJzdDsKICAgICAgfQoKICAgICAgYXV0aGVudGljYXRlZCA9IHByb2ZpbGUuYXBwcm92ZWQ7CiAgICAgIHBlbmRpbmdBcHByb3ZhbCA9ICFwcm9maWxlLmFwcHJvdmVkOwogICAgICBzeW5jQ29uZGl0aW9uID0gU3luY0NvbmRpdGlvbi5zeW5jZWQ7CiAgICAgIG5vdGlmeUxpc3RlbmVycygpOwogICAgfSBjYXRjaCAoXykgewogICAgICBhdXRoZW50aWNhdGVkID0gZmFsc2U7CiAgICAgIHBlbmRpbmdBcHByb3ZhbCA9IGZhbHNlOwogICAgICBzeW5jQ29uZGl0aW9uID0gU3luY0NvbmRpdGlvbi5mYWlsZWQ7CiAgICAgIG5vdGlmeUxpc3RlbmVycygpOwogICAgfQogIH0iIiIKICAgIHMgPSByZXBsYWNlX2JldHdlZW4oCiAgICAgICAgcywKICAgICAgICAnICBGdXR1cmU8dm9pZD4gYm9vdHN0cmFwU2Vzc2lvbigpIGFzeW5jIHsnLAogICAgICAgICdcblxuICBGdXR1cmU8Ym9vbD4gcmVxdWVzdFNlY3VyZUVtYWlsU2lnbkluKCcsCiAgICAgICAgYm9vdHN0cmFwLAogICAgICAgIGxhYmVsPSdib290c3RyYXBTZXNzaW9uJywKICAgICkKICAgIHByaW50KCfinJMgYm9vdHN0cmFwU2Vzc2lvbiByZXBhaXJlZCcpCmVsc2U6CiAgICBwcmludCgn4pyTIGJvb3RzdHJhcFNlc3Npb24gYWxyZWFkeSByZXBhaXJlZCcpCgpsb2dpbiA9IHIiIiIgIHZvaWQgbG9naW4oe3JlcXVpcmVkIFN0cmluZyBzZWxlY3RlZFJvbGV9KSB7CiAgICBhdXRoZW50aWNhdGVkID0gdHJ1ZTsKICAgIHBlbmRpbmdBcHByb3ZhbCA9IGZhbHNlOwogICAgcm9sZSA9IHNlbGVjdGVkUm9sZTsKICAgIG5vdGlmeUxpc3RlbmVycygpOwogIH0iIiIKcyA9IHJlcGxhY2VfYmV0d2VlbigKICAgIHMsCiAgICAnICB2b2lkIGxvZ2luKHtyZXF1aXJlZCBTdHJpbmcgc2VsZWN0ZWRSb2xlfSkgeycsCiAgICAnXG5cbiAgdm9pZCBsb2dvdXQoKSB7JywKICAgIGxvZ2luLAogICAgbGFiZWw9J2xvZ2luJywKKQoKbG9nb3V0ID0gciIiIiAgdm9pZCBsb2dvdXQoKSB7CiAgICB1bmF3YWl0ZWQoYmFja2VuZC5zaWduT3V0KCkpOwogICAgYXV0aGVudGljYXRlZCA9IGZhbHNlOwogICAgcGVuZGluZ0FwcHJvdmFsID0gZmFsc2U7CiAgICBub3RpZnlMaXN0ZW5lcnMoKTsKICB9IiIiCnMgPSByZXBsYWNlX2JldHdlZW4oCiAgICBzLAogICAgJyAgdm9pZCBsb2dvdXQoKSB7JywKICAgICdcblxuICB2b2lkIHNlbGVjdEhvdXNlKFN0cmluZyBjb2RlKSB7JywKICAgIGxvZ291dCwKICAgIGxhYmVsPSdsb2dvdXQnLAopCnAud3JpdGVfdGV4dChzKQpwcmludCgn4pyTIGxvZ2luL2xvZ291dCBwZW5kaW5nIHN0YXRlIHJlcGFpcmVkJykKCiMgMykgTG9naW4gc2NyZWVuIOKAlCByZW5kZXIgYSBwZW5kaW5nLWFjY2VzcyBzdGF0ZSBpbnN0ZWFkIG9mIGFwcGVhcmluZyB0byBmYWlsIE9BdXRoLgpwID0gUGF0aCgnbGliL3NjcmVlbnMvYXV0aF9zY3JlZW5zLmRhcnQnKQpzID0gcC5yZWFkX3RleHQoKQoKaWYgIidBY2Nlc3MgYXdhaXRpbmcgYXBwcm92YWwnIiBub3QgaW4gczoKICAgIGNscyA9IHMuZmluZCgnY2xhc3MgX0xvZ2luU2NyZWVuU3RhdGUgZXh0ZW5kcyBTdGF0ZTxMb2dpblNjcmVlbj4geycpCiAgICBpZiBjbHMgPCAwOgogICAgICAgIHJhaXNlIFN5c3RlbUV4aXQoJ19Mb2dpblNjcmVlblN0YXRlIGNsYXNzIG5vdCBmb3VuZCcpCgogICAgb2xkX3ByZWZpeCA9ICIiIiAgQG92ZXJyaWRlCiAgV2lkZ2V0IGJ1aWxkKEJ1aWxkQ29udGV4dCBjb250ZXh0KSB7CiAgICBmaW5hbCBjb2xvclNjaGVtZSA9IFRoZW1lLm9mKGNvbnRleHQpLmNvbG9yU2NoZW1lOwogICAgcmV0dXJuIFNjYWZmb2xkKCIiIgogICAgcHJlZml4X2F0ID0gcy5maW5kKG9sZF9wcmVmaXgsIGNscykKICAgIGlmIHByZWZpeF9hdCA8IDA6CiAgICAgICAgcmFpc2UgU3lzdGVtRXhpdCgnTG9naW5TY3JlZW4gYnVpbGQgcHJlZml4IG5vdCBmb3VuZCcpCgogICAgbmV3X3ByZWZpeCA9IHIiIiIgIEBvdmVycmlkZQogIFdpZGdldCBidWlsZChCdWlsZENvbnRleHQgY29udGV4dCkgewogICAgZmluYWwgc3RhdGUgPSBBcHBTY29wZS5vZihjb250ZXh0KTsKICAgIGZpbmFsIGNvbG9yU2NoZW1lID0gVGhlbWUub2YoY29udGV4dCkuY29sb3JTY2hlbWU7CgogICAgaWYgKHN0YXRlLnBlbmRpbmdBcHByb3ZhbCkgewogICAgICByZXR1cm4gU2NhZmZvbGQoCiAgICAgICAgYm9keTogU2FmZUFyZWEoCiAgICAgICAgICBjaGlsZDogQ2VudGVyKAogICAgICAgICAgICBjaGlsZDogU2luZ2xlQ2hpbGRTY3JvbGxWaWV3KAogICAgICAgICAgICAgIHBhZGRpbmc6IGNvbnN0IEVkZ2VJbnNldHMuYWxsKDI0KSwKICAgICAgICAgICAgICBjaGlsZDogQ29uc3RyYWluZWRCb3goCiAgICAgICAgICAgICAgICBjb25zdHJhaW50czogY29uc3QgQm94Q29uc3RyYWludHMobWF4V2lkdGg6IDUyMCksCiAgICAgICAgICAgICAgICBjaGlsZDogQ2FyZCgKICAgICAgICAgICAgICAgICAgY2hpbGQ6IFBhZGRpbmcoCiAgICAgICAgICAgICAgICAgICAgcGFkZGluZzogY29uc3QgRWRnZUluc2V0cy5hbGwoMjgpLAogICAgICAgICAgICAgICAgICAgIGNoaWxkOiBDb2x1bW4oCiAgICAgICAgICAgICAgICAgICAgICBtYWluQXhpc1NpemU6IE1haW5BeGlzU2l6ZS5taW4sCiAgICAgICAgICAgICAgICAgICAgICBjaGlsZHJlbjogPFdpZGdldD5bCiAgICAgICAgICAgICAgICAgICAgICAgIEljb24oCiAgICAgICAgICAgICAgICAgICAgICAgICAgSWNvbnMudmVyaWZpZWRfdXNlcl9vdXRsaW5lZCwKICAgICAgICAgICAgICAgICAgICAgICAgICBzaXplOiA1OCwKICAgICAgICAgICAgICAgICAgICAgICAgICBjb2xvcjogY29sb3JTY2hlbWUucHJpbWFyeSwKICAgICAgICAgICAgICAgICAgICAgICAgKSwKICAgICAgICAgICAgICAgICAgICAgICAgY29uc3QgU2l6ZWRCb3goaGVpZ2h0OiAyMCksCiAgICAgICAgICAgICAgICAgICAgICAgIFRleHQoCiAgICAgICAgICAgICAgICAgICAgICAgICAgJ0FjY2VzcyBhd2FpdGluZyBhcHByb3ZhbCcsCiAgICAgICAgICAgICAgICAgICAgICAgICAgdGV4dEFsaWduOiBUZXh0QWxpZ24uY2VudGVyLAogICAgICAgICAgICAgICAgICAgICAgICAgIHN0eWxlOiBUaGVtZS5vZihjb250ZXh0KS50ZXh0VGhlbWUuaGVhZGxpbmVTbWFsbCwKICAgICAgICAgICAgICAgICAgICAgICAgKSwKICAgICAgICAgICAgICAgICAgICAgICAgY29uc3QgU2l6ZWRCb3goaGVpZ2h0OiAxMiksCiAgICAgICAgICAgICAgICAgICAgICAgIFRleHQoCiAgICAgICAgICAgICAgICAgICAgICAgICAgJ1lvdXIgc2VjdXJlIEdvb2dsZS9TdXBhYmFzZSBzZXNzaW9uIGlzIGFjdGl2ZS4gJwogICAgICAgICAgICAgICAgICAgICAgICAgICdPcGVyYXRpb25hbCBhY2Nlc3Mgd2lsbCBvcGVuIGFmdGVyIGFuIGF1dGhvcml6ZWQgJwogICAgICAgICAgICAgICAgICAgICAgICAgICdSQyBTT1cgYWRtaW5pc3RyYXRvciBhcHByb3ZlcyB0aGlzIGFjY291bnQuJywKICAgICAgICAgICAgICAgICAgICAgICAgICB0ZXh0QWxpZ246IFRleHRBbGlnbi5jZW50ZXIsCiAgICAgICAgICAgICAgICAgICAgICAgICAgc3R5bGU6IFRoZW1lLm9mKGNvbnRleHQpLnRleHRUaGVtZS5ib2R5TGFyZ2UsCiAgICAgICAgICAgICAgICAgICAgICAgICksCiAgICAgICAgICAgICAgICAgICAgICAgIGNvbnN0IFNpemVkQm94KGhlaWdodDogMjQpLAogICAgICAgICAgICAgICAgICAgICAgICBGaWxsZWRCdXR0b24uaWNvbigKICAgICAgICAgICAgICAgICAgICAgICAgICBvblByZXNzZWQ6IF9idXN5CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgID8gbnVsbAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICA6ICgpIGFzeW5jIHsKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHNldFN0YXRlKCgpID0+IF9idXN5ID0gdHJ1ZSk7CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBhd2FpdCBzdGF0ZS5ib290c3RyYXBTZXNzaW9uKCk7CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBpZiAoIWNvbnRleHQubW91bnRlZCkgcmV0dXJuOwoKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIGlmIChzdGF0ZS5hdXRoZW50aWNhdGVkKSB7CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIE5hdmlnYXRvci5wdXNoTmFtZWRBbmRSZW1vdmVVbnRpbCgKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBjb250ZXh0LAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIFJjUm91dGVzLmhvbWUsCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgKF8pID0+IGZhbHNlLAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICApOwogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICByZXR1cm47CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICB9CgogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgc2V0U3RhdGUoKCkgPT4gX2J1c3kgPSBmYWxzZSk7CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBTY2FmZm9sZE1lc3Nlbmdlci5vZihjb250ZXh0KS5zaG93U25hY2tCYXIoCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIGNvbnN0IFNuYWNrQmFyKAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIGNvbnRlbnQ6IFRleHQoCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAnQWNjZXNzIGlzIHN0aWxsIGF3YWl0aW5nIGFkbWluaXN0cmF0b3IgYXBwcm92YWwuJywKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICApLAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICApLAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgKTsKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICB9LAogICAgICAgICAgICAgICAgICAgICAgICAgIGljb246IF9idXN5CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgID8gY29uc3QgU2l6ZWRCb3guc3F1YXJlKAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgZGltZW5zaW9uOiAxOCwKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIGNoaWxkOiBDaXJjdWxhclByb2dyZXNzSW5kaWNhdG9yKAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBzdHJva2VXaWR0aDogMi40LAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgKSwKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICApCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIDogY29uc3QgSWNvbihJY29ucy5yZWZyZXNoKSwKICAgICAgICAgICAgICAgICAgICAgICAgICBsYWJlbDogY29uc3QgVGV4dCgnQ0hFQ0sgQUNDRVNTJyksCiAgICAgICAgICAgICAgICAgICAgICAgICksCiAgICAgICAgICAgICAgICAgICAgICAgIGNvbnN0IFNpemVkQm94KGhlaWdodDogOCksCiAgICAgICAgICAgICAgICAgICAgICAgIFRleHRCdXR0b24uaWNvbigKICAgICAgICAgICAgICAgICAgICAgICAgICBvblByZXNzZWQ6IF9idXN5ID8gbnVsbCA6IHN0YXRlLmxvZ291dCwKICAgICAgICAgICAgICAgICAgICAgICAgICBpY29uOiBjb25zdCBJY29uKEljb25zLmxvZ291dCksCiAgICAgICAgICAgICAgICAgICAgICAgICAgbGFiZWw6IGNvbnN0IFRleHQoJ1NJR04gT1VUJyksCiAgICAgICAgICAgICAgICAgICAgICAgICksCiAgICAgICAgICAgICAgICAgICAgICBdLAogICAgICAgICAgICAgICAgICAgICksCiAgICAgICAgICAgICAgICAgICksCiAgICAgICAgICAgICAgICApLAogICAgICAgICAgICAgICksCiAgICAgICAgICAgICksCiAgICAgICAgICApLAogICAgICAgICksCiAgICAgICk7CiAgICB9CgogICAgcmV0dXJuIFNjYWZmb2xkKCIiIgogICAgcyA9IHNbOnByZWZpeF9hdF0gKyBuZXdfcHJlZml4ICsgc1twcmVmaXhfYXQgKyBsZW4ob2xkX3ByZWZpeCk6XQogICAgcC53cml0ZV90ZXh0KHMpCiAgICBwcmludCgn4pyTIHBlbmRpbmctYXBwcm92YWwgVUkgYWRkZWQnKQplbHNlOgogICAgcHJpbnQoJ+KckyBwZW5kaW5nLWFwcHJvdmFsIFVJIGFscmVhZHkgcHJlc2VudCcpCgojIEhhcmQgYXNzZXJ0aW9ucyBiZWZvcmUgYW55IGNvbW1pdC4KYmFja2VuZCA9IFBhdGgoJ2xpYi9zZXJ2aWNlcy9wcm9kdWN0aW9uX2JhY2tlbmQuZGFydCcpLnJlYWRfdGV4dCgpCnN0YXRlID0gUGF0aCgnbGliL2NvcmUvYXBwX3N0YXRlLmRhcnQnKS5yZWFkX3RleHQoKQphdXRoID0gUGF0aCgnbGliL3NjcmVlbnMvYXV0aF9zY3JlZW5zLmRhcnQnKS5yZWFkX3RleHQoKQoKY2hlY2tzID0gewogICAgJ1N1cGFiYXNlUHJvZHVjdGlvbkJhY2tlbmQgcHJlc2VydmVkJzogJ2NsYXNzIFN1cGFiYXNlUHJvZHVjdGlvbkJhY2tlbmQnIGluIGJhY2tlbmQsCiAgICAnZGVwbG95ZWQgdXNlcl9pZCBhZGFwdGVyJzogIi5lcSgndXNlcl9pZCcsIHVzZXIuaWQpIiBpbiBiYWNrZW5kLAogICAgJ21pZ3JhdGlvbiBpZCBmYWxsYmFjayc6ICIuZXEoJ2lkJywgdXNlci5pZCkiIGluIGJhY2tlbmQsCiAgICAnYXBwcm92YWwgc3RhdGUgY2hlY2tlZCc6ICJyb3dbJ2FwcHJvdmVkJ10gPT0gdHJ1ZSIgaW4gYmFja2VuZCwKICAgICdwZW5kaW5nIGZpZWxkJzogJ2Jvb2wgcGVuZGluZ0FwcHJvdmFsID0gZmFsc2U7JyBpbiBzdGF0ZSwKICAgICdwZW5kaW5nIGJvb3RzdHJhcCc6ICdwZW5kaW5nQXBwcm92YWwgPSAhcHJvZmlsZS5hcHByb3ZlZDsnIGluIHN0YXRlLAogICAgJ3BlbmRpbmcgVUknOiAiJ0FjY2VzcyBhd2FpdGluZyBhcHByb3ZhbCciIGluIGF1dGgsCiAgICAnY2hlY2sgYWNjZXNzIGFjdGlvbic6ICInQ0hFQ0sgQUNDRVNTJyIgaW4gYXV0aCwKfQpmb3IgbGFiZWwsIG9rIGluIGNoZWNrcy5pdGVtcygpOgogICAgcHJpbnQoKCfinJMnIGlmIG9rIGVsc2UgJ+KclycpLCBsYWJlbCkKICAgIGlmIG5vdCBvazoKICAgICAgICByYWlzZSBTeXN0ZW1FeGl0KGYnQXV0aCByZXBhaXIgYXNzZXJ0aW9uIGZhaWxlZDoge2xhYmVsfScpCg=='
+        run: |
+          printf '%s' "$REPAIR_B64" | base64 --decode > /tmp/rc_sow_auth_repair.py
+          python3 /tmp/rc_sow_auth_repair.py
+
+      - name: Format and verify patch
+        run: |
+          dart format \
+            lib/services/production_backend.dart \
+            lib/core/app_state.dart \
+            lib/screens/auth_screens.dart
+          git diff --check
+          mapfile -t changed < <(git diff --name-only)
+          printf 'Changed files:\n%s\n' "${changed[*]}"
+          for file in "${changed[@]}"; do
+            case "$file" in
+              lib/services/production_backend.dart|lib/core/app_state.dart|lib/screens/auth_screens.dart)
+                ;;
+              *)
+                echo "Unexpected repair change: $file"
+                exit 1
+                ;;
+            esac
+          done
+
+      - name: Analyze repaired source
+        run: flutter analyze
+
+      - name: Targeted auth/navigation tests
+        run: |
+          flutter test \
+            test/app_state_test.dart \
+            test/all_routes_render_test.dart \
+            test/navigation_journeys_test.dart
+
+      - name: Commit repaired source
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add \
+            lib/services/production_backend.dart \
+            lib/core/app_state.dart \
+            lib/screens/auth_screens.dart
+
+          if git diff --cached --quiet; then
+            echo "Auth source already repaired."
+          else
+            git commit -m "fix: stop Supabase authentication login loop"
+            git fetch origin "$RC_BRANCH"
+            if ! git merge-base --is-ancestor "origin/$RC_BRANCH" HEAD; then
+              git rebase "origin/$RC_BRANCH"
+            fi
+            git push origin "HEAD:$RC_BRANCH"
+          fi
+
+          echo "Repaired branch head:"
+          git rev-parse HEAD
+
+  preflight:
+    name: preflight
+    needs: repair
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: rc-sow-connected-v20.1.0
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+      - name: Generate platform scaffolding
+        run: flutter create --platforms=android,web --project-name=rc_sow_connected --org=org.jamaicaredcross .
+      - name: Resolve dependencies
+        run: flutter pub get
+      - name: Format check
+        run: dart format --output=none --set-exit-if-changed lib test
+      - name: Analyze
+        run: flutter analyze
+
+  core-tests:
+    name: core-tests
+    needs: repair
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: rc-sow-connected-v20.1.0
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+      - name: Generate platform scaffolding
+        run: flutter create --platforms=android,web --project-name=rc_sow_connected --org=org.jamaicaredcross .
+      - name: Resolve dependencies
+        run: flutter pub get
+      - name: Run core and navigation tests
+        shell: bash
+        run: |
+          mapfile -t test_files < <(
+            find test -maxdepth 1 -name '*_test.dart' ! -name 'all_interactions_test.dart' -print | sort
+          )
+          printf 'Running %s non-interaction test files\n' "${#test_files[@]}"
+          flutter test "${test_files[@]}"
+
+  interaction-tests:
+    name: interaction-shard-${{ matrix.shard }}
+    needs: repair
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [0, 1, 2, 3, 4, 5]
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: rc-sow-connected-v20.1.0
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+      - name: Generate platform scaffolding
+        run: flutter create --platforms=android,web --project-name=rc_sow_connected --org=org.jamaicaredcross .
+      - name: Resolve dependencies
+        run: flutter pub get
+      - name: Run interaction shard
+        run: >
+          flutter test test/all_interactions_test.dart
+          --dart-define=INTERACTION_SHARD_INDEX=${{ matrix.shard }}
+          --dart-define=INTERACTION_SHARD_COUNT=6
+
+  build-web:
+    name: build-web
+    needs: repair
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: rc-sow-connected-v20.1.0
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+      - name: Generate web scaffolding
+        run: flutter create --platforms=web --project-name=rc_sow_connected --org=org.jamaicaredcross .
+      - name: Resolve dependencies
+        run: flutter pub get
+      - name: Build web
+        run: flutter build web --release
+      - uses: actions/upload-artifact@v7
+        with:
+          name: RC-SOW-v20.1.0-AuthFixed-Web
+          path: build/web
+          if-no-files-found: error
+          retention-days: 30
+
+  build-android-apk:
+    name: build-android-apk
+    needs: repair
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: rc-sow-connected-v20.1.0
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+      - name: Generate Android scaffolding
+        run: flutter create --platforms=android --project-name=rc_sow_connected --org=org.jamaicaredcross .
+      - name: Resolve dependencies
+        run: flutter pub get
+      - name: Build Android APK
+        run: flutter build apk --release
+      - uses: actions/upload-artifact@v7
+        with:
+          name: RC-SOW-v20.1.0-AuthFixed-Android-APK
+          path: build/app/outputs/flutter-apk/app-release.apk
+          if-no-files-found: error
+          retention-days: 30
+
+  build-android-aab:
+    name: build-android-aab
+    needs: repair
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: rc-sow-connected-v20.1.0
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+      - name: Generate Android scaffolding
+        run: flutter create --platforms=android --project-name=rc_sow_connected --org=org.jamaicaredcross .
+      - name: Resolve dependencies
+        run: flutter pub get
+      - name: Build Android AAB
+        run: flutter build appbundle --release
+      - uses: actions/upload-artifact@v7
+        with:
+          name: RC-SOW-v20.1.0-AuthFixed-Android-AAB
+          path: build/app/outputs/bundle/release/app-release.aab
+          if-no-files-found: error
+          retention-days: 30
+
+  package-source:
+    name: package-fixed-source
+    needs: repair
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: rc-sow-connected-v20.1.0
+          fetch-depth: 0
+      - name: Package fixed source
+        run: |
+          git archive \
+            --format=zip \
+            --output=RC_SOW_v20.1.0_AUTH_FIXED_SOURCE.zip \
+            HEAD
+      - uses: actions/upload-artifact@v7
+        with:
+          name: RC-SOW-v20.1.0-AuthFixed-Source
+          path: RC_SOW_v20.1.0_AUTH_FIXED_SOURCE.zip
+          if-no-files-found: error
+          retention-days: 30
+
+  verify:
+    name: verify
+    if: always()
+    needs:
+      - repair
+      - preflight
+      - core-tests
+      - interaction-tests
+      - build-web
+      - build-android-apk
+      - build-android-aab
+      - package-source
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - name: Enforce auth-fixed green gate
+        env:
+          REPAIR: ${{ needs.repair.result }}
+          PREFLIGHT: ${{ needs.preflight.result }}
+          CORE: ${{ needs.core-tests.result }}
+          INTERACTIONS: ${{ needs.interaction-tests.result }}
+          WEB: ${{ needs.build-web.result }}
+          APK: ${{ needs.build-android-apk.result }}
+          AAB: ${{ needs.build-android-aab.result }}
+          SOURCE: ${{ needs.package-source.result }}
+        run: |
+          for result in \
+            "$REPAIR" "$PREFLIGHT" "$CORE" "$INTERACTIONS" \
+            "$WEB" "$APK" "$AAB" "$SOURCE"; do
+            test "$result" = "success"
+          done
+          echo "RC SOW v20.1 auth-fixed GitHub gate passed."

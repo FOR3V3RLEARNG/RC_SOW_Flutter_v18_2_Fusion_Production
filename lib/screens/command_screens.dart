@@ -25,7 +25,7 @@ class _ConstructionScheduleScreenState
         .where((house) => _phase == null || house.phase == _phase)
         .toList();
     return Scaffold(
-      appBar: AppBar(
+      appBar: RcAppBar(
         title: const Text('Construction Schedule'),
         actions: <Widget>[
           IconButton(
@@ -255,9 +255,9 @@ class _LiveBriefingScreenState extends State<LiveBriefingScreen> {
 
   static const _agenda = <String>[
     'Safety moment and attendance',
-    'H12 zinc shortage and transfer ETA',
-    'H2 close-out evidence review',
-    'Crew allocation for tomorrow',
+    'Priority production blockers',
+    'Close-out and evidence review',
+    'Crew allocation and next actions',
   ];
 
   @override
@@ -271,7 +271,7 @@ class _LiveBriefingScreenState extends State<LiveBriefingScreen> {
     final state = AppScope.of(context);
     final house = state.selectedHouse;
     return Scaffold(
-      appBar: AppBar(title: const Text('Live Team Briefing')),
+      appBar: RcAppBar(title: const Text('Live Team Briefing')),
       body: Column(
         children: <Widget>[
           const RcSyncBanner(),
@@ -447,7 +447,7 @@ class ProductionCommandScreen extends StatelessWidget {
         .where((item) => item.delivered + item.additions < item.boq)
         .toList();
     return Scaffold(
-      appBar: AppBar(
+      appBar: RcAppBar(
         title: const Text('Production Command'),
         actions: <Widget>[
           IconButton(
@@ -625,7 +625,7 @@ class FinanceCommandScreen extends StatelessWidget {
         .where((house) => house.phase == LifecyclePhase.finance)
         .toList();
     return Scaffold(
-      appBar: AppBar(title: const Text('Finance Command')),
+      appBar: RcAppBar(title: const Text('Finance Command')),
       body: Column(
         children: <Widget>[
           const RcSyncBanner(),
@@ -807,7 +807,7 @@ class HqCommandScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final state = AppScope.of(context);
     return Scaffold(
-      appBar: AppBar(title: const Text('HQ Command Centre')),
+      appBar: RcAppBar(title: const Text('HQ Command Centre')),
       body: Column(
         children: <Widget>[
           const RcSyncBanner(),
@@ -958,7 +958,7 @@ class InstitutionalReportScreen extends StatelessWidget {
     final state = AppScope.of(context);
     final complete = state.houses.where((house) => house.progress >= 1).length;
     return Scaffold(
-      appBar: AppBar(title: const Text('Institutional Report')),
+      appBar: RcAppBar(title: const Text('Institutional Report')),
       body: Column(
         children: <Widget>[
           const RcSyncBanner(),
@@ -1127,7 +1127,7 @@ class AdminCommandScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final state = AppScope.of(context);
     return Scaffold(
-      appBar: AppBar(title: const Text('Administration Command')),
+      appBar: RcAppBar(title: const Text('Administration Command')),
       body: Column(
         children: <Widget>[
           const RcSyncBanner(),
@@ -1282,7 +1282,7 @@ class ApprovalQueueScreen extends StatelessWidget {
         .toList();
     final total = transfers.length + closeOut.length + finance.length;
     return Scaffold(
-      appBar: AppBar(title: const Text('Connected Approval Queue')),
+      appBar: RcAppBar(title: const Text('Connected Approval Queue')),
       body: Column(
         children: <Widget>[
           const RcSyncBanner(),

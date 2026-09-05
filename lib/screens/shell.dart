@@ -104,6 +104,11 @@ class _AppShellState extends State<AppShell> {
               ),
             ),
             IconButton(
+              tooltip: 'Messages',
+              onPressed: () => Navigator.pushNamed(context, RcRoutes.messages),
+              icon: const Icon(Icons.chat_bubble_outline),
+            ),
+            IconButton(
               tooltip: 'Notifications',
               onPressed: () =>
                   Navigator.pushNamed(context, RcRoutes.notifications),
@@ -112,13 +117,11 @@ class _AppShellState extends State<AppShell> {
                 count: state.unreadNotifications,
               ),
             ),
-            if (wide)
-              IconButton(
-                tooltip: 'Settings',
-                onPressed: () =>
-                    Navigator.pushNamed(context, RcRoutes.settings),
-                icon: const Icon(Icons.settings_outlined),
-              ),
+            IconButton(
+              tooltip: 'Settings',
+              onPressed: () => Navigator.pushNamed(context, RcRoutes.settings),
+              icon: const Icon(Icons.settings_outlined),
+            ),
             const SizedBox(width: 6),
           ],
         );
@@ -136,6 +139,11 @@ class _AppShellState extends State<AppShell> {
           return Scaffold(
             appBar: appBar,
             body: content,
+            floatingActionButton: _FieldCommsDock(
+              onlineCount: state.team.where((person) => person.online).length,
+            ),
+            floatingActionButtonLocation:
+                FloatingActionButtonLocation.endFloat,
             bottomNavigationBar: NavigationBar(
               selectedIndex: _index,
               destinations: _destinations,
@@ -233,6 +241,34 @@ class _CountedIcon extends StatelessWidget {
   }
 }
 
+class _FieldCommsDock extends StatelessWidget {
+  const _FieldCommsDock({required this.onlineCount});
+
+  final int onlineCount;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.end,
+      children: <Widget>[
+        ActionChip(
+          avatar: const Icon(Icons.circle, size: 10, color: RcColors.success),
+          label: Text('$onlineCount users online'),
+          onPressed: () => Navigator.pushNamed(context, RcRoutes.usersOnline),
+        ),
+        const SizedBox(height: 8),
+        FloatingActionButton.small(
+          heroTag: 'field-comms',
+          tooltip: 'Open field communications',
+          onPressed: () => Navigator.pushNamed(context, RcRoutes.messages),
+          child: const Icon(Icons.chat_bubble_outline),
+        ),
+      ],
+    );
+  }
+}
+
 class DashboardScreen extends StatelessWidget {
   const DashboardScreen({required this.onDestination, super.key});
 
@@ -241,6 +277,13 @@ class DashboardScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final state = AppScope.of(context);
+    final colorScheme = Theme.of(context).colorScheme;
+    final dark = Theme.of(context).brightness == Brightness.dark;
+    final completedHouses =
+        state.houses.where((house) => house.progress >= 1).length;
+    final closureRatio = state.houses.isEmpty
+        ? 0.0
+        : completedHouses / state.houses.length;
     return SingleChildScrollView(
       padding: const EdgeInsets.fromLTRB(16, 18, 16, 32),
       child: Center(
@@ -255,57 +298,85 @@ class DashboardScreen extends StatelessWidget {
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
                     colors: <Color>[
-                      Theme.of(context).colorScheme.primaryContainer,
-                      Theme.of(context).colorScheme.surface,
+                      colorScheme.primaryContainer,
+                      dark
+                          ? Color.alphaBlend(
+                              RcColors.sunshine.withOpacity(.18),
+                              colorScheme.surface,
+                            )
+                          : RcColors.sunshineSoft,
                     ],
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                   ),
-                  borderRadius: BorderRadius.circular(28),
+                  borderRadius: const BorderRadius.only(
+                    topLeft: Radius.circular(38),
+                    topRight: Radius.circular(22),
+                    bottomLeft: Radius.circular(22),
+                    bottomRight: Radius.circular(38),
+                  ),
                   border: Border.all(
                     color:
                         Theme.of(context).colorScheme.primary.withOpacity(.15),
                   ),
                 ),
-                child: Wrap(
-                  alignment: WrapAlignment.spaceBetween,
-                  crossAxisAlignment: WrapCrossAlignment.center,
-                  runSpacing: 18,
-                  children: <Widget>[
-                    ConstrainedBox(
-                      constraints: const BoxConstraints(maxWidth: 650),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                child: LayoutBuilder(
+                  builder: (context, constraints) {
+                    final copy = Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        const RcStatusChip(
+                          label: 'LIVE PRODUCTION',
+                          icon: Icons.bolt,
+                          tone: RcStatusTone.brand,
+                        ),
+                        const SizedBox(height: 16),
+                        Text(
+                          'From assessment to paid completion',
+                          style: Theme.of(context).textTheme.headlineLarge,
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          '${state.activeHouses} active houses • ${state.attentionHouses} need attention. Keep approvals, field evidence, materials, completion and payment connected.',
+                          style:
+                              Theme.of(context).textTheme.bodyLarge?.copyWith(
+                                    color: colorScheme.onSurfaceVariant,
+                                  ),
+                        ),
+                        const SizedBox(height: 18),
+                        FilledButton.icon(
+                          onPressed: () => onDestination(2),
+                          icon: const Icon(Icons.construction_outlined),
+                          label: const Text('OPEN PRODUCTION CONTROL'),
+                        ),
+                      ],
+                    );
+                    final progress = _DashboardProgressOrb(
+                      value: closureRatio,
+                      complete: completedHouses,
+                      total: state.houses.length,
+                    );
+                    if (constraints.maxWidth < 720) {
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: <Widget>[
-                          const RcStatusChip(
-                            label: 'LIVE PRODUCTION',
-                            icon: Icons.bolt,
-                            tone: RcStatusTone.brand,
-                          ),
-                          const SizedBox(height: 16),
-                          Text(
-                            'From assessment to paid completion',
-                            style: Theme.of(context).textTheme.headlineLarge,
-                          ),
-                          const SizedBox(height: 8),
-                          Text(
-                            '${state.activeHouses} active houses • ${state.attentionHouses} need attention. Keep approvals, field evidence, materials, completion and payment connected.',
-                            style:
-                                Theme.of(context).textTheme.bodyLarge?.copyWith(
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .onSurfaceVariant,
-                                    ),
+                          copy,
+                          const SizedBox(height: 18),
+                          Align(
+                            alignment: Alignment.centerRight,
+                            child: progress,
                           ),
                         ],
-                      ),
-                    ),
-                    FilledButton.icon(
-                      onPressed: () => onDestination(2),
-                      icon: const Icon(Icons.construction_outlined),
-                      label: const Text('OPEN PRODUCTION CONTROL'),
-                    ),
-                  ],
+                      );
+                    }
+                    return Row(
+                      children: <Widget>[
+                        Expanded(child: copy),
+                        const SizedBox(width: 28),
+                        progress,
+                      ],
+                    );
+                  },
                 ),
               ),
               const SizedBox(height: 18),
@@ -338,6 +409,14 @@ class DashboardScreen extends StatelessWidget {
                         Navigator.pushNamed(context, RcRoutes.workLogs),
                   ),
                   ActionChip(
+                    avatar: const Icon(Icons.space_dashboard_outlined, size: 18),
+                    label: const Text('Production board'),
+                    onPressed: () => Navigator.pushNamed(
+                      context,
+                      RcRoutes.productionBoard,
+                    ),
+                  ),
+                  ActionChip(
                     avatar: const Icon(Icons.swap_horiz_outlined, size: 18),
                     label: Text('Transfers (${state.pendingTransfers})'),
                     onPressed: () =>
@@ -365,8 +444,8 @@ class DashboardScreen extends StatelessWidget {
               ),
               const SizedBox(height: 12),
               RcResponsiveGrid(
-                minItemWidth: 190,
-                childAspectRatio: 1.25,
+                minItemWidth: 160,
+                childAspectRatio: 1.05,
                 children: <Widget>[
                   RcMetricTile(
                     label: 'Active houses',
@@ -457,6 +536,70 @@ class DashboardScreen extends StatelessWidget {
   }
 }
 
+class _DashboardProgressOrb extends StatelessWidget {
+  const _DashboardProgressOrb({
+    required this.value,
+    required this.complete,
+    required this.total,
+  });
+
+  final double value;
+  final int complete;
+  final int total;
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final reducedMotion = AppScope.of(context).reducedMotion;
+    return Semantics(
+      label: '$complete of $total houses complete',
+      child: TweenAnimationBuilder<double>(
+        tween: Tween<double>(begin: 0, end: value),
+        duration: Duration(milliseconds: reducedMotion ? 0 : 750),
+        curve: Curves.easeOutCubic,
+        builder: (context, animatedValue, _) {
+          return SizedBox(
+            width: 116,
+            height: 116,
+            child: Stack(
+              alignment: Alignment.center,
+              children: <Widget>[
+                SizedBox.expand(
+                  child: CircularProgressIndicator(
+                    value: animatedValue.clamp(0, 1).toDouble(),
+                    strokeWidth: 11,
+                    strokeCap: StrokeCap.round,
+                    color: colorScheme.primary,
+                    backgroundColor: colorScheme.primary.withOpacity(.14),
+                  ),
+                ),
+                Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: <Widget>[
+                    Text(
+                      '${(animatedValue * 100).round()}%',
+                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                            color: colorScheme.primary,
+                            fontWeight: FontWeight.w900,
+                          ),
+                    ),
+                    Text(
+                      'closed',
+                      style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                            color: colorScheme.onSurfaceVariant,
+                          ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          );
+        },
+      ),
+    );
+  }
+}
+
 class ControlOfWorksScreen extends StatefulWidget {
   const ControlOfWorksScreen({super.key});
 
@@ -470,6 +613,8 @@ class _ControlOfWorksScreenState extends State<ControlOfWorksScreen> {
   @override
   Widget build(BuildContext context) {
     final state = AppScope.of(context);
+    final colorScheme = Theme.of(context).colorScheme;
+    final dark = Theme.of(context).brightness == Brightness.dark;
     final modulesById = <String, ControlModuleDefinition>{
       for (final module in ControlModules.all) module.id: module,
     };
@@ -497,6 +642,37 @@ class _ControlOfWorksScreenState extends State<ControlOfWorksScreen> {
                 description:
                     'Plan, deliver, inspect, close and pay while preserving a complete evidence trail.',
               ),
+              const SizedBox(height: 14),
+              RcSectionHeader(
+                title: 'House close-out',
+                subtitle: '${state.selectedHouseCode} • completion and finance stay one tap away',
+              ),
+              const SizedBox(height: 8),
+              Row(
+                children: <Widget>[
+                  Expanded(
+                    child: _PinnedControlAction(
+                      title: 'Completion',
+                      subtitle: 'Inspection • sign-off',
+                      icon: Icons.task_alt_outlined,
+                      onTap: state.houses.isEmpty
+                          ? null
+                          : () => Navigator.pushNamed(context, RcRoutes.completion),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: _PinnedControlAction(
+                      title: 'Payment',
+                      subtitle: '46 / 31 / 23',
+                      icon: Icons.payments_outlined,
+                      onTap: state.houses.isEmpty
+                          ? null
+                          : () => Navigator.pushNamed(context, RcRoutes.payment),
+                    ),
+                  ),
+                ],
+              ),
               const SizedBox(height: 16),
               Wrap(
                 spacing: 8,
@@ -521,8 +697,25 @@ class _ControlOfWorksScreenState extends State<ControlOfWorksScreen> {
                 Container(
                   padding: const EdgeInsets.all(20),
                   decoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.primaryContainer,
-                    borderRadius: BorderRadius.circular(26),
+                    gradient: LinearGradient(
+                      colors: <Color>[
+                        colorScheme.primaryContainer,
+                        dark
+                            ? Color.alphaBlend(
+                                RcColors.sunshine.withOpacity(.18),
+                                colorScheme.surface,
+                              )
+                            : RcColors.sunshineSoft,
+                      ],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+                    borderRadius: const BorderRadius.only(
+                      topLeft: Radius.circular(34),
+                      topRight: Radius.circular(20),
+                      bottomLeft: Radius.circular(20),
+                      bottomRight: Radius.circular(34),
+                    ),
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -545,8 +738,8 @@ class _ControlOfWorksScreenState extends State<ControlOfWorksScreen> {
               ],
               if (state.controlShowInsights) ...<Widget>[
                 RcResponsiveGrid(
-                  minItemWidth: 190,
-                  childAspectRatio: 1.35,
+                  minItemWidth: 160,
+                  childAspectRatio: 1.05,
                   children: <Widget>[
                     RcMetricTile(
                       label: 'Open production',
@@ -648,8 +841,8 @@ class _ControlOfWorksScreenState extends State<ControlOfWorksScreen> {
                       ),
                     ),
                     RcResponsiveGrid(
-                      minItemWidth: compact ? 260 : 320,
-                      childAspectRatio: compact ? 2.05 : 1.65,
+                      minItemWidth: compact ? 190 : 250,
+                      childAspectRatio: compact ? 1.75 : 1.25,
                       children: modules
                           .where((module) => module.phase == phase)
                           .map(
@@ -664,8 +857,8 @@ class _ControlOfWorksScreenState extends State<ControlOfWorksScreen> {
                   ]
               else
                 RcResponsiveGrid(
-                  minItemWidth: compact ? 260 : 320,
-                  childAspectRatio: compact ? 2.05 : 1.65,
+                  minItemWidth: compact ? 190 : 250,
+                  childAspectRatio: compact ? 1.75 : 1.25,
                   children: modules
                       .map(
                         (module) => _ControlModuleCard(
@@ -683,6 +876,72 @@ class _ControlOfWorksScreenState extends State<ControlOfWorksScreen> {
   }
 }
 
+class _PinnedControlAction extends StatelessWidget {
+  const _PinnedControlAction({
+    required this.title,
+    required this.subtitle,
+    required this.icon,
+    required this.onTap,
+  });
+
+  final String title;
+  final String subtitle;
+  final IconData icon;
+  final VoidCallback? onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      margin: EdgeInsets.zero,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(18),
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 11),
+          child: Row(
+            children: <Widget>[
+              Container(
+                width: 34,
+                height: 34,
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.primaryContainer,
+                  borderRadius: BorderRadius.circular(11),
+                ),
+                child: Icon(
+                  icon,
+                  size: 19,
+                  color: Theme.of(context).colorScheme.primary,
+                ),
+              ),
+              const SizedBox(width: 9),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Text(
+                      title,
+                      style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                            fontWeight: FontWeight.w900,
+                          ),
+                    ),
+                    Text(
+                      subtitle,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: Theme.of(context).textTheme.labelSmall,
+                    ),
+                  ],
+                ),
+              ),
+              const Icon(Icons.chevron_right, size: 18),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 class _ControlModuleCard extends StatelessWidget {
   const _ControlModuleCard({required this.module, required this.compact});
 
@@ -691,12 +950,20 @@ class _ControlModuleCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final moduleColor = switch (module.phase) {
+      LifecyclePhase.scope => RcColors.brand,
+      LifecyclePhase.plan => RcColors.plum,
+      LifecyclePhase.delivery => RcColors.info,
+      LifecyclePhase.quality => RcColors.mint,
+      LifecyclePhase.closeOut => RcColors.success,
+      LifecyclePhase.finance => RcColors.sunshine,
+    };
     return Card(
       clipBehavior: Clip.antiAlias,
       child: InkWell(
         onTap: () => Navigator.pushNamed(context, module.route),
         child: Padding(
-          padding: const EdgeInsets.all(17),
+          padding: const EdgeInsets.all(16),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
@@ -704,12 +971,17 @@ class _ControlModuleCard extends StatelessWidget {
                 width: 46,
                 height: 46,
                 decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.primaryContainer,
-                  borderRadius: BorderRadius.circular(14),
+                  color: moduleColor.withOpacity(.13),
+                  borderRadius: const BorderRadius.only(
+                    topLeft: Radius.circular(18),
+                    topRight: Radius.circular(10),
+                    bottomLeft: Radius.circular(10),
+                    bottomRight: Radius.circular(18),
+                  ),
                 ),
                 child: Icon(
                   module.icon,
-                  color: Theme.of(context).colorScheme.primary,
+                  color: moduleColor,
                 ),
               ),
               const SizedBox(width: 13),
@@ -852,11 +1124,35 @@ class _HousesScreenState extends State<HousesScreen> {
                   minItemWidth: 300,
                   childAspectRatio: 1.48,
                   children: houses.map((house) {
+                    final evidence = state.evidence
+                        .where((item) => item.houseCode == house.code)
+                        .toList();
+                    String? photoUri;
+                    for (final item in evidence) {
+                      if (item.uri != null && item.uri!.isNotEmpty) {
+                        photoUri = item.uri;
+                        break;
+                      }
+                    }
+                    void select() => state.selectHouse(house.code);
                     return RcHouseCard(
                       house: house,
+                      photoUri: photoUri,
                       onOpen: () {
-                        state.selectHouse(house.code);
+                        select();
                         Navigator.pushNamed(context, RcRoutes.houseCommand);
+                      },
+                      onScope: () {
+                        select();
+                        Navigator.pushNamed(context, RcRoutes.scopeHouse);
+                      },
+                      onControl: () {
+                        select();
+                        Navigator.pushNamed(context, RcRoutes.houseCommand);
+                      },
+                      onCrew: () {
+                        select();
+                        Navigator.pushNamed(context, RcRoutes.teamResources);
                       },
                     );
                   }).toList(),
@@ -872,143 +1168,243 @@ class _HousesScreenState extends State<HousesScreen> {
 class MoreScreen extends StatelessWidget {
   const MoreScreen({super.key});
 
+  void _openSettingsPopup(BuildContext context) {
+    showModalBottomSheet<void>(
+      context: context,
+      showDragHandle: true,
+      useSafeArea: true,
+      builder: (sheetContext) {
+        return Padding(
+          padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              const ListTile(
+                leading: Icon(Icons.tune_outlined),
+                title: Text('Quick settings'),
+                subtitle: Text('Keep field controls close without a long settings page.'),
+              ),
+              ListTile(
+                leading: const Icon(Icons.settings_outlined),
+                title: const Text('All settings'),
+                trailing: const Icon(Icons.chevron_right),
+                onTap: () {
+                  Navigator.pop(sheetContext);
+                  Navigator.pushNamed(context, RcRoutes.settings);
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.sync_outlined),
+                title: const Text('Offline & sync'),
+                trailing: const Icon(Icons.chevron_right),
+                onTap: () {
+                  Navigator.pop(sheetContext);
+                  Navigator.pushNamed(context, RcRoutes.syncMonitor);
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.dashboard_customize_outlined),
+                title: const Text('Control layout'),
+                trailing: const Icon(Icons.chevron_right),
+                onTap: () {
+                  Navigator.pop(sheetContext);
+                  Navigator.pushNamed(context, RcRoutes.controlLayout);
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.admin_panel_settings_outlined),
+                title: const Text('Users & access'),
+                trailing: const Icon(Icons.chevron_right),
+                onTap: () {
+                  Navigator.pop(sheetContext);
+                  Navigator.pushNamed(context, RcRoutes.adminUsers);
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final state = AppScope.of(context);
-    final groups = <_MoreGroup>[
-      const _MoreGroup('Field operations', <_MoreItem>[
-        _MoreItem('Work Logs', Icons.edit_note_outlined, RcRoutes.workLogs),
-        _MoreItem(
-          'Transfer Management',
-          Icons.swap_horiz_outlined,
-          RcRoutes.transfers,
-        ),
-        _MoreItem(
-          'Construction Schedule',
-          Icons.event_available_outlined,
-          RcRoutes.schedule,
-        ),
-        _MoreItem(
-          'Live Team Briefing',
-          Icons.video_camera_front_outlined,
-          RcRoutes.liveBriefing,
-        ),
-        _MoreItem(
-          'Inventory Tracker',
-          Icons.inventory_2_outlined,
-          RcRoutes.inventory,
-        ),
-        _MoreItem(
-          'Evidence Viewer',
-          Icons.photo_library_outlined,
-          RcRoutes.evidence,
-        ),
-        _MoreItem(
-          'Operational Map',
-          Icons.map_outlined,
-          RcRoutes.operationalMap,
-        ),
-      ]),
-      const _MoreGroup('Communication', <_MoreItem>[
-        _MoreItem('Messages', Icons.forum_outlined, RcRoutes.messages),
-        _MoreItem(
-          'Notifications',
-          Icons.notifications_outlined,
-          RcRoutes.notifications,
-        ),
-        _MoreItem('Users Online', Icons.group_outlined, RcRoutes.usersOnline),
-        _MoreItem('Gmail', Icons.mail_outline, RcRoutes.gmail),
-      ]),
-      const _MoreGroup('Team and community', <_MoreItem>[
-        _MoreItem(
-          'Team Excellence Community',
-          Icons.diversity_3_outlined,
-          RcRoutes.teamCommunity,
-        ),
-        _MoreItem(
-          'Team Performance',
-          Icons.insights_outlined,
-          RcRoutes.teamPerformance,
-        ),
-        _MoreItem(
-          'Team Resource Manager',
-          Icons.groups_2_outlined,
-          RcRoutes.teamResources,
-        ),
-        _MoreItem(
-          'Promotion Routing',
-          Icons.military_tech_outlined,
-          RcRoutes.promotionRouting,
-        ),
-      ]),
-      const _MoreGroup('Command and review', <_MoreItem>[
-        _MoreItem(
-          'Production Command',
-          Icons.precision_manufacturing_outlined,
-          RcRoutes.productionCommand,
-        ),
-        _MoreItem(
-          'Finance Command',
-          Icons.account_balance_wallet_outlined,
-          RcRoutes.financeCommand,
-        ),
-        _MoreItem(
-          'Connected Approval Queue',
-          Icons.approval_outlined,
-          RcRoutes.approvalQueue,
-        ),
-        _MoreItem(
-          'HQ Command Centre',
-          Icons.account_balance_outlined,
-          RcRoutes.hqCommand,
-        ),
-        _MoreItem(
-          'Institutional Report',
-          Icons.summarize_outlined,
-          RcRoutes.institutionalReport,
-        ),
-        _MoreItem(
-          'Production Analytics',
-          Icons.analytics_outlined,
-          RcRoutes.analytics,
-        ),
-        _MoreItem('Activity History', Icons.history, RcRoutes.activity),
-      ]),
-      const _MoreGroup('Administration', <_MoreItem>[
-        _MoreItem(
-          'Administration Command',
-          Icons.settings_suggest_outlined,
-          RcRoutes.adminCommand,
-        ),
-        _MoreItem(
-          'Control Layout',
-          Icons.dashboard_customize_outlined,
-          RcRoutes.controlLayout,
-        ),
-        _MoreItem(
-          'Transfer Logic',
-          Icons.alt_route_outlined,
-          RcRoutes.transferAutomation,
-        ),
-        _MoreItem(
-          'Awards & Incentives',
-          Icons.workspace_premium_outlined,
-          RcRoutes.awardsIncentives,
-        ),
-        _MoreItem(
-          'User Access',
-          Icons.admin_panel_settings_outlined,
-          RcRoutes.adminUsers,
-        ),
-        _MoreItem(
-          'Templates',
-          Icons.dashboard_customize_outlined,
-          RcRoutes.adminTemplates,
-        ),
-      ]),
+    final items = <_MoreItem>[
+      const _MoreItem(
+        'Work Logs',
+        Icons.edit_note_outlined,
+        RcRoutes.workLogs,
+      ),
+      const _MoreItem(
+        'Work Projection Log',
+        Icons.calendar_view_week_outlined,
+        RcRoutes.workProjections,
+      ),
+      const _MoreItem(
+        'Production Command Board',
+        Icons.dashboard_outlined,
+        RcRoutes.productionBoard,
+      ),
+      const _MoreItem(
+        'Transfer Management',
+        Icons.swap_horiz_outlined,
+        RcRoutes.transfers,
+      ),
+      const _MoreItem(
+        'Construction Schedule',
+        Icons.event_available_outlined,
+        RcRoutes.schedule,
+      ),
+      const _MoreItem(
+        'Live Team Briefing',
+        Icons.groups_outlined,
+        RcRoutes.liveBriefing,
+      ),
+      const _MoreItem(
+        'Inventory Tracker',
+        Icons.inventory_2_outlined,
+        RcRoutes.inventory,
+      ),
+      const _MoreItem(
+        'Parish / House Stock Transfer',
+        Icons.compare_arrows_outlined,
+        RcRoutes.inventoryTransfer,
+      ),
+      const _MoreItem(
+        'Evidence Viewer',
+        Icons.photo_library_outlined,
+        RcRoutes.evidence,
+      ),
+      const _MoreItem(
+        'Operational Map',
+        Icons.map_outlined,
+        RcRoutes.operationalMap,
+      ),
+      const _MoreItem(
+        'Messages',
+        Icons.forum_outlined,
+        RcRoutes.messages,
+      ),
+      const _MoreItem(
+        'Notifications',
+        Icons.notifications_outlined,
+        RcRoutes.notifications,
+      ),
+      const _MoreItem(
+        'Users Online',
+        Icons.people_outline,
+        RcRoutes.usersOnline,
+      ),
+      const _MoreItem(
+        'Gmail',
+        Icons.mail_outline,
+        RcRoutes.gmail,
+      ),
+      const _MoreItem(
+        'Team Excellence Community',
+        Icons.groups_2_outlined,
+        RcRoutes.teamCommunity,
+      ),
+      const _MoreItem(
+        'Team Performance',
+        Icons.analytics_outlined,
+        RcRoutes.teamPerformance,
+      ),
+      const _MoreItem(
+        'Team Resource Manager',
+        Icons.group_work_outlined,
+        RcRoutes.teamResources,
+      ),
+      const _MoreItem(
+        'Promotion Routing',
+        Icons.trending_up_outlined,
+        RcRoutes.promotionRouting,
+      ),
+      const _MoreItem(
+        'Production Command',
+        Icons.precision_manufacturing_outlined,
+        RcRoutes.productionCommand,
+      ),
+      const _MoreItem(
+        'Finance Command',
+        Icons.account_balance_wallet_outlined,
+        RcRoutes.financeCommand,
+      ),
+      const _MoreItem(
+        'Connected Approval Queue',
+        Icons.approval_outlined,
+        RcRoutes.approvalQueue,
+      ),
+      const _MoreItem(
+        'HQ Command Centre',
+        Icons.business_outlined,
+        RcRoutes.hqCommand,
+      ),
+      const _MoreItem(
+        'Institutional Report',
+        Icons.assessment_outlined,
+        RcRoutes.institutionalReport,
+      ),
+      const _MoreItem(
+        'Production Analytics',
+        Icons.query_stats_outlined,
+        RcRoutes.analytics,
+      ),
+      const _MoreItem(
+        'Activity History',
+        Icons.history,
+        RcRoutes.activity,
+      ),
+      const _MoreItem(
+        'Administration Command',
+        Icons.admin_panel_settings_outlined,
+        RcRoutes.adminCommand,
+      ),
+      const _MoreItem(
+        'Offline Sync Monitor',
+        Icons.sync_outlined,
+        RcRoutes.syncMonitor,
+      ),
+      const _MoreItem(
+        'Image & Legacy Import',
+        Icons.upload_file_outlined,
+        RcRoutes.scopeImport,
+      ),
+      const _MoreItem(
+        'Control Layout',
+        Icons.dashboard_customize_outlined,
+        RcRoutes.controlLayout,
+      ),
+      const _MoreItem(
+        'Transfer Logic',
+        Icons.alt_route_outlined,
+        RcRoutes.transferAutomation,
+      ),
+      const _MoreItem(
+        'Awards & Incentives',
+        Icons.emoji_events_outlined,
+        RcRoutes.awardsIncentives,
+      ),
+      const _MoreItem(
+        'User Access',
+        Icons.manage_accounts_outlined,
+        RcRoutes.adminUsers,
+      ),
+      const _MoreItem(
+        'Templates',
+        Icons.description_outlined,
+        RcRoutes.adminTemplates,
+      ),
+      const _MoreItem(
+        'SETTINGS & ACCESSIBILITY',
+        Icons.settings_outlined,
+        RcRoutes.settings,
+      ),
     ];
+
     return SingleChildScrollView(
-      padding: const EdgeInsets.fromLTRB(16, 20, 16, 32),
+      padding: const EdgeInsets.fromLTRB(16, 18, 16, 32),
       child: Center(
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 900),
@@ -1019,43 +1415,47 @@ class MoreScreen extends StatelessWidget {
                 eyebrow: state.role,
                 title: 'More operations',
                 description:
-                    'Collaboration, review, administration and account controls.',
-              ),
-              const SizedBox(height: 20),
-              for (final group in groups) ...<Widget>[
-                RcSectionHeader(title: group.title),
-                const SizedBox(height: 10),
-                Card(
-                  child: Column(
-                    children: group.items.map((item) {
-                      return Material(
-                        color: Colors.transparent,
-                        child: ListTile(
-                          minLeadingWidth: 34,
-                          leading: Icon(
-                            item.icon,
-                            color: Theme.of(context).colorScheme.primary,
-                          ),
-                          title: Text(
-                            item.label,
-                            style: const TextStyle(
-                              fontWeight: FontWeight.w700,
-                            ),
-                          ),
-                          trailing: const Icon(Icons.chevron_right),
-                          onTap: () => Navigator.pushNamed(context, item.route),
-                        ),
-                      );
-                    }).toList(),
-                  ),
+                    'A compact operations menu for communication, maps, logistics and administration.',
+                action: IconButton.filledTonal(
+                  tooltip: 'Quick settings',
+                  onPressed: () => _openSettingsPopup(context),
+                  icon: const Icon(Icons.settings_outlined),
                 ),
-                const SizedBox(height: 22),
-              ],
-              FilledButton.tonalIcon(
-                onPressed: () =>
-                    Navigator.pushNamed(context, RcRoutes.settings),
-                icon: const Icon(Icons.settings_outlined),
-                label: const Text('SETTINGS & ACCESSIBILITY'),
+              ),
+              const SizedBox(height: 18),
+              RcResponsiveGrid(
+                minItemWidth: 125,
+                childAspectRatio: 1.12,
+                children: items.map((item) {
+                  return Card(
+                    margin: EdgeInsets.zero,
+                    child: InkWell(
+                      borderRadius: BorderRadius.circular(18),
+                      onTap: () => Navigator.pushNamed(context, item.route),
+                      child: Padding(
+                        padding: const EdgeInsets.all(12),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: <Widget>[
+                            Icon(
+                              item.icon,
+                              color: Theme.of(context).colorScheme.primary,
+                            ),
+                            const Spacer(),
+                            Text(
+                              item.label,
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                              style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                                    fontWeight: FontWeight.w900,
+                                  ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  );
+                }).toList(),
               ),
             ],
           ),
@@ -1063,12 +1463,6 @@ class MoreScreen extends StatelessWidget {
       ),
     );
   }
-}
-
-class _MoreGroup {
-  const _MoreGroup(this.title, this.items);
-  final String title;
-  final List<_MoreItem> items;
 }
 
 class _MoreItem {

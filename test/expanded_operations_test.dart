@@ -82,7 +82,7 @@ void main() {
     expect(state.controlShowInsights, isFalse);
 
     state.resetControlLayout();
-    expect(state.controlTileOrder.first, 'work-plan');
+    expect(state.controlTileOrder.first, 'production-board');
     expect(state.hiddenControlTiles, isEmpty);
     expect(state.controlGrouping, 'Lifecycle');
     expect(state.controlDensity, 'Comfortable');

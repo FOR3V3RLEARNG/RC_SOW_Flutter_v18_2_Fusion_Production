@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 
 import '../core/app_state.dart';
 import '../core/models.dart';
+import '../core/production_models.dart';
 import '../core/routes.dart';
 import '../core/theme.dart';
 import '../core/widgets.dart';
@@ -21,14 +22,9 @@ class HouseCommandScreen extends StatelessWidget {
         .toList();
     final documents = state.completedDocuments[house.code]?.length ?? 0;
     return Scaffold(
-      appBar: AppBar(
+      appBar: RcAppBar(
         title: Text('${house.code} • House Command'),
         actions: <Widget>[
-          IconButton(
-            tooltip: 'Messages',
-            onPressed: () => Navigator.pushNamed(context, RcRoutes.messages),
-            icon: const Icon(Icons.forum_outlined),
-          ),
           IconButton(
             tooltip: 'Activity',
             onPressed: () => Navigator.pushNamed(context, RcRoutes.activity),
@@ -204,52 +200,153 @@ class HouseCommandScreen extends StatelessWidget {
                         ),
                         const SizedBox(height: 24),
                         RcSectionHeader(
-                          title: 'Operational modules',
+                          title: '${house.code} records',
                           subtitle:
-                              'Actions remain connected to ${house.code}.',
+                              'Every tile belongs to this house and opens its input form or working record.',
                         ),
                         const SizedBox(height: 10),
-                        Card(
-                          child: Column(
-                            children: <Widget>[
-                              _CommandTile(
-                                icon: Icons.architecture_outlined,
-                                title: 'Scope & roof drawing',
-                                subtitle:
-                                    '${house.roofType} • ${house.roofArea.toStringAsFixed(0)} sq ft',
-                                route: RcRoutes.scopeHouse,
-                              ),
-                              const Divider(height: 1),
-                              const _CommandTile(
-                                icon: Icons.event_note_outlined,
-                                title: 'Work Plan',
-                                subtitle: 'Schedule, crew and agreement',
-                                route: RcRoutes.workPlan,
-                              ),
-                              const Divider(height: 1),
-                              const _CommandTile(
-                                icon: Icons.location_on_outlined,
-                                title: 'Site Visits & Daily Logs',
-                                subtitle:
-                                    'Field monitoring and production progress',
-                                route: RcRoutes.siteVisits,
-                              ),
-                              const Divider(height: 1),
-                              const _CommandTile(
-                                icon: Icons.fact_check_outlined,
-                                title: 'Technical Quality',
-                                subtitle: 'Monitoring and final inspection',
-                                route: RcRoutes.monitoring,
-                              ),
-                              const Divider(height: 1),
-                              const _CommandTile(
+                        Row(
+                          children: <Widget>[
+                            Expanded(
+                              child: _HouseRecordTile(
+                                title: 'Completion',
+                                subtitle: 'Close-out',
                                 icon: Icons.task_alt_outlined,
-                                title: 'Close-out & Payment',
-                                subtitle: 'Completion readiness and finance',
                                 route: RcRoutes.completion,
+                                emphasized: true,
                               ),
-                            ],
-                          ),
+                            ),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: _HouseRecordTile(
+                                title: 'Payment',
+                                subtitle: 'Finance',
+                                icon: Icons.payments_outlined,
+                                route: RcRoutes.payment,
+                                emphasized: true,
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 16),
+                        const RcSectionHeader(
+                          title: 'Technical & scope',
+                          subtitle: 'Beneficiary, roof, quantities and document readiness.',
+                        ),
+                        const SizedBox(height: 8),
+                        RcResponsiveGrid(
+                          minItemWidth: 145,
+                          childAspectRatio: 1.25,
+                          children: const <Widget>[
+                            _HouseRecordTile(
+                              title: 'Beneficiary & Scope',
+                              subtitle: 'House input',
+                              icon: Icons.person_pin_circle_outlined,
+                              route: RcRoutes.scopeHouse,
+                            ),
+                            _HouseRecordTile(
+                              title: 'Roof Drawing',
+                              subtitle: 'Custom geometry',
+                              icon: Icons.architecture_outlined,
+                              route: RcRoutes.scopeRoof,
+                            ),
+                            _HouseRecordTile(
+                              title: 'BOQ',
+                              subtitle: 'Quantities',
+                              icon: Icons.calculate_outlined,
+                              route: RcRoutes.boq,
+                            ),
+                            _HouseRecordTile(
+                              title: 'Documents',
+                              subtitle: 'Readiness',
+                              icon: Icons.fact_check_outlined,
+                              route: RcRoutes.documentChecklist,
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 16),
+                        const RcSectionHeader(
+                          title: 'Delivery & crew',
+                          subtitle: 'Planning, visits, daily production, materials and house stock.',
+                        ),
+                        const SizedBox(height: 8),
+                        RcResponsiveGrid(
+                          minItemWidth: 145,
+                          childAspectRatio: 1.25,
+                          children: const <Widget>[
+                            _HouseRecordTile(
+                              title: 'Work Plan',
+                              subtitle: 'Plan & crew',
+                              icon: Icons.event_note_outlined,
+                              route: RcRoutes.workPlan,
+                            ),
+                            _HouseRecordTile(
+                              title: 'Site Visits',
+                              subtitle: 'Inspection',
+                              icon: Icons.location_on_outlined,
+                              route: RcRoutes.siteVisits,
+                            ),
+                            _HouseRecordTile(
+                              title: 'Daily Log',
+                              subtitle: 'Production',
+                              icon: Icons.menu_book_outlined,
+                              route: RcRoutes.dailyLog,
+                            ),
+                            _HouseRecordTile(
+                              title: 'Materials',
+                              subtitle: 'Request',
+                              icon: Icons.inventory_2_outlined,
+                              route: RcRoutes.materialRequest,
+                            ),
+                            _HouseRecordTile(
+                              title: 'Consumables',
+                              subtitle: 'Request',
+                              icon: Icons.handyman_outlined,
+                              route: RcRoutes.consumableRequest,
+                            ),
+                            _HouseRecordTile(
+                              title: 'Inventory',
+                              subtitle: 'House stock',
+                              icon: Icons.warehouse_outlined,
+                              route: RcRoutes.inventory,
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 16),
+                        const RcSectionHeader(
+                          title: 'Quality & evidence',
+                          subtitle: 'Monitoring, photo/file evidence, production hours and audit trail.',
+                        ),
+                        const SizedBox(height: 8),
+                        RcResponsiveGrid(
+                          minItemWidth: 145,
+                          childAspectRatio: 1.25,
+                          children: const <Widget>[
+                            _HouseRecordTile(
+                              title: 'Monitoring',
+                              subtitle: 'Quality',
+                              icon: Icons.rule_folder_outlined,
+                              route: RcRoutes.monitoring,
+                            ),
+                            _HouseRecordTile(
+                              title: 'Evidence',
+                              subtitle: 'Photos & files',
+                              icon: Icons.photo_library_outlined,
+                              route: RcRoutes.evidence,
+                            ),
+                            _HouseRecordTile(
+                              title: 'Work Logs',
+                              subtitle: 'Hours & work',
+                              icon: Icons.edit_note_outlined,
+                              route: RcRoutes.workLogs,
+                            ),
+                            _HouseRecordTile(
+                              title: 'Activity',
+                              subtitle: 'Audit trail',
+                              icon: Icons.history,
+                              route: RcRoutes.activity,
+                            ),
+                          ],
                         ),
                         const SizedBox(height: 24),
                         RcSectionHeader(
@@ -310,27 +407,70 @@ class HouseCommandScreen extends StatelessWidget {
   }
 }
 
-class _CommandTile extends StatelessWidget {
-  const _CommandTile({
-    required this.icon,
+class _HouseRecordTile extends StatelessWidget {
+  const _HouseRecordTile({
     required this.title,
     required this.subtitle,
+    required this.icon,
     required this.route,
+    this.emphasized = false,
   });
-  final IconData icon;
+
   final String title;
   final String subtitle;
+  final IconData icon;
   final String route;
+  final bool emphasized;
 
   @override
   Widget build(BuildContext context) {
-    return ListTile(
-      minVerticalPadding: 13,
-      leading: Icon(icon, color: Theme.of(context).colorScheme.primary),
-      title: Text(title, style: const TextStyle(fontWeight: FontWeight.w700)),
-      subtitle: Text(subtitle),
-      trailing: const Icon(Icons.chevron_right),
-      onTap: () => Navigator.pushNamed(context, route),
+    final scheme = Theme.of(context).colorScheme;
+    return Card(
+      margin: EdgeInsets.zero,
+      color: emphasized ? scheme.primaryContainer : null,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(18),
+        onTap: () => Navigator.pushNamed(context, route),
+        child: Padding(
+          padding: const EdgeInsets.all(12),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              Container(
+                width: 36,
+                height: 36,
+                decoration: BoxDecoration(
+                  color: emphasized
+                      ? scheme.primary.withOpacity(.12)
+                      : scheme.surfaceContainerHighest,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Icon(
+                  icon,
+                  size: 19,
+                  color: emphasized ? scheme.primary : scheme.onSurfaceVariant,
+                ),
+              ),
+              const SizedBox(height: 12),
+              Text(
+                title,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                      fontWeight: FontWeight.w900,
+                    ),
+              ),
+              const SizedBox(height: 2),
+              Text(
+                subtitle,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: Theme.of(context).textTheme.labelSmall,
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }
@@ -380,7 +520,7 @@ class _NewControlScreenState extends State<NewControlScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('New Control')),
+      appBar: RcAppBar(title: const Text('New Control')),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: <Widget>[
@@ -552,7 +692,7 @@ class SiteVisitsScreen extends StatelessWidget {
         )
         .toList();
     return Scaffold(
-      appBar: AppBar(title: const Text('Site Visits')),
+      appBar: RcAppBar(title: const Text('Site Visits')),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => Navigator.pushNamed(context, RcRoutes.siteVisitDetail),
         icon: const Icon(Icons.add_location_alt_outlined),
@@ -671,7 +811,7 @@ class _SiteVisitDetailScreenState extends State<SiteVisitDetailScreen> {
   Widget build(BuildContext context) {
     final house = AppScope.of(context).selectedHouse;
     return Scaffold(
-      appBar: AppBar(title: Text('${house.code} • Site Visit')),
+      appBar: RcAppBar(title: Text('${house.code} • Site Visit')),
       body: Form(
         key: _formKey,
         child: ListView(
@@ -930,19 +1070,32 @@ class _NumberStepper extends StatelessWidget {
   }
 }
 
-class InventoryScreen extends StatelessWidget {
+class InventoryScreen extends StatefulWidget {
   const InventoryScreen({super.key});
+
+  @override
+  State<InventoryScreen> createState() => _InventoryScreenState();
+}
+
+class _InventoryScreenState extends State<InventoryScreen> {
+  InventoryTier _tier = InventoryTier.parish;
 
   @override
   Widget build(BuildContext context) {
     final state = AppScope.of(context);
-    final shortages = state.inventory.where((item) => item.variance > 0).length;
-    final totalValue = state.inventory.fold<double>(
-      0,
-      (sum, item) => sum + item.delivered,
+    final ledger = state.inventoryFor(
+      tier: _tier,
+      parish: state.selectedParish,
+      houseCode:
+          _tier == InventoryTier.house ? state.selectedHouseCode : null,
     );
+    final shortages = ledger
+        .where((item) => item.health != InventoryHealth.healthy)
+        .length;
+    final totalValue =
+        ledger.fold<double>(0, (sum, item) => sum + item.stockValueJmd);
     return Scaffold(
-      appBar: AppBar(title: Text('${state.selectedParish} • Inventory')),
+      appBar: RcAppBar(title: Text('${state.selectedParish} • Inventory')),
       body: Column(
         children: <Widget>[
           const RcSyncBanner(),
@@ -960,46 +1113,114 @@ class InventoryScreen extends StatelessWidget {
                           eyebrow: '${state.selectedParish} / Logistics',
                           title: 'Live inventory',
                           description:
-                              'Reconcile BOQ, delivered quantities, additions, leftovers and storage direction.',
-                          action: FilledButton.icon(
-                            onPressed: () => Navigator.pushNamed(
-                              context,
-                              RcRoutes.addInventory,
-                            ),
-                            icon: const Icon(Icons.add),
-                            label: const Text('ADD RECORD'),
+                              'See each material at parish depot, cluster store and house level, then reconcile or transfer stock without losing the audit trail.',
+                          action: Wrap(
+                            spacing: 8,
+                            runSpacing: 8,
+                            alignment: WrapAlignment.end,
+                            children: <Widget>[
+                              OutlinedButton.icon(
+                                onPressed: () => Navigator.pushNamed(
+                                  context,
+                                  RcRoutes.inventoryTransfer,
+                                ),
+                                icon: const Icon(Icons.swap_horiz_outlined),
+                                label: const Text('TRANSFER'),
+                              ),
+                              FilledButton.icon(
+                                onPressed: () => Navigator.pushNamed(
+                                  context,
+                                  RcRoutes.addInventory,
+                                ),
+                                icon: const Icon(Icons.add),
+                                label: const Text('ADD RECORD'),
+                              ),
+                            ],
                           ),
                         ),
                         const SizedBox(height: 18),
                         RcResponsiveGrid(
-                          minItemWidth: 210,
-                          childAspectRatio: 1.3,
+                          minItemWidth: 160,
+                          childAspectRatio: 1.05,
                           children: <Widget>[
                             RcMetricTile(
                               label: 'Material lines',
-                              value: '${state.inventory.length}',
+                              value: '${ledger.length}',
                               icon: Icons.inventory_2_outlined,
                               color: RcColors.info,
                             ),
                             RcMetricTile(
-                              label: 'Shortage lines',
+                              label: 'Low / critical lines',
                               value: '$shortages',
                               icon: Icons.warning_amber_rounded,
                               color: RcColors.warning,
                             ),
                             RcMetricTile(
-                              label: 'Total delivered units',
-                              value: totalValue.toStringAsFixed(0),
-                              icon: Icons.local_shipping_outlined,
+                              label: 'Stock value',
+                              value: _compactJmd(totalValue),
+                              icon: Icons.account_balance_wallet_outlined,
                               color: RcColors.success,
                             ),
                           ],
                         ),
                         const SizedBox(height: 22),
+                        SingleChildScrollView(
+                          scrollDirection: Axis.horizontal,
+                          child: SegmentedButton<InventoryTier>(
+                            segments: InventoryTier.values
+                                .map(
+                                  (tier) => ButtonSegment<InventoryTier>(
+                                    value: tier,
+                                    icon: Icon(
+                                      switch (tier) {
+                                        InventoryTier.parish =>
+                                          Icons.warehouse_outlined,
+                                        InventoryTier.cluster =>
+                                          Icons.hub_outlined,
+                                        InventoryTier.house =>
+                                          Icons.home_work_outlined,
+                                      },
+                                    ),
+                                    label: Text(tier.label.toUpperCase()),
+                                  ),
+                                )
+                                .toList(),
+                            selected: <InventoryTier>{_tier},
+                            onSelectionChanged: (value) =>
+                                setState(() => _tier = value.first),
+                          ),
+                        ),
+                        const SizedBox(height: 20),
+                        RcSectionHeader(
+                          title: '${_tier.label} ledger',
+                          subtitle: _tier == InventoryTier.house
+                              ? '${state.selectedHouseCode} • received, consumed and remaining'
+                              : '${state.selectedParish} • live quantities and storage zones',
+                          trailing: RcStatusChip(
+                            label: '$shortages ATTENTION',
+                            tone: shortages > 0
+                                ? RcStatusTone.warning
+                                : RcStatusTone.success,
+                          ),
+                        ),
+                        const SizedBox(height: 10),
+                        if (ledger.isEmpty)
+                          const RcEmptyState(
+                            icon: Icons.inventory_2_outlined,
+                            title: 'No stock lines at this level',
+                            message:
+                                'Choose another inventory level or record the first allocation.',
+                          )
+                        else
+                          for (final item in ledger) ...<Widget>[
+                            _StockLedgerCard(item: item),
+                            const SizedBox(height: 10),
+                          ],
+                        const SizedBox(height: 14),
                         const RcSectionHeader(
                           title: 'Material catalog',
                           subtitle:
-                              'Hanover Central Depot + connected house stores',
+                              'House BOQ reconciliation retained for delivery audit',
                         ),
                         const SizedBox(height: 10),
                         for (final item in state.inventory) ...<Widget>[
@@ -1022,6 +1243,204 @@ class InventoryScreen extends StatelessWidget {
       ),
     );
   }
+}
+
+class _StockLedgerCard extends StatelessWidget {
+  const _StockLedgerCard({required this.item});
+
+  final StockLedgerItem item;
+
+  @override
+  Widget build(BuildContext context) {
+    final color = switch (item.health) {
+      InventoryHealth.healthy => RcColors.success,
+      InventoryHealth.low => RcColors.warning,
+      InventoryHealth.critical || InventoryHealth.outOfStock => RcColors.brand,
+    };
+    final tone = switch (item.health) {
+      InventoryHealth.healthy => RcStatusTone.success,
+      InventoryHealth.low => RcStatusTone.warning,
+      InventoryHealth.critical || InventoryHealth.outOfStock =>
+        RcStatusTone.error,
+    };
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(17),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Container(
+                  width: 48,
+                  height: 48,
+                  decoration: BoxDecoration(
+                    color: color.withOpacity(.12),
+                    borderRadius: const BorderRadius.only(
+                      topLeft: Radius.circular(18),
+                      topRight: Radius.circular(10),
+                      bottomLeft: Radius.circular(10),
+                      bottomRight: Radius.circular(18),
+                    ),
+                  ),
+                  child: Icon(Icons.inventory_2_outlined, color: color),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      Text(item.name,
+                          style: Theme.of(context).textTheme.titleMedium),
+                      const SizedBox(height: 3),
+                      Text(
+                        '${item.materialCode} • ${item.location}${item.zone.isEmpty ? '' : ' • ${item.zone}'}',
+                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .onSurfaceVariant,
+                            ),
+                      ),
+                    ],
+                  ),
+                ),
+                RcStatusChip(
+                  label: item.health.label.toUpperCase(),
+                  tone: tone,
+                  compact: true,
+                ),
+              ],
+            ),
+            const SizedBox(height: 15),
+            Wrap(
+              spacing: 22,
+              runSpacing: 10,
+              children: <Widget>[
+                _InventoryFact(
+                  label: 'On hand',
+                  value: item.onHand,
+                  unit: item.unit,
+                ),
+                _InventoryFact(
+                  label: 'Received',
+                  value: item.received,
+                  unit: item.unit,
+                ),
+                _InventoryFact(
+                  label: 'Issued / used',
+                  value: item.issued,
+                  unit: item.unit,
+                ),
+                _InventoryFact(
+                  label: 'Minimum',
+                  value: item.minimumStock,
+                  unit: item.unit,
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            Row(
+              children: <Widget>[
+                Icon(
+                  item.liveSynced
+                      ? Icons.cloud_done_outlined
+                      : Icons.cloud_off_outlined,
+                  size: 17,
+                  color: item.liveSynced ? RcColors.success : RcColors.warning,
+                ),
+                const SizedBox(width: 6),
+                Expanded(
+                  child: Text(
+                    item.liveSynced
+                        ? 'Live ledger synchronized'
+                        : 'Saved on device • waiting to sync',
+                    style: Theme.of(context).textTheme.labelMedium,
+                  ),
+                ),
+                TextButton.icon(
+                  onPressed: () => _editLedger(context),
+                  icon: const Icon(Icons.edit_outlined),
+                  label: const Text('RECONCILE'),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Future<void> _editLedger(BuildContext context) async {
+    final received =
+        TextEditingController(text: item.received.toStringAsFixed(0));
+    final issued = TextEditingController(text: item.issued.toStringAsFixed(0));
+    final adjustments =
+        TextEditingController(text: item.adjustments.toStringAsFixed(0));
+    final save = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: Text('Reconcile ${item.materialCode}'),
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              TextField(
+                controller: received,
+                keyboardType:
+                    const TextInputType.numberWithOptions(decimal: true),
+                decoration: const InputDecoration(labelText: 'Total received'),
+              ),
+              const SizedBox(height: 10),
+              TextField(
+                controller: issued,
+                keyboardType:
+                    const TextInputType.numberWithOptions(decimal: true),
+                decoration:
+                    const InputDecoration(labelText: 'Total issued / used'),
+              ),
+              const SizedBox(height: 10),
+              TextField(
+                controller: adjustments,
+                keyboardType:
+                    const TextInputType.numberWithOptions(decimal: true),
+                decoration:
+                    const InputDecoration(labelText: 'Stock adjustment'),
+              ),
+            ],
+          ),
+        ),
+        actions: <Widget>[
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext, false),
+            child: const Text('CANCEL'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(dialogContext, true),
+            child: const Text('SAVE'),
+          ),
+        ],
+      ),
+    );
+    if (save == true && context.mounted) {
+      AppScope.of(context).updateStockLedger(
+        id: item.id,
+        received: double.tryParse(received.text) ?? item.received,
+        issued: double.tryParse(issued.text) ?? item.issued,
+        adjustments: double.tryParse(adjustments.text) ?? item.adjustments,
+      );
+      showSavedMessage(context, submitted: false);
+    }
+    received.dispose();
+    issued.dispose();
+    adjustments.dispose();
+  }
+}
+
+String _compactJmd(double value) {
+  if (value >= 1000000) return 'JMD ${(value / 1000000).toStringAsFixed(1)}M';
+  if (value >= 1000) return 'JMD ${(value / 1000).toStringAsFixed(0)}K';
+  return 'JMD ${value.toStringAsFixed(0)}';
 }
 
 class _InventoryCard extends StatelessWidget {
@@ -1174,7 +1593,7 @@ class _InventoryEditScreenState extends State<InventoryEditScreen> {
   Widget build(BuildContext context) {
     final state = AppScope.of(context);
     return Scaffold(
-      appBar: AppBar(title: const Text('Inventory Record')),
+      appBar: RcAppBar(title: const Text('Inventory Record')),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: <Widget>[
@@ -1280,7 +1699,7 @@ class _CompletionScreenState extends State<CompletionScreen> {
         _representativeSigned &&
         house.evidenceReady;
     return Scaffold(
-      appBar: AppBar(title: Text('${house.code} • Notice of Completion')),
+      appBar: RcAppBar(title: Text('${house.code} • Notice of Completion')),
       body: ListView(
         padding: const EdgeInsets.fromLTRB(16, 18, 16, 110),
         children: <Widget>[
@@ -1302,8 +1721,8 @@ class _CompletionScreenState extends State<CompletionScreen> {
                   ),
                   const SizedBox(height: 18),
                   RcResponsiveGrid(
-                    minItemWidth: 190,
-                    childAspectRatio: 1.25,
+                    minItemWidth: 160,
+                    childAspectRatio: 1.05,
                     children: <Widget>[
                       RcMetricTile(
                         label: 'Evidence',
@@ -1517,7 +1936,7 @@ class _FinalInspectionScreenState extends State<FinalInspectionScreen> {
     final passed = _checks.values.where((value) => value).length;
     final complete = passed == _checks.length;
     return Scaffold(
-      appBar: AppBar(title: Text('${house.code} • Final Inspection')),
+      appBar: RcAppBar(title: Text('${house.code} • Final Inspection')),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: <Widget>[
@@ -1617,7 +2036,7 @@ class PaymentScreen extends StatelessWidget {
     final total = base + demolition + additional;
     final ready = house.progress >= .9 && house.evidenceReady;
     return Scaffold(
-      appBar: AppBar(title: Text('${house.code} • Payment')),
+      appBar: RcAppBar(title: Text('${house.code} • Payment')),
       body: ListView(
         padding: const EdgeInsets.fromLTRB(16, 18, 16, 32),
         children: <Widget>[
@@ -1933,7 +2352,7 @@ class EvidenceScreen extends StatelessWidget {
     final items =
         state.evidence.where((item) => item.houseCode == house.code).toList();
     return Scaffold(
-      appBar: AppBar(title: Text('${house.code} • Evidence Viewer')),
+      appBar: RcAppBar(title: Text('${house.code} • Evidence Viewer')),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: <Widget>[
@@ -2159,7 +2578,7 @@ class ActivityScreen extends StatelessWidget {
         .where((entry) => entry.houseCode == house.code)
         .toList();
     return Scaffold(
-      appBar: AppBar(title: Text('${house.code} • Activity History')),
+      appBar: RcAppBar(title: Text('${house.code} • Activity History')),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: <Widget>[
@@ -2282,9 +2701,15 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
         .where((item) => !_unreadOnly || !item.read)
         .toList();
     return Scaffold(
-      appBar: AppBar(
+      appBar: RcAppBar(
         title: const Text('Operational Notifications'),
         actions: <Widget>[
+          IconButton(
+            tooltip: 'Send notification',
+            onPressed: () =>
+                Navigator.pushNamed(context, RcRoutes.notificationCompose),
+            icon: const Icon(Icons.add_alert_outlined),
+          ),
           IconButton(
             tooltip: _unreadOnly ? 'Show all' : 'Unread only',
             onPressed: () => setState(() => _unreadOnly = !_unreadOnly),
@@ -2361,7 +2786,9 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                               ),
                             ),
                             subtitle: Text(
-                              '${item.detail}\n${_relativeTime(item.time)}',
+                              '${item.detail}\n'
+                              '${item.audiences.isEmpty ? '' : '${item.audiences.join(' • ')}\n'}'
+                              '${_relativeTime(item.time)}',
                             ),
                             isThreeLine: true,
                             trailing: RcStatusChip(
@@ -2402,7 +2829,7 @@ class UsersOnlineScreen extends StatelessWidget {
     final online = state.team.where((person) => person.online).toList();
     final offline = state.team.where((person) => !person.online).toList();
     return Scaffold(
-      appBar: AppBar(title: const Text('Users Online')),
+      appBar: RcAppBar(title: const Text('Users Online')),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: <Widget>[
@@ -2585,7 +3012,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
     final state = AppScope.of(context);
     final house = state.selectedHouse;
     return Scaffold(
-      appBar: AppBar(
+      appBar: RcAppBar(
         title: const Text('Operational Messages'),
         actions: <Widget>[
           IconButton(
@@ -2628,24 +3055,13 @@ class _MessagesScreenState extends State<MessagesScreen> {
               children: <Widget>[
                 for (final message in _sent.reversed)
                   _MessageBubble(text: message, mine: true, label: 'You • now'),
-                const _MessageBubble(
-                  text:
-                      'I can approve the zinc transfer once the updated material request is linked to H12.',
-                  mine: false,
-                  label: 'Maria Green • 18 min ago',
-                ),
-                const _MessageBubble(
-                  text:
-                      'Site progress is 64%. Twelve 14 ft zinc sheets are still needed to keep tomorrow’s work on schedule.',
-                  mine: true,
-                  label: 'You • 24 min ago',
-                ),
-                const _MessageBubble(
-                  text:
-                      'Please send the H12 delivery gap and latest site evidence.',
-                  mine: false,
-                  label: 'Maria Green • 31 min ago',
-                ),
+                if (_sent.isEmpty)
+                  const Padding(
+                    padding: EdgeInsets.symmetric(vertical: 24),
+                    child: Center(
+                      child: Text('No messages in this house thread yet.'),
+                    ),
+                  ),
               ],
             ),
           ),
@@ -2744,7 +3160,7 @@ class SettingsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final state = AppScope.of(context);
     return Scaffold(
-      appBar: AppBar(title: const Text('Settings')),
+      appBar: RcAppBar(title: const Text('Settings')),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: <Widget>[
@@ -2759,6 +3175,11 @@ class SettingsScreen extends StatelessWidget {
                     title: 'Settings & access',
                     description:
                         'Display, field resilience, accessibility and account controls.',
+                    action: const RcStatusChip(
+                      label: 'MATERIAL 3 • COMFORTABLE',
+                      icon: Icons.palette_outlined,
+                      tone: RcStatusTone.info,
+                    ),
                   ),
                   const SizedBox(height: 18),
                   const RcSectionHeader(title: 'Field experience'),
@@ -2828,15 +3249,64 @@ class SettingsScreen extends StatelessWidget {
                     child: Column(
                       children: <Widget>[
                         ListTile(
-                          leading: const CircleAvatar(child: Text('AB')),
-                          title: const Text(
-                            'Andre Brown',
-                            style: TextStyle(fontWeight: FontWeight.w700),
+                          leading: const CircleAvatar(child: Icon(Icons.person_outline)),
+                          title: Text(
+                            state.role,
+                            style: const TextStyle(fontWeight: FontWeight.w700),
                           ),
                           subtitle: Text(
                             '${state.role} • ${state.selectedParish}',
                           ),
                           trailing: const Icon(Icons.chevron_right),
+                          onTap: () => showModalBottomSheet<void>(
+                            context: context,
+                            showDragHandle: true,
+                            builder: (sheetContext) => SafeArea(
+                              child: Padding(
+                                padding:
+                                    const EdgeInsets.fromLTRB(20, 8, 20, 24),
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: <Widget>[
+                                    Text(
+                                      state.role,
+                                      style: Theme.of(sheetContext)
+                                          .textTheme
+                                          .headlineMedium,
+                                    ),
+                                    const SizedBox(height: 8),
+                                    Text('${state.role} • ${state.selectedParish}'),
+                                    const SizedBox(height: 16),
+                                    RcStatusChip(
+                                      label: state.backendConnectionLabel
+                                          .toUpperCase(),
+                                      icon: state.remoteConnected
+                                          ? Icons.cloud_done_outlined
+                                          : Icons.phone_android_outlined,
+                                      tone: state.remoteConnected
+                                          ? RcStatusTone.success
+                                          : RcStatusTone.info,
+                                    ),
+                                    const SizedBox(height: 18),
+                                    FilledButton.tonalIcon(
+                                      onPressed: () {
+                                        Navigator.pop(sheetContext);
+                                        Navigator.pushNamed(
+                                          context,
+                                          RcRoutes.adminUsers,
+                                        );
+                                      },
+                                      icon: const Icon(
+                                        Icons.manage_accounts_outlined,
+                                      ),
+                                      label: const Text('VIEW ACCESS PROFILE'),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
                         ),
                         ListTile(
                           leading: const Icon(Icons.security_outlined),
@@ -2884,12 +3354,20 @@ class WorkLogsScreen extends StatefulWidget {
 class _WorkLogsScreenState extends State<WorkLogsScreen> {
   final _detail = TextEditingController();
   final _hours = TextEditingController(text: '8');
+  final _materials = TextEditingController();
+  final _blocker = TextEditingController();
+  final _nextAction = TextEditingController();
   String _category = 'Site monitoring';
+  double _progress = 0;
+  final Set<String> _crewPresent = <String>{};
 
   @override
   void dispose() {
     _detail.dispose();
     _hours.dispose();
+    _materials.dispose();
+    _blocker.dispose();
+    _nextAction.dispose();
     super.dispose();
   }
 
@@ -2906,8 +3384,16 @@ class _WorkLogsScreenState extends State<WorkLogsScreen> {
       category: _category,
       detail: _detail.text.trim(),
       hours: double.tryParse(_hours.text) ?? 0,
+      progress: _progress,
+      crewPresent: _crewPresent.toList(),
+      materialsUsed: _materials.text.trim(),
+      blocker: _blocker.text.trim(),
+      nextAction: _nextAction.text.trim(),
     );
     _detail.clear();
+    _materials.clear();
+    _blocker.clear();
+    _nextAction.clear();
     showSavedMessage(context, submitted: false);
   }
 
@@ -2915,7 +3401,7 @@ class _WorkLogsScreenState extends State<WorkLogsScreen> {
   Widget build(BuildContext context) {
     final state = AppScope.of(context);
     return Scaffold(
-      appBar: AppBar(title: const Text('Work Logs')),
+      appBar: RcAppBar(title: const Text('Control of Work')),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: <Widget>[
@@ -2925,11 +3411,19 @@ class _WorkLogsScreenState extends State<WorkLogsScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
-                  const RcPageHeading(
+                  RcPageHeading(
                     eyebrow: 'Fast Entry / Field Operations',
-                    title: 'Daily work log',
+                    title: 'Control of work log',
                     description:
-                        'Record role, time, cluster or house, activity, detailed work and linked operational context.',
+                        'Record who worked, what changed, measured progress, materials consumed, blockers and the next action for the house.',
+                    action: OutlinedButton.icon(
+                      onPressed: () => Navigator.pushNamed(
+                        context,
+                        RcRoutes.workProjections,
+                      ),
+                      icon: const Icon(Icons.trending_up_outlined),
+                      label: const Text('WEEKLY PROJECTION'),
+                    ),
                   ),
                   const SizedBox(height: 18),
                   Card(
@@ -3003,6 +3497,100 @@ class _WorkLogsScreenState extends State<WorkLogsScreen> {
                             ),
                           ),
                           const SizedBox(height: 12),
+                          InputDecorator(
+                            decoration: const InputDecoration(
+                              labelText: 'Verified progress',
+                              prefixIcon: Icon(Icons.percent),
+                            ),
+                            child: Column(
+                              children: <Widget>[
+                                Row(
+                                  children: <Widget>[
+                                    Expanded(
+                                      child: Text(
+                                        '${state.selectedHouseCode} completion',
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .labelLarge,
+                                      ),
+                                    ),
+                                    Text(
+                                      '${_progress.round()}%',
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .titleMedium
+                                          ?.copyWith(color: RcColors.brand),
+                                    ),
+                                  ],
+                                ),
+                                Slider(
+                                  value: _progress,
+                                  min: 0,
+                                  max: 100,
+                                  divisions: 20,
+                                  label: '${_progress.round()}%',
+                                  onChanged: (value) =>
+                                      setState(() => _progress = value),
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(height: 12),
+                          InputDecorator(
+                            decoration: const InputDecoration(
+                              labelText: 'Crew present',
+                              alignLabelWithHint: true,
+                            ),
+                            child: Wrap(
+                              spacing: 8,
+                              runSpacing: 8,
+                              children: state.selectedHouse.team.map((name) {
+                                return FilterChip(
+                                  label: Text(name),
+                                  selected: _crewPresent.contains(name),
+                                  onSelected: (selected) => setState(() {
+                                    if (selected) {
+                                      _crewPresent.add(name);
+                                    } else {
+                                      _crewPresent.remove(name);
+                                    }
+                                  }),
+                                );
+                              }).toList(),
+                            ),
+                          ),
+                          const SizedBox(height: 12),
+                          TextField(
+                            controller: _materials,
+                            minLines: 2,
+                            maxLines: 3,
+                            decoration: const InputDecoration(
+                              labelText: 'Materials consumed / needed',
+                              alignLabelWithHint: true,
+                              hintText:
+                                  'Example: 8 zinc sheets used; 12 more required.',
+                            ),
+                          ),
+                          const SizedBox(height: 12),
+                          TextField(
+                            controller: _blocker,
+                            minLines: 2,
+                            maxLines: 3,
+                            decoration: const InputDecoration(
+                              labelText: 'Delay, issue or blocker',
+                              alignLabelWithHint: true,
+                              hintText: 'Leave blank when work is unblocked.',
+                            ),
+                          ),
+                          const SizedBox(height: 12),
+                          TextField(
+                            controller: _nextAction,
+                            decoration: const InputDecoration(
+                              labelText: 'Next action and owner',
+                              prefixIcon: Icon(Icons.next_plan_outlined),
+                            ),
+                          ),
+                          const SizedBox(height: 12),
                           TextField(
                             controller: _detail,
                             minLines: 4,
@@ -3041,7 +3629,7 @@ class _WorkLogsScreenState extends State<WorkLogsScreen> {
                             style: const TextStyle(fontWeight: FontWeight.w700),
                           ),
                           subtitle: Text(
-                            '${log.detail}\n${log.user} • ${log.hours.toStringAsFixed(1)} hours • ${_relativeTime(log.createdAt)}',
+                            '${log.detail}\n${log.user} • ${log.hours.toStringAsFixed(1)} hours • ${log.progress.toStringAsFixed(0)}% • ${_relativeTime(log.createdAt)}',
                           ),
                           isThreeLine: true,
                         );
@@ -3075,7 +3663,7 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
         .where((house) => _parish == 'All' || house.parish == _parish)
         .toList();
     return Scaffold(
-      appBar: AppBar(
+      appBar: RcAppBar(
         title: const Text('Production Database'),
         actions: <Widget>[
           TextButton.icon(
@@ -3131,8 +3719,8 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
                   ),
                   const SizedBox(height: 18),
                   RcResponsiveGrid(
-                    minItemWidth: 190,
-                    childAspectRatio: 1.25,
+                    minItemWidth: 160,
+                    childAspectRatio: 1.05,
                     children: <Widget>[
                       RcMetricTile(
                         label: 'Houses',
@@ -3370,79 +3958,219 @@ class _EvidenceGauge extends StatelessWidget {
   }
 }
 
-class OperationalMapScreen extends StatelessWidget {
+class _HouseGeoPoint {
+  const _HouseGeoPoint({required this.house, required this.latitude, required this.longitude});
+  final HouseRecord house;
+  final double latitude;
+  final double longitude;
+}
+
+_HouseGeoPoint? _houseGeoPoint(HouseRecord house) {
+  final raw = house.gps.trim();
+  if (raw.isEmpty) return null;
+  final matches = RegExp(r'-?\d+(?:\.\d+)?').allMatches(raw).toList();
+  if (matches.length < 2) return null;
+  final lat = double.tryParse(matches[0].group(0)!);
+  final lng = double.tryParse(matches[1].group(0)!);
+  if (lat == null || lng == null || lat.abs() > 90 || lng.abs() > 180) {
+    return null;
+  }
+  return _HouseGeoPoint(house: house, latitude: lat, longitude: lng);
+}
+
+class OperationalMapScreen extends StatefulWidget {
   const OperationalMapScreen({super.key});
+
+  @override
+  State<OperationalMapScreen> createState() => _OperationalMapScreenState();
+}
+
+class _OperationalMapScreenState extends State<OperationalMapScreen> {
+  bool _tracking = true;
+  DateTime _lastRefresh = DateTime.now();
+
+  void _refresh() {
+    setState(() => _lastRefresh = DateTime.now());
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Latest permitted house positions loaded.')),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     final state = AppScope.of(context);
+    final points = state.houses
+        .map(_houseGeoPoint)
+        .whereType<_HouseGeoPoint>()
+        .toList(growable: false);
     return Scaffold(
-      appBar: AppBar(title: const Text('Operational Map')),
-      body: Stack(
-        children: <Widget>[
-          Positioned.fill(
-            child: CustomPaint(
-              painter: _OperationalMapPainter(
-                colorScheme: Theme.of(context).colorScheme,
-                houses: state.houses,
-              ),
-            ),
-          ),
-          Positioned(
-            left: 16,
-            right: 16,
-            top: 16,
-            child: SafeArea(
-              child: Card(
-                child: Padding(
-                  padding: const EdgeInsets.all(14),
-                  child: Row(
-                    children: <Widget>[
-                      const Icon(Icons.map_outlined, color: RcColors.brand),
-                      const SizedBox(width: 10),
-                      Expanded(
-                        child: Text(
-                          '${state.selectedParish} field operations • Select a house pin to open its command record.',
-                          style: const TextStyle(fontWeight: FontWeight.w700),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-          ),
-          Positioned(
-            left: 16,
-            right: 16,
-            bottom: 18,
-            child: SafeArea(
-              top: false,
-              child: Card(
-                child: SizedBox(
-                  height: 92,
-                  child: ListView.separated(
-                    scrollDirection: Axis.horizontal,
-                    padding: const EdgeInsets.all(10),
-                    itemCount: state.houses.length,
-                    separatorBuilder: (_, __) => const SizedBox(width: 8),
-                    itemBuilder: (context, index) {
-                      final house = state.houses[index];
-                      return ActionChip(
-                        avatar: const Icon(Icons.house_outlined, size: 18),
-                        label: Text('${house.code}\n${house.community}'),
-                        onPressed: () {
-                          state.selectHouse(house.code);
-                          Navigator.pushNamed(context, RcRoutes.houseCommand);
-                        },
-                      );
-                    },
-                  ),
-                ),
-              ),
-            ),
+      appBar: RcAppBar(
+        title: const Text('Beneficiary / House Map'),
+        actions: <Widget>[
+          IconButton(
+            tooltip: 'Refresh live positions',
+            onPressed: _refresh,
+            icon: const Icon(Icons.my_location_outlined),
           ),
         ],
+      ),
+      body: LayoutBuilder(
+        builder: (context, constraints) {
+          return Stack(
+            children: <Widget>[
+              Positioned.fill(
+                child: CustomPaint(
+                  painter: _OperationalMapPainter(
+                    colorScheme: Theme.of(context).colorScheme,
+                    houses: state.houses,
+                  ),
+                ),
+              ),
+              for (final point in points)
+                Builder(
+                  builder: (context) {
+                    final minLat = points.isEmpty
+                        ? 0.0
+                        : points.map((p) => p.latitude).reduce(math.min);
+                    final maxLat = points.isEmpty
+                        ? 1.0
+                        : points.map((p) => p.latitude).reduce(math.max);
+                    final minLng = points.isEmpty
+                        ? 0.0
+                        : points.map((p) => p.longitude).reduce(math.min);
+                    final maxLng = points.isEmpty
+                        ? 1.0
+                        : points.map((p) => p.longitude).reduce(math.max);
+                    final latSpan = math.max(.0001, maxLat - minLat);
+                    final lngSpan = math.max(.0001, maxLng - minLng);
+                    final x = .12 + ((point.longitude - minLng) / lngSpan) * .76;
+                    final y = .82 - ((point.latitude - minLat) / latSpan) * .64;
+                    return Positioned(
+                      left: constraints.maxWidth * x - 24,
+                      top: constraints.maxHeight * y - 24,
+                      child: Semantics(
+                        label:
+                            '${point.house.code}, ${point.house.beneficiary}, ${point.house.community}',
+                        button: true,
+                        child: IconButton.filled(
+                          tooltip: '${point.house.code} • ${point.house.beneficiary}',
+                          style: IconButton.styleFrom(
+                            backgroundColor: point.house.needsAttention
+                                ? RcColors.warning
+                                : RcColors.brand,
+                            foregroundColor: Colors.white,
+                          ),
+                          onPressed: () {
+                            state.selectHouse(point.house.code);
+                            Navigator.pushNamed(context, RcRoutes.houseCommand);
+                          },
+                          icon: Text(
+                            point.house.code,
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 10,
+                              fontWeight: FontWeight.w900,
+                            ),
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              Positioned(
+                left: 16,
+                right: 16,
+                top: 16,
+                child: SafeArea(
+                  child: Card(
+                    child: Padding(
+                      padding: const EdgeInsets.all(14),
+                      child: Row(
+                        children: <Widget>[
+                          Container(
+                            width: 46,
+                            height: 46,
+                            decoration: BoxDecoration(
+                              color: RcColors.infoSoft,
+                              borderRadius: BorderRadius.circular(16),
+                            ),
+                            child: const Icon(
+                              Icons.radar_outlined,
+                              color: RcColors.info,
+                            ),
+                          ),
+                          const SizedBox(width: 10),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: <Widget>[
+                                Text(
+                                  '${state.selectedParish} • ${points.length} GPS-linked houses',
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.w800,
+                                  ),
+                                ),
+                                Text(
+                                  _tracking
+                                      ? 'Live refresh on • ${_relativeTime(_lastRefresh)}'
+                                      : 'Live refresh paused • last known positions shown',
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .bodySmall,
+                                ),
+                              ],
+                            ),
+                          ),
+                          Switch(
+                            value: _tracking,
+                            onChanged: (value) =>
+                                setState(() => _tracking = value),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              Positioned(
+                left: 16,
+                right: 16,
+                bottom: 18,
+                child: SafeArea(
+                  top: false,
+                  child: Card(
+                    child: SizedBox(
+                      height: 92,
+                      child: ListView.separated(
+                        scrollDirection: Axis.horizontal,
+                        padding: const EdgeInsets.all(10),
+                        itemCount: state.houses.length,
+                        separatorBuilder: (_, __) => const SizedBox(width: 8),
+                        itemBuilder: (context, index) {
+                          final house = state.houses[index];
+                          return ActionChip(
+                            avatar: const Icon(Icons.house_outlined, size: 18),
+                            label: Text(
+                              '${house.code} • ${house.beneficiary}\n'
+                              '${house.gps.isEmpty ? 'GPS required' : house.community}',
+                            ),
+                            onPressed: () {
+                              state.selectHouse(house.code);
+                              Navigator.pushNamed(
+                                context,
+                                RcRoutes.houseCommand,
+                              );
+                            },
+                          );
+                        },
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          );
+        },
       ),
     );
   }
@@ -3505,29 +4233,6 @@ class _OperationalMapPainter extends CustomPainter {
     canvas.drawPath(paths[0], road);
     canvas.drawPath(paths[1], minorRoad);
     canvas.drawPath(paths[2], road);
-    for (var i = 0; i < houses.length; i++) {
-      final angle = (i / math.max(1, houses.length)) * math.pi * 1.5 + .5;
-      final center = Offset(
-        size.width * .5 + math.cos(angle) * size.width * .27,
-        size.height * .48 + math.sin(angle) * size.height * .25,
-      );
-      final pin = Paint()
-        ..color = houses[i].needsAttention ? RcColors.warning : RcColors.brand;
-      canvas.drawCircle(center, 17, Paint()..color = colorScheme.surface);
-      canvas.drawCircle(center, 13, pin);
-      final text = TextPainter(
-        text: TextSpan(
-          text: houses[i].code,
-          style: const TextStyle(
-            color: Colors.white,
-            fontSize: 9,
-            fontWeight: FontWeight.w900,
-          ),
-        ),
-        textDirection: TextDirection.ltr,
-      )..layout();
-      text.paint(canvas, center - Offset(text.width / 2, text.height / 2));
-    }
   }
 
   @override

@@ -6,6 +6,7 @@ import '../core/app_state.dart';
 import '../core/routes.dart';
 import '../core/theme.dart';
 import '../core/widgets.dart';
+import 'roof_drawing_studio.dart';
 
 class ScopeWorkspace extends StatefulWidget {
   const ScopeWorkspace({
@@ -27,6 +28,46 @@ class _ScopeWorkspaceState extends State<ScopeWorkspace> {
   @override
   Widget build(BuildContext context) {
     final state = AppScope.of(context);
+    if (state.houses.isEmpty) {
+      final empty = Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 620),
+          child: Padding(
+            padding: const EdgeInsets.all(24),
+            child: RcEmptyState(
+              icon: Icons.add_home_work_outlined,
+              title: 'Start with a real house',
+              message:
+                  'Create a new beneficiary house or import an approved legacy SOW / assessment before entering scope data.',
+              action: Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                alignment: WrapAlignment.center,
+                children: <Widget>[
+                  FilledButton.icon(
+                    onPressed: () =>
+                        Navigator.pushNamed(context, RcRoutes.newControl),
+                    icon: const Icon(Icons.add_home_work_outlined),
+                    label: const Text('CREATE HOUSE'),
+                  ),
+                  OutlinedButton.icon(
+                    onPressed: () =>
+                        Navigator.pushNamed(context, RcRoutes.scopeImport),
+                    icon: const Icon(Icons.upload_file_outlined),
+                    label: const Text('IMPORT LEGACY'),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      );
+      if (!widget.standalone) return empty;
+      return Scaffold(
+        appBar: RcAppBar(title: const Text('Scope of Work')),
+        body: empty,
+      );
+    }
     final body = Column(
       children: <Widget>[
         _ScopeStepper(
@@ -53,7 +94,7 @@ class _ScopeWorkspaceState extends State<ScopeWorkspace> {
     );
     if (!widget.standalone) return body;
     return Scaffold(
-      appBar: AppBar(
+      appBar: RcAppBar(
         title: Text('${state.selectedHouse.code} • Scope of Work'),
         actions: <Widget>[
           IconButton(
@@ -511,6 +552,9 @@ class _RoofScopeStepState extends State<_RoofScopeStep> {
 
   @override
   Widget build(BuildContext context) {
+    if (Theme.of(context).useMaterial3) {
+      return const RoofDrawingStudio();
+    }
     final state = AppScope.of(context);
     final house = state.selectedHouse;
     const tools = <String>[

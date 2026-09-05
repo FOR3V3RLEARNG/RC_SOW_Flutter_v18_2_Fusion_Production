@@ -2,13 +2,16 @@ name: RC SOW Connected Green Gate
 
 on:
   push:
+    branches:
+      - main
   pull_request:
   workflow_dispatch:
 
 jobs:
-  verify:
+  preflight:
+    name: preflight
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 8
     steps:
       - uses: actions/checkout@v6
       - uses: subosito/flutter-action@v2
@@ -16,30 +19,153 @@ jobs:
           channel: stable
           cache: true
       - name: Generate platform scaffolding
-        run: flutter create --platforms=android,web --project-name=rc_sow_connected .
+        run: flutter create --platforms=android,web --project-name=rc_sow_connected --org=org.jamaicaredcross .
       - name: Resolve dependencies
         run: flutter pub get
       - name: Format source
         run: dart format lib test
       - name: Analyze
         run: flutter analyze
-      - name: Test
-        run: flutter test
+
+  core-tests:
+    name: core-tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v6
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+      - name: Generate platform scaffolding
+        run: flutter create --platforms=android,web --project-name=rc_sow_connected --org=org.jamaicaredcross .
+      - name: Resolve dependencies
+        run: flutter pub get
+      - name: Run core and navigation tests
+        shell: bash
+        run: |
+          mapfile -t test_files < <(
+            find test -maxdepth 1 -name '*_test.dart' ! -name 'all_interactions_test.dart' -print | sort
+          )
+          printf 'Running %s non-interaction test files\n' "${#test_files[@]}"
+          flutter test "${test_files[@]}"
+
+  interaction-tests:
+    name: interaction-shard-${{ matrix.shard }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [0, 1, 2, 3, 4, 5]
+    steps:
+      - uses: actions/checkout@v6
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+      - name: Generate platform scaffolding
+        run: flutter create --platforms=android,web --project-name=rc_sow_connected --org=org.jamaicaredcross .
+      - name: Resolve dependencies
+        run: flutter pub get
+      - name: Run interaction shard
+        run: >
+          flutter test test/all_interactions_test.dart
+          --dart-define=INTERACTION_SHARD_INDEX=${{ matrix.shard }}
+          --dart-define=INTERACTION_SHARD_COUNT=6
+
+  build-web:
+    name: build-web
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v6
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+      - name: Generate platform scaffolding
+        run: flutter create --platforms=android,web --project-name=rc_sow_connected --org=org.jamaicaredcross .
+      - name: Resolve dependencies
+        run: flutter pub get
       - name: Build web
         run: flutter build web --release
-      - name: Upload web preview
-        uses: actions/upload-artifact@v7
+      - uses: actions/upload-artifact@v7
         with:
-          name: RC-SOW-v19.1.0-Web-Preview
+          name: RC-SOW-v20.1.0-Web-Preview
           path: build/web
           if-no-files-found: error
           retention-days: 30
+
+  build-android-apk:
+    name: build-android-apk
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v6
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+      - name: Generate Android scaffolding
+        run: flutter create --platforms=android --project-name=rc_sow_connected --org=org.jamaicaredcross .
+      - name: Resolve dependencies
+        run: flutter pub get
       - name: Build Android APK
         run: flutter build apk --release
-      - name: Upload Android APK
-        uses: actions/upload-artifact@v7
+      - uses: actions/upload-artifact@v7
         with:
-          name: RC-SOW-v19.1.0-Android-APK
+          name: RC-SOW-v20.1.0-Android-APK
           path: build/app/outputs/flutter-apk/app-release.apk
           if-no-files-found: error
           retention-days: 30
+
+  build-android-aab:
+    name: build-android-aab
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v6
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+      - name: Generate Android scaffolding
+        run: flutter create --platforms=android --project-name=rc_sow_connected --org=org.jamaicaredcross .
+      - name: Resolve dependencies
+        run: flutter pub get
+      - name: Build Android AAB
+        run: flutter build appbundle --release
+      - uses: actions/upload-artifact@v7
+        with:
+          name: RC-SOW-v20.1.0-Android-AAB
+          path: build/app/outputs/bundle/release/app-release.aab
+          if-no-files-found: error
+          retention-days: 30
+
+  verify:
+    name: verify
+    if: always()
+    needs:
+      - preflight
+      - core-tests
+      - interaction-tests
+      - build-web
+      - build-android-apk
+      - build-android-aab
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - name: Enforce Green Gate
+        env:
+          PREFLIGHT: ${{ needs.preflight.result }}
+          CORE_TESTS: ${{ needs.core-tests.result }}
+          INTERACTION_TESTS: ${{ needs.interaction-tests.result }}
+          WEB: ${{ needs.build-web.result }}
+          APK: ${{ needs.build-android-apk.result }}
+          AAB: ${{ needs.build-android-aab.result }}
+        run: |
+          for result in "$PREFLIGHT" "$CORE_TESTS" "$INTERACTION_TESTS" "$WEB" "$APK" "$AAB"; do
+            test "$result" = "success"
+          done
+          echo "RC SOW v20.1 Green Gate passed."

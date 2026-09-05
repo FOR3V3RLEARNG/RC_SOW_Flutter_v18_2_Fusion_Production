@@ -31,7 +31,7 @@ class _TeamCommunityScreenState extends State<TeamCommunityScreen> {
         .where((post) => _feed == 'All' || post.crew == _feed)
         .toList();
     return Scaffold(
-      appBar: AppBar(
+      appBar: RcAppBar(
         title: const Text('Team Excellence Community'),
         actions: <Widget>[
           IconButton(
@@ -299,7 +299,7 @@ class TeamPerformanceScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final state = AppScope.of(context);
     return Scaffold(
-      appBar: AppBar(title: const Text('Team Performance')),
+      appBar: RcAppBar(title: const Text('Team Performance')),
       body: Column(
         children: <Widget>[
           const RcSyncBanner(),
@@ -520,7 +520,7 @@ class _TeamResourceScreenState extends State<TeamResourceScreen> {
   Widget build(BuildContext context) {
     final state = AppScope.of(context);
     return Scaffold(
-      appBar: AppBar(title: const Text('Team Resource Manager')),
+      appBar: RcAppBar(title: const Text('Team Resource Manager')),
       body: Column(
         children: <Widget>[
           const RcSyncBanner(),
@@ -713,7 +713,7 @@ class _AwardsIncentivesScreenState extends State<AwardsIncentivesScreen> {
   Widget build(BuildContext context) {
     final state = AppScope.of(context);
     return Scaffold(
-      appBar: AppBar(title: const Text('Awards & Incentives')),
+      appBar: RcAppBar(title: const Text('Awards & Incentives')),
       body: Column(
         children: <Widget>[
           const RcSyncBanner(),
@@ -911,7 +911,7 @@ class PromotionRoutingScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final state = AppScope.of(context);
     return Scaffold(
-      appBar: AppBar(title: const Text('Promotion Routing')),
+      appBar: RcAppBar(title: const Text('Promotion Routing')),
       body: Column(
         children: <Widget>[
           const RcSyncBanner(),

@@ -3,12 +3,18 @@ import 'package:flutter/material.dart';
 import 'core/app_state.dart';
 import 'core/routes.dart';
 import 'core/theme.dart';
+import 'core/widgets.dart';
+import 'core/production_models.dart';
 import 'screens/admin_screens.dart';
 import 'screens/auth_screens.dart';
 import 'screens/command_screens.dart';
+import 'screens/control_intelligence_screens.dart';
 import 'screens/control_layout_screen.dart';
 import 'screens/form_screens.dart';
 import 'screens/operation_screens.dart';
+import 'screens/notification_composer_screen.dart';
+import 'screens/production_system_screens.dart';
+import 'screens/weekly_projection_screen.dart';
 import 'screens/shell.dart';
 import 'screens/scope_screens.dart';
 import 'screens/team_screens.dart';
@@ -29,8 +35,14 @@ class RcSowApp extends StatelessWidget {
           return MaterialApp(
             title: 'RC SOW Operations',
             debugShowCheckedModeBanner: false,
-            theme: RcTheme.light(highContrast: state.highContrast),
-            darkTheme: RcTheme.dark(highContrast: state.highContrast),
+            theme: RcTheme.light(
+              highContrast: state.highContrast,
+              reducedMotion: state.reducedMotion,
+            ),
+            darkTheme: RcTheme.dark(
+              highContrast: state.highContrast,
+              reducedMotion: state.reducedMotion,
+            ),
             themeMode: state.darkMode ? ThemeMode.dark : ThemeMode.light,
             initialRoute: RcRoutes.splash,
             onGenerateRoute: buildRcRoute,
@@ -41,8 +53,20 @@ class RcSowApp extends StatelessWidget {
   }
 }
 
+String normalizeRcRouteName(String? rawName) {
+  if (rawName == null || rawName.isEmpty) return RcRoutes.splash;
+  final uri = Uri.tryParse(rawName);
+  if (uri == null) return rawName;
+  if (uri.scheme == 'org.jamaicaredcross.rcsowflutter' &&
+      uri.host == 'login-callback') {
+    return RcRoutes.splash;
+  }
+  return uri.path.isEmpty ? RcRoutes.splash : uri.path;
+}
+
 Route<dynamic> buildRcRoute(RouteSettings settings) {
-  final screen = switch (settings.name) {
+  final normalizedName = normalizeRcRouteName(settings.name);
+  final screen = switch (normalizedName) {
     RcRoutes.splash => const RcSplashScreen(),
     RcRoutes.login => const LoginScreen(),
     RcRoutes.home || RcRoutes.dashboard => const AppShell(initialIndex: 0),
@@ -62,6 +86,12 @@ Route<dynamic> buildRcRoute(RouteSettings settings) {
         initialStep: 3,
         standalone: true,
       ),
+    RcRoutes.boq => const OperationalFormScreen.boq(),
+    RcRoutes.scopeImport => ScopeImportScreen(
+        seedDocument: settings.arguments is RoofDrawingDocument
+            ? settings.arguments! as RoofDrawingDocument
+            : null,
+      ),
     RcRoutes.control => const AppShell(initialIndex: 2),
     RcRoutes.houses => const AppShell(initialIndex: 3),
     RcRoutes.houseCommand => const HouseCommandScreen(),
@@ -77,16 +107,23 @@ Route<dynamic> buildRcRoute(RouteSettings settings) {
       const OperationalFormScreen.consumableRequest(),
     RcRoutes.inventory => const InventoryScreen(),
     RcRoutes.addInventory => const InventoryEditScreen(),
+    RcRoutes.inventoryTransfer => const InventoryTransferScreen(),
     RcRoutes.completion => const CompletionScreen(),
+    RcRoutes.completionDocuments =>
+      const AllHouseCompletionDocumentsScreen(),
     RcRoutes.finalInspection => const FinalInspectionScreen(),
     RcRoutes.payment => const PaymentScreen(),
     RcRoutes.evidence => const EvidenceScreen(),
     RcRoutes.activity => const ActivityScreen(),
     RcRoutes.notifications => const NotificationsScreen(),
+    RcRoutes.notificationCompose => const NotificationComposerScreen(),
     RcRoutes.usersOnline => const UsersOnlineScreen(),
     RcRoutes.messages => const MessagesScreen(),
     RcRoutes.settings => const SettingsScreen(),
     RcRoutes.workLogs => const WorkLogsScreen(),
+    RcRoutes.workProjections => const WeeklyWorkProjectionScreen(),
+    RcRoutes.productionBoard => const ProductionBoardScreen(),
+    RcRoutes.syncMonitor => const SyncMonitorScreen(),
     RcRoutes.analytics => const AnalyticsScreen(),
     RcRoutes.operationalMap => const OperationalMapScreen(),
     RcRoutes.adminUsers => const AdminUsersScreen(),
@@ -101,7 +138,7 @@ Route<dynamic> buildRcRoute(RouteSettings settings) {
     RcRoutes.teamResources => const TeamResourceScreen(),
     RcRoutes.awardsIncentives => const AwardsIncentivesScreen(),
     RcRoutes.promotionRouting => const PromotionRoutingScreen(),
-    RcRoutes.schedule => const ConstructionScheduleScreen(),
+    RcRoutes.schedule => const ProximityConstructionScheduleScreen(),
     RcRoutes.liveBriefing => const LiveBriefingScreen(),
     RcRoutes.productionCommand => const ProductionCommandScreen(),
     RcRoutes.financeCommand => const FinanceCommandScreen(),
@@ -123,7 +160,7 @@ class UnknownRouteScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Page unavailable')),
+      appBar: RcAppBar(title: const Text('Page unavailable')),
       body: Center(
         child: Text('No RC SOW screen is registered for $routeName.'),
       ),
