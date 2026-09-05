@@ -42,11 +42,9 @@ class WeeklyProjectionRepository {
           .toList();
 
       for (final file in files) {
-        _cache(file);
+        _cache(file, synced: true);
       }
 
-      state.syncCondition = SyncCondition.synced;
-      state.notifyListeners();
       return files;
     }
 
@@ -57,10 +55,7 @@ class WeeklyProjectionRepository {
     _cache(file);
 
     if (state.backend is! SupabaseProductionBackend || state.offline) {
-      state.syncCondition =
-          state.offline ? SyncCondition.waiting : SyncCondition.savedLocal;
       state.queuedChanges = _unsyncedLocalCount;
-      state.notifyListeners();
       return;
     }
 
@@ -73,19 +68,12 @@ class WeeklyProjectionRepository {
       throw StateError('A weekly file can only be edited by its owner.');
     }
 
-    state.syncCondition = SyncCondition.syncing;
-    state.notifyListeners();
-
     try {
       await _upsert(backend, file);
       _markSynced(file);
       state.queuedChanges = _unsyncedLocalCount;
-      state.syncCondition = SyncCondition.synced;
-      state.notifyListeners();
     } on Object {
-      state.syncCondition = SyncCondition.failed;
       state.queuedChanges = _unsyncedLocalCount;
-      state.notifyListeners();
       rethrow;
     }
   }

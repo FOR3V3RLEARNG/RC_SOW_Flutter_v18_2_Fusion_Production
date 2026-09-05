@@ -944,7 +944,6 @@ class _WeeklyFileCard extends StatelessWidget {
           '${file.position} • ${file.parish} • ${file.cluster}\n'
           '${file.plannedDays} days • ${file.plannedHours.toStringAsFixed(1)} hours',
         ),
-        isThreeLine: true,
         trailing: RcStatusChip(
           label: file.status.label.toUpperCase(),
           tone: file.status == WeeklyProjectionStatus.submitted
