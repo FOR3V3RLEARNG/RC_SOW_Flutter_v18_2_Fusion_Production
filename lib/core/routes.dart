@@ -25,6 +25,7 @@ abstract final class RcRoutes {
   static const String addInventory = '/inventory/add';
   static const String inventoryTransfer = '/inventory/transfer';
   static const String completion = '/completion';
+  static const String completionDocuments = '/completion-documents';
   static const String finalInspection = '/final-inspection';
   static const String payment = '/payment';
   static const String evidence = '/evidence';
@@ -89,6 +90,7 @@ abstract final class RcRoutes {
     addInventory,
     inventoryTransfer,
     completion,
+    completionDocuments,
     finalInspection,
     payment,
     evidence,

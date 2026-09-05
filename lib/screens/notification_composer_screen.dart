@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 
 import '../core/app_state.dart';
 import '../core/models.dart';
-import '../core/routes.dart';
 import '../core/widgets.dart';
 
 class NotificationComposerScreen extends StatefulWidget {
@@ -141,6 +140,7 @@ class _NotificationComposerScreenState extends State<NotificationComposerScreen>
                               children: <Widget>[
                                 Expanded(
                                   child: DropdownButtonFormField<String>(
+                                    isExpanded: true,
                                     value: _kind,
                                     decoration: const InputDecoration(labelText: 'Type'),
                                     items: const <String>[
@@ -157,6 +157,7 @@ class _NotificationComposerScreenState extends State<NotificationComposerScreen>
                                 const SizedBox(width: 10),
                                 Expanded(
                                   child: DropdownButtonFormField<String>(
+                                    isExpanded: true,
                                     value: _priority,
                                     decoration: const InputDecoration(labelText: 'Priority'),
                                     items: const <String>['Info', 'Action', 'High']
@@ -169,6 +170,7 @@ class _NotificationComposerScreenState extends State<NotificationComposerScreen>
                             ),
                             const SizedBox(height: 12),
                             DropdownButtonFormField<String>(
+                              isExpanded: true,
                               value: _houseCode,
                               decoration: const InputDecoration(
                                 labelText: 'House context (optional)',
@@ -183,7 +185,7 @@ class _NotificationComposerScreenState extends State<NotificationComposerScreen>
                                   ),
                                 ),
                               ],
-                              onChanged: (value) => setState(() => _houseCode = value),
+                              onChanged: (value) => setState(() => _houseCode = value ?? ''),
                             ),
                           ],
                         ),

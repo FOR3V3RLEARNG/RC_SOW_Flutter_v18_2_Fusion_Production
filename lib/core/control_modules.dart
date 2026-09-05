@@ -46,7 +46,7 @@ abstract final class ControlModules {
     ControlModuleDefinition(
       id: 'work-projections',
       title: 'Work Projection Log',
-      description: 'Plan weekly milestones, crew hours, materials and risks.',
+      description: 'One signed weekly file per admin staff member with daily 09:00–17:00 or custom hours and role-scoped review.',
       phase: LifecyclePhase.plan,
       icon: Icons.trending_up_outlined,
       route: RcRoutes.workProjections,
@@ -64,7 +64,7 @@ abstract final class ControlModules {
     ControlModuleDefinition(
       id: 'schedule',
       title: 'Construction Schedule',
-      description: 'Coordinate house phases, blockers, dates and teams.',
+      description: 'Sequence parish and cluster builds by beneficiary GPS proximity with AI-assisted suggestions and manual override.',
       phase: LifecyclePhase.plan,
       icon: Icons.event_available_outlined,
       route: RcRoutes.schedule,
@@ -204,6 +204,15 @@ abstract final class ControlModules {
       icon: Icons.task_alt_outlined,
       route: RcRoutes.completion,
       priority: 1,
+    ),
+    ControlModuleDefinition(
+      id: 'completion-documents',
+      title: 'All House Completion Docs',
+      description: 'Review every house close-out document, update notifications and the supporting activity trail.',
+      phase: LifecyclePhase.closeOut,
+      icon: Icons.folder_copy_outlined,
+      route: RcRoutes.completionDocuments,
+      priority: 2,
     ),
     ControlModuleDefinition(
       id: 'payment',

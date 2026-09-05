@@ -1023,6 +1023,25 @@ class RcResponsiveGrid extends StatelessWidget {
       builder: (context, constraints) {
         final count =
             (constraints.maxWidth / minItemWidth).floor().clamp(1, 4).toInt();
+        if (children.any((child) => child is RcHouseCard)) {
+          const spacing = 12.0;
+          final itemWidth =
+              (constraints.maxWidth - spacing * (count - 1)) / count;
+
+          return Wrap(
+            spacing: spacing,
+            runSpacing: spacing,
+            children: children
+                .map(
+                  (child) => SizedBox(
+                    width: itemWidth,
+                    child: child,
+                  ),
+                )
+                .toList(),
+          );
+        }
+
         return GridView.count(
           crossAxisCount: count,
           shrinkWrap: true,

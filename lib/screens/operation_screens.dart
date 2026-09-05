@@ -451,7 +451,7 @@ class _HouseRecordTile extends StatelessWidget {
                   color: emphasized ? scheme.primary : scheme.onSurfaceVariant,
                 ),
               ),
-              const Spacer(),
+              const SizedBox(height: 12),
               Text(
                 title,
                 maxLines: 2,
@@ -471,31 +471,6 @@ class _HouseRecordTile extends StatelessWidget {
           ),
         ),
       ),
-    );
-  }
-}
-
-class _CommandTile extends StatelessWidget {
-  const _CommandTile({
-    required this.icon,
-    required this.title,
-    required this.subtitle,
-    required this.route,
-  });
-  final IconData icon;
-  final String title;
-  final String subtitle;
-  final String route;
-
-  @override
-  Widget build(BuildContext context) {
-    return ListTile(
-      minVerticalPadding: 13,
-      leading: Icon(icon, color: Theme.of(context).colorScheme.primary),
-      title: Text(title, style: const TextStyle(fontWeight: FontWeight.w700)),
-      subtitle: Text(subtitle),
-      trailing: const Icon(Icons.chevron_right),
-      onTap: () => Navigator.pushNamed(context, route),
     );
   }
 }

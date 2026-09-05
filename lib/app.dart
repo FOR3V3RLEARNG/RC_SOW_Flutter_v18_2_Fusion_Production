@@ -8,11 +8,13 @@ import 'core/production_models.dart';
 import 'screens/admin_screens.dart';
 import 'screens/auth_screens.dart';
 import 'screens/command_screens.dart';
+import 'screens/control_intelligence_screens.dart';
 import 'screens/control_layout_screen.dart';
 import 'screens/form_screens.dart';
 import 'screens/operation_screens.dart';
 import 'screens/notification_composer_screen.dart';
 import 'screens/production_system_screens.dart';
+import 'screens/weekly_projection_screen.dart';
 import 'screens/shell.dart';
 import 'screens/scope_screens.dart';
 import 'screens/team_screens.dart';
@@ -107,6 +109,8 @@ Route<dynamic> buildRcRoute(RouteSettings settings) {
     RcRoutes.addInventory => const InventoryEditScreen(),
     RcRoutes.inventoryTransfer => const InventoryTransferScreen(),
     RcRoutes.completion => const CompletionScreen(),
+    RcRoutes.completionDocuments =>
+      const AllHouseCompletionDocumentsScreen(),
     RcRoutes.finalInspection => const FinalInspectionScreen(),
     RcRoutes.payment => const PaymentScreen(),
     RcRoutes.evidence => const EvidenceScreen(),
@@ -117,7 +121,7 @@ Route<dynamic> buildRcRoute(RouteSettings settings) {
     RcRoutes.messages => const MessagesScreen(),
     RcRoutes.settings => const SettingsScreen(),
     RcRoutes.workLogs => const WorkLogsScreen(),
-    RcRoutes.workProjections => const WorkProjectionScreen(),
+    RcRoutes.workProjections => const WeeklyWorkProjectionScreen(),
     RcRoutes.productionBoard => const ProductionBoardScreen(),
     RcRoutes.syncMonitor => const SyncMonitorScreen(),
     RcRoutes.analytics => const AnalyticsScreen(),
@@ -134,7 +138,7 @@ Route<dynamic> buildRcRoute(RouteSettings settings) {
     RcRoutes.teamResources => const TeamResourceScreen(),
     RcRoutes.awardsIncentives => const AwardsIncentivesScreen(),
     RcRoutes.promotionRouting => const PromotionRoutingScreen(),
-    RcRoutes.schedule => const ConstructionScheduleScreen(),
+    RcRoutes.schedule => const ProximityConstructionScheduleScreen(),
     RcRoutes.liveBriefing => const LiveBriefingScreen(),
     RcRoutes.productionCommand => const ProductionCommandScreen(),
     RcRoutes.financeCommand => const FinanceCommandScreen(),
