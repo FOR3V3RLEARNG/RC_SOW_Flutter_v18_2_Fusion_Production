@@ -842,7 +842,7 @@ class _ControlOfWorksScreenState extends State<ControlOfWorksScreen> {
                     ),
                     RcResponsiveGrid(
                       minItemWidth: compact ? 190 : 250,
-                      childAspectRatio: compact ? 1.75 : 1.45,
+                      childAspectRatio: compact ? 1.75 : 1.25,
                       children: modules
                           .where((module) => module.phase == phase)
                           .map(
@@ -858,7 +858,7 @@ class _ControlOfWorksScreenState extends State<ControlOfWorksScreen> {
               else
                 RcResponsiveGrid(
                   minItemWidth: compact ? 190 : 250,
-                  childAspectRatio: compact ? 1.75 : 1.45,
+                  childAspectRatio: compact ? 1.75 : 1.25,
                   children: modules
                       .map(
                         (module) => _ControlModuleCard(
@@ -963,7 +963,7 @@ class _ControlModuleCard extends StatelessWidget {
       child: InkWell(
         onTap: () => Navigator.pushNamed(context, module.route),
         child: Padding(
-          padding: const EdgeInsets.all(17),
+          padding: const EdgeInsets.all(16),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
@@ -1231,21 +1231,176 @@ class MoreScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final state = AppScope.of(context);
     final items = <_MoreItem>[
-      const _MoreItem('Map', Icons.map_outlined, RcRoutes.operationalMap),
-      const _MoreItem('Notifications', Icons.notifications_outlined, RcRoutes.notifications),
-      const _MoreItem('Messages', Icons.forum_outlined, RcRoutes.messages),
-      const _MoreItem('Schedule', Icons.event_available_outlined, RcRoutes.schedule),
-      const _MoreItem('Work Logs', Icons.edit_note_outlined, RcRoutes.workLogs),
-      const _MoreItem('Inventory', Icons.inventory_2_outlined, RcRoutes.inventory),
-      const _MoreItem('Transfers', Icons.swap_horiz_outlined, RcRoutes.transfers),
-      const _MoreItem('Evidence', Icons.photo_library_outlined, RcRoutes.evidence),
-      const _MoreItem('Analytics', Icons.analytics_outlined, RcRoutes.analytics),
-      const _MoreItem('Team', Icons.groups_2_outlined, RcRoutes.teamResources),
-      const _MoreItem('Approvals', Icons.approval_outlined, RcRoutes.approvalQueue),
-      const _MoreItem('Templates', Icons.description_outlined, RcRoutes.adminTemplates),
-      const _MoreItem('Import', Icons.upload_file_outlined, RcRoutes.scopeImport),
-      const _MoreItem('Gmail', Icons.mail_outline, RcRoutes.gmail),
-      const _MoreItem('Activity', Icons.history, RcRoutes.activity),
+      const _MoreItem(
+        'Work Logs',
+        Icons.edit_note_outlined,
+        RcRoutes.workLogs,
+      ),
+      const _MoreItem(
+        'Work Projection Log',
+        Icons.calendar_view_week_outlined,
+        RcRoutes.workProjections,
+      ),
+      const _MoreItem(
+        'Production Command Board',
+        Icons.dashboard_outlined,
+        RcRoutes.productionBoard,
+      ),
+      const _MoreItem(
+        'Transfer Management',
+        Icons.swap_horiz_outlined,
+        RcRoutes.transfers,
+      ),
+      const _MoreItem(
+        'Construction Schedule',
+        Icons.event_available_outlined,
+        RcRoutes.schedule,
+      ),
+      const _MoreItem(
+        'Live Team Briefing',
+        Icons.groups_outlined,
+        RcRoutes.liveBriefing,
+      ),
+      const _MoreItem(
+        'Inventory Tracker',
+        Icons.inventory_2_outlined,
+        RcRoutes.inventory,
+      ),
+      const _MoreItem(
+        'Parish / House Stock Transfer',
+        Icons.compare_arrows_outlined,
+        RcRoutes.inventoryTransfer,
+      ),
+      const _MoreItem(
+        'Evidence Viewer',
+        Icons.photo_library_outlined,
+        RcRoutes.evidence,
+      ),
+      const _MoreItem(
+        'Operational Map',
+        Icons.map_outlined,
+        RcRoutes.operationalMap,
+      ),
+      const _MoreItem(
+        'Messages',
+        Icons.forum_outlined,
+        RcRoutes.messages,
+      ),
+      const _MoreItem(
+        'Notifications',
+        Icons.notifications_outlined,
+        RcRoutes.notifications,
+      ),
+      const _MoreItem(
+        'Users Online',
+        Icons.people_outline,
+        RcRoutes.usersOnline,
+      ),
+      const _MoreItem(
+        'Gmail',
+        Icons.mail_outline,
+        RcRoutes.gmail,
+      ),
+      const _MoreItem(
+        'Team Excellence Community',
+        Icons.groups_2_outlined,
+        RcRoutes.teamCommunity,
+      ),
+      const _MoreItem(
+        'Team Performance',
+        Icons.analytics_outlined,
+        RcRoutes.teamPerformance,
+      ),
+      const _MoreItem(
+        'Team Resource Manager',
+        Icons.group_work_outlined,
+        RcRoutes.teamResources,
+      ),
+      const _MoreItem(
+        'Promotion Routing',
+        Icons.trending_up_outlined,
+        RcRoutes.promotionRouting,
+      ),
+      const _MoreItem(
+        'Production Command',
+        Icons.precision_manufacturing_outlined,
+        RcRoutes.productionCommand,
+      ),
+      const _MoreItem(
+        'Finance Command',
+        Icons.account_balance_wallet_outlined,
+        RcRoutes.financeCommand,
+      ),
+      const _MoreItem(
+        'Connected Approval Queue',
+        Icons.approval_outlined,
+        RcRoutes.approvalQueue,
+      ),
+      const _MoreItem(
+        'HQ Command Centre',
+        Icons.business_outlined,
+        RcRoutes.hqCommand,
+      ),
+      const _MoreItem(
+        'Institutional Report',
+        Icons.assessment_outlined,
+        RcRoutes.institutionalReport,
+      ),
+      const _MoreItem(
+        'Production Analytics',
+        Icons.query_stats_outlined,
+        RcRoutes.analytics,
+      ),
+      const _MoreItem(
+        'Activity History',
+        Icons.history,
+        RcRoutes.activity,
+      ),
+      const _MoreItem(
+        'Administration Command',
+        Icons.admin_panel_settings_outlined,
+        RcRoutes.adminCommand,
+      ),
+      const _MoreItem(
+        'Offline Sync Monitor',
+        Icons.sync_outlined,
+        RcRoutes.syncMonitor,
+      ),
+      const _MoreItem(
+        'Image & Legacy Import',
+        Icons.upload_file_outlined,
+        RcRoutes.scopeImport,
+      ),
+      const _MoreItem(
+        'Control Layout',
+        Icons.dashboard_customize_outlined,
+        RcRoutes.controlLayout,
+      ),
+      const _MoreItem(
+        'Transfer Logic',
+        Icons.alt_route_outlined,
+        RcRoutes.transferAutomation,
+      ),
+      const _MoreItem(
+        'Awards & Incentives',
+        Icons.emoji_events_outlined,
+        RcRoutes.awardsIncentives,
+      ),
+      const _MoreItem(
+        'User Access',
+        Icons.manage_accounts_outlined,
+        RcRoutes.adminUsers,
+      ),
+      const _MoreItem(
+        'Templates',
+        Icons.description_outlined,
+        RcRoutes.adminTemplates,
+      ),
+      const _MoreItem(
+        'SETTINGS & ACCESSIBILITY',
+        Icons.settings_outlined,
+        RcRoutes.settings,
+      ),
     ];
 
     return SingleChildScrollView(
@@ -1258,7 +1413,7 @@ class MoreScreen extends StatelessWidget {
             children: <Widget>[
               RcPageHeading(
                 eyebrow: state.role,
-                title: 'More',
+                title: 'More operations',
                 description:
                     'A compact operations menu for communication, maps, logistics and administration.',
                 action: IconButton.filledTonal(
