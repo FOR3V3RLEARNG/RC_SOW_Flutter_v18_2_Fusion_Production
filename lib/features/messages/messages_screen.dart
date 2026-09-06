@@ -232,7 +232,7 @@ Future<void> showComposeMessage(
                           );
                           if (sheetContext.mounted) Navigator.pop(sheetContext);
                         } catch (_) {
-                          if (context.mounted)
+                          if (context.mounted) {
                             ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(
                                 content: Text(
@@ -240,9 +240,11 @@ Future<void> showComposeMessage(
                                 ),
                               ),
                             );
+                          }
                         } finally {
-                          if (context.mounted)
+                          if (context.mounted) {
                             setSheetState(() => busy = false);
+                          }
                         }
                       },
                 icon: const Icon(Icons.send_outlined),

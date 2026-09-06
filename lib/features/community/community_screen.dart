@@ -237,12 +237,13 @@ class _CommunityScreenState extends State<CommunityScreen> {
         profile: widget.state.profile!,
         body: text,
       );
-      if (mounted)
+      if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Suggestion sent to Admin.')),
         );
+      }
     } catch (_) {
-      if (mounted)
+      if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text(
@@ -250,6 +251,7 @@ class _CommunityScreenState extends State<CommunityScreen> {
             ),
           ),
         );
+      }
     }
   }
 
@@ -310,8 +312,9 @@ class _CommunityScreenState extends State<CommunityScreen> {
                 const SizedBox(height: 14),
                 FilledButton(
                   onPressed: () async {
-                    if (title.text.trim().isEmpty || body.text.trim().isEmpty)
+                    if (title.text.trim().isEmpty || body.text.trim().isEmpty) {
                       return;
+                    }
                     try {
                       await widget.state.repository.submitCommunityPost(
                         profile: widget.state.profile!,

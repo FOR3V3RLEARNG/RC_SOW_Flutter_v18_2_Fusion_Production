@@ -86,8 +86,9 @@ class AppState extends ChangeNotifier {
     final prefs = await SharedPreferences.getInstance();
     final role = prefs.getString('pendingRequestedRole');
     final parish = prefs.getString('pendingRequestedParish');
-    if (role == null || role.isEmpty || parish == null || parish.isEmpty)
+    if (role == null || role.isEmpty || parish == null || parish.isEmpty) {
       return;
+    }
     try {
       final user = Supabase.instance.client.auth.currentUser;
       await Supabase.instance.client.rpc(

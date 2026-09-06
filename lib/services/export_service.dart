@@ -129,10 +129,11 @@ abstract final class RcExportService {
 
   static String _display(Object? value) {
     if (value is List) return value.map(_display).join('\n');
-    if (value is Map)
+    if (value is Map) {
       return value.entries
           .map((e) => '${e.key}: ${_display(e.value)}')
           .join('\n');
+    }
     return '${value ?? ''}';
   }
 

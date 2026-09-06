@@ -143,10 +143,11 @@ class _RecordFormScreenState extends State<RecordFormScreen> {
       _snack('Saved and synchronized.');
       Navigator.pop(context, true);
     } catch (_) {
-      if (mounted)
+      if (mounted) {
         _snack(
           'Could not save. Your input remains on screen; check connectivity and retry.',
         );
+      }
     } finally {
       if (mounted) setState(() => busy = false);
     }
@@ -203,8 +204,9 @@ class _RecordFormScreenState extends State<RecordFormScreen> {
                                 limit: 100,
                               );
                         } finally {
-                          if (context.mounted)
+                          if (context.mounted) {
                             setSheetState(() => loading = false);
+                          }
                         }
                       },
                       icon: const Icon(Icons.search),
@@ -268,12 +270,15 @@ class _RecordFormScreenState extends State<RecordFormScreen> {
       _setController('cluster', selected.cluster);
       _setController('gps', selected.gps);
       values['parish'] = selected.parish;
-      if (selected.roofLength != null)
+      if (selected.roofLength != null) {
         _setController('length', '${selected.roofLength}');
-      if (selected.roofWidth != null)
+      }
+      if (selected.roofWidth != null) {
         _setController('width', '${selected.roofWidth}');
-      if (selected.wallHeight != null)
+      }
+      if (selected.wallHeight != null) {
         _setController('wallHeight', '${selected.wallHeight}');
+      }
       if (selected.roofType != null) values['roofType'] = selected.roofType;
     });
   }
@@ -467,10 +472,11 @@ class _RecordFormScreenState extends State<RecordFormScreen> {
       await widget.state.repository.deleteProductionRecord(record);
       if (mounted) Navigator.pop(context, true);
     } catch (_) {
-      if (mounted)
+      if (mounted) {
         _snack(
           'Record could not be deleted. Confirm Admin access and backend migration, then retry.',
         );
+      }
     }
   }
 
@@ -720,13 +726,14 @@ class _RecordFormScreenState extends State<RecordFormScreen> {
               initialDate: DateTime.now(),
             );
             if (!mounted) return;
-            if (picked != null)
+            if (picked != null) {
               setState(
                 () => values[field.key] = picked
                     .toIso8601String()
                     .split('T')
                     .first,
               );
+            }
           },
         );
       case RcFieldKind.photo:
@@ -821,8 +828,9 @@ class _RecordFormScreenState extends State<RecordFormScreen> {
     if (lower.contains('regional')) return 'Regional Supervisor';
     if (lower.contains('construction')) return 'Construction Specialist';
     if (lower.contains('carpenter')) return 'Carpenter';
-    if (lower.contains('site supervisor') || lower.contains('supervisor'))
+    if (lower.contains('site supervisor') || lower.contains('supervisor')) {
       return 'Site Supervisor';
+    }
     return profile.role;
   }
 }

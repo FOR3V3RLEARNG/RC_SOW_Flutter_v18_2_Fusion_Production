@@ -235,12 +235,13 @@ class _GmailScreenState extends State<GmailScreen> {
             subject: subjectController.text.trim(),
             body: bodyController.text,
           );
-          if (mounted)
+          if (mounted) {
             ScaffoldMessenger.of(
               context,
             ).showSnackBar(const SnackBar(content: Text('Gmail sent.')));
+          }
         } catch (_) {
-          if (mounted)
+          if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(
                 content: Text(
@@ -248,6 +249,7 @@ class _GmailScreenState extends State<GmailScreen> {
                 ),
               ),
             );
+          }
         }
       }
     }

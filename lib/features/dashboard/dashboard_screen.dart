@@ -340,7 +340,7 @@ class _RoleHero extends StatelessWidget {
               ),
             ],
           );
-          if (constraints.maxWidth < 560)
+          if (constraints.maxWidth < 560) {
             return Column(
               children: [
                 Align(alignment: Alignment.centerLeft, child: text),
@@ -348,6 +348,7 @@ class _RoleHero extends StatelessWidget {
                 RcProgressOrb(value: progress, label: 'closed', size: 105),
               ],
             );
+          }
           return Row(
             children: [
               Expanded(child: text),

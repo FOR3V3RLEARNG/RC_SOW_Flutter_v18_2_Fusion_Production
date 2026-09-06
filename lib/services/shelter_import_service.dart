@@ -46,8 +46,9 @@ abstract final class ShelterImportService {
     }
     final table = selected!;
     final rows = table.rows;
-    if (rows.isEmpty)
+    if (rows.isEmpty) {
       throw const FormatException('The selected worksheet is empty.');
+    }
 
     var headerIndex = 0;
     var headerScore = -1;
@@ -99,12 +100,13 @@ abstract final class ShelterImportService {
         middle,
         last,
       ].where((x) => x.isNotEmpty).join(' ').trim();
-      if (name.isEmpty)
+      if (name.isEmpty) {
         name = _find(raw, [
           'beneficiary name',
           'name of beneficiary',
           'full name',
         ]);
+      }
       final parish = _find(raw, ['parish']).isEmpty
           ? fallbackParish
           : _find(raw, ['parish']);

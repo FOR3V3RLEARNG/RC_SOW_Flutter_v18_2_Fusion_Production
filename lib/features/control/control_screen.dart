@@ -350,8 +350,9 @@ class _ProductionModuleScreenState extends State<ProductionModuleScreen> {
     final profile = widget.state.profile!;
     if (profile.canEditProduction) return true;
     if (!profile.isCrew) return false;
-    if (widget.schema.eventType == 'dailyLog')
+    if (widget.schema.eventType == 'dailyLog') {
       return profile.hasPrivilege('uploadEvidence');
+    }
     if (widget.schema.eventType == 'materialRequest' ||
         widget.schema.eventType == 'consumables') {
       return profile.hasPrivilege('submitFieldRequests');

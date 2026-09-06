@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart' show FileOptions;
@@ -547,22 +545,24 @@ class _BeneficiarySourceAdminState extends State<_BeneficiarySourceAdmin> {
         'updated_by': client.auth.currentUser?.id,
         'updated_at': DateTime.now().toUtc().toIso8601String(),
       }, onConflict: 'parish');
-      if (mounted)
-        ScaffoldMessenger.of(this.context).showSnackBar(
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('$count beneficiary rows imported for $selected.'),
           ),
         );
+      }
       await refresh();
     } catch (_) {
-      if (mounted)
-        ScaffoldMessenger.of(this.context).showSnackBar(
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text(
               'Beneficiary workbook could not be imported. Confirm the Shelter workbook format and backend migration.',
             ),
           ),
         );
+      }
     }
   }
 }
@@ -898,7 +898,7 @@ class _FormStudioState extends State<_FormStudio> {
           : 'custom:${_slug(rawEvent)}';
       if (normalizedEvent == 'custom:' || _parseFields(fields.text).isEmpty) {
         if (mounted) {
-          ScaffoldMessenger.of(this.context).showSnackBar(
+          ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
               content: Text(
                 'A form needs a valid event key and at least one field.',
@@ -923,8 +923,9 @@ class _FormStudioState extends State<_FormStudio> {
   }
 
   String _fieldsText(Object? raw) {
-    if (raw is! List)
+    if (raw is! List) {
       return 'houseCode | House number | text | required\nparish | Parish | dropdown | required';
+    }
     return raw
         .whereType<Map>()
         .map(
@@ -975,7 +976,9 @@ class _ParishMapAdminState extends State<_ParishMapAdmin> {
   final controllers = <String, TextEditingController>{};
   @override
   void dispose() {
-    for (final c in controllers.values) c.dispose();
+    for (final c in controllers.values) {
+      c.dispose();
+    }
     super.dispose();
   }
 
@@ -1018,10 +1021,11 @@ class _ParishMapAdminState extends State<_ParishMapAdmin> {
                       parish: parish,
                       url: url,
                     );
-                    if (mounted)
+                    if (mounted) {
                       ScaffoldMessenger.of(this.context).showSnackBar(
                         SnackBar(content: Text('$parish map saved.')),
                       );
+                    }
                   },
                   icon: const Icon(Icons.save_outlined),
                 ),

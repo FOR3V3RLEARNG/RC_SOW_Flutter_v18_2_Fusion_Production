@@ -61,8 +61,9 @@ class _CrewAssignmentPanelState extends State<CrewAssignmentPanel> {
     if (houseCode == null ||
         email == null ||
         houseCode.isEmpty ||
-        email.isEmpty)
+        email.isEmpty) {
       return;
+    }
     final house = data.houses.where((h) => h.code == houseCode).firstOrNull;
     final member = data.users
         .where(
@@ -160,8 +161,9 @@ class _CrewAssignmentPanelState extends State<CrewAssignmentPanel> {
         final crew = data.users.where((u) {
           final role = '${u['role'] ?? ''}';
           if (!RcApp.crewRoles.contains(role)) return false;
-          if (selectedHouseRecord == null || profile.canViewAllParishes)
+          if (selectedHouseRecord == null || profile.canViewAllParishes) {
             return true;
+          }
           return '${u['parish'] ?? ''}' == selectedHouseRecord.parish;
         }).toList();
         final assignments = data.assignments

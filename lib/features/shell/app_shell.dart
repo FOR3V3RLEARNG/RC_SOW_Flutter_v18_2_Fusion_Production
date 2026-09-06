@@ -26,8 +26,9 @@ class AppShell extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final profile = state.profile;
-    if (profile == null || !profile.approved || !profile.active)
+    if (profile == null || !profile.approved || !profile.active) {
       return _ApprovalGate(state: state);
+    }
 
     final pages = <Widget>[
       DashboardScreen(state: state),

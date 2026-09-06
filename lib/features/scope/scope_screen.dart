@@ -627,8 +627,9 @@ class _ScopeScreenState extends State<ScopeScreen>
               context,
               title: '$role signature',
             );
-            if (bytes != null && mounted)
+            if (bytes != null && mounted) {
               setState(() => signatures[role] = bytes);
+            }
           } else {
             if (house.text.trim().isEmpty) {
               _snack('Enter or choose a house first.');
@@ -785,10 +786,12 @@ class _ScopeScreenState extends State<ScopeScreen>
       gps.text = selected.gps;
       if (selected.roofWidth != null) width.text = '${selected.roofWidth}';
       if (selected.roofLength != null) length.text = '${selected.roofLength}';
-      if (selected.wallHeight != null)
+      if (selected.wallHeight != null) {
         wallHeight.text = '${selected.wallHeight}';
-      if (selected.roofType != null && selected.roofType!.isNotEmpty)
+      }
+      if (selected.roofType != null && selected.roofType!.isNotEmpty) {
         roofType = selected.roofType!;
+      }
     });
   }
 
@@ -803,8 +806,9 @@ class _ScopeScreenState extends State<ScopeScreen>
       current = [];
       redo.clear();
     });
-    if (drawTool != RoofDrawTool.freehand && drawTool != RoofDrawTool.drain)
+    if (drawTool != RoofDrawTool.freehand && drawTool != RoofDrawTool.drain) {
       await _editMeasurement(stroke);
+    }
   }
 
   Future<void> _editMeasurement(RoofStroke stroke) async {
@@ -1066,19 +1070,24 @@ class RoofCanvasPainter extends CustomPainter {
       final grid = Paint()
         ..color = RcColors.line.withValues(alpha: .7)
         ..strokeWidth = .6;
-      for (double x = 0; x < size.width; x += 20)
+      for (double x = 0; x < size.width; x += 20) {
         canvas.drawLine(Offset(x, 0), Offset(x, size.height), grid);
-      for (double y = 0; y < size.height; y += 20)
+      }
+      for (double y = 0; y < size.height; y += 20) {
         canvas.drawLine(Offset(0, y), Offset(size.width, y), grid);
+      }
     }
-    for (final stroke in strokes) _drawStroke(canvas, stroke, size);
-    if (current.length >= 2)
+    for (final stroke in strokes) {
+      _drawStroke(canvas, stroke, size);
+    }
+    if (current.length >= 2) {
       _drawStroke(
         canvas,
         RoofStroke(tool: currentTool, points: current),
         size,
         preview: true,
       );
+    }
   }
 
   void _drawStroke(
@@ -1106,7 +1115,9 @@ class RoofCanvasPainter extends CustomPainter {
     if (stroke.tool == RoofDrawTool.freehand) {
       final path = Path()
         ..moveTo(stroke.points.first.dx, stroke.points.first.dy);
-      for (final p in stroke.points.skip(1)) path.lineTo(p.dx, p.dy);
+      for (final p in stroke.points.skip(1)) {
+        path.lineTo(p.dx, p.dy);
+      }
       canvas.drawPath(path, paint);
     } else {
       final start = stroke.points.first;
@@ -1190,12 +1201,13 @@ class StandardRoofPainter extends CustomPainter {
       Offset(right + 10, wallTop + 8),
       green,
     );
-    for (double x = left; x <= right; x += 22)
+    for (double x = left; x <= right; x += 22) {
       canvas.drawLine(
         Offset(x, wallTop + 8),
         Offset(size.width * .5 + (x - size.width * .5) * .55, ridge.dy + 8),
         green,
       );
+    }
     final tp = TextPainter(
       text: const TextSpan(
         text: 'JRC STANDARD FINISHED ROOF STYLE',

@@ -161,7 +161,7 @@ class RcSowRepository {
         'priority': priority,
         'readBy': [profile.email],
         if (houseCode != null && houseCode.isNotEmpty) 'houseCode': houseCode,
-        if (replyTo != null) 'replyTo': replyTo,
+        'replyTo': ?replyTo,
       },
     );
   }
@@ -493,10 +493,12 @@ class RcSowRepository {
         parishFilter != 'All Parishes') {
       query = query.eq('parish', parishFilter);
     }
-    if (eventType != null && eventType.isNotEmpty)
+    if (eventType != null && eventType.isNotEmpty) {
       query = query.eq('event_type', eventType);
-    if (houseCode != null && houseCode.isNotEmpty)
+    }
+    if (houseCode != null && houseCode.isNotEmpty) {
       query = query.eq('house_code', houseCode);
+    }
     final rows = await query.order('updated_at', ascending: false).limit(limit);
     const productionTypes = {
       'scope',
@@ -524,8 +526,9 @@ class RcSowRepository {
           return productionTypes.contains(type) || type.startsWith('custom:');
         })
         .where((row) {
-          if (!(profile.isTechnicalAdmin || profile.isCommunityAdmin))
+          if (!(profile.isTechnicalAdmin || profile.isCommunityAdmin)) {
             return true;
+          }
           final item = Map<String, dynamic>.from(
             row['item'] as Map? ?? const {},
           );
@@ -719,7 +722,7 @@ class RcSowRepository {
     bool active = true,
   }) async {
     final payload = {
-      if (templateId != null) 'id': templateId,
+      'id': ?templateId,
       'title': title,
       'event_type': eventType,
       'phase': phase,
@@ -769,8 +772,9 @@ class RcSowRepository {
       uri,
       headers: {'Authorization': 'Bearer $token'},
     );
-    if (response.statusCode != 200)
+    if (response.statusCode != 200) {
       throw StateError('Gmail inbox could not be loaded.');
+    }
     final json = jsonDecode(response.body) as Map<String, dynamic>;
     final ids = (json['messages'] as List? ?? const [])
         .whereType<Map>()
@@ -816,16 +820,18 @@ class RcSowRepository {
 
   Future<Map<String, dynamic>> gmailMessage(String id) async {
     final token = googleProviderToken;
-    if (token == null || token.isEmpty)
+    if (token == null || token.isEmpty) {
       throw StateError('Google access token is not available.');
+    }
     final response = await http.get(
       Uri.https('gmail.googleapis.com', '/gmail/v1/users/me/messages/$id', {
         'format': 'full',
       }),
       headers: {'Authorization': 'Bearer $token'},
     );
-    if (response.statusCode != 200)
+    if (response.statusCode != 200) {
       throw StateError('Gmail message could not be loaded.');
+    }
     final data = Map<String, dynamic>.from(jsonDecode(response.body) as Map);
     final payload = Map<String, dynamic>.from(
       data['payload'] as Map? ?? const {},
@@ -841,8 +847,9 @@ class RcSowRepository {
     if (to.trim().isEmpty) throw ArgumentError('Recipient email is required.');
     if (body.trim().isEmpty) throw ArgumentError('Message body is required.');
     final token = googleProviderToken;
-    if (token == null || token.isEmpty)
+    if (token == null || token.isEmpty) {
       throw StateError('Google access token is not available.');
+    }
     final raw =
         'To: $to\r\nSubject: $subject\r\nContent-Type: text/plain; charset="UTF-8"\r\n\r\n$body';
     final encoded = base64Url.encode(utf8.encode(raw)).replaceAll('=', '');
@@ -911,8 +918,9 @@ class RcSowRepository {
       if ((preferPlain && mime == 'text/plain') ||
           (!preferPlain && mime == 'text/html')) {
         final decoded = decodeBody(part);
-        if (decoded.isNotEmpty)
+        if (decoded.isNotEmpty) {
           return mime == 'text/html' ? _stripHtml(decoded) : decoded;
+        }
       }
       for (final child
           in (part['parts'] as List? ?? const []).whereType<Map>()) {

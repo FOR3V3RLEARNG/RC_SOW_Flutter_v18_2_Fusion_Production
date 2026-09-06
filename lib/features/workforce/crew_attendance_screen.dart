@@ -44,8 +44,9 @@ class _CrewAttendanceScreenState extends State<CrewAttendanceScreen> {
 
   Future<_AttendanceData> _load() async {
     final houses = await widget.state.repository.houses(profile);
-    if (selectedHouse == null && houses.isNotEmpty)
+    if (selectedHouse == null && houses.isNotEmpty) {
       selectedHouse = houses.first.code;
+    }
     final rows = await widget.state.repository.crewAttendance(
       profile: profile,
       houseCode: selectedHouse,
@@ -191,8 +192,9 @@ class _CrewAttendanceScreenState extends State<CrewAttendanceScreen> {
                               initialDate: workDate,
                             );
                             if (!mounted) return;
-                            if (picked != null)
+                            if (picked != null) {
                               setState(() => workDate = picked);
+                            }
                           },
                         ),
                         const SizedBox(height: 8),

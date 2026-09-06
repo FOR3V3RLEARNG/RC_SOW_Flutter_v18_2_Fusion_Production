@@ -59,10 +59,11 @@ class _BeneficiarySearchScreenState extends State<BeneficiarySearchScreen> {
               future: future,
               builder: (_, snap) {
                 final records = snap.data ?? const <BeneficiaryRecord>[];
-                if (future == null)
+                if (future == null) {
                   return const Center(
                     child: Text('Search protected Shelter assessment data.'),
                   );
+                }
                 if (snap.connectionState == ConnectionState.waiting) {
                   return const Center(child: CircularProgressIndicator());
                 }
@@ -90,12 +91,13 @@ class _BeneficiarySearchScreenState extends State<BeneficiarySearchScreen> {
                     ),
                   );
                 }
-                if (records.isEmpty)
+                if (records.isEmpty) {
                   return const Center(
                     child: Text(
                       'No matching beneficiary records are visible for this account.',
                     ),
                   );
+                }
                 return ListView.separated(
                   padding: const EdgeInsets.fromLTRB(12, 0, 12, 40),
                   itemCount: records.length,
