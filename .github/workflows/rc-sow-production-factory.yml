@@ -97,7 +97,8 @@ jobs:
               --platforms=android \
               --org org.jamaicaredcross \
               --project-name rc_sow_flutter \
-              --empty
+              --empty \
+              --no-pub
           fi
           chmod +x scripts/patch_android.sh
           ./scripts/patch_android.sh
