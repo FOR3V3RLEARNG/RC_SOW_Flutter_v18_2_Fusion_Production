@@ -92,6 +92,27 @@ jobs:
       - name: Resolve dependencies
         run: flutter pub get
 
+      - name: Fusion analyzer auto-repair
+        if: github.event_name != 'pull_request'
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          dart fix --apply
+          dart format .
+          git diff --check
+
+          if ! git diff --quiet -- lib test; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+            git add -u -- lib test
+            git commit -m "chore(ci): apply analyzer-safe Dart fixes"
+            git push origin "HEAD:${GITHUB_REF_NAME}"
+          else
+            echo "No analyzer-safe source repairs required."
+          fi
+
       - name: Dependency compatibility graph
         run: flutter pub deps --style=compact
 

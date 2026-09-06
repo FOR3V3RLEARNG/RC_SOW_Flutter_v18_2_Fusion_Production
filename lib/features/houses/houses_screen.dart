@@ -246,7 +246,14 @@ class HouseCommandScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 12),
                 FilledButton.tonalIcon(
-                  onPressed: () => setState(() {}),
+                  onPressed: () => Navigator.of(context).pushReplacement(
+                    MaterialPageRoute<void>(
+                      builder: (_) => HouseCommandScreen(
+                        state: state,
+                        house: house,
+                      ),
+                    ),
+                  ),
                   icon: const Icon(Icons.refresh_rounded),
                   label: const Text('Retry'),
                 ),

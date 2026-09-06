@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:supabase_flutter/supabase_flutter.dart' show FileOptions;
 
 import '../../core/app_constants.dart';
 import '../../core/design_tokens.dart';
@@ -476,13 +477,14 @@ class _BeneficiarySourceAdminState extends State<_BeneficiarySourceAdmin> {
   }
 
   Future<void> _import() async {
-    final picked = await FilePicker.platform.pickFiles(
+    final picked = await FilePicker.pickFiles(
       type: FileType.custom,
       allowedExtensions: ['xlsx'],
       withData: true,
+      allowMultiple: false,
     );
-    if (picked == null || picked.files.isEmpty) return;
-    final file = picked.files.single;
+    if (picked.isEmpty) return;
+    final file = picked.single;
     final bytes = file.bytes;
     if (bytes == null) return;
     if (!mounted) return;
@@ -546,7 +548,7 @@ class _BeneficiarySourceAdminState extends State<_BeneficiarySourceAdmin> {
         'updated_at': DateTime.now().toUtc().toIso8601String(),
       }, onConflict: 'parish');
       if (mounted)
-        ScaffoldMessenger.of(context).showSnackBar(
+        ScaffoldMessenger.of(this.context).showSnackBar(
           SnackBar(
             content: Text('$count beneficiary rows imported for $selected.'),
           ),
@@ -554,7 +556,7 @@ class _BeneficiarySourceAdminState extends State<_BeneficiarySourceAdmin> {
       await refresh();
     } catch (_) {
       if (mounted)
-        ScaffoldMessenger.of(context).showSnackBar(
+        ScaffoldMessenger.of(this.context).showSnackBar(
           const SnackBar(
             content: Text(
               'Beneficiary workbook could not be imported. Confirm the Shelter workbook format and backend migration.',
@@ -644,13 +646,14 @@ class _TemplateAdminState extends State<_TemplateAdmin> {
   }
 
   Future<void> _upload() async {
-    final result = await FilePicker.platform.pickFiles(
+    final result = await FilePicker.pickFiles(
       withData: true,
       allowedExtensions: ['xlsx', 'docx', 'pdf'],
       type: FileType.custom,
+      allowMultiple: false,
     );
-    if (result == null || result.files.isEmpty) return;
-    final file = result.files.single;
+    if (result.isEmpty) return;
+    final file = result.single;
     final bytes = file.bytes;
     if (bytes == null) return;
     const schemaNames = <String, String>{
@@ -895,7 +898,7 @@ class _FormStudioState extends State<_FormStudio> {
           : 'custom:${_slug(rawEvent)}';
       if (normalizedEvent == 'custom:' || _parseFields(fields.text).isEmpty) {
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
+          ScaffoldMessenger.of(this.context).showSnackBar(
             const SnackBar(
               content: Text(
                 'A form needs a valid event key and at least one field.',
@@ -1016,7 +1019,7 @@ class _ParishMapAdminState extends State<_ParishMapAdmin> {
                       url: url,
                     );
                     if (mounted)
-                      ScaffoldMessenger.of(context).showSnackBar(
+                      ScaffoldMessenger.of(this.context).showSnackBar(
                         SnackBar(content: Text('$parish map saved.')),
                       );
                   },

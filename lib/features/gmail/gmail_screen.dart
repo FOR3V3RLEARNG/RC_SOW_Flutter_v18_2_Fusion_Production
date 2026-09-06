@@ -55,7 +55,7 @@ class _GmailScreenState extends State<GmailScreen> {
             }
             if (items.isEmpty &&
                 snap.connectionState != ConnectionState.waiting) {
-              return const ListView(
+              return ListView(
                 children: [
                   Padding(
                     padding: EdgeInsets.all(24),

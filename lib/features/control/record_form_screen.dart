@@ -3,6 +3,7 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
+import '../../core/design_tokens.dart';
 import '../../core/workforce.dart';
 import '../../core/record_schemas.dart';
 import '../../core/rc_components.dart';

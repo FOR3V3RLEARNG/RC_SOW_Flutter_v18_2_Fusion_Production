@@ -301,7 +301,7 @@ class _ActiveUsersBodyState extends State<ActiveUsersBody> {
             OutlinedButton.icon(
               onPressed: () async {
                 await Clipboard.setData(ClipboardData(text: email));
-                if (context.mounted) {
+                if (mounted) {
                   ScaffoldMessenger.of(this.context).showSnackBar(
                     const SnackBar(content: Text('Contact email copied.')),
                   );

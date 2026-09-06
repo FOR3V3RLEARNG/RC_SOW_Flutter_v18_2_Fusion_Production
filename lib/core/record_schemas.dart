@@ -95,11 +95,7 @@ class RcRecordSchema {
     title: '${map['title'] ?? ''}',
     eventType: '${map['eventType'] ?? map['event_type'] ?? ''}',
     phase: '${map['phase'] ?? 'Other'}',
-    icon: IconData(
-      (map['iconCodePoint'] as num?)?.toInt() ??
-          Icons.description_outlined.codePoint,
-      fontFamily: 'MaterialIcons',
-    ),
+    icon: Icons.description_outlined,
     fields: (map['fields'] as List? ?? const [])
         .whereType<Map>()
         .map((e) => RcFormFieldDef.fromMap(Map<String, dynamic>.from(e)))

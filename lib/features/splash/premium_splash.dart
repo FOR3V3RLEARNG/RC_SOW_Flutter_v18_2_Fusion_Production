@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:math' as math;
-import 'dart:ui';
 
 import 'package:flame/game.dart';
 import 'package:flutter/material.dart';
@@ -108,6 +107,7 @@ class HouseRepairGame extends FlameGame {
 
   @override
   void render(Canvas canvas) {
+    super.render(canvas);
     final w = size.x;
     final h = size.y;
     final bg = Paint()
@@ -118,7 +118,6 @@ class HouseRepairGame extends FlameGame {
       ).createShader(Rect.fromLTWH(0, 0, w, h));
     canvas.drawRect(Rect.fromLTWH(0, 0, w, h), bg);
 
-    final t = reduceMotion ? 1.0 : stage(0, 2.85);
     final shake = reduceMotion
         ? 0.0
         : (stage(2.0, 2.45) *

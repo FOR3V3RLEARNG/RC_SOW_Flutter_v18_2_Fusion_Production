@@ -355,7 +355,7 @@ class _MessagesDrawerBodyState extends State<MessagesDrawerBody> {
                 final messages = snap.data ?? const <MessageRecord>[];
                 if (snap.connectionState == ConnectionState.waiting &&
                     messages.isEmpty) {
-                  return const ListView(
+                  return ListView(
                     children: [
                       Padding(
                         padding: EdgeInsets.all(32),
@@ -390,7 +390,7 @@ class _MessagesDrawerBodyState extends State<MessagesDrawerBody> {
                   );
                 }
                 if (messages.isEmpty) {
-                  return const ListView(
+                  return ListView(
                     children: [
                       Padding(
                         padding: EdgeInsets.all(24),
