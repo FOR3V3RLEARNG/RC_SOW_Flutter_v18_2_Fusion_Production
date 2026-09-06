@@ -248,10 +248,8 @@ class HouseCommandScreen extends StatelessWidget {
                 FilledButton.tonalIcon(
                   onPressed: () => Navigator.of(context).pushReplacement(
                     MaterialPageRoute<void>(
-                      builder: (_) => HouseCommandScreen(
-                        state: state,
-                        house: house,
-                      ),
+                      builder: (_) =>
+                          HouseCommandScreen(state: state, house: house),
                     ),
                   ),
                   icon: const Icon(Icons.refresh_rounded),
