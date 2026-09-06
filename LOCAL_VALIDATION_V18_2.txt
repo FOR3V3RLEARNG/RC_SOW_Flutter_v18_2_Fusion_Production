@@ -1,0 +1,27 @@
+RC SOW v18.2 local validation
+Date: 2026-08-20
+
+PASS  Uploaded ZIP readable (64 entries)
+PASS  Pubspec/YAML syntax parse
+PASS  GitHub workflow YAML parse
+PASS  Dart structural delimiter scan across lib/
+PASS  Relative Dart import targets exist
+PASS  scripts/patch_android.sh shell syntax
+PASS  OAuth callback has one canonical source in SupabaseConfig
+PASS  Android patch script reads callback from SupabaseConfig instead of maintaining an independent URI literal
+PASS  No new runtime dependency added
+PASS  ProductionRecord lifecycle model added
+PASS  Callback contract unit test added
+PASS  Production lifecycle model tests added
+PASS  Green Gate still targets Flutter 3.44.7 and APK + AAB
+PASS  Green Gate format step is now non-mutating/failing: dart format --output=none --set-exit-if-changed .
+PASS  Green Gate verifies generated Android OAuth scheme + host
+
+NOT RUN LOCALLY  dart format (Dart SDK is not installed in this execution container)
+NOT RUN LOCALLY  flutter analyze (Flutter SDK is not installed in this execution container)
+NOT RUN LOCALLY  flutter test (Flutter SDK is not installed in this execution container)
+NOT RUN LOCALLY  flutter build apk --release
+NOT RUN LOCALLY  flutter build appbundle --release
+
+These remain mandatory CI Green Gate checks and must pass before an APK/AAB is described as verified.
+Physical-device Google OAuth remains an end-to-end acceptance check after CI because it requires Google -> Supabase -> custom URI -> RC SOW session return on Android.
