@@ -475,16 +475,12 @@ class _BeneficiarySourceAdminState extends State<_BeneficiarySourceAdmin> {
   }
 
   Future<void> _import() async {
-    final picked = await FilePicker.pickFiles(
+    final file = await FilePicker.pickFile(
       type: FileType.custom,
       allowedExtensions: ['xlsx'],
-      withData: true,
-      allowMultiple: false,
     );
-    if (picked.isEmpty) return;
-    final file = picked.single;
-    final bytes = file.bytes;
-    if (bytes == null) return;
+    if (file == null) return;
+    final bytes = await file.readAsBytes();
     if (!mounted) return;
     String parish = 'Hanover';
     final selected = await showDialog<String>(
@@ -646,16 +642,13 @@ class _TemplateAdminState extends State<_TemplateAdmin> {
   }
 
   Future<void> _upload() async {
-    final result = await FilePicker.pickFiles(
-      withData: true,
+    final file = await FilePicker.pickFile(
       allowedExtensions: ['xlsx', 'docx', 'pdf'],
       type: FileType.custom,
-      allowMultiple: false,
     );
-    if (result.isEmpty) return;
-    final file = result.single;
-    final bytes = file.bytes;
-    if (bytes == null) return;
+    if (file == null) return;
+    final bytes = await file.readAsBytes();
+    if (!mounted) return;
     const schemaNames = <String, String>{
       'work-plan': 'Work Plan',
       'scope': 'Scope of Work',
