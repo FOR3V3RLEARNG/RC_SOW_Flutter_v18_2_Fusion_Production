@@ -68,7 +68,8 @@ class AppState extends ChangeNotifier {
             ? 'Session synchronized ($reason)'
             : 'Signed out ($reason)';
       } catch (error) {
-        lastAuthDiagnostic = 'Session sync failed ($reason): ${error.runtimeType}';
+        lastAuthDiagnostic =
+            'Session sync failed ($reason): ${error.runtimeType}';
         if (!signedIn) profile = null;
       } finally {
         _authSyncInFlight = false;
@@ -77,23 +78,29 @@ class AppState extends ChangeNotifier {
     } while (_authSyncQueued);
   }
 
-  Future<void> refreshProfile() => synchronizeAuthSession(reason: 'manual-refresh');
+  Future<void> refreshProfile() =>
+      synchronizeAuthSession(reason: 'manual-refresh');
 
   Future<void> _submitPendingRoleRequestIfNeeded() async {
     if (!signedIn || profile == null || profile!.approved) return;
     final prefs = await SharedPreferences.getInstance();
     final role = prefs.getString('pendingRequestedRole');
     final parish = prefs.getString('pendingRequestedParish');
-    if (role == null || role.isEmpty || parish == null || parish.isEmpty) return;
+    if (role == null || role.isEmpty || parish == null || parish.isEmpty)
+      return;
     try {
       final user = Supabase.instance.client.auth.currentUser;
-      await Supabase.instance.client.rpc('request_role_assignment', params: {
-        'p_requested_role': role,
-        'p_requested_parish': parish,
-        'p_full_name': user?.userMetadata?['full_name'] ??
-            user?.email?.split('@').first ??
-            'RC SOW user',
-      });
+      await Supabase.instance.client.rpc(
+        'request_role_assignment',
+        params: {
+          'p_requested_role': role,
+          'p_requested_parish': parish,
+          'p_full_name':
+              user?.userMetadata?['full_name'] ??
+              user?.email?.split('@').first ??
+              'RC SOW user',
+        },
+      );
       await prefs.remove('pendingRequestedRole');
       await prefs.remove('pendingRequestedParish');
       profile = await repository.currentProfile();
@@ -162,13 +169,13 @@ class AppState extends ChangeNotifier {
   }
 
   ThemeMode _themeModeFromString(String? value) => switch (value) {
-        'light' => ThemeMode.light,
-        'dark' => ThemeMode.dark,
-        _ => ThemeMode.system,
-      };
+    'light' => ThemeMode.light,
+    'dark' => ThemeMode.dark,
+    _ => ThemeMode.system,
+  };
 
   RcDesignDna _dnaFromString(String? value) => RcDesignDna.values.firstWhere(
-        (dna) => dna.name == value,
-        orElse: () => RcDesignDna.redCrossClassic,
-      );
+    (dna) => dna.name == value,
+    orElse: () => RcDesignDna.redCrossClassic,
+  );
 }

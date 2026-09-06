@@ -8,7 +8,10 @@ class RcSignaturePad extends StatefulWidget {
   const RcSignaturePad({super.key, this.title = 'Digital signature'});
   final String title;
 
-  static Future<Uint8List?> capture(BuildContext context, {String title = 'Digital signature'}) {
+  static Future<Uint8List?> capture(
+    BuildContext context, {
+    String title = 'Digital signature',
+  }) {
     return showModalBottomSheet<Uint8List>(
       context: context,
       isScrollControlled: true,
@@ -37,7 +40,8 @@ class _RcSignaturePadState extends State<RcSignaturePad> {
 
   Future<void> done() async {
     if (strokes.every((stroke) => stroke.isEmpty)) return;
-    final boundary = key.currentContext?.findRenderObject() as RenderRepaintBoundary?;
+    final boundary =
+        key.currentContext?.findRenderObject() as RenderRepaintBoundary?;
     if (boundary == null) return;
     final image = await boundary.toImage(pixelRatio: 2.5);
     final bytes = await image.toByteData(format: ui.ImageByteFormat.png);
@@ -57,7 +61,9 @@ class _RcSignaturePadState extends State<RcSignaturePad> {
           const SizedBox(height: 5),
           Text(
             'Sign with a finger or stylus. The signature is saved with signer, role and timestamp when the record is submitted.',
-            style: theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.onSurfaceVariant),
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: theme.colorScheme.onSurfaceVariant,
+            ),
           ),
           const SizedBox(height: 14),
           Expanded(
@@ -72,7 +78,8 @@ class _RcSignaturePadState extends State<RcSignaturePad> {
                 clipBehavior: Clip.antiAlias,
                 child: GestureDetector(
                   behavior: HitTestBehavior.opaque,
-                  onPanStart: (details) => setState(() => strokes.add([details.localPosition])),
+                  onPanStart: (details) =>
+                      setState(() => strokes.add([details.localPosition])),
                   onPanUpdate: (details) => add(details.localPosition),
                   onPanEnd: (_) => setState(() => strokes.add(<Offset>[])),
                   child: CustomPaint(

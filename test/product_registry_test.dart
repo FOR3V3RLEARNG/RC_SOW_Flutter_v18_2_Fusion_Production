@@ -3,13 +3,13 @@ import 'package:rc_sow_flutter/core/product_registry.dart';
 import 'package:rc_sow_flutter/models/app_models.dart';
 
 UserProfile profile(String role, {String parish = 'Hanover'}) => UserProfile(
-      userId: role,
-      email: '${role.toLowerCase().replaceAll(' ', '.')}@example.org',
-      role: role,
-      parish: parish,
-      approved: true,
-      privileges: const {},
-    );
+  userId: role,
+  email: '${role.toLowerCase().replaceAll(' ', '.')}@example.org',
+  role: role,
+  parish: parish,
+  approved: true,
+  privileges: const {},
+);
 
 void main() {
   test('crew experience exposes only field-owned production forms', () {
@@ -43,34 +43,44 @@ void main() {
     expect(RcProductRegistry.isCustomEventType('payment'), isFalse);
   });
 
+  test(
+    'admin dashboard is governance-first while production remains in chain',
+    () {
+      final admin = RcProductRegistry.experience(profile('Admin'));
+      expect(admin.quickActions, contains(RcQuickActionKey.adminUsers));
+      expect(admin.quickActions, contains(RcQuickActionKey.adminForms));
+      expect(
+        admin.quickActions,
+        isNot(contains(RcQuickActionKey.materialRequest)),
+      );
+    },
+  );
 
-  test('admin dashboard is governance-first while production remains in chain', () {
-    final admin = RcProductRegistry.experience(profile('Admin'));
-    expect(admin.quickActions, contains(RcQuickActionKey.adminUsers));
-    expect(admin.quickActions, contains(RcQuickActionKey.adminForms));
-    expect(admin.quickActions, isNot(contains(RcQuickActionKey.materialRequest)));
-  });
-
-  test('site supervisor defaults parish-first and can be explicitly promoted', () {
-    final normal = UserProfile(
-      userId: 'site',
-      email: 'site@example.org',
-      role: 'Site Supervisor',
-      parish: 'Hanover',
-      approved: true,
-      privileges: const {'viewAllParishes': false},
-    );
-    final promoted = UserProfile(
-      userId: 'site2',
-      email: 'site2@example.org',
-      role: 'Site Supervisor',
-      parish: 'Hanover',
-      approved: true,
-      privileges: const {'viewAllParishes': true},
-    );
-    expect(normal.canViewAllParishes, isFalse);
-    expect(promoted.canViewAllParishes, isTrue);
-    expect(RcProductRegistry.experience(promoted).heroTitle, contains('Multi-parish'));
-  });
-
+  test(
+    'site supervisor defaults parish-first and can be explicitly promoted',
+    () {
+      final normal = UserProfile(
+        userId: 'site',
+        email: 'site@example.org',
+        role: 'Site Supervisor',
+        parish: 'Hanover',
+        approved: true,
+        privileges: const {'viewAllParishes': false},
+      );
+      final promoted = UserProfile(
+        userId: 'site2',
+        email: 'site2@example.org',
+        role: 'Site Supervisor',
+        parish: 'Hanover',
+        approved: true,
+        privileges: const {'viewAllParishes': true},
+      );
+      expect(normal.canViewAllParishes, isFalse);
+      expect(promoted.canViewAllParishes, isTrue);
+      expect(
+        RcProductRegistry.experience(promoted).heroTitle,
+        contains('Multi-parish'),
+      );
+    },
+  );
 }

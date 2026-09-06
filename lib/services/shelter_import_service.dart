@@ -1,7 +1,12 @@
 import 'package:excel/excel.dart';
 
 class ShelterImportResult {
-  const ShelterImportResult({required this.rows, required this.sheetName, required this.headerRow, required this.sourceColumnCount});
+  const ShelterImportResult({
+    required this.rows,
+    required this.sheetName,
+    required this.headerRow,
+    required this.sourceColumnCount,
+  });
   final List<Map<String, dynamic>> rows;
   final String sheetName;
   final int headerRow;
@@ -41,7 +46,8 @@ abstract final class ShelterImportService {
     }
     final table = selected!;
     final rows = table.rows;
-    if (rows.isEmpty) throw const FormatException('The selected worksheet is empty.');
+    if (rows.isEmpty)
+      throw const FormatException('The selected worksheet is empty.');
 
     var headerIndex = 0;
     var headerScore = -1;
@@ -88,9 +94,20 @@ abstract final class ShelterImportService {
       final first = _find(raw, ['first name', 'firstname']);
       final middle = _find(raw, ['middle name', 'middlename']);
       final last = _find(raw, ['last name', 'lastname', 'surname']);
-      var name = [first, middle, last].where((x) => x.isNotEmpty).join(' ').trim();
-      if (name.isEmpty) name = _find(raw, ['beneficiary name', 'name of beneficiary', 'full name']);
-      final parish = _find(raw, ['parish']).isEmpty ? fallbackParish : _find(raw, ['parish']);
+      var name = [
+        first,
+        middle,
+        last,
+      ].where((x) => x.isNotEmpty).join(' ').trim();
+      if (name.isEmpty)
+        name = _find(raw, [
+          'beneficiary name',
+          'name of beneficiary',
+          'full name',
+        ]);
+      final parish = _find(raw, ['parish']).isEmpty
+          ? fallbackParish
+          : _find(raw, ['parish']);
       final community = _find(raw, ['community', 'village', 'cluster']);
       final gps = _find(raw, ['gps', 'gis']);
       final latitude = _number(_find(raw, ['latitude', 'lat']));
@@ -111,15 +128,24 @@ abstract final class ShelterImportService {
         'source_row': rowIndex + 1,
         'raw': raw,
         'roof_type': _find(raw, ['roof type', 'type of roof']),
-        'roof_length': _number(_find(raw, ['roof length', 'length of roof', 'length'])),
-        'roof_width': _number(_find(raw, ['roof width', 'width of roof', 'width'])),
+        'roof_length': _number(
+          _find(raw, ['roof length', 'length of roof', 'length']),
+        ),
+        'roof_width': _number(
+          _find(raw, ['roof width', 'width of roof', 'width']),
+        ),
         'wall_height': _number(_find(raw, ['wall height', 'height of wall'])),
         'building_type': _find(raw, ['building type', 'structure type']),
         'damage_extent': _find(raw, ['extent of damage', 'damage']),
       });
     }
 
-    return ShelterImportResult(rows: maps, sheetName: selectedName, headerRow: headerIndex + 1, sourceColumnCount: headers.length);
+    return ShelterImportResult(
+      rows: maps,
+      sheetName: selectedName,
+      headerRow: headerIndex + 1,
+      sourceColumnCount: headers.length,
+    );
   }
 
   static String _cellText(Data? cell) => cell?.value?.toString() ?? '';
@@ -137,13 +163,23 @@ abstract final class ShelterImportService {
   }
 
   static String _houseCode(List<Data?> row, Map<String, dynamic> raw) {
-    final byHeader = _find(raw, ['house code', 'house number', 'beneficiary code', 'beneficiary id']);
-    if (RegExp(r'^[A-Za-z]{1,5}[A-Za-z0-9-]*\d+[A-Za-z0-9-]*$').hasMatch(byHeader.replaceAll(' ', ''))) {
+    final byHeader = _find(raw, [
+      'house code',
+      'house number',
+      'beneficiary code',
+      'beneficiary id',
+    ]);
+    if (RegExp(
+      r'^[A-Za-z]{1,5}[A-Za-z0-9-]*\d+[A-Za-z0-9-]*$',
+    ).hasMatch(byHeader.replaceAll(' ', ''))) {
       return byHeader.replaceAll(' ', '');
     }
     for (var i = 0; i < row.length; i++) {
       final value = _cellText(row[i]).trim().replaceAll(' ', '');
-      if (RegExp(r'^[A-Za-z]{1,5}[A-Za-z0-9-]*\d+[A-Za-z0-9-]*$').hasMatch(value) && value.length <= 16) {
+      if (RegExp(
+            r'^[A-Za-z]{1,5}[A-Za-z0-9-]*\d+[A-Za-z0-9-]*$',
+          ).hasMatch(value) &&
+          value.length <= 16) {
         return value;
       }
     }
@@ -152,7 +188,9 @@ abstract final class ShelterImportService {
 
   static double? _number(String value) {
     if (value.trim().isEmpty) return null;
-    final match = RegExp(r'-?\d+(?:\.\d+)?').firstMatch(value.replaceAll(',', ''));
+    final match = RegExp(
+      r'-?\d+(?:\.\d+)?',
+    ).firstMatch(value.replaceAll(',', ''));
     return match == null ? null : double.tryParse(match.group(0)!);
   }
 }

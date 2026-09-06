@@ -44,7 +44,8 @@ class _CrewAttendanceScreenState extends State<CrewAttendanceScreen> {
 
   Future<_AttendanceData> _load() async {
     final houses = await widget.state.repository.houses(profile);
-    if (selectedHouse == null && houses.isNotEmpty) selectedHouse = houses.first.code;
+    if (selectedHouse == null && houses.isNotEmpty)
+      selectedHouse = houses.first.code;
     final rows = await widget.state.repository.crewAttendance(
       profile: profile,
       houseCode: selectedHouse,
@@ -74,10 +75,16 @@ class _CrewAttendanceScreenState extends State<CrewAttendanceScreen> {
         note: note.text.trim().isEmpty ? null : note.text.trim(),
       );
       await widget.state.feedback(strong: true);
-      _snack(action == 'sign_out' ? 'Signed out. Attendance is awaiting verification.' : 'Signed in. Attendance is awaiting verification.');
+      _snack(
+        action == 'sign_out'
+            ? 'Signed out. Attendance is awaiting verification.'
+            : 'Signed in. Attendance is awaiting verification.',
+      );
       await _refresh();
     } catch (_) {
-      _snack('Attendance could not be saved. Confirm this house is assigned to your crew and retry.');
+      _snack(
+        'Attendance could not be saved. Confirm this house is assigned to your crew and retry.',
+      );
     } finally {
       if (mounted) setState(() => busy = false);
     }
@@ -97,7 +104,9 @@ class _CrewAttendanceScreenState extends State<CrewAttendanceScreen> {
 
   void _snack(String message) {
     if (!mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(message)));
   }
 
   @override
@@ -117,8 +126,12 @@ class _CrewAttendanceScreenState extends State<CrewAttendanceScreen> {
               padding: const EdgeInsets.fromLTRB(16, 14, 16, 100),
               children: [
                 RcPageHeading(
-                  eyebrow: profile.isCrew ? 'Daily crew register' : 'Workforce control',
-                  title: profile.isCrew ? 'Sign attendance for assigned work' : 'Verify house attendance',
+                  eyebrow: profile.isCrew
+                      ? 'Daily crew register'
+                      : 'Workforce control',
+                  title: profile.isCrew
+                      ? 'Sign attendance for assigned work'
+                      : 'Verify house attendance',
                   subtitle: profile.isCrew
                       ? 'Attendance is tied to a specific house and becomes payable only after supervisor verification.'
                       : 'Review who worked, attendance status, clock times and verification before payment processing.',
@@ -127,19 +140,31 @@ class _CrewAttendanceScreenState extends State<CrewAttendanceScreen> {
                 if (profile.isCrew)
                   RcExpressiveSurface(
                     shape: RcSurfaceShape.hero,
-                    tone: theme.colorScheme.primaryContainer.withValues(alpha: .32),
+                    tone: theme.colorScheme.primaryContainer.withValues(
+                      alpha: .32,
+                    ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
                         DropdownButtonFormField<String>(
-                          key: ValueKey('attendance-house-${selectedHouse ?? ''}'),
-                          initialValue: houseCodes.contains(selectedHouse) ? selectedHouse : null,
-                          decoration: const InputDecoration(labelText: 'Assigned house'),
+                          key: ValueKey(
+                            'attendance-house-${selectedHouse ?? ''}',
+                          ),
+                          initialValue: houseCodes.contains(selectedHouse)
+                              ? selectedHouse
+                              : null,
+                          decoration: const InputDecoration(
+                            labelText: 'Assigned house',
+                          ),
                           items: data.houses
-                              .map((house) => DropdownMenuItem(
-                                    value: house.code,
-                                    child: Text('${house.code} • ${house.beneficiary}'),
-                                  ))
+                              .map(
+                                (house) => DropdownMenuItem(
+                                  value: house.code,
+                                  child: Text(
+                                    '${house.code} • ${house.beneficiary}',
+                                  ),
+                                ),
+                              )
                               .toList(),
                           onChanged: (value) async {
                             setState(() {
@@ -152,41 +177,60 @@ class _CrewAttendanceScreenState extends State<CrewAttendanceScreen> {
                         ListTile(
                           contentPadding: EdgeInsets.zero,
                           title: const Text('Work date'),
-                          subtitle: Text(workDate.toIso8601String().split('T').first),
+                          subtitle: Text(
+                            workDate.toIso8601String().split('T').first,
+                          ),
                           trailing: const Icon(Icons.calendar_today_outlined),
                           onTap: () async {
                             final picked = await showDatePicker(
                               context: context,
                               firstDate: DateTime(2025),
-                              lastDate: DateTime.now().add(const Duration(days: 7)),
+                              lastDate: DateTime.now().add(
+                                const Duration(days: 7),
+                              ),
                               initialDate: workDate,
                             );
                             if (!mounted) return;
-                            if (picked != null) setState(() => workDate = picked);
+                            if (picked != null)
+                              setState(() => workDate = picked);
                           },
                         ),
                         const SizedBox(height: 8),
                         DropdownButtonFormField<String>(
                           initialValue: status,
-                          decoration: const InputDecoration(labelText: 'Attendance status'),
-                          items: const ['Present', 'Half day', 'Absent', 'Excused']
-                              .map((value) => DropdownMenuItem(value: value, child: Text(value)))
-                              .toList(),
-                          onChanged: busy ? null : (value) => setState(() => status = value!),
+                          decoration: const InputDecoration(
+                            labelText: 'Attendance status',
+                          ),
+                          items:
+                              const ['Present', 'Half day', 'Absent', 'Excused']
+                                  .map(
+                                    (value) => DropdownMenuItem(
+                                      value: value,
+                                      child: Text(value),
+                                    ),
+                                  )
+                                  .toList(),
+                          onChanged: busy
+                              ? null
+                              : (value) => setState(() => status = value!),
                         ),
                         const SizedBox(height: 10),
                         TextField(
                           controller: note,
                           minLines: 2,
                           maxLines: 4,
-                          decoration: const InputDecoration(labelText: 'Work / attendance note'),
+                          decoration: const InputDecoration(
+                            labelText: 'Work / attendance note',
+                          ),
                         ),
                         const SizedBox(height: 14),
                         Row(
                           children: [
                             Expanded(
                               child: FilledButton.icon(
-                                onPressed: busy || data.houses.isEmpty ? null : () => _submit('sign_in'),
+                                onPressed: busy || data.houses.isEmpty
+                                    ? null
+                                    : () => _submit('sign_in'),
                                 icon: const Icon(Icons.login_rounded),
                                 label: const Text('Sign in'),
                               ),
@@ -194,7 +238,9 @@ class _CrewAttendanceScreenState extends State<CrewAttendanceScreen> {
                             const SizedBox(width: 10),
                             Expanded(
                               child: FilledButton.tonalIcon(
-                                onPressed: busy || data.houses.isEmpty ? null : () => _submit('sign_out'),
+                                onPressed: busy || data.houses.isEmpty
+                                    ? null
+                                    : () => _submit('sign_out'),
                                 icon: const Icon(Icons.logout_rounded),
                                 label: const Text('Sign out'),
                               ),
@@ -203,7 +249,9 @@ class _CrewAttendanceScreenState extends State<CrewAttendanceScreen> {
                         ),
                         if (data.houses.isEmpty) ...[
                           const SizedBox(height: 12),
-                          const Text('No active house is assigned to this crew account. Ask the Site Supervisor or management team to assign a house.'),
+                          const Text(
+                            'No active house is assigned to this crew account. Ask the Site Supervisor or management team to assign a house.',
+                          ),
                         ],
                       ],
                     ),
@@ -211,18 +259,33 @@ class _CrewAttendanceScreenState extends State<CrewAttendanceScreen> {
                 if (profile.isCrew) const SizedBox(height: 18),
                 Row(
                   children: [
-                    Expanded(child: Text('Attendance ledger', style: theme.textTheme.titleLarge)),
+                    Expanded(
+                      child: Text(
+                        'Attendance ledger',
+                        style: theme.textTheme.titleLarge,
+                      ),
+                    ),
                     if (snap.connectionState == ConnectionState.waiting)
-                      const SizedBox(width: 22, height: 22, child: CircularProgressIndicator(strokeWidth: 2)),
+                      const SizedBox(
+                        width: 22,
+                        height: 22,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      ),
                   ],
                 ),
                 const SizedBox(height: 9),
-                if (data.rows.isEmpty && snap.connectionState != ConnectionState.waiting)
-                  const RcExpressiveSurface(child: Text('No attendance entries are visible for this selection.')),
+                if (data.rows.isEmpty &&
+                    snap.connectionState != ConnectionState.waiting)
+                  const RcExpressiveSurface(
+                    child: Text(
+                      'No attendance entries are visible for this selection.',
+                    ),
+                  ),
                 ...data.rows.map((row) {
                   final verified = row['verified'] == true;
                   final statusText = '${row['status'] ?? ''}';
-                  final name = '${row['member_name'] ?? row['member_email'] ?? 'Crew member'}';
+                  final name =
+                      '${row['member_name'] ?? row['member_email'] ?? 'Crew member'}';
                   final role = '${row['member_role'] ?? ''}';
                   final date = '${row['work_date'] ?? ''}';
                   return Padding(
@@ -233,8 +296,17 @@ class _CrewAttendanceScreenState extends State<CrewAttendanceScreen> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           CircleAvatar(
-                            backgroundColor: verified ? RcColors.success.withValues(alpha: .12) : RcColors.warning.withValues(alpha: .12),
-                            child: Icon(verified ? Icons.verified_outlined : Icons.schedule_outlined, color: verified ? RcColors.success : RcColors.warning),
+                            backgroundColor: verified
+                                ? RcColors.success.withValues(alpha: .12)
+                                : RcColors.warning.withValues(alpha: .12),
+                            child: Icon(
+                              verified
+                                  ? Icons.verified_outlined
+                                  : Icons.schedule_outlined,
+                              color: verified
+                                  ? RcColors.success
+                                  : RcColors.warning,
+                            ),
                           ),
                           const SizedBox(width: 12),
                           Expanded(
@@ -243,23 +315,41 @@ class _CrewAttendanceScreenState extends State<CrewAttendanceScreen> {
                               children: [
                                 Text(name, style: theme.textTheme.titleMedium),
                                 const SizedBox(height: 3),
-                                Text('${row['house_code'] ?? ''} • $role • $date'),
+                                Text(
+                                  '${row['house_code'] ?? ''} • $role • $date',
+                                ),
                                 const SizedBox(height: 6),
                                 Wrap(
                                   spacing: 6,
                                   runSpacing: 6,
                                   children: [
-                                    RcStatusPill(label: statusText.toUpperCase(), color: statusText == 'Absent' ? RcColors.warning : theme.colorScheme.primary),
-                                    RcStatusPill(label: verified ? 'VERIFIED' : 'PENDING', color: verified ? RcColors.success : RcColors.warning),
+                                    RcStatusPill(
+                                      label: statusText.toUpperCase(),
+                                      color: statusText == 'Absent'
+                                          ? RcColors.warning
+                                          : theme.colorScheme.primary,
+                                    ),
+                                    RcStatusPill(
+                                      label: verified ? 'VERIFIED' : 'PENDING',
+                                      color: verified
+                                          ? RcColors.success
+                                          : RcColors.warning,
+                                    ),
                                   ],
                                 ),
-                                if ('${row['note'] ?? ''}'.trim().isNotEmpty) ...[
+                                if ('${row['note'] ?? ''}'
+                                    .trim()
+                                    .isNotEmpty) ...[
                                   const SizedBox(height: 6),
                                   Text('${row['note']}'),
                                 ],
-                                if (row['clock_in'] != null || row['clock_out'] != null) ...[
+                                if (row['clock_in'] != null ||
+                                    row['clock_out'] != null) ...[
                                   const SizedBox(height: 5),
-                                  Text('In ${_time(row['clock_in'])} • Out ${_time(row['clock_out'])}', style: theme.textTheme.bodySmall),
+                                  Text(
+                                    'In ${_time(row['clock_in'])} • Out ${_time(row['clock_out'])}',
+                                    style: theme.textTheme.bodySmall,
+                                  ),
                                 ],
                               ],
                             ),
@@ -278,7 +368,9 @@ class _CrewAttendanceScreenState extends State<CrewAttendanceScreen> {
                   const SizedBox(height: 12),
                   RcExpressiveSurface(
                     tone: theme.colorScheme.errorContainer,
-                    child: const Text('Attendance could not be loaded. Apply the v20.3 workforce migration and retry.'),
+                    child: const Text(
+                      'Attendance could not be loaded. Apply the v20.3 workforce migration and retry.',
+                    ),
                   ),
                 ],
               ],

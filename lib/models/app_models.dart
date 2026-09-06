@@ -30,7 +30,8 @@ class UserProfile {
   bool get isSiteSupervisor => role == 'Site Supervisor';
   bool get isTechnicalAdmin => role == 'Technical Admin';
   bool get isCommunityAdmin => role == 'Community Admin';
-  bool get isLimitedParishRole => isSiteSupervisor || isTechnicalAdmin || isCommunityAdmin || isCrew;
+  bool get isLimitedParishRole =>
+      isSiteSupervisor || isTechnicalAdmin || isCommunityAdmin || isCrew;
 
   bool hasPrivilege(String key) => privileges[key] == true;
 
@@ -41,7 +42,8 @@ class UserProfile {
   bool get canApproveScope => hasPrivilege('approveScope');
   bool get canExportData => hasPrivilege('exportData');
   bool get canEditProduction => hasPrivilege('editControl');
-  bool get canCreateCommunityEvent => isAdmin && hasPrivilege('manageCommunity');
+  bool get canCreateCommunityEvent =>
+      isAdmin && hasPrivilege('manageCommunity');
   bool get canModerateCommunity => isAdmin && hasPrivilege('manageCommunity');
 
   String get displayName => (fullName?.trim().isNotEmpty ?? false)
@@ -49,16 +51,18 @@ class UserProfile {
       : email.split('@').first;
 
   factory UserProfile.fromMap(Map<String, dynamic> map) => UserProfile(
-        userId: '${map['user_id'] ?? ''}',
-        email: '${map['email'] ?? ''}',
-        role: '${map['role'] ?? ''}',
-        parish: '${map['parish'] ?? ''}',
-        approved: map['approved'] == true,
-        active: map['active'] != false,
-        registrationStatus: '${map['registration_status'] ?? 'approved'}',
-        privileges: Map<String, dynamic>.from(map['privileges'] as Map? ?? const {}),
-        fullName: map['full_name'] as String?,
-      );
+    userId: '${map['user_id'] ?? ''}',
+    email: '${map['email'] ?? ''}',
+    role: '${map['role'] ?? ''}',
+    parish: '${map['parish'] ?? ''}',
+    approved: map['approved'] == true,
+    active: map['active'] != false,
+    registrationStatus: '${map['registration_status'] ?? 'approved'}',
+    privileges: Map<String, dynamic>.from(
+      map['privileges'] as Map? ?? const {},
+    ),
+    fullName: map['full_name'] as String?,
+  );
 }
 
 class BeneficiaryRecord {
@@ -95,8 +99,11 @@ class BeneficiaryRecord {
   bool get hasCoordinates => latitude != null && longitude != null;
 
   factory BeneficiaryRecord.fromMap(Map<String, dynamic> map) {
-    final source = Map<String, dynamic>.from(map['source_payload'] as Map? ?? const {});
-    double? d(Object? value) => value is num ? value.toDouble() : double.tryParse('$value');
+    final source = Map<String, dynamic>.from(
+      map['source_payload'] as Map? ?? const {},
+    );
+    double? d(Object? value) =>
+        value is num ? value.toDouble() : double.tryParse('$value');
     return BeneficiaryRecord(
       houseCode: '${map['house_code'] ?? ''}',
       beneficiaryName: '${map['beneficiary_name'] ?? ''}',
@@ -144,9 +151,15 @@ class HouseRecord {
       parish: '${row['parish'] ?? item['parish'] ?? ''}',
       cluster: '${item['cluster'] ?? ''}',
       stage: '${item['stage'] ?? item['status'] ?? 'Not specified'}',
-      progress: ((item['progress'] as num?)?.round() ?? 0).clamp(0, 100).toInt(),
-      assignedCrew: (item['assignedCrew'] as List? ?? const []).map((e) => '$e').toList(),
-      updatedAt: DateTime.tryParse('${row['updated_at'] ?? row['created_at'] ?? ''}'),
+      progress: ((item['progress'] as num?)?.round() ?? 0)
+          .clamp(0, 100)
+          .toInt(),
+      assignedCrew: (item['assignedCrew'] as List? ?? const [])
+          .map((e) => '$e')
+          .toList(),
+      updatedAt: DateTime.tryParse(
+        '${row['updated_at'] ?? row['created_at'] ?? ''}',
+      ),
     );
   }
 }
@@ -180,8 +193,10 @@ class MessageRecord {
 
   factory MessageRecord.fromEvent(Map<String, dynamic> row, String email) {
     final item = Map<String, dynamic>.from(row['item'] as Map? ?? const {});
-    final readBy = (item['readBy'] as List?)?.map((e) => '$e').toSet() ?? <String>{};
-    final recipientRaw = row['recipients'] as List? ?? item['recipients'] as List? ?? const [];
+    final readBy =
+        (item['readBy'] as List?)?.map((e) => '$e').toSet() ?? <String>{};
+    final recipientRaw =
+        row['recipients'] as List? ?? item['recipients'] as List? ?? const [];
     return MessageRecord(
       id: '${row['item_id'] ?? row['id']}',
       sender: '${item['senderName'] ?? row['created_by_email'] ?? 'RC SOW'}',
@@ -189,11 +204,15 @@ class MessageRecord {
       senderRole: '${item['fromRole'] ?? ''}',
       subject: '${item['subject'] ?? item['title'] ?? 'Message'}',
       body: '${item['body'] ?? item['message'] ?? ''}',
-      createdAt: DateTime.tryParse('${row['created_at'] ?? ''}') ?? DateTime.now(),
+      createdAt:
+          DateTime.tryParse('${row['created_at'] ?? ''}') ?? DateTime.now(),
       unread: !readBy.contains(email),
       houseCode: (row['house_code'] ?? item['houseCode'])?.toString(),
       priority: '${item['priority'] ?? 'Normal'}',
-      recipients: recipientRaw.whereType<Map>().map((e) => Map<String, dynamic>.from(e)).toList(),
+      recipients: recipientRaw
+          .whereType<Map>()
+          .map((e) => Map<String, dynamic>.from(e))
+          .toList(),
     );
   }
 }
@@ -224,17 +243,19 @@ class ManagedUser {
   final DateTime? lastSeen;
 
   factory ManagedUser.fromMap(Map<String, dynamic> map) => ManagedUser(
-        userId: '${map['user_id'] ?? ''}',
-        email: '${map['email'] ?? ''}',
-        fullName: '${map['full_name'] ?? ''}',
-        role: '${map['role'] ?? ''}',
-        parish: '${map['parish'] ?? ''}',
-        approved: map['approved'] == true,
-        active: map['active'] == true,
-        registrationStatus: '${map['registration_status'] ?? ''}',
-        privileges: Map<String, dynamic>.from(map['privileges'] as Map? ?? const {}),
-        lastSeen: DateTime.tryParse('${map['last_seen'] ?? ''}'),
-      );
+    userId: '${map['user_id'] ?? ''}',
+    email: '${map['email'] ?? ''}',
+    fullName: '${map['full_name'] ?? ''}',
+    role: '${map['role'] ?? ''}',
+    parish: '${map['parish'] ?? ''}',
+    approved: map['approved'] == true,
+    active: map['active'] == true,
+    registrationStatus: '${map['registration_status'] ?? ''}',
+    privileges: Map<String, dynamic>.from(
+      map['privileges'] as Map? ?? const {},
+    ),
+    lastSeen: DateTime.tryParse('${map['last_seen'] ?? ''}'),
+  );
 }
 
 class RoofMeasurements {
@@ -253,7 +274,8 @@ class RoofMeasurements {
   double get ridgeRiseFt => widthFt / 2 * pitchRisePer12 / 12;
   double get ridgeHeightFt => wallHeightFt + ridgeRiseFt;
   double get halfSpanFt => widthFt / 2;
-  double get rafterLengthFt => (halfSpanFt * halfSpanFt + ridgeRiseFt * ridgeRiseFt).sqrt();
+  double get rafterLengthFt =>
+      (halfSpanFt * halfSpanFt + ridgeRiseFt * ridgeRiseFt).sqrt();
 }
 
 extension _NumSqrt on double {
@@ -290,8 +312,15 @@ class ProductionRecord {
   final DateTime updatedAt;
   final Map<String, dynamic> item;
 
-  bool get isClosed => const {'Completed', 'Approved', 'Paid', 'Closed'}.contains(status);
-  bool get needsAttention => const {'Rejected', 'Blocked', 'Overdue', 'Critical', 'Need Attention'}.contains(status);
+  bool get isClosed =>
+      const {'Completed', 'Approved', 'Paid', 'Closed'}.contains(status);
+  bool get needsAttention => const {
+    'Rejected',
+    'Blocked',
+    'Overdue',
+    'Critical',
+    'Need Attention',
+  }.contains(status);
   bool get paymentReceived => eventType == 'payment' && status == 'Paid';
 
   factory ProductionRecord.fromEvent(Map<String, dynamic> row) {
@@ -304,31 +333,36 @@ class ProductionRecord {
       parish: '${row['parish'] ?? item['parish'] ?? ''}',
       status: '${item['status'] ?? 'Open'}',
       title: '${item['title'] ?? productionTitle(eventType)}',
-      summary: '${item['summary'] ?? item['note'] ?? item['description'] ?? ''}',
-      updatedAt: DateTime.tryParse('${row['updated_at'] ?? row['created_at'] ?? ''}') ?? DateTime.now(),
+      summary:
+          '${item['summary'] ?? item['note'] ?? item['description'] ?? ''}',
+      updatedAt:
+          DateTime.tryParse(
+            '${row['updated_at'] ?? row['created_at'] ?? ''}',
+          ) ??
+          DateTime.now(),
       item: item,
     );
   }
 }
 
 String productionTitle(String eventType) => switch (eventType) {
-      'scope' => 'Scope of Work',
-      'controlData' => 'Control of Work',
-      'workPlan' => 'Work Plan',
-      'workProjection' => 'Weekly Work Projection',
-      'constructionSchedule' => 'Construction Schedule',
-      'crewAttendance' => 'Crew Daily Attendance',
-      'monitoring' => 'Monitoring Checklist',
-      'siteVisit' => 'Site Visit',
-      'dailyLog' => 'Daily Site Log',
-      'documentChecklist' => 'Document Checklist',
-      'materialRequest' => 'Material Request',
-      'consumables' => 'Consumables Form',
-      'inventory' => 'Inventory Tracker',
-      'notice' => 'Notice of Completion',
-      'payment' => 'Payment Request',
-      'communityPost' => 'Community Post',
-      'communitySuggestion' => 'Community Suggestion',
-      'signatureRequest' => 'Signature Request',
-      _ => eventType.isEmpty ? 'Production Record' : eventType,
-    };
+  'scope' => 'Scope of Work',
+  'controlData' => 'Control of Work',
+  'workPlan' => 'Work Plan',
+  'workProjection' => 'Weekly Work Projection',
+  'constructionSchedule' => 'Construction Schedule',
+  'crewAttendance' => 'Crew Daily Attendance',
+  'monitoring' => 'Monitoring Checklist',
+  'siteVisit' => 'Site Visit',
+  'dailyLog' => 'Daily Site Log',
+  'documentChecklist' => 'Document Checklist',
+  'materialRequest' => 'Material Request',
+  'consumables' => 'Consumables Form',
+  'inventory' => 'Inventory Tracker',
+  'notice' => 'Notice of Completion',
+  'payment' => 'Payment Request',
+  'communityPost' => 'Community Post',
+  'communitySuggestion' => 'Community Suggestion',
+  'signatureRequest' => 'Signature Request',
+  _ => eventType.isEmpty ? 'Production Record' : eventType,
+};

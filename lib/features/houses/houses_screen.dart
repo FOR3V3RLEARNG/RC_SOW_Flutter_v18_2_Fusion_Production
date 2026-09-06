@@ -29,7 +29,9 @@ class _HousesScreenState extends State<HousesScreen> {
   }
 
   Future<void> _refresh() async {
-    setState(() => future = widget.state.repository.houses(widget.state.profile!));
+    setState(
+      () => future = widget.state.repository.houses(widget.state.profile!),
+    );
     await future;
   }
 
@@ -91,7 +93,8 @@ class _HousesScreenState extends State<HousesScreen> {
                     'Could not load houses. Check connectivity and pull to refresh.',
                   ),
                 ),
-              if (snap.connectionState != ConnectionState.waiting && filtered.isEmpty)
+              if (snap.connectionState != ConnectionState.waiting &&
+                  filtered.isEmpty)
                 const RcExpressiveSurface(
                   child: Text('No active houses are visible for this account.'),
                 ),
@@ -177,12 +180,11 @@ class _HousesScreenState extends State<HousesScreen> {
     Navigator.of(context).push(
       PageRouteBuilder<void>(
         settings: RouteSettings(name: '/houses/${house.code}'),
-        transitionDuration:
-            widget.state.reduceMotion ? Duration.zero : RcMotion.medium,
-        pageBuilder: (_, _, _) => HouseCommandScreen(
-          state: widget.state,
-          house: house,
-        ),
+        transitionDuration: widget.state.reduceMotion
+            ? Duration.zero
+            : RcMotion.medium,
+        pageBuilder: (_, _, _) =>
+            HouseCommandScreen(state: widget.state, house: house),
         transitionsBuilder: (_, animation, _, child) => FadeTransition(
           opacity: animation,
           child: SlideTransition(
@@ -209,10 +211,7 @@ class HouseCommandScreen extends StatelessWidget {
 
   Future<_HouseCommandData> _load() async {
     final results = await Future.wait([
-      state.repository.productionRecords(
-        state.profile!,
-        houseCode: house.code,
-      ),
+      state.repository.productionRecords(state.profile!, houseCode: house.code),
       state.repository.crewAttendance(
         profile: state.profile!,
         houseCode: house.code,
@@ -241,7 +240,9 @@ class HouseCommandScreen extends StatelessWidget {
               children: [
                 RcExpressiveSurface(
                   tone: Theme.of(context).colorScheme.errorContainer,
-                  child: const Text('This house workspace could not be loaded. Your data was not changed. Check the connection and retry.'),
+                  child: const Text(
+                    'This house workspace could not be loaded. Your data was not changed. Check the connection and retry.',
+                  ),
                 ),
                 const SizedBox(height: 12),
                 FilledButton.tonalIcon(
@@ -253,7 +254,8 @@ class HouseCommandScreen extends StatelessWidget {
             );
           }
           final records = snap.data?.records ?? const <ProductionRecord>[];
-          final attendance = snap.data?.attendance ?? const <Map<String, dynamic>>[];
+          final attendance =
+              snap.data?.attendance ?? const <Map<String, dynamic>>[];
           final open = records.where((r) => !r.isClosed).length;
           final attention = records.where((r) => r.needsAttention).length;
           return ListView(
@@ -293,7 +295,9 @@ class HouseCommandScreen extends StatelessWidget {
                             ),
                             RcStatusPill(
                               label: '$attention ATTENTION',
-                              color: attention > 0 ? RcColors.warning : RcColors.success,
+                              color: attention > 0
+                                  ? RcColors.warning
+                                  : RcColors.success,
                             ),
                           ],
                         ),
@@ -336,26 +340,59 @@ class HouseCommandScreen extends StatelessWidget {
                 records: records,
                 onOpen: (type) {
                   if (type == 'crewAttendance') {
-                    Navigator.of(context).push(MaterialPageRoute(builder: (_) => CrewAttendanceScreen(state: state, initialHouseCode: house.code)));
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (_) => CrewAttendanceScreen(
+                          state: state,
+                          initialHouseCode: house.code,
+                        ),
+                      ),
+                    );
                   } else {
-                    Navigator.of(context).push(MaterialPageRoute(builder: (_) => ProductionModuleScreen(state: state, schema: RcRecordSchemas.byEventType(type))));
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (_) => ProductionModuleScreen(
+                          state: state,
+                          schema: RcRecordSchemas.byEventType(type),
+                        ),
+                      ),
+                    );
                   }
                 },
               ),
               const SizedBox(height: 18),
               _AttendanceSummary(
                 rows: attendance,
-                onOpen: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => CrewAttendanceScreen(state: state, initialHouseCode: house.code))),
+                onOpen: () => Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (_) => CrewAttendanceScreen(
+                      state: state,
+                      initialHouseCode: house.code,
+                    ),
+                  ),
+                ),
               ),
               if (state.profile!.hasPrivilege('manageCrew')) ...[
                 const SizedBox(height: 18),
-                CrewAssignmentPanel(state: state, initialHouseCode: house.code, compact: true),
+                CrewAssignmentPanel(
+                  state: state,
+                  initialHouseCode: house.code,
+                  compact: true,
+                ),
               ],
               const SizedBox(height: 18),
               Row(
                 children: [
-                  Expanded(child: Text('Evidence & activity', style: theme.textTheme.titleLarge)),
-                  Text('${records.length} records', style: theme.textTheme.labelMedium),
+                  Expanded(
+                    child: Text(
+                      'Evidence & activity',
+                      style: theme.textTheme.titleLarge,
+                    ),
+                  ),
+                  Text(
+                    '${records.length} records',
+                    style: theme.textTheme.labelMedium,
+                  ),
                 ],
               ),
               const SizedBox(height: 9),
@@ -368,7 +405,9 @@ class HouseCommandScreen extends StatelessWidget {
                 )
               else if (records.isEmpty)
                 const RcExpressiveSurface(
-                  child: Text('No production records are linked to this house yet.'),
+                  child: Text(
+                    'No production records are linked to this house yet.',
+                  ),
                 )
               else
                 ...records.map(
@@ -378,9 +417,26 @@ class HouseCommandScreen extends StatelessWidget {
                       shape: RcSurfaceShape.offset,
                       onTap: () {
                         if (r.eventType == 'crewAttendance') {
-                          Navigator.of(context).push(MaterialPageRoute(builder: (_) => CrewAttendanceScreen(state: state, initialHouseCode: house.code)));
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (_) => CrewAttendanceScreen(
+                                state: state,
+                                initialHouseCode: house.code,
+                              ),
+                            ),
+                          );
                         } else {
-                          Navigator.of(context).push(MaterialPageRoute(builder: (_) => RecordFormScreen(state: state, schema: RcRecordSchemas.byEventType(r.eventType), record: r)));
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (_) => RecordFormScreen(
+                                state: state,
+                                schema: RcRecordSchemas.byEventType(
+                                  r.eventType,
+                                ),
+                                record: r,
+                              ),
+                            ),
+                          );
                         }
                       },
                       child: Row(
@@ -398,13 +454,20 @@ class HouseCommandScreen extends StatelessWidget {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(r.title, style: theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w900)),
+                                Text(
+                                  r.title,
+                                  style: theme.textTheme.titleSmall?.copyWith(
+                                    fontWeight: FontWeight.w900,
+                                  ),
+                                ),
                                 const SizedBox(height: 2),
                                 Text(
                                   r.summary.isEmpty ? r.eventType : r.summary,
                                   maxLines: 2,
                                   overflow: TextOverflow.ellipsis,
-                                  style: theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.onSurfaceVariant),
+                                  style: theme.textTheme.bodySmall?.copyWith(
+                                    color: theme.colorScheme.onSurfaceVariant,
+                                  ),
                                 ),
                               ],
                             ),
@@ -414,8 +477,8 @@ class HouseCommandScreen extends StatelessWidget {
                             color: r.needsAttention
                                 ? RcColors.warning
                                 : r.isClosed
-                                    ? RcColors.success
-                                    : theme.colorScheme.secondary,
+                                ? RcColors.success
+                                : theme.colorScheme.secondary,
                           ),
                         ],
                       ),
@@ -429,7 +492,6 @@ class HouseCommandScreen extends StatelessWidget {
     );
   }
 }
-
 
 class _AttendanceSummary extends StatelessWidget {
   const _AttendanceSummary({required this.rows, required this.onOpen});
@@ -446,32 +508,57 @@ class _AttendanceSummary extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(children: [
-            Icon(Icons.how_to_reg_outlined, color: theme.colorScheme.primary),
-            const SizedBox(width: 8),
-            Expanded(child: Text('Who worked on this house', style: theme.textTheme.titleLarge)),
-            RcStatusPill(
-              label: '${rows.length} DAYS',
-              color: rows.isEmpty ? theme.colorScheme.outline : RcColors.blue,
-            ),
-          ]),
+          Row(
+            children: [
+              Icon(Icons.how_to_reg_outlined, color: theme.colorScheme.primary),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  'Who worked on this house',
+                  style: theme.textTheme.titleLarge,
+                ),
+              ),
+              RcStatusPill(
+                label: '${rows.length} DAYS',
+                color: rows.isEmpty ? theme.colorScheme.outline : RcColors.blue,
+              ),
+            ],
+          ),
           const SizedBox(height: 6),
-          Text('$verified verified attendance entries • tap to review or verify'),
+          Text(
+            '$verified verified attendance entries • tap to review or verify',
+          ),
           const SizedBox(height: 8),
           if (rows.isEmpty)
-            const Text('No daily attendance has been recorded for this house yet.')
+            const Text(
+              'No daily attendance has been recorded for this house yet.',
+            )
           else
-            ...rows.take(8).map((row) => ListTile(
-                  contentPadding: EdgeInsets.zero,
-                  dense: true,
-                  leading: Icon(row['verified'] == true ? Icons.verified_outlined : Icons.schedule_outlined),
-                  title: Text('${row['member_name'] ?? row['member_email'] ?? 'Crew member'}'),
-                  subtitle: Text('${row['work_date'] ?? ''} • ${row['member_role'] ?? ''} • ${row['status'] ?? ''}'),
-                  trailing: RcStatusPill(
-                    label: row['verified'] == true ? 'VERIFIED' : 'PENDING',
-                    color: row['verified'] == true ? RcColors.success : RcColors.warning,
+            ...rows
+                .take(8)
+                .map(
+                  (row) => ListTile(
+                    contentPadding: EdgeInsets.zero,
+                    dense: true,
+                    leading: Icon(
+                      row['verified'] == true
+                          ? Icons.verified_outlined
+                          : Icons.schedule_outlined,
+                    ),
+                    title: Text(
+                      '${row['member_name'] ?? row['member_email'] ?? 'Crew member'}',
+                    ),
+                    subtitle: Text(
+                      '${row['work_date'] ?? ''} • ${row['member_role'] ?? ''} • ${row['status'] ?? ''}',
+                    ),
+                    trailing: RcStatusPill(
+                      label: row['verified'] == true ? 'VERIFIED' : 'PENDING',
+                      color: row['verified'] == true
+                          ? RcColors.success
+                          : RcColors.warning,
+                    ),
                   ),
-                )),
+                ),
         ],
       ),
     );
@@ -479,7 +566,10 @@ class _AttendanceSummary extends StatelessWidget {
 }
 
 class _HouseCommandData {
-  const _HouseCommandData({this.records = const [], this.attendance = const []});
+  const _HouseCommandData({
+    this.records = const [],
+    this.attendance = const [],
+  });
   final List<ProductionRecord> records;
   final List<Map<String, dynamic>> attendance;
 }
@@ -492,11 +582,27 @@ class _HousePipeline extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    bool hasAny(Set<String> types) => records.any((r) => types.contains(r.eventType));
+    bool hasAny(Set<String> types) =>
+        records.any((r) => types.contains(r.eventType));
     final steps = [
       ('Scope', 'scope', hasAny({'scope'})),
-      ('Plan', 'workPlan', hasAny({'controlData', 'workPlan', 'documentChecklist'})),
-      ('Delivery', 'dailyLog', hasAny({'siteVisit', 'dailyLog', 'crewAttendance', 'materialRequest', 'consumables', 'inventory'})),
+      (
+        'Plan',
+        'workPlan',
+        hasAny({'controlData', 'workPlan', 'documentChecklist'}),
+      ),
+      (
+        'Delivery',
+        'dailyLog',
+        hasAny({
+          'siteVisit',
+          'dailyLog',
+          'crewAttendance',
+          'materialRequest',
+          'consumables',
+          'inventory',
+        }),
+      ),
       ('Quality', 'monitoring', hasAny({'monitoring'})),
       ('Complete', 'notice', hasAny({'notice'})),
       ('Payment', 'payment', hasAny({'payment'})),
@@ -510,30 +616,35 @@ class _HousePipeline extends StatelessWidget {
               borderRadius: BorderRadius.circular(15),
               onTap: () => onOpen(steps[i].$2),
               child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 10),
-              decoration: BoxDecoration(
-                color: steps[i].$3
-                    ? theme.colorScheme.primaryContainer
-                    : theme.colorScheme.surfaceContainerLow,
-                borderRadius: BorderRadius.circular(15),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 13,
+                  vertical: 10,
+                ),
+                decoration: BoxDecoration(
+                  color: steps[i].$3
+                      ? theme.colorScheme.primaryContainer
+                      : theme.colorScheme.surfaceContainerLow,
+                  borderRadius: BorderRadius.circular(15),
+                ),
+                child: Row(
+                  children: [
+                    Icon(
+                      steps[i].$3
+                          ? Icons.check_circle
+                          : Icons.radio_button_unchecked,
+                      size: 17,
+                      color: steps[i].$3
+                          ? theme.colorScheme.primary
+                          : theme.colorScheme.outline,
+                    ),
+                    const SizedBox(width: 6),
+                    Text(
+                      steps[i].$1,
+                      style: const TextStyle(fontWeight: FontWeight.w800),
+                    ),
+                  ],
+                ),
               ),
-              child: Row(
-                children: [
-                  Icon(
-                    steps[i].$3 ? Icons.check_circle : Icons.radio_button_unchecked,
-                    size: 17,
-                    color: steps[i].$3
-                        ? theme.colorScheme.primary
-                        : theme.colorScheme.outline,
-                  ),
-                  const SizedBox(width: 6),
-                  Text(
-                    steps[i].$1,
-                    style: const TextStyle(fontWeight: FontWeight.w800),
-                  ),
-                ],
-              ),
-            ),
             ),
             if (i != steps.length - 1)
               Padding(

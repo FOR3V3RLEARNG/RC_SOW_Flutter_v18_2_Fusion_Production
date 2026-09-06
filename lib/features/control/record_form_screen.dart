@@ -50,10 +50,12 @@ class _RecordFormScreenState extends State<RecordFormScreen> {
         final initial = values[field.key] ?? field.defaultValue ?? '';
         controllers[field.key] = TextEditingController(text: '$initial');
       }
-      if (field.kind == RcFieldKind.checkbox && !values.containsKey(field.key)) {
+      if (field.kind == RcFieldKind.checkbox &&
+          !values.containsKey(field.key)) {
         values[field.key] = field.defaultValue == true;
       }
-      if (field.kind == RcFieldKind.dropdown && !values.containsKey(field.key)) {
+      if (field.kind == RcFieldKind.dropdown &&
+          !values.containsKey(field.key)) {
         if (field.key == 'parish' && !profile.canViewAllParishes) {
           values[field.key] = profile.parish;
         } else if (field.options.isNotEmpty && field.defaultValue != null) {
@@ -64,12 +66,12 @@ class _RecordFormScreenState extends State<RecordFormScreen> {
   }
 
   bool _usesController(RcFieldKind kind) => const {
-        RcFieldKind.text,
-        RcFieldKind.number,
-        RcFieldKind.multiline,
-        RcFieldKind.lineItems,
-        RcFieldKind.percentage,
-      }.contains(kind);
+    RcFieldKind.text,
+    RcFieldKind.number,
+    RcFieldKind.multiline,
+    RcFieldKind.lineItems,
+    RcFieldKind.percentage,
+  }.contains(kind);
 
   @override
   void dispose() {
@@ -102,10 +104,17 @@ class _RecordFormScreenState extends State<RecordFormScreen> {
   Future<void> _save() async {
     if (!(formKey.currentState?.validate() ?? false)) return;
     formKey.currentState!.save();
-    final currentHouse = controllers['houseCode']?.text.trim().toUpperCase() ??
-        '${values['houseCode'] ?? widget.record?.houseCode ?? ''}'.trim().toUpperCase();
-    final parish = '${values['parish'] ?? widget.record?.parish ?? profile.parish}'.trim();
-    if (currentHouse.isEmpty && widget.schema.eventType != 'inventory' && widget.schema.eventType != 'workProjection' && widget.schema.eventType != 'constructionSchedule') {
+    final currentHouse =
+        controllers['houseCode']?.text.trim().toUpperCase() ??
+        '${values['houseCode'] ?? widget.record?.houseCode ?? ''}'
+            .trim()
+            .toUpperCase();
+    final parish =
+        '${values['parish'] ?? widget.record?.parish ?? profile.parish}'.trim();
+    if (currentHouse.isEmpty &&
+        widget.schema.eventType != 'inventory' &&
+        widget.schema.eventType != 'workProjection' &&
+        widget.schema.eventType != 'constructionSchedule') {
       _snack('House number is required.');
       return;
     }
@@ -113,7 +122,9 @@ class _RecordFormScreenState extends State<RecordFormScreen> {
       _snack('Parish is required.');
       return;
     }
-    final house = currentHouse.isEmpty ? 'PARISH-${parish.toUpperCase().replaceAll(' ', '-')}' : currentHouse;
+    final house = currentHouse.isEmpty
+        ? 'PARISH-${parish.toUpperCase().replaceAll(' ', '-')}'
+        : currentHouse;
     setState(() => busy = true);
     try {
       await _uploadPendingArtifacts(house: house, parish: parish);
@@ -131,18 +142,25 @@ class _RecordFormScreenState extends State<RecordFormScreen> {
       _snack('Saved and synchronized.');
       Navigator.pop(context, true);
     } catch (_) {
-      if (mounted) _snack('Could not save. Your input remains on screen; check connectivity and retry.');
+      if (mounted)
+        _snack(
+          'Could not save. Your input remains on screen; check connectivity and retry.',
+        );
     } finally {
       if (mounted) setState(() => busy = false);
     }
   }
 
   void _snack(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(message)));
   }
 
   Future<void> _chooseBeneficiary() async {
-    final search = TextEditingController(text: controllers['houseCode']?.text ?? '');
+    final search = TextEditingController(
+      text: controllers['houseCode']?.text ?? '',
+    );
     List<BeneficiaryRecord> results = const [];
     bool loading = false;
     final selected = await showModalBottomSheet<BeneficiaryRecord>(
@@ -158,7 +176,12 @@ class _RecordFormScreenState extends State<RecordFormScreen> {
               children: [
                 Row(
                   children: [
-                    Expanded(child: Text('IA • Shelter beneficiary data', style: Theme.of(context).textTheme.titleLarge)),
+                    Expanded(
+                      child: Text(
+                        'IA • Shelter beneficiary data',
+                        style: Theme.of(context).textTheme.titleLarge,
+                      ),
+                    ),
                     const Icon(Icons.auto_awesome_outlined),
                   ],
                 ),
@@ -172,9 +195,15 @@ class _RecordFormScreenState extends State<RecordFormScreen> {
                       onPressed: () async {
                         setSheetState(() => loading = true);
                         try {
-                          results = await widget.state.repository.searchBeneficiaries(profile, query: search.text.trim(), limit: 100);
+                          results = await widget.state.repository
+                              .searchBeneficiaries(
+                                profile,
+                                query: search.text.trim(),
+                                limit: 100,
+                              );
                         } finally {
-                          if (context.mounted) setSheetState(() => loading = false);
+                          if (context.mounted)
+                            setSheetState(() => loading = false);
                         }
                       },
                       icon: const Icon(Icons.search),
@@ -183,7 +212,12 @@ class _RecordFormScreenState extends State<RecordFormScreen> {
                   onSubmitted: (_) async {
                     setSheetState(() => loading = true);
                     try {
-                      results = await widget.state.repository.searchBeneficiaries(profile, query: search.text.trim(), limit: 100);
+                      results = await widget.state.repository
+                          .searchBeneficiaries(
+                            profile,
+                            query: search.text.trim(),
+                            limit: 100,
+                          );
                     } finally {
                       if (context.mounted) setSheetState(() => loading = false);
                     }
@@ -193,16 +227,26 @@ class _RecordFormScreenState extends State<RecordFormScreen> {
                 const SizedBox(height: 8),
                 Expanded(
                   child: results.isEmpty
-                      ? const Center(child: Text('Search protected Shelter assessment data.'))
+                      ? const Center(
+                          child: Text(
+                            'Search protected Shelter assessment data.',
+                          ),
+                        )
                       : ListView.separated(
                           itemCount: results.length,
                           separatorBuilder: (_, _) => const Divider(height: 1),
                           itemBuilder: (_, index) {
                             final item = results[index];
                             return ListTile(
-                              leading: const CircleAvatar(child: Icon(Icons.home_outlined)),
-                              title: Text('${item.houseCode} • ${item.beneficiaryName}'),
-                              subtitle: Text('${item.parish} • ${item.cluster}${item.gps.isEmpty ? '' : ' • ${item.gps}'}'),
+                              leading: const CircleAvatar(
+                                child: Icon(Icons.home_outlined),
+                              ),
+                              title: Text(
+                                '${item.houseCode} • ${item.beneficiaryName}',
+                              ),
+                              subtitle: Text(
+                                '${item.parish} • ${item.cluster}${item.gps.isEmpty ? '' : ' • ${item.gps}'}',
+                              ),
                               onTap: () => Navigator.pop(sheetContext, item),
                             );
                           },
@@ -223,9 +267,12 @@ class _RecordFormScreenState extends State<RecordFormScreen> {
       _setController('cluster', selected.cluster);
       _setController('gps', selected.gps);
       values['parish'] = selected.parish;
-      if (selected.roofLength != null) _setController('length', '${selected.roofLength}');
-      if (selected.roofWidth != null) _setController('width', '${selected.roofWidth}');
-      if (selected.wallHeight != null) _setController('wallHeight', '${selected.wallHeight}');
+      if (selected.roofLength != null)
+        _setController('length', '${selected.roofLength}');
+      if (selected.roofWidth != null)
+        _setController('width', '${selected.roofWidth}');
+      if (selected.wallHeight != null)
+        _setController('wallHeight', '${selected.wallHeight}');
       if (selected.roofType != null) values['roofType'] = selected.roofType;
     });
   }
@@ -275,7 +322,9 @@ class _RecordFormScreenState extends State<RecordFormScreen> {
       );
       values[entry.key] = path;
       values['${entry.key}StorageBucket'] = 'evidence';
-      values['${entry.key}UploadedAt'] = DateTime.now().toUtc().toIso8601String();
+      values['${entry.key}UploadedAt'] = DateTime.now()
+          .toUtc()
+          .toIso8601String();
     }
     for (final entry in signatures.entries) {
       final path = await widget.state.repository.uploadSignature(
@@ -294,7 +343,11 @@ class _RecordFormScreenState extends State<RecordFormScreen> {
   }
 
   double _number(String key) =>
-      double.tryParse(controllers[key]?.text.trim().replaceAll(',', '') ?? '${values[key] ?? ''}') ?? 0;
+      double.tryParse(
+        controllers[key]?.text.trim().replaceAll(',', '') ??
+            '${values[key] ?? ''}',
+      ) ??
+      0;
 
   Future<void> _calculatePaymentFromAttendance() async {
     final house = controllers['houseCode']?.text.trim().toUpperCase() ?? '';
@@ -309,7 +362,9 @@ class _RecordFormScreenState extends State<RecordFormScreen> {
     }
     setState(() => paymentCalculating = true);
     try {
-      final summary = await widget.state.repository.attendancePaymentSummary(houseCode: house);
+      final summary = await widget.state.repository.attendancePaymentSummary(
+        houseCode: house,
+      );
       if (summary.isEmpty) {
         _snack('No attendance records are available for $house.');
         return;
@@ -333,9 +388,16 @@ class _RecordFormScreenState extends State<RecordFormScreen> {
       final lines = <String>[];
       for (final row in summary) {
         final role = '${row['member_role'] ?? ''}';
-        final member = '${row['member_name'] ?? row['member_email'] ?? 'Crew member'}';
-        final payable = (row['payable_days'] as num?)?.toDouble() ?? double.tryParse('${row['payable_days'] ?? 0}') ?? 0;
-        final pendingDays = (row['pending_days'] as num?)?.toInt() ?? int.tryParse('${row['pending_days'] ?? 0}') ?? 0;
+        final member =
+            '${row['member_name'] ?? row['member_email'] ?? 'Crew member'}';
+        final payable =
+            (row['payable_days'] as num?)?.toDouble() ??
+            double.tryParse('${row['payable_days'] ?? 0}') ??
+            0;
+        final pendingDays =
+            (row['pending_days'] as num?)?.toInt() ??
+            int.tryParse('${row['pending_days'] ?? 0}') ??
+            0;
         pending += pendingDays;
         final percent = percentages[role] ?? 0;
         final membersInRole = roleCounts[role] ?? 1;
@@ -344,22 +406,34 @@ class _RecordFormScreenState extends State<RecordFormScreen> {
         final deduction = memberGrossShare * (missing / expectedDays);
         final adjusted = memberGrossShare - deduction;
         totalDeduction += deduction;
-        lines.add('$role • $member • ${payable.toStringAsFixed(1)}/${expectedDays.toStringAsFixed(1)} payable days • JMD ${adjusted.toStringAsFixed(2)}');
+        lines.add(
+          '$role • $member • ${payable.toStringAsFixed(1)}/${expectedDays.toStringAsFixed(1)} payable days • JMD ${adjusted.toStringAsFixed(2)}',
+        );
       }
       _setController('roofingAmount', roofingAmount.toStringAsFixed(2));
       _setController('totalLabourCost', gross.toStringAsFixed(2));
       _setController('attendanceDeductions', totalDeduction.toStringAsFixed(2));
-      _setController('adjustedPayment', (gross - totalDeduction).clamp(0.0, double.infinity).toDouble().toStringAsFixed(2));
+      _setController(
+        'adjustedPayment',
+        (gross - totalDeduction)
+            .clamp(0.0, double.infinity)
+            .toDouble()
+            .toStringAsFixed(2),
+      );
       _setController('teamAllocation', lines.join('\n'));
       values['attendanceSummary'] = summary;
       values['attendancePendingDays'] = pending;
       values['status'] = pending > 0 ? 'Not Ready' : 'Ready';
-      _snack(pending > 0
-          ? '$pending attendance entries still require verification. Payment remains Not Ready.'
-          : 'Attendance reconciled. Payment is ready for approval review.');
+      _snack(
+        pending > 0
+            ? '$pending attendance entries still require verification. Payment remains Not Ready.'
+            : 'Attendance reconciled. Payment is ready for approval review.',
+      );
       if (mounted) setState(() {});
     } catch (_) {
-      _snack('Attendance reconciliation failed. Verify the workforce backend and retry.');
+      _snack(
+        'Attendance reconciliation failed. Verify the workforce backend and retry.',
+      );
     } finally {
       if (mounted) setState(() => paymentCalculating = false);
     }
@@ -372,10 +446,18 @@ class _RecordFormScreenState extends State<RecordFormScreen> {
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Delete record?'),
-        content: const Text('This removes the operational record and is recorded in the audit trail where supported.'),
+        content: const Text(
+          'This removes the operational record and is recorded in the audit trail where supported.',
+        ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Cancel')),
-          FilledButton(onPressed: () => Navigator.pop(context, true), child: const Text('Delete')),
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Cancel'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('Delete'),
+          ),
         ],
       ),
     );
@@ -384,7 +466,10 @@ class _RecordFormScreenState extends State<RecordFormScreen> {
       await widget.state.repository.deleteProductionRecord(record);
       if (mounted) Navigator.pop(context, true);
     } catch (_) {
-      if (mounted) _snack('Record could not be deleted. Confirm Admin access and backend migration, then retry.');
+      if (mounted)
+        _snack(
+          'Record could not be deleted. Confirm Admin access and backend migration, then retry.',
+        );
     }
   }
 
@@ -394,20 +479,35 @@ class _RecordFormScreenState extends State<RecordFormScreen> {
     final data = _collect();
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.record == null ? 'Add ${widget.schema.title}' : widget.schema.title),
+        title: Text(
+          widget.record == null
+              ? 'Add ${widget.schema.title}'
+              : widget.schema.title,
+        ),
         actions: [
           IconButton(
             tooltip: 'Export PDF',
-            onPressed: () => RcExportService.shareRecordPdf(title: widget.schema.title, data: data, signature: signatures.values.firstOrNull),
+            onPressed: () => RcExportService.shareRecordPdf(
+              title: widget.schema.title,
+              data: data,
+              signature: signatures.values.firstOrNull,
+            ),
             icon: const Icon(Icons.picture_as_pdf_outlined),
           ),
           IconButton(
             tooltip: 'Export Excel',
-            onPressed: () => RcExportService.shareRecordXlsx(title: widget.schema.title, data: data),
+            onPressed: () => RcExportService.shareRecordXlsx(
+              title: widget.schema.title,
+              data: data,
+            ),
             icon: const Icon(Icons.table_view_outlined),
           ),
           if (widget.record != null && profile.isAdmin)
-            IconButton(tooltip: 'Delete record', onPressed: _delete, icon: const Icon(Icons.delete_outline)),
+            IconButton(
+              tooltip: 'Delete record',
+              onPressed: _delete,
+              icon: const Icon(Icons.delete_outline),
+            ),
         ],
       ),
       body: Form(
@@ -421,18 +521,37 @@ class _RecordFormScreenState extends State<RecordFormScreen> {
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Icon(widget.schema.icon, size: RcIconSize.lg, color: theme.colorScheme.primary),
+                  Icon(
+                    widget.schema.icon,
+                    size: RcIconSize.lg,
+                    color: theme.colorScheme.primary,
+                  ),
                   const SizedBox(width: 14),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(widget.schema.phase.toUpperCase(), style: theme.textTheme.labelSmall?.copyWith(fontWeight: FontWeight.w900, letterSpacing: 1.1)),
+                        Text(
+                          widget.schema.phase.toUpperCase(),
+                          style: theme.textTheme.labelSmall?.copyWith(
+                            fontWeight: FontWeight.w900,
+                            letterSpacing: 1.1,
+                          ),
+                        ),
                         const SizedBox(height: 4),
-                        Text(widget.schema.description.isEmpty ? 'Structured RC SOW production record.' : widget.schema.description),
+                        Text(
+                          widget.schema.description.isEmpty
+                              ? 'Structured RC SOW production record.'
+                              : widget.schema.description,
+                        ),
                         if (widget.schema.templateAsset != null) ...[
                           const SizedBox(height: 6),
-                          Text('Template-backed record', style: theme.textTheme.labelMedium?.copyWith(color: theme.colorScheme.primary)),
+                          Text(
+                            'Template-backed record',
+                            style: theme.textTheme.labelMedium?.copyWith(
+                              color: theme.colorScheme.primary,
+                            ),
+                          ),
                         ],
                       ],
                     ),
@@ -457,27 +576,39 @@ class _RecordFormScreenState extends State<RecordFormScreen> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text('Attendance → payment reconciliation', style: TextStyle(fontWeight: FontWeight.w900)),
+                          Text(
+                            'Attendance → payment reconciliation',
+                            style: TextStyle(fontWeight: FontWeight.w900),
+                          ),
                           SizedBox(height: 3),
-                          Text('Uses verified daily crew attendance to calculate missing-day deductions before the 46 / 31 / 23 payout.'),
+                          Text(
+                            'Uses verified daily crew attendance to calculate missing-day deductions before the 46 / 31 / 23 payout.',
+                          ),
                         ],
                       ),
                     ),
                     const SizedBox(width: 10),
                     FilledButton.tonal(
-                      onPressed: paymentCalculating ? null : _calculatePaymentFromAttendance,
-                      child: Text(paymentCalculating ? 'Calculating…' : 'Calculate'),
+                      onPressed: paymentCalculating
+                          ? null
+                          : _calculatePaymentFromAttendance,
+                      child: Text(
+                        paymentCalculating ? 'Calculating…' : 'Calculate',
+                      ),
                     ),
                   ],
                 ),
               ),
               const SizedBox(height: 14),
             ],
-            ...widget.schema.fields.map((field) => Padding(
-                  padding: const EdgeInsets.only(bottom: 12),
-                  child: _field(field),
-                )),
-            if (widget.schema.eventType == 'constructionSchedule' && profile.hasPrivilege('manageCrew')) ...[
+            ...widget.schema.fields.map(
+              (field) => Padding(
+                padding: const EdgeInsets.only(bottom: 12),
+                child: _field(field),
+              ),
+            ),
+            if (widget.schema.eventType == 'constructionSchedule' &&
+                profile.hasPrivilege('manageCrew')) ...[
               const SizedBox(height: 2),
               CrewAssignmentPanel(state: widget.state),
               const SizedBox(height: 14),
@@ -486,7 +617,11 @@ class _RecordFormScreenState extends State<RecordFormScreen> {
             FilledButton.icon(
               onPressed: busy ? null : _save,
               icon: busy
-                  ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2))
+                  ? const SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    )
                   : const Icon(Icons.cloud_done_outlined),
               label: Text(busy ? 'Saving…' : 'Save record'),
             ),
@@ -506,24 +641,55 @@ class _RecordFormScreenState extends State<RecordFormScreen> {
       case RcFieldKind.percentage:
         return TextFormField(
           controller: controller,
-          keyboardType: field.kind == RcFieldKind.number || field.kind == RcFieldKind.percentage
+          keyboardType:
+              field.kind == RcFieldKind.number ||
+                  field.kind == RcFieldKind.percentage
               ? const TextInputType.numberWithOptions(decimal: true)
               : TextInputType.multiline,
-          minLines: field.kind == RcFieldKind.multiline || field.kind == RcFieldKind.lineItems ? 3 : 1,
-          maxLines: field.kind == RcFieldKind.multiline || field.kind == RcFieldKind.lineItems ? 6 : 1,
-          decoration: InputDecoration(labelText: field.label, helperText: field.helper),
-          validator: field.required ? (value) => value == null || value.trim().isEmpty ? '${field.label} is required.' : null : null,
+          minLines:
+              field.kind == RcFieldKind.multiline ||
+                  field.kind == RcFieldKind.lineItems
+              ? 3
+              : 1,
+          maxLines:
+              field.kind == RcFieldKind.multiline ||
+                  field.kind == RcFieldKind.lineItems
+              ? 6
+              : 1,
+          decoration: InputDecoration(
+            labelText: field.label,
+            helperText: field.helper,
+          ),
+          validator: field.required
+              ? (value) => value == null || value.trim().isEmpty
+                    ? '${field.label} is required.'
+                    : null
+              : null,
         );
       case RcFieldKind.dropdown:
-        final options = field.key == 'parish' && !profile.canViewAllParishes ? [profile.parish] : field.options;
+        final options = field.key == 'parish' && !profile.canViewAllParishes
+            ? [profile.parish]
+            : field.options;
         final current = values[field.key]?.toString();
         return DropdownButtonFormField<String>(
           key: ValueKey('${field.key}:${current ?? ''}'),
           initialValue: options.contains(current) ? current : null,
-          decoration: InputDecoration(labelText: field.label, helperText: field.helper),
-          items: options.map((option) => DropdownMenuItem(value: option, child: Text(option))).toList(),
+          decoration: InputDecoration(
+            labelText: field.label,
+            helperText: field.helper,
+          ),
+          items: options
+              .map(
+                (option) =>
+                    DropdownMenuItem(value: option, child: Text(option)),
+              )
+              .toList(),
           onChanged: (value) => setState(() => values[field.key] = value),
-          validator: field.required ? (value) => value == null || value.isEmpty ? '${field.label} is required.' : null : null,
+          validator: field.required
+              ? (value) => value == null || value.isEmpty
+                    ? '${field.label} is required.'
+                    : null
+              : null,
         );
       case RcFieldKind.checkbox:
         return SwitchListTile.adaptive(
@@ -536,59 +702,107 @@ class _RecordFormScreenState extends State<RecordFormScreen> {
       case RcFieldKind.date:
         return ListTile(
           contentPadding: const EdgeInsets.symmetric(horizontal: 12),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16), side: BorderSide(color: Theme.of(context).colorScheme.outlineVariant)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+            side: BorderSide(
+              color: Theme.of(context).colorScheme.outlineVariant,
+            ),
+          ),
           title: Text(field.label),
           subtitle: Text('${values[field.key] ?? 'Choose date'}'),
           trailing: const Icon(Icons.calendar_today_outlined),
           onTap: () async {
-            final picked = await showDatePicker(context: context, firstDate: DateTime(2020), lastDate: DateTime(2035), initialDate: DateTime.now());
+            final picked = await showDatePicker(
+              context: context,
+              firstDate: DateTime(2020),
+              lastDate: DateTime(2035),
+              initialDate: DateTime.now(),
+            );
             if (!mounted) return;
-        if (picked != null) setState(() => values[field.key] = picked.toIso8601String().split('T').first);
+            if (picked != null)
+              setState(
+                () => values[field.key] = picked
+                    .toIso8601String()
+                    .split('T')
+                    .first,
+              );
           },
         );
       case RcFieldKind.photo:
         return ListTile(
           contentPadding: const EdgeInsets.symmetric(horizontal: 12),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16), side: BorderSide(color: Theme.of(context).colorScheme.outlineVariant)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+            side: BorderSide(
+              color: Theme.of(context).colorScheme.outlineVariant,
+            ),
+          ),
           leading: const Icon(Icons.camera_alt_outlined),
           title: Text(field.label),
-          subtitle: Text(photoBytes.containsKey(field.key) ? 'Photo ready for secure upload' : values[field.key] == null ? 'Capture evidence photo' : 'Evidence stored securely'),
+          subtitle: Text(
+            photoBytes.containsKey(field.key)
+                ? 'Photo ready for secure upload'
+                : values[field.key] == null
+                ? 'Capture evidence photo'
+                : 'Evidence stored securely',
+          ),
           trailing: const Icon(Icons.chevron_right),
           onTap: () => _pickPhoto(field),
         );
       case RcFieldKind.signature:
         return ListTile(
           contentPadding: const EdgeInsets.symmetric(horizontal: 12),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16), side: BorderSide(color: Theme.of(context).colorScheme.outlineVariant)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+            side: BorderSide(
+              color: Theme.of(context).colorScheme.outlineVariant,
+            ),
+          ),
           leading: const Icon(Icons.draw_outlined),
           title: Text(field.label),
-          subtitle: Text(signatures.containsKey(field.key) ? 'Digitally signed in this session' : 'Tap to sign or request signature'),
+          subtitle: Text(
+            signatures.containsKey(field.key)
+                ? 'Digitally signed in this session'
+                : 'Tap to sign or request signature',
+          ),
           trailing: PopupMenuButton<String>(
             onSelected: (action) async {
               if (action == 'sign') {
                 await _captureSignature(field);
               } else {
-                final house = controllers['houseCode']?.text.trim() ?? widget.record?.houseCode ?? '';
-                final parish = '${values['parish'] ?? widget.record?.parish ?? profile.parish}';
+                final house =
+                    controllers['houseCode']?.text.trim() ??
+                    widget.record?.houseCode ??
+                    '';
+                final parish =
+                    '${values['parish'] ?? widget.record?.parish ?? profile.parish}';
                 if (house.isEmpty) {
                   _snack('Choose a house before requesting a signature.');
                   return;
                 }
-                final isBeneficiary = field.label.toLowerCase().contains('beneficiary');
-                final role = isBeneficiary ? 'Beneficiary' : _roleFromSignatureLabel(field.label);
+                final isBeneficiary = field.label.toLowerCase().contains(
+                  'beneficiary',
+                );
+                final role = isBeneficiary
+                    ? 'Beneficiary'
+                    : _roleFromSignatureLabel(field.label);
                 final recipientRole = isBeneficiary ? 'Site Supervisor' : role;
                 await widget.state.repository.requestSignature(
                   profile: profile,
                   houseCode: house,
                   parish: parish,
                   recordType: widget.schema.eventType,
-                  recordId: widget.record?.id ?? 'draft-${widget.schema.eventType}-$house',
+                  recordId:
+                      widget.record?.id ??
+                      'draft-${widget.schema.eventType}-$house',
                   signerRole: role,
                   recipientRole: recipientRole,
                 );
-                _snack(isBeneficiary
-                    ? 'Beneficiary signature task sent to the Site Supervisor for in-person capture.'
-                    : 'Signature request sent to $recipientRole.');
+                _snack(
+                  isBeneficiary
+                      ? 'Beneficiary signature task sent to the Site Supervisor for in-person capture.'
+                      : 'Signature request sent to $recipientRole.',
+                );
               }
             },
             itemBuilder: (_) => const [
@@ -606,7 +820,8 @@ class _RecordFormScreenState extends State<RecordFormScreen> {
     if (lower.contains('regional')) return 'Regional Supervisor';
     if (lower.contains('construction')) return 'Construction Specialist';
     if (lower.contains('carpenter')) return 'Carpenter';
-    if (lower.contains('site supervisor') || lower.contains('supervisor')) return 'Site Supervisor';
+    if (lower.contains('site supervisor') || lower.contains('supervisor'))
+      return 'Site Supervisor';
     return profile.role;
   }
 }

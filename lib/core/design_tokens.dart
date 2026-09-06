@@ -75,21 +75,31 @@ ThemeData buildRcTheme({
 }) {
   final dark = brightness == Brightness.dark || designDna.prefersDark;
   final effectiveBrightness = dark ? Brightness.dark : brightness;
-  final scheme = ColorScheme.fromSeed(
-    seedColor: designDna.seed,
-    brightness: effectiveBrightness,
-  ).copyWith(
-    primary: dark ? ColorScheme.fromSeed(seedColor: designDna.seed, brightness: Brightness.dark).primary : designDna.seed,
-    onPrimary: dark ? const Color(0xFF680014) : Colors.white,
-    secondary: dark ? const Color(0xFFADC6FF) : RcColors.blue,
-    error: dark ? const Color(0xFFFFB4AB) : RcColors.danger,
-    surface: dark ? const Color(0xFF15191F) : RcColors.surface,
-    surfaceContainerLowest: dark ? const Color(0xFF101317) : RcColors.surface,
-    surfaceContainerLow: dark ? const Color(0xFF181C22) : RcColors.surface2,
-    surfaceContainer: dark ? const Color(0xFF1D2229) : const Color(0xFFF1F4F8),
-    outline: dark ? const Color(0xFF8B919A) : RcColors.lineStrong,
-    outlineVariant: dark ? const Color(0xFF3F454D) : RcColors.line,
-  );
+  final scheme =
+      ColorScheme.fromSeed(
+        seedColor: designDna.seed,
+        brightness: effectiveBrightness,
+      ).copyWith(
+        primary: dark
+            ? ColorScheme.fromSeed(
+                seedColor: designDna.seed,
+                brightness: Brightness.dark,
+              ).primary
+            : designDna.seed,
+        onPrimary: dark ? const Color(0xFF680014) : Colors.white,
+        secondary: dark ? const Color(0xFFADC6FF) : RcColors.blue,
+        error: dark ? const Color(0xFFFFB4AB) : RcColors.danger,
+        surface: dark ? const Color(0xFF15191F) : RcColors.surface,
+        surfaceContainerLowest: dark
+            ? const Color(0xFF101317)
+            : RcColors.surface,
+        surfaceContainerLow: dark ? const Color(0xFF181C22) : RcColors.surface2,
+        surfaceContainer: dark
+            ? const Color(0xFF1D2229)
+            : const Color(0xFFF1F4F8),
+        outline: dark ? const Color(0xFF8B919A) : RcColors.lineStrong,
+        outlineVariant: dark ? const Color(0xFF3F454D) : RcColors.line,
+      );
 
   final border = highContrast
       ? (dark ? Colors.white : RcColors.ink)
@@ -100,8 +110,13 @@ ThemeData buildRcTheme({
     brightness: effectiveBrightness,
     colorScheme: scheme,
     scaffoldBackgroundColor: dark ? const Color(0xFF0F1216) : RcColors.bg,
-    visualDensity: compactDensity ? VisualDensity.compact : VisualDensity.standard,
-    iconTheme: IconThemeData(size: RcIconSize.md, color: scheme.onSurfaceVariant),
+    visualDensity: compactDensity
+        ? VisualDensity.compact
+        : VisualDensity.standard,
+    iconTheme: IconThemeData(
+      size: RcIconSize.md,
+      color: scheme.onSurfaceVariant,
+    ),
     iconButtonTheme: IconButtonThemeData(
       style: IconButton.styleFrom(
         iconSize: RcIconSize.md,

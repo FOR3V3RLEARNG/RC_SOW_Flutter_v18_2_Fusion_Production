@@ -25,21 +25,21 @@ class RcExpressiveSurface extends StatelessWidget {
   final String? semanticLabel;
 
   BorderRadius _radius() => switch (shape) {
-        RcSurfaceShape.standard => BorderRadius.circular(RcRadius.lg),
-        RcSurfaceShape.hero => const BorderRadius.only(
-            topLeft: Radius.circular(36),
-            topRight: Radius.circular(18),
-            bottomLeft: Radius.circular(18),
-            bottomRight: Radius.circular(36),
-          ),
-        RcSurfaceShape.offset => const BorderRadius.only(
-            topLeft: Radius.circular(14),
-            topRight: Radius.circular(30),
-            bottomLeft: Radius.circular(30),
-            bottomRight: Radius.circular(14),
-          ),
-        RcSurfaceShape.pill => BorderRadius.circular(999),
-      };
+    RcSurfaceShape.standard => BorderRadius.circular(RcRadius.lg),
+    RcSurfaceShape.hero => const BorderRadius.only(
+      topLeft: Radius.circular(36),
+      topRight: Radius.circular(18),
+      bottomLeft: Radius.circular(18),
+      bottomRight: Radius.circular(36),
+    ),
+    RcSurfaceShape.offset => const BorderRadius.only(
+      topLeft: Radius.circular(14),
+      topRight: Radius.circular(30),
+      bottomLeft: Radius.circular(30),
+      bottomRight: Radius.circular(14),
+    ),
+    RcSurfaceShape.pill => BorderRadius.circular(999),
+  };
 
   @override
   Widget build(BuildContext context) {
@@ -59,11 +59,7 @@ class RcExpressiveSurface extends StatelessWidget {
       label: semanticLabel,
       child: Material(
         color: Colors.transparent,
-        child: InkWell(
-          borderRadius: radius,
-          onTap: onTap,
-          child: surface,
-        ),
+        child: InkWell(borderRadius: radius, onTap: onTap, child: surface),
       ),
     );
   }
@@ -117,22 +113,14 @@ class RcPageHeading extends StatelessWidget {
             ],
           ),
         ),
-        if (trailing != null) ...[
-          const SizedBox(width: 12),
-          trailing!,
-        ],
+        if (trailing != null) ...[const SizedBox(width: 12), trailing!],
       ],
     );
   }
 }
 
 class RcStatusPill extends StatelessWidget {
-  const RcStatusPill({
-    super.key,
-    required this.label,
-    this.icon,
-    this.color,
-  });
+  const RcStatusPill({super.key, required this.label, this.icon, this.color});
 
   final String label;
   final IconData? icon;
@@ -244,13 +232,7 @@ class _ProgressOrbPainter extends CustomPainter {
       ..strokeCap = StrokeCap.round
       ..color = color;
     canvas.drawArc(arcRect, -math.pi / 2, math.pi * 2, false, track);
-    canvas.drawArc(
-      arcRect,
-      -math.pi / 2,
-      math.pi * 2 * value,
-      false,
-      progress,
-    );
+    canvas.drawArc(arcRect, -math.pi / 2, math.pi * 2 * value, false, progress);
   }
 
   @override

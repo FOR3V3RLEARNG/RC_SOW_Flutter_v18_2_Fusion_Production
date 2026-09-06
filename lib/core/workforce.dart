@@ -2,18 +2,18 @@ enum AttendanceStatus { pending, present, halfDay, absent, excused }
 
 extension AttendanceStatusX on AttendanceStatus {
   String get label => switch (this) {
-        AttendanceStatus.pending => 'Pending',
-        AttendanceStatus.present => 'Present',
-        AttendanceStatus.halfDay => 'Half day',
-        AttendanceStatus.absent => 'Absent',
-        AttendanceStatus.excused => 'Excused',
-      };
+    AttendanceStatus.pending => 'Pending',
+    AttendanceStatus.present => 'Present',
+    AttendanceStatus.halfDay => 'Half day',
+    AttendanceStatus.absent => 'Absent',
+    AttendanceStatus.excused => 'Excused',
+  };
 
   double get payableDay => switch (this) {
-        AttendanceStatus.present => 1,
-        AttendanceStatus.halfDay => .5,
-        _ => 0,
-      };
+    AttendanceStatus.present => 1,
+    AttendanceStatus.halfDay => .5,
+    _ => 0,
+  };
 
   bool get verifiedEligible => this != AttendanceStatus.pending;
 }
@@ -80,7 +80,9 @@ abstract final class RcPaymentRules {
     final demolition = includeDemolition ? demolitionAllowance : 0.0;
     final additional = includeAdditional ? additionalAllowance : 0.0;
     final gross = base + demolition + additional;
-    final adjusted = (gross - attendanceDeductions).clamp(0.0, double.infinity).toDouble();
+    final adjusted = (gross - attendanceDeductions)
+        .clamp(0.0, double.infinity)
+        .toDouble();
     return PaymentBreakdown(
       baseLabour: base,
       demolitionAllowance: demolition,

@@ -64,8 +64,12 @@ class _LoginScreenState extends State<LoginScreen> {
         OAuthProvider.google,
         redirectTo: RcAuthSupport.oauthRedirectUri,
         authScreenLaunchMode: LaunchMode.externalApplication,
-        scopes: 'openid email profile https://www.googleapis.com/auth/gmail.readonly https://www.googleapis.com/auth/gmail.send',
-        queryParams: const {'prompt': 'select_account consent', 'access_type': 'offline'},
+        scopes:
+            'openid email profile https://www.googleapis.com/auth/gmail.readonly https://www.googleapis.com/auth/gmail.send',
+        queryParams: const {
+          'prompt': 'select_account consent',
+          'access_type': 'offline',
+        },
       );
       if (!launched && mounted) {
         setState(() => error = 'Google sign-in could not be opened.');
@@ -106,7 +110,9 @@ class _LoginScreenState extends State<LoginScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('Role and parish request submitted for Admin approval.'),
+            content: Text(
+              'Role and parish request submitted for Admin approval.',
+            ),
           ),
         );
       }
@@ -132,7 +138,9 @@ class _LoginScreenState extends State<LoginScreen> {
                   RcExpressiveSurface(
                     shape: RcSurfaceShape.hero,
                     padding: const EdgeInsets.all(16),
-                    tone: theme.colorScheme.primaryContainer.withValues(alpha: .5),
+                    tone: theme.colorScheme.primaryContainer.withValues(
+                      alpha: .5,
+                    ),
                     child: Image.asset(
                       'assets/brand/rc_sow_house_icon.png',
                       width: 88,
@@ -251,7 +259,8 @@ class _LoginScreenState extends State<LoginScreen> {
                                     child: Text(
                                       error!,
                                       style: TextStyle(
-                                        color: theme.colorScheme.onErrorContainer,
+                                        color:
+                                            theme.colorScheme.onErrorContainer,
                                         fontWeight: FontWeight.w700,
                                       ),
                                     ),
@@ -264,7 +273,9 @@ class _LoginScreenState extends State<LoginScreen> {
                           FilledButton.icon(
                             onPressed: busy ? null : signIn,
                             icon: const Icon(Icons.shield_outlined),
-                            label: Text(busy ? 'Please wait…' : 'Sign in securely'),
+                            label: Text(
+                              busy ? 'Please wait…' : 'Sign in securely',
+                            ),
                           ),
                           const SizedBox(height: 10),
                           OutlinedButton.icon(

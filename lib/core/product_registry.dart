@@ -113,14 +113,18 @@ abstract final class RcProductRegistry {
       );
     }
     if (profile.isSiteSupervisor) {
-      final scopeLabel = profile.canViewAllParishes ? 'Expanded site production' : '${profile.parish} site production';
+      final scopeLabel = profile.canViewAllParishes
+          ? 'Expanded site production'
+          : '${profile.parish} site production';
       final scopeDescription = profile.canViewAllParishes
           ? 'Admin-granted multi-parish production access: houses, schedules, attendance, evidence, requests and required actions.'
           : 'Only ${profile.parish} production: active houses, schedules, attendance, evidence, requests and required actions.';
       return RcRoleExperience(
         eyebrow: scopeLabel,
         subtitle: scopeDescription,
-        heroTitle: profile.canViewAllParishes ? 'Multi-parish production workspace' : '${profile.parish} production workspace',
+        heroTitle: profile.canViewAllParishes
+            ? 'Multi-parish production workspace'
+            : '${profile.parish} production workspace',
         allowedRecordTypes: const {},
         metrics: const [
           RcDashboardMetricKey.activeHouses,

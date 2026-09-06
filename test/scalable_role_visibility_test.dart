@@ -2,14 +2,18 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:rc_sow_flutter/core/product_registry.dart';
 import 'package:rc_sow_flutter/models/app_models.dart';
 
-UserProfile profile(String role, String parish, Map<String, dynamic> privileges) => UserProfile(
-      userId: 'test-$role',
-      email: '${role.toLowerCase().replaceAll(' ', '.')}@example.invalid',
-      role: role,
-      parish: parish,
-      approved: true,
-      privileges: privileges,
-    );
+UserProfile profile(
+  String role,
+  String parish,
+  Map<String, dynamic> privileges,
+) => UserProfile(
+  userId: 'test-$role',
+  email: '${role.toLowerCase().replaceAll(' ', '.')}@example.invalid',
+  role: role,
+  parish: parish,
+  approved: true,
+  privileges: privileges,
+);
 
 void main() {
   test('crew sees only field-safe production schemas', () {
@@ -19,7 +23,9 @@ void main() {
       'submitFieldRequests': true,
       'uploadEvidence': true,
     });
-    final types = RcProductRegistry.visibleSchemas(carpenter).map((e) => e.eventType).toSet();
+    final types = RcProductRegistry.visibleSchemas(
+      carpenter,
+    ).map((e) => e.eventType).toSet();
     expect(types, RcProductRegistry.crewRecordTypes);
     expect(types.contains('payment'), isFalse);
     expect(types.contains('workProjection'), isFalse);
@@ -28,7 +34,9 @@ void main() {
   test('technical and community input roles remain parish-input focused', () {
     for (final role in ['Technical Admin', 'Community Admin']) {
       final user = profile(role, 'Hanover', const {'exportData': true});
-      final types = RcProductRegistry.visibleSchemas(user).map((e) => e.eventType).toSet();
+      final types = RcProductRegistry.visibleSchemas(
+        user,
+      ).map((e) => e.eventType).toSet();
       expect(types, RcProductRegistry.inputRoleRecordTypes);
       expect(RcProductRegistry.experience(user).communityReadOnly, isTrue);
     }

@@ -22,36 +22,57 @@ abstract final class RcExportService {
         pageFormat: PdfPageFormat.a4,
         margin: const pw.EdgeInsets.all(32),
         build: (_) => [
-          pw.Text('JAMAICA RED CROSS', style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 12)),
+          pw.Text(
+            'JAMAICA RED CROSS',
+            style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 12),
+          ),
           pw.SizedBox(height: 8),
-          pw.Text(title, style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 22)),
+          pw.Text(
+            title,
+            style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 22),
+          ),
           pw.SizedBox(height: 18),
           pw.TableHelper.fromTextArray(
             headers: const ['Field', 'Value'],
             data: data.entries
-                .where((entry) => entry.value != null && '${entry.value}'.trim().isNotEmpty)
+                .where(
+                  (entry) =>
+                      entry.value != null && '${entry.value}'.trim().isNotEmpty,
+                )
                 .map((entry) => [entry.key, _display(entry.value)])
                 .toList(),
           ),
           if (signature != null) ...[
             pw.SizedBox(height: 18),
-            pw.Text('Digital signature', style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
+            pw.Text(
+              'Digital signature',
+              style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
+            ),
             pw.SizedBox(height: 6),
             pw.Image(pw.MemoryImage(signature), height: 80),
           ],
         ],
       ),
     );
-    await Printing.sharePdf(bytes: await doc.save(), filename: '${_safe(title)}.pdf');
+    await Printing.sharePdf(
+      bytes: await doc.save(),
+      filename: '${_safe(title)}.pdf',
+    );
   }
 
-  static Future<void> shareRecordXlsx({required String title, required Map<String, dynamic> data}) async {
+  static Future<void> shareRecordXlsx({
+    required String title,
+    required Map<String, dynamic> data,
+  }) async {
     final excel = Excel.createExcel();
     final sheet = excel['Record'];
     sheet.appendRow([TextCellValue(title)]);
     sheet.appendRow([TextCellValue('Field'), TextCellValue('Value')]);
     for (final entry in data.entries) {
-      sheet.appendRow([TextCellValue(entry.key), TextCellValue(_display(entry.value))]);
+      sheet.appendRow([
+        TextCellValue(entry.key),
+        TextCellValue(_display(entry.value)),
+      ]);
     }
     final bytes = excel.encode();
     if (bytes == null) throw StateError('Could not create Excel export.');
@@ -61,12 +82,21 @@ abstract final class RcExportService {
     await SharePlus.instance.share(
       ShareParams(
         text: title,
-        files: [XFile(file.path, mimeType: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')],
+        files: [
+          XFile(
+            file.path,
+            mimeType:
+                'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+          ),
+        ],
       ),
     );
   }
 
-  static Future<void> shareProductionTable({required String title, required List<ProductionRecord> records}) async {
+  static Future<void> shareProductionTable({
+    required String title,
+    required List<ProductionRecord> records,
+  }) async {
     final excel = Excel.createExcel();
     final sheet = excel['Production'];
     sheet.appendRow([
@@ -92,14 +122,20 @@ abstract final class RcExportService {
     final dir = await getTemporaryDirectory();
     final file = File('${dir.path}/${_safe(title)}.xlsx');
     await file.writeAsBytes(bytes, flush: true);
-    await SharePlus.instance.share(ShareParams(text: title, files: [XFile(file.path)]));
+    await SharePlus.instance.share(
+      ShareParams(text: title, files: [XFile(file.path)]),
+    );
   }
 
   static String _display(Object? value) {
     if (value is List) return value.map(_display).join('\n');
-    if (value is Map) return value.entries.map((e) => '${e.key}: ${_display(e.value)}').join('\n');
+    if (value is Map)
+      return value.entries
+          .map((e) => '${e.key}: ${_display(e.value)}')
+          .join('\n');
     return '${value ?? ''}';
   }
 
-  static String _safe(String value) => value.replaceAll(RegExp(r'[^A-Za-z0-9_-]+'), '_');
+  static String _safe(String value) =>
+      value.replaceAll(RegExp(r'[^A-Za-z0-9_-]+'), '_');
 }

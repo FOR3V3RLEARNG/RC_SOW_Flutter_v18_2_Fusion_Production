@@ -17,7 +17,11 @@ class RcSowRepository {
   Future<UserProfile?> currentProfile() async {
     final id = user?.id;
     if (id == null) return null;
-    final row = await client.from('profiles').select().eq('user_id', id).maybeSingle();
+    final row = await client
+        .from('profiles')
+        .select()
+        .eq('user_id', id)
+        .maybeSingle();
     if (row == null) return null;
     return UserProfile.fromMap(Map<String, dynamic>.from(row));
   }
@@ -29,7 +33,9 @@ class RcSowRepository {
             .from('house_crew_assignments')
             .select('house_code')
             .eq('active', true)
-            .or('user_id.eq.${profile.userId},email.eq.${profile.email.toLowerCase()}');
+            .or(
+              'user_id.eq.${profile.userId},email.eq.${profile.email.toLowerCase()}',
+            );
         final codes = assignments
             .map((row) => '${row['house_code'] ?? ''}'.trim().toUpperCase())
             .where((code) => code.isNotEmpty)
@@ -69,7 +75,8 @@ class RcSowRepository {
       return result.where((h) {
         if (h.assignedCrew.isEmpty) return false;
         return h.assignedCrew.any(
-          (member) => member.toLowerCase() == profile.email.toLowerCase() ||
+          (member) =>
+              member.toLowerCase() == profile.email.toLowerCase() ||
               member.toLowerCase() == profile.displayName.toLowerCase(),
         );
       }).toList();
@@ -77,7 +84,10 @@ class RcSowRepository {
     return result;
   }
 
-  Future<List<MessageRecord>> messages(UserProfile profile, {int limit = 100}) async {
+  Future<List<MessageRecord>> messages(
+    UserProfile profile, {
+    int limit = 100,
+  }) async {
     final rows = await client
         .from('app_events')
         .select()
@@ -85,11 +95,19 @@ class RcSowRepository {
         .order('created_at', ascending: false)
         .limit(limit);
     return rows
-        .map((e) => MessageRecord.fromEvent(Map<String, dynamic>.from(e), profile.email))
+        .map(
+          (e) => MessageRecord.fromEvent(
+            Map<String, dynamic>.from(e),
+            profile.email,
+          ),
+        )
         .toList();
   }
 
-  Future<void> markMessageRead(MessageRecord message, UserProfile profile) async {
+  Future<void> markMessageRead(
+    MessageRecord message,
+    UserProfile profile,
+  ) async {
     final row = await client
         .from('app_events')
         .select()
@@ -98,7 +116,8 @@ class RcSowRepository {
         .maybeSingle();
     if (row == null) return;
     final item = Map<String, dynamic>.from(row['item'] as Map? ?? const {});
-    final readBy = (item['readBy'] as List?)?.map((e) => '$e').toSet() ?? <String>{};
+    final readBy =
+        (item['readBy'] as List?)?.map((e) => '$e').toSet() ?? <String>{};
     readBy.add(profile.email);
     item['readBy'] = readBy.toList();
     item['id'] = message.id;
@@ -168,13 +187,16 @@ class RcSowRepository {
     String? parish,
     Map<String, dynamic>? privileges,
   }) async {
-    await client.rpc('manage_user_access', params: {
-      'p_user_id': userId,
-      'p_action': action,
-      'p_role': role,
-      'p_parish': parish,
-      'p_privileges': privileges,
-    });
+    await client.rpc(
+      'manage_user_access',
+      params: {
+        'p_user_id': userId,
+        'p_action': action,
+        'p_role': role,
+        'p_parish': parish,
+        'p_privileges': privileges,
+      },
+    );
   }
 
   Future<List<Map<String, dynamic>>> registrationRequests() async {
@@ -185,15 +207,24 @@ class RcSowRepository {
   }
 
   Future<void> approveRegistration(String userId) async {
-    await client.rpc('approve_registration_request', params: {'p_user_id': userId});
+    await client.rpc(
+      'approve_registration_request',
+      params: {'p_user_id': userId},
+    );
   }
 
   Future<void> rejectRegistration(String userId) async {
-    await client.rpc('reject_registration_request', params: {'p_user_id': userId});
+    await client.rpc(
+      'reject_registration_request',
+      params: {'p_user_id': userId},
+    );
   }
 
   Future<List<Map<String, dynamic>>> liveTrackers(UserProfile profile) async {
-    var query = client.from('parish_live_trackers').select().eq('enabled', true);
+    var query = client
+        .from('parish_live_trackers')
+        .select()
+        .eq('enabled', true);
     if (!profile.canViewAllParishes && profile.parish.isNotEmpty) {
       query = query.eq('parish', profile.parish);
     }
@@ -212,17 +243,25 @@ class RcSowRepository {
 
   Future<int> importBeneficiaryRows(List<Map<String, dynamic>> rows) async {
     if (rows.isEmpty) return 0;
-    final result = await client.rpc('upsert_beneficiary_directory', params: {'p_rows': rows});
+    final result = await client.rpc(
+      'upsert_beneficiary_directory',
+      params: {'p_rows': rows},
+    );
     if (result is num) return result.toInt();
     return rows.length;
   }
 
   Future<List<Map<String, dynamic>>> beneficiarySources() async {
-    final rows = await client.from('beneficiary_sources').select().order('parish');
+    final rows = await client
+        .from('beneficiary_sources')
+        .select()
+        .order('parish');
     return rows.map((e) => Map<String, dynamic>.from(e)).toList();
   }
 
-  Future<List<Map<String, dynamic>>> crewAssignments({String? houseCode}) async {
+  Future<List<Map<String, dynamic>>> crewAssignments({
+    String? houseCode,
+  }) async {
     var query = client.from('house_crew_assignments').select();
     if (houseCode != null && houseCode.trim().isNotEmpty) {
       query = query.eq('house_code', houseCode.trim().toUpperCase());
@@ -240,15 +279,18 @@ class RcSowRepository {
     required String role,
     bool active = true,
   }) async {
-    await client.rpc('assign_house_crew', params: {
-      'p_house_code': houseCode.trim().toUpperCase(),
-      'p_parish': parish,
-      'p_user_id': userId,
-      'p_email': email.trim().toLowerCase(),
-      'p_member_name': memberName.trim(),
-      'p_role': role,
-      'p_active': active,
-    });
+    await client.rpc(
+      'assign_house_crew',
+      params: {
+        'p_house_code': houseCode.trim().toUpperCase(),
+        'p_parish': parish,
+        'p_user_id': userId,
+        'p_email': email.trim().toLowerCase(),
+        'p_member_name': memberName.trim(),
+        'p_role': role,
+        'p_active': active,
+      },
+    );
   }
 
   Future<List<Map<String, dynamic>>> crewAttendance({
@@ -281,16 +323,20 @@ class RcSowRepository {
     String? note,
     String? evidencePath,
   }) async {
-    final result = await client.rpc('upsert_crew_attendance', params: {
-      'p_house_code': houseCode.trim().toUpperCase(),
-      'p_work_date': _date(workDate),
-      'p_status': status,
-      'p_clock_action': clockAction,
-      'p_note': note,
-      'p_evidence_path': evidencePath,
-    });
+    final result = await client.rpc(
+      'upsert_crew_attendance',
+      params: {
+        'p_house_code': houseCode.trim().toUpperCase(),
+        'p_work_date': _date(workDate),
+        'p_status': status,
+        'p_clock_action': clockAction,
+        'p_note': note,
+        'p_evidence_path': evidencePath,
+      },
+    );
     final row = Map<String, dynamic>.from(result as Map? ?? const {});
-    final id = '${row['id'] ?? 'attendance-${DateTime.now().microsecondsSinceEpoch}'}';
+    final id =
+        '${row['id'] ?? 'attendance-${DateTime.now().microsecondsSinceEpoch}'}';
     await _upsertEvent(
       type: 'crewAttendance',
       id: id,
@@ -321,11 +367,14 @@ class RcSowRepository {
     required bool verified,
     String? status,
   }) async {
-    final result = await client.rpc('verify_crew_attendance', params: {
-      'p_attendance_id': attendanceId,
-      'p_verified': verified,
-      'p_status': status,
-    });
+    final result = await client.rpc(
+      'verify_crew_attendance',
+      params: {
+        'p_attendance_id': attendanceId,
+        'p_verified': verified,
+        'p_status': status,
+      },
+    );
     return Map<String, dynamic>.from(result as Map? ?? const {});
   }
 
@@ -334,11 +383,14 @@ class RcSowRepository {
     DateTime? startDate,
     DateTime? endDate,
   }) async {
-    final result = await client.rpc('attendance_payment_summary', params: {
-      'p_house_code': houseCode.trim().toUpperCase(),
-      'p_start_date': startDate == null ? null : _date(startDate),
-      'p_end_date': endDate == null ? null : _date(endDate),
-    });
+    final result = await client.rpc(
+      'attendance_payment_summary',
+      params: {
+        'p_house_code': houseCode.trim().toUpperCase(),
+        'p_start_date': startDate == null ? null : _date(startDate),
+        'p_end_date': endDate == null ? null : _date(endDate),
+      },
+    );
     return (result as List? ?? const [])
         .map((e) => Map<String, dynamic>.from(e as Map))
         .toList();
@@ -356,12 +408,18 @@ class RcSowRepository {
     final safeHouse = _safePath(houseCode.toUpperCase());
     final safeType = _safePath(recordType);
     final safeField = _safePath(fieldKey);
-    final path = '$safeParish/$safeHouse/$safeType/${DateTime.now().microsecondsSinceEpoch}-$safeField.$extension';
-    await client.storage.from('evidence').uploadBinary(
-      path,
-      bytes,
-      fileOptions: FileOptions(upsert: false, contentType: _imageMime(extension)),
-    );
+    final path =
+        '$safeParish/$safeHouse/$safeType/${DateTime.now().microsecondsSinceEpoch}-$safeField.$extension';
+    await client.storage
+        .from('evidence')
+        .uploadBinary(
+          path,
+          bytes,
+          fileOptions: FileOptions(
+            upsert: false,
+            contentType: _imageMime(extension),
+          ),
+        );
     return path;
   }
 
@@ -372,12 +430,18 @@ class RcSowRepository {
     required String fieldKey,
     required Uint8List bytes,
   }) async {
-    final path = '${_parishSegment(parish)}/${_safePath(houseCode.toUpperCase())}/${_safePath(recordType)}/${DateTime.now().microsecondsSinceEpoch}-${_safePath(fieldKey)}.png';
-    await client.storage.from('signatures').uploadBinary(
-      path,
-      bytes,
-      fileOptions: const FileOptions(upsert: false, contentType: 'image/png'),
-    );
+    final path =
+        '${_parishSegment(parish)}/${_safePath(houseCode.toUpperCase())}/${_safePath(recordType)}/${DateTime.now().microsecondsSinceEpoch}-${_safePath(fieldKey)}.png';
+    await client.storage
+        .from('signatures')
+        .uploadBinary(
+          path,
+          bytes,
+          fileOptions: const FileOptions(
+            upsert: false,
+            contentType: 'image/png',
+          ),
+        );
     return path;
   }
 
@@ -387,12 +451,15 @@ class RcSowRepository {
     int limit = 100,
   }) async {
     try {
-      final result = await client.rpc('search_beneficiaries', params: {
-        'p_query': query,
-        'p_limit': limit,
-      });
+      final result = await client.rpc(
+        'search_beneficiaries',
+        params: {'p_query': query, 'p_limit': limit},
+      );
       return (result as List? ?? const [])
-          .map((e) => BeneficiaryRecord.fromMap(Map<String, dynamic>.from(e as Map)))
+          .map(
+            (e) =>
+                BeneficiaryRecord.fromMap(Map<String, dynamic>.from(e as Map)),
+          )
           .toList();
     } catch (_) {
       var request = client.from('beneficiary_directory').select();
@@ -419,12 +486,17 @@ class RcSowRepository {
     int limit = 500,
   }) async {
     var query = client.from('app_events').select();
-    final parishFilter = parish ?? (!profile.canViewAllParishes ? profile.parish : null);
-    if (parishFilter != null && parishFilter.isNotEmpty && parishFilter != 'All Parishes') {
+    final parishFilter =
+        parish ?? (!profile.canViewAllParishes ? profile.parish : null);
+    if (parishFilter != null &&
+        parishFilter.isNotEmpty &&
+        parishFilter != 'All Parishes') {
       query = query.eq('parish', parishFilter);
     }
-    if (eventType != null && eventType.isNotEmpty) query = query.eq('event_type', eventType);
-    if (houseCode != null && houseCode.isNotEmpty) query = query.eq('house_code', houseCode);
+    if (eventType != null && eventType.isNotEmpty)
+      query = query.eq('event_type', eventType);
+    if (houseCode != null && houseCode.isNotEmpty)
+      query = query.eq('house_code', houseCode);
     final rows = await query.order('updated_at', ascending: false).limit(limit);
     const productionTypes = {
       'scope',
@@ -452,9 +524,13 @@ class RcSowRepository {
           return productionTypes.contains(type) || type.startsWith('custom:');
         })
         .where((row) {
-          if (!(profile.isTechnicalAdmin || profile.isCommunityAdmin)) return true;
-          final item = Map<String, dynamic>.from(row['item'] as Map? ?? const {});
-          return '${row['created_by_email'] ?? item['updatedBy'] ?? ''}'.toLowerCase() ==
+          if (!(profile.isTechnicalAdmin || profile.isCommunityAdmin))
+            return true;
+          final item = Map<String, dynamic>.from(
+            row['item'] as Map? ?? const {},
+          );
+          return '${row['created_by_email'] ?? item['updatedBy'] ?? ''}'
+                  .toLowerCase() ==
               profile.email.toLowerCase();
         });
     return visibleRows.map(ProductionRecord.fromEvent).toList();
@@ -469,7 +545,8 @@ class RcSowRepository {
     List<Map<String, dynamic>> recipients = const [],
     String? recordId,
   }) async {
-    final id = recordId ?? '$eventType-${DateTime.now().microsecondsSinceEpoch}';
+    final id =
+        recordId ?? '$eventType-${DateTime.now().microsecondsSinceEpoch}';
     await _upsertEvent(
       type: eventType,
       id: id,
@@ -489,10 +566,10 @@ class RcSowRepository {
   Future<void> deleteProductionRecord(ProductionRecord record) async {
     // Production deletes must always pass through the audited SECURITY DEFINER RPC.
     // Do not fall back to a direct table delete if the audit path is unavailable.
-    await client.rpc('delete_app_event', params: {
-      'p_event_type': record.eventType,
-      'p_item_id': record.id,
-    });
+    await client.rpc(
+      'delete_app_event',
+      params: {'p_event_type': record.eventType, 'p_item_id': record.id},
+    );
   }
 
   Future<List<ProductionRecord>> communityRecords(
@@ -508,7 +585,8 @@ class RcSowRepository {
     return rows
         .map((e) => ProductionRecord.fromEvent(Map<String, dynamic>.from(e)))
         .where(
-          (r) => profile.canViewAllParishes ||
+          (r) =>
+              profile.canViewAllParishes ||
               r.parish.isEmpty ||
               r.parish == profile.parish ||
               r.parish == 'All Parishes',
@@ -525,7 +603,9 @@ class RcSowRepository {
     String? parish,
   }) async {
     final id = 'community-${DateTime.now().microsecondsSinceEpoch}';
-    final targetParish = parish ?? (profile.canViewAllParishes ? 'All Parishes' : profile.parish);
+    final targetParish =
+        parish ??
+        (profile.canViewAllParishes ? 'All Parishes' : profile.parish);
     await _upsertEvent(
       type: 'communityPost',
       id: id,
@@ -606,7 +686,8 @@ class RcSowRepository {
       item: {
         'id': messageId,
         'subject': 'Signature required • $houseCode',
-        'body': '$signerRole signature is required for $recordType. Open house $houseCode and complete the linked record.',
+        'body':
+            '$signerRole signature is required for $recordType. Open house $houseCode and complete the linked record.',
         'senderName': profile.displayName,
         'fromEmail': profile.email,
         'fromRole': profile.role,
@@ -655,48 +736,72 @@ class RcSowRepository {
   }
 
   Future<List<Map<String, dynamic>>> documentTemplates() async {
-    final rows = await client.from('document_templates').select().order('display_name');
+    final rows = await client
+        .from('document_templates')
+        .select()
+        .order('display_name');
     return rows.map((e) => Map<String, dynamic>.from(e)).toList();
   }
 
-  Future<void> setParishMapUrl({required String parish, required String url}) async {
-    await client.rpc('set_parish_live_tracker', params: {
-      'p_parish': parish,
-      'p_url': url,
-      'p_enabled': true,
-    });
+  Future<void> setParishMapUrl({
+    required String parish,
+    required String url,
+  }) async {
+    await client.rpc(
+      'set_parish_live_tracker',
+      params: {'p_parish': parish, 'p_url': url, 'p_enabled': true},
+    );
   }
 
   Future<List<Map<String, dynamic>>> gmailInbox({int maxResults = 20}) async {
     final token = googleProviderToken;
     if (token == null || token.isEmpty) {
-      throw StateError('Google access token is not available. Reconnect Google in Settings.');
+      throw StateError(
+        'Google access token is not available. Reconnect Google in Settings.',
+      );
     }
-    final uri = Uri.https('gmail.googleapis.com', '/gmail/v1/users/me/messages', {
-      'maxResults': '$maxResults',
-      'labelIds': 'INBOX',
-    });
-    final response = await http.get(uri, headers: {'Authorization': 'Bearer $token'});
-    if (response.statusCode != 200) throw StateError('Gmail inbox could not be loaded.');
+    final uri = Uri.https(
+      'gmail.googleapis.com',
+      '/gmail/v1/users/me/messages',
+      {'maxResults': '$maxResults', 'labelIds': 'INBOX'},
+    );
+    final response = await http.get(
+      uri,
+      headers: {'Authorization': 'Bearer $token'},
+    );
+    if (response.statusCode != 200)
+      throw StateError('Gmail inbox could not be loaded.');
     final json = jsonDecode(response.body) as Map<String, dynamic>;
-    final ids = (json['messages'] as List? ?? const []).whereType<Map>().toList();
+    final ids = (json['messages'] as List? ?? const [])
+        .whereType<Map>()
+        .toList();
     final results = <Map<String, dynamic>>[];
     for (final message in ids.take(20)) {
       final id = '${message['id'] ?? ''}';
       if (id.isEmpty) continue;
       final detail = await http.get(
-        Uri.https('gmail.googleapis.com', '/gmail/v1/users/me/messages/$id', {'format': 'metadata'}),
+        Uri.https('gmail.googleapis.com', '/gmail/v1/users/me/messages/$id', {
+          'format': 'metadata',
+        }),
         headers: {'Authorization': 'Bearer $token'},
       );
       if (detail.statusCode != 200) continue;
       final data = jsonDecode(detail.body) as Map<String, dynamic>;
-      final payload = Map<String, dynamic>.from(data['payload'] as Map? ?? const {});
-      final headers = (payload['headers'] as List? ?? const []).whereType<Map>();
-      String header(String name) => headers
-          .cast<Map>()
-          .map((h) => Map<String, dynamic>.from(h))
-          .firstWhere((h) => '${h['name']}'.toLowerCase() == name.toLowerCase(), orElse: () => const {})['value']
-          ?.toString() ?? '';
+      final payload = Map<String, dynamic>.from(
+        data['payload'] as Map? ?? const {},
+      );
+      final headers = (payload['headers'] as List? ?? const [])
+          .whereType<Map>();
+      String header(String name) =>
+          headers
+              .cast<Map>()
+              .map((h) => Map<String, dynamic>.from(h))
+              .firstWhere(
+                (h) => '${h['name']}'.toLowerCase() == name.toLowerCase(),
+                orElse: () => const {},
+              )['value']
+              ?.toString() ??
+          '';
       results.add({
         'id': id,
         'threadId': data['threadId'],
@@ -711,23 +816,35 @@ class RcSowRepository {
 
   Future<Map<String, dynamic>> gmailMessage(String id) async {
     final token = googleProviderToken;
-    if (token == null || token.isEmpty) throw StateError('Google access token is not available.');
+    if (token == null || token.isEmpty)
+      throw StateError('Google access token is not available.');
     final response = await http.get(
-      Uri.https('gmail.googleapis.com', '/gmail/v1/users/me/messages/$id', {'format': 'full'}),
+      Uri.https('gmail.googleapis.com', '/gmail/v1/users/me/messages/$id', {
+        'format': 'full',
+      }),
       headers: {'Authorization': 'Bearer $token'},
     );
-    if (response.statusCode != 200) throw StateError('Gmail message could not be loaded.');
+    if (response.statusCode != 200)
+      throw StateError('Gmail message could not be loaded.');
     final data = Map<String, dynamic>.from(jsonDecode(response.body) as Map);
-    final payload = Map<String, dynamic>.from(data['payload'] as Map? ?? const {});
+    final payload = Map<String, dynamic>.from(
+      data['payload'] as Map? ?? const {},
+    );
     return {...data, 'bodyText': _gmailBodyText(payload)};
   }
 
-  Future<void> gmailSend({required String to, required String subject, required String body}) async {
+  Future<void> gmailSend({
+    required String to,
+    required String subject,
+    required String body,
+  }) async {
     if (to.trim().isEmpty) throw ArgumentError('Recipient email is required.');
     if (body.trim().isEmpty) throw ArgumentError('Message body is required.');
     final token = googleProviderToken;
-    if (token == null || token.isEmpty) throw StateError('Google access token is not available.');
-    final raw = 'To: $to\r\nSubject: $subject\r\nContent-Type: text/plain; charset="UTF-8"\r\n\r\n$body';
+    if (token == null || token.isEmpty)
+      throw StateError('Google access token is not available.');
+    final raw =
+        'To: $to\r\nSubject: $subject\r\nContent-Type: text/plain; charset="UTF-8"\r\n\r\n$body';
     final encoded = base64Url.encode(utf8.encode(raw)).replaceAll('=', '');
     final response = await http.post(
       Uri.https('gmail.googleapis.com', '/gmail/v1/users/me/messages/send'),
@@ -750,26 +867,28 @@ class RcSowRepository {
     List<Map<String, dynamic>> recipients = const [],
     required Map<String, dynamic> item,
   }) async {
-    await client.rpc('upsert_app_event', params: {
-      'p_event': {
-        'type': type,
-        'event_type': type,
-        'item_id': id,
-        'parish': parish,
-        'house_code': houseCode,
-        'recipients': recipients,
-        'item': {
-          ...item,
-          'id': id,
+    await client.rpc(
+      'upsert_app_event',
+      params: {
+        'p_event': {
+          'type': type,
+          'event_type': type,
+          'item_id': id,
+          'parish': parish,
+          'house_code': houseCode,
           'recipients': recipients,
+          'item': {...item, 'id': id, 'recipients': recipients},
         },
       },
-    });
+    );
   }
 
   List<Map<String, dynamic>> _recipientMaps(Object? value) {
     if (value is! List) return const [];
-    return value.whereType<Map>().map((e) => Map<String, dynamic>.from(e)).toList();
+    return value
+        .whereType<Map>()
+        .map((e) => Map<String, dynamic>.from(e))
+        .toList();
   }
 
   String _date(DateTime value) => value.toIso8601String().split('T').first;
@@ -789,12 +908,18 @@ class RcSowRepository {
 
     String walk(Map<String, dynamic> part, {required bool preferPlain}) {
       final mime = '${part['mimeType'] ?? ''}'.toLowerCase();
-      if ((preferPlain && mime == 'text/plain') || (!preferPlain && mime == 'text/html')) {
+      if ((preferPlain && mime == 'text/plain') ||
+          (!preferPlain && mime == 'text/html')) {
         final decoded = decodeBody(part);
-        if (decoded.isNotEmpty) return mime == 'text/html' ? _stripHtml(decoded) : decoded;
+        if (decoded.isNotEmpty)
+          return mime == 'text/html' ? _stripHtml(decoded) : decoded;
       }
-      for (final child in (part['parts'] as List? ?? const []).whereType<Map>()) {
-        final result = walk(Map<String, dynamic>.from(child), preferPlain: preferPlain);
+      for (final child
+          in (part['parts'] as List? ?? const []).whereType<Map>()) {
+        final result = walk(
+          Map<String, dynamic>.from(child),
+          preferPlain: preferPlain,
+        );
         if (result.isNotEmpty) return result;
       }
       return '';
@@ -818,7 +943,8 @@ class RcSowRepository {
       .replaceAll('&quot;', '"')
       .replaceAll('&#39;', "'");
 
-  String _parishSegment(String value) => value.trim().replaceAll(RegExp(r'[/\\]+'), '-');
+  String _parishSegment(String value) =>
+      value.trim().replaceAll(RegExp(r'[/\\]+'), '-');
 
   String _safePath(String value) => value
       .trim()
@@ -826,15 +952,15 @@ class RcSowRepository {
       .replaceAll(RegExp(r'-+'), '-');
 
   String _imageMime(String extension) => switch (extension.toLowerCase()) {
-        'png' => 'image/png',
-        'webp' => 'image/webp',
-        _ => 'image/jpeg',
-      };
+    'png' => 'image/png',
+    'webp' => 'image/webp',
+    _ => 'image/jpeg',
+  };
 
   String debugSummary(UserProfile? profile) => jsonEncode({
-        'connected': user != null,
-        'role': profile?.role,
-        'parish': profile?.parish,
-        'adminVisible': profile?.canViewAdmin,
-      });
+    'connected': user != null,
+    'role': profile?.role,
+    'parish': profile?.parish,
+    'adminVisible': profile?.canViewAdmin,
+  });
 }
