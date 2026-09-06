@@ -1,5 +1,5 @@
 name: rc_sow_flutter
-version: 20.4.1+205
+version: 20.4.1+206
 description: RC SOW scalable production management system — Fusion v20.4, preserving the spacious v18.2 Design DNA.
 publish_to: none
 
@@ -29,8 +29,6 @@ dev_dependencies:
   integration_test:
     sdk: flutter
   flutter_launcher_icons: 0.14.4
-  flutter_native_splash: 2.4.4
-
 flutter:
   uses-material-design: true
   assets:
@@ -42,10 +40,3 @@ flutter_launcher_icons:
   image_path: assets/brand/rc_sow_house_icon.png
   adaptive_icon_background: "#FFFFFF"
   adaptive_icon_foreground: assets/brand/rc_sow_house_icon.png
-
-flutter_native_splash:
-  color: "#F4F7FB"
-  image: assets/brand/rc_sow_house_icon.png
-  android_12:
-    color: "#F4F7FB"
-    image: assets/brand/rc_sow_house_icon.png

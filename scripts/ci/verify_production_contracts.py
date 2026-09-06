@@ -80,6 +80,12 @@ checks: list[tuple[str, bool]] = [
     ),
     ("Android patch script exists", (ROOT / "scripts/patch_android.sh").is_file()),
     (
+        "Native splash is app-owned and API-safe",
+        "flutter_native_splash" not in read(ROOT / "pubspec.yaml")
+        and contains("scripts/patch_android.sh", "windowSplashScreenAnimatedIcon")
+        and contains("scripts/patch_android.sh", "org.gradle.vfs.watch=false"),
+    ),
+    (
         "Unit tests exist",
         (ROOT / "test").is_dir() and any((ROOT / "test").rglob("*_test.dart")),
     ),

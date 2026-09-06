@@ -128,8 +128,15 @@ jobs:
       - name: Generate launcher icon
         run: dart run flutter_launcher_icons
 
-      - name: Generate native splash
-        run: dart run flutter_native_splash:create
+      - name: Verify native splash resources
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -s android/app/src/main/res/drawable/launch_background.xml
+          test -s android/app/src/main/res/values-v31/styles.xml
+          grep -q 'rc_splash_background' android/app/src/main/res/values/colors.xml
+          grep -q 'windowSplashScreenAnimatedIcon' android/app/src/main/res/values-v31/styles.xml
+          ! grep -q 'flutter_native_splash' pubspec.yaml
 
       - name: Post-generation formatting verification
         run: dart format --output=none --set-exit-if-changed .
