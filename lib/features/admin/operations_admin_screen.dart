@@ -651,8 +651,7 @@ class _InterfaceConfigState extends State<_InterfaceConfig> {
                 child: ReorderableListView.builder(
                   padding: const EdgeInsets.fromLTRB(12, 4, 12, 20),
                   itemCount: draft.length,
-                  onReorderItem: (oldIndex, newIndex) =>
-                      setSheetState(() {
+                  onReorderItem: (oldIndex, newIndex) => setSheetState(() {
                     final item = draft.removeAt(oldIndex);
                     draft.insert(newIndex, item);
                   }),
