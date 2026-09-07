@@ -102,7 +102,6 @@ class AppState extends ChangeNotifier {
     } while (_authSyncQueued);
   }
 
-
   Future<void> refreshUiConfig() async {
     await _loadRemoteUiConfig();
     notifyListeners();

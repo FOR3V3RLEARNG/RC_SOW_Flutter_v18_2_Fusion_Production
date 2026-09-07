@@ -47,8 +47,14 @@ class _OperationsAdminScreenState extends State<OperationsAdminScreen>
           tabs: const [
             Tab(text: 'BOQ', icon: Icon(Icons.receipt_long_outlined)),
             Tab(text: 'Authorized', icon: Icon(Icons.mark_email_read_outlined)),
-            Tab(text: 'Interface', icon: Icon(Icons.dashboard_customize_outlined)),
-            Tab(text: 'Notify', icon: Icon(Icons.notifications_active_outlined)),
+            Tab(
+              text: 'Interface',
+              icon: Icon(Icons.dashboard_customize_outlined),
+            ),
+            Tab(
+              text: 'Notify',
+              icon: Icon(Icons.notifications_active_outlined),
+            ),
             Tab(text: 'Staff', icon: Icon(Icons.badge_outlined)),
             Tab(text: 'Tracker', icon: Icon(Icons.location_searching)),
           ],
@@ -88,7 +94,8 @@ class _BoqTemplatesState extends State<_BoqTemplates> {
 
   Future<void> _refresh() async {
     setState(
-      () => future = widget.state.repository.boqTemplates(widget.state.profile!),
+      () =>
+          future = widget.state.repository.boqTemplates(widget.state.profile!),
     );
     await future;
   }
@@ -112,9 +119,10 @@ class _BoqTemplatesState extends State<_BoqTemplates> {
             content: DropdownButtonFormField<String>(
               initialValue: scope,
               decoration: const InputDecoration(labelText: 'Template scope'),
-              items: ['All Parishes', ...RcApp.parishes]
-                  .map((p) => DropdownMenuItem(value: p, child: Text(p)))
-                  .toList(),
+              items: [
+                'All Parishes',
+                ...RcApp.parishes,
+              ].map((p) => DropdownMenuItem(value: p, child: Text(p))).toList(),
               onChanged: (v) => setDialogState(() => scope = v!),
             ),
             actions: [
@@ -290,7 +298,9 @@ class _BoqTemplatesState extends State<_BoqTemplates> {
 
   void _snack(String message) {
     if (!mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(message)));
   }
 
   @override
@@ -456,8 +466,7 @@ class _AuthorizedAccountsState extends State<_AuthorizedAccounts> {
         email: email.text.trim(),
         label: label.text.trim(),
         role: role,
-        parish:
-            RcApp.managementRoles.contains(role) ? 'All Parishes' : parish,
+        parish: RcApp.managementRoles.contains(role) ? 'All Parishes' : parish,
         active: active,
       );
       await _refresh();
@@ -507,8 +516,9 @@ class _AuthorizedAccountsState extends State<_AuthorizedAccounts> {
                         if (action == 'edit') {
                           await _edit(row);
                         } else if (action == 'delete') {
-                          await widget.state.repository
-                              .deleteAuthorizedAccount('${row['email']}');
+                          await widget.state.repository.deleteAuthorizedAccount(
+                            '${row['email']}',
+                          );
                           await _refresh();
                         }
                       },
@@ -556,30 +566,34 @@ class _InterfaceConfigState extends State<_InterfaceConfig> {
       return value.isEmpty ? fallback : value;
     }
 
-    appTitle =
-        TextEditingController(text: text('appTitle', 'Red Cross Scope Of Work'));
-    controlTitle =
-        TextEditingController(text: text('controlTitle', 'Control Of Works'));
+    appTitle = TextEditingController(
+      text: text('appTitle', 'Red Cross Scope Of Work'),
+    );
+    controlTitle = TextEditingController(
+      text: text('controlTitle', 'Control Of Works'),
+    );
     controlSubtitle = TextEditingController(
       text: text(
         'controlSubtitle',
         'House-code and production-module views stay synchronized.',
       ),
     );
-    completionLabel =
-        TextEditingController(text: text('completionLabel', 'Completion'));
+    completionLabel = TextEditingController(
+      text: text('completionLabel', 'Completion'),
+    );
     paymentLabel = TextEditingController(text: text('paymentLabel', 'Payment'));
-    needActionLabel =
-        TextEditingController(text: text('needActionLabel', 'Need Attention'));
+    needActionLabel = TextEditingController(
+      text: text('needActionLabel', 'Need Attention'),
+    );
     openLabel = TextEditingController(text: text('openLabel', 'Open'));
     columns = widget.state.controlColumns.clamp(1, 3);
     defaultView = widget.state.controlDefaultView;
     final configured = widget.state.controlModuleOrder;
     moduleOrder = configured.isEmpty
         ? RcRecordSchemas.schemas
-            .where((schema) => schema.eventType != 'crewAttendance')
-            .map((schema) => schema.eventType)
-            .toList()
+              .where((schema) => schema.eventType != 'crewAttendance')
+              .map((schema) => schema.eventType)
+              .toList()
         : List<String>.from(configured);
   }
 
@@ -599,10 +613,10 @@ class _InterfaceConfigState extends State<_InterfaceConfig> {
     super.dispose();
   }
 
-
   Future<void> _editModuleOrder() async {
     final labels = {
-      for (final schema in RcRecordSchemas.schemas) schema.eventType: schema.title,
+      for (final schema in RcRecordSchemas.schemas)
+        schema.eventType: schema.title,
     };
     final draft = List<String>.from(moduleOrder);
     final result = await showModalBottomSheet<List<String>>(
@@ -725,8 +739,7 @@ class _InterfaceConfigState extends State<_InterfaceConfig> {
         const SizedBox(height: 9),
         DropdownButtonFormField<String>(
           initialValue: defaultView,
-          decoration:
-              const InputDecoration(labelText: 'Default Control view'),
+          decoration: const InputDecoration(labelText: 'Default Control view'),
           items: const [
             DropdownMenuItem(value: 'houses', child: Text('House Codes')),
             DropdownMenuItem(
@@ -836,7 +849,9 @@ class _NotificationCentreState extends State<_NotificationCentre> {
 
   void _snack(String message) {
     if (!mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(message)));
   }
 
   @override
@@ -879,8 +894,9 @@ class _NotificationCentreState extends State<_NotificationCentre> {
         const SizedBox(height: 10),
         DropdownButtonFormField<String?>(
           initialValue: role,
-          decoration:
-              const InputDecoration(labelText: 'Role target (optional)'),
+          decoration: const InputDecoration(
+            labelText: 'Role target (optional)',
+          ),
           items: [
             const DropdownMenuItem<String?>(
               value: null,
@@ -903,8 +919,9 @@ class _NotificationCentreState extends State<_NotificationCentre> {
         TextField(
           controller: house,
           textCapitalization: TextCapitalization.characters,
-          decoration:
-              const InputDecoration(labelText: 'Linked house code (optional)'),
+          decoration: const InputDecoration(
+            labelText: 'Linked house code (optional)',
+          ),
         ),
         const SizedBox(height: 9),
         TextField(
@@ -922,29 +939,32 @@ class _NotificationCentreState extends State<_NotificationCentre> {
         DropdownButtonFormField<String>(
           initialValue: category,
           decoration: const InputDecoration(labelText: 'Notification Category'),
-          items: const [
-            'General',
-            'House',
-            'Meeting',
-            'Event',
-            'Safety',
-            'Payment',
-            'Completion',
-          ]
-              .map((value) => DropdownMenuItem(
-                    value: value,
-                    child: Text(value),
-                  ))
-              .toList(),
+          items:
+              const [
+                    'General',
+                    'House',
+                    'Meeting',
+                    'Event',
+                    'Safety',
+                    'Payment',
+                    'Completion',
+                  ]
+                  .map(
+                    (value) =>
+                        DropdownMenuItem(value: value, child: Text(value)),
+                  )
+                  .toList(),
           onChanged: (value) => setState(() => category = value!),
         ),
         const SizedBox(height: 9),
         DropdownButtonFormField<String>(
           initialValue: priority,
           decoration: const InputDecoration(labelText: 'Priority'),
-          items: const ['Normal', 'Action required', 'Urgent']
-              .map((p) => DropdownMenuItem(value: p, child: Text(p)))
-              .toList(),
+          items: const [
+            'Normal',
+            'Action required',
+            'Urgent',
+          ].map((p) => DropdownMenuItem(value: p, child: Text(p))).toList(),
           onChanged: (v) => setState(() => priority = v!),
         ),
         const SizedBox(height: 14),

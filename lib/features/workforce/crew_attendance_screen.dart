@@ -97,7 +97,6 @@ class _CrewAttendanceScreenState extends State<CrewAttendanceScreen> {
     }
   }
 
-
   Future<(double?, double?, double?, String)> _captureLocation() async {
     try {
       final enabled = await Geolocator.isLocationServiceEnabled();
@@ -118,7 +117,12 @@ class _CrewAttendanceScreenState extends State<CrewAttendanceScreen> {
           timeLimit: Duration(seconds: 12),
         ),
       );
-      return (position.latitude, position.longitude, position.accuracy, 'captured');
+      return (
+        position.latitude,
+        position.longitude,
+        position.accuracy,
+        'captured',
+      );
     } catch (_) {
       return (null, null, null, 'unavailable');
     }
@@ -386,7 +390,9 @@ class _CrewAttendanceScreenState extends State<CrewAttendanceScreen> {
                                     style: theme.textTheme.bodySmall,
                                   ),
                                 ],
-                                if ('${row['location_status'] ?? ''}'.trim().isNotEmpty) ...[
+                                if ('${row['location_status'] ?? ''}'
+                                    .trim()
+                                    .isNotEmpty) ...[
                                   const SizedBox(height: 4),
                                   Text(
                                     'GPS audit: ${row['location_status']}'

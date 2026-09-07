@@ -74,14 +74,21 @@ abstract final class BoqImportService {
     }
 
     final codeCol = col(['item code', 'code', 'item no', 'item #']);
-    final descCol = col(['description', 'material', 'item description', 'item']);
+    final descCol = col([
+      'description',
+      'material',
+      'item description',
+      'item',
+    ]);
     final unitCol = col(['unit']);
     final qtyCol = col(['quantity', 'qty', 'boq qty', 'boq quantity']);
     final sizeCol = col(['size']);
     final lengthCol = col(['length']);
     final categoryCol = col(['category', 'section', 'trade']);
     if (descCol < 0) {
-      throw const FormatException('Could not identify a material/description column.');
+      throw const FormatException(
+        'Could not identify a material/description column.',
+      );
     }
 
     String value(List<Data?> row, int i) =>
@@ -104,8 +111,13 @@ abstract final class BoqImportService {
         'boqQuantity': double.tryParse(match?.group(0) ?? '') ?? 0,
       });
     }
-    if (items.isEmpty) throw const FormatException('No BOQ material rows were found.');
-    return BoqImportResult(items: items, sheetName: selectedName, headerRow: headerIndex + 1);
+    if (items.isEmpty)
+      throw const FormatException('No BOQ material rows were found.');
+    return BoqImportResult(
+      items: items,
+      sheetName: selectedName,
+      headerRow: headerIndex + 1,
+    );
   }
 
   static String _cell(Data? cell) => cell?.value?.toString() ?? '';

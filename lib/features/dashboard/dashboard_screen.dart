@@ -432,7 +432,6 @@ class _ProductionChainNav extends StatelessWidget {
   }
 }
 
-
 class _DashboardCommandStrip extends StatelessWidget {
   const _DashboardCommandStrip({
     required this.onMessages,
@@ -454,11 +453,25 @@ class _DashboardCommandStrip extends StatelessWidget {
       spacing: 8,
       runSpacing: 8,
       children: [
-        ActionChip(avatar: const Icon(Icons.notifications_outlined), label: const Text('Notifications'), onPressed: onMessages),
-        ActionChip(avatar: const Icon(Icons.forum_outlined), label: const Text('Messages'), onPressed: onMessages),
-        ActionChip(avatar: const Icon(Icons.settings_outlined), label: const Text('Settings'), onPressed: onSettings),
         ActionChip(
-          avatar: Icon(canManageCrew ? Icons.groups_2_outlined : Icons.home_work_outlined),
+          avatar: const Icon(Icons.notifications_outlined),
+          label: const Text('Notifications'),
+          onPressed: onMessages,
+        ),
+        ActionChip(
+          avatar: const Icon(Icons.forum_outlined),
+          label: const Text('Messages'),
+          onPressed: onMessages,
+        ),
+        ActionChip(
+          avatar: const Icon(Icons.settings_outlined),
+          label: const Text('Settings'),
+          onPressed: onSettings,
+        ),
+        ActionChip(
+          avatar: Icon(
+            canManageCrew ? Icons.groups_2_outlined : Icons.home_work_outlined,
+          ),
           label: Text(canManageCrew ? 'Crew Assignment' : 'My Houses'),
           onPressed: canManageCrew ? onControl : onHouses,
         ),

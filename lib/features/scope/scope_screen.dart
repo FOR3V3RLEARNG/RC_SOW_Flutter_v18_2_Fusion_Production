@@ -73,12 +73,20 @@ class _ScopeScreenState extends State<ScopeScreen>
   final repairNotes = TextEditingController();
   String repairPreset = 'Replace damaged roof sheeting';
   static const repairPresets = <String>[
-    'Replace damaged roof sheeting', 'Replace / repair wall plate',
-    'Replace rafters', 'Install / replace collar ties', 'Replace battens',
-    'Install hurricane straps', 'Repair ridge beam',
-    'Install / replace fascia board', 'Install / replace blocking board',
-    'Install flashing', 'Repair gable', 'Repair veranda roof',
-    'Install / repair gutters', 'Concrete / ring beam repair',
+    'Replace damaged roof sheeting',
+    'Replace / repair wall plate',
+    'Replace rafters',
+    'Install / replace collar ties',
+    'Replace battens',
+    'Install hurricane straps',
+    'Repair ridge beam',
+    'Install / replace fascia board',
+    'Install / replace blocking board',
+    'Install flashing',
+    'Repair gable',
+    'Repair veranda roof',
+    'Install / repair gutters',
+    'Concrete / ring beam repair',
     'Other / custom repair',
   ];
 
@@ -309,8 +317,15 @@ class _ScopeScreenState extends State<ScopeScreen>
               ),
               DropdownButtonFormField<String>(
                 initialValue: repairPreset,
-                decoration: const InputDecoration(labelText: 'Quick Repair Selection'),
-                items: repairPresets.map((repair) => DropdownMenuItem(value: repair, child: Text(repair))).toList(),
+                decoration: const InputDecoration(
+                  labelText: 'Quick Repair Selection',
+                ),
+                items: repairPresets
+                    .map(
+                      (repair) =>
+                          DropdownMenuItem(value: repair, child: Text(repair)),
+                    )
+                    .toList(),
                 onChanged: (value) => setState(() => repairPreset = value!),
               ),
               const SizedBox(height: 8),
@@ -319,7 +334,11 @@ class _ScopeScreenState extends State<ScopeScreen>
                 child: OutlinedButton.icon(
                   onPressed: () {
                     final existing = repairNotes.text.trim();
-                    setState(() => repairNotes.text = existing.isEmpty ? '• $repairPreset' : '$existing\n• $repairPreset');
+                    setState(
+                      () => repairNotes.text = existing.isEmpty
+                          ? '• $repairPreset'
+                          : '$existing\n• $repairPreset',
+                    );
                   },
                   icon: const Icon(Icons.add),
                   label: const Text('Add Repair'),
@@ -332,7 +351,8 @@ class _ScopeScreenState extends State<ScopeScreen>
                 maxLines: 9,
                 decoration: const InputDecoration(
                   labelText: 'Repairs To Be Done / Technical Notes',
-                  helperText: 'Add quick repairs, then customize the wording as required.',
+                  helperText:
+                      'Add quick repairs, then customize the wording as required.',
                 ),
               ),
             ],
@@ -461,14 +481,19 @@ class _ScopeScreenState extends State<ScopeScreen>
                     behavior: HitTestBehavior.opaque,
                     onTapUp: drawTool == RoofDrawTool.freehand
                         ? null
-                        : (details) => _placeTechnicalPoint(details.localPosition),
+                        : (details) =>
+                              _placeTechnicalPoint(details.localPosition),
                     onPanStart: drawTool == RoofDrawTool.freehand
-                        ? (details) => setState(() => current = [details.localPosition])
+                        ? (details) =>
+                              setState(() => current = [details.localPosition])
                         : null,
                     onPanUpdate: drawTool == RoofDrawTool.freehand
-                        ? (details) => setState(() => current.add(details.localPosition))
+                        ? (details) =>
+                              setState(() => current.add(details.localPosition))
                         : null,
-                    onPanEnd: drawTool == RoofDrawTool.freehand ? (_) => _finishStroke() : null,
+                    onPanEnd: drawTool == RoofDrawTool.freehand
+                        ? (_) => _finishStroke()
+                        : null,
                     child: CustomPaint(
                       painter: RoofCanvasPainter(
                         strokes: strokes,
@@ -627,14 +652,28 @@ class _ScopeScreenState extends State<ScopeScreen>
               _line('Community', cluster.text),
               _line('Finished Roof Style', roofType),
               const SizedBox(height: 10),
-              Text('Repairs To Be Done', style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w900)),
+              Text(
+                'Repairs To Be Done',
+                style: theme.textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.w900,
+                ),
+              ),
               const SizedBox(height: 5),
-              Text(repairNotes.text.trim().isEmpty ? 'No repair items entered.' : repairNotes.text.trim()),
+              Text(
+                repairNotes.text.trim().isEmpty
+                    ? 'No repair items entered.'
+                    : repairNotes.text.trim(),
+              ),
               const SizedBox(height: 10),
               OutlinedButton.icon(
-                onPressed: () => Navigator.of(context).push(MaterialPageRoute(
-                  builder: (_) => TechnicalRoofDraftScreen(initialMeasurements: measurements, initialRoofType: roofType),
-                )),
+                onPressed: () => Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (_) => TechnicalRoofDraftScreen(
+                      initialMeasurements: measurements,
+                      initialRoofType: roofType,
+                    ),
+                  ),
+                ),
                 icon: const Icon(Icons.architecture_outlined),
                 label: const Text('View Technical Roof Draft'),
               ),
@@ -847,15 +886,22 @@ class _ScopeScreenState extends State<ScopeScreen>
     });
   }
 
-
   Future<void> _placeTechnicalPoint(Offset point) async {
-    if (drawTool == RoofDrawTool.select || drawTool == RoofDrawTool.freehand) return;
+    if (drawTool == RoofDrawTool.select || drawTool == RoofDrawTool.freehand)
+      return;
     if (current.isEmpty) {
-      setState(() { current = [point]; redo.clear(); });
+      setState(() {
+        current = [point];
+        redo.clear();
+      });
       return;
     }
     final stroke = RoofStroke(tool: drawTool, points: [current.first, point]);
-    setState(() { strokes.add(stroke); current = []; redo.clear(); });
+    setState(() {
+      strokes.add(stroke);
+      current = [];
+      redo.clear();
+    });
     if (drawTool != RoofDrawTool.drain) await _editMeasurement(stroke);
   }
 
@@ -1007,8 +1053,15 @@ class _ScopeScreenState extends State<ScopeScreen>
               style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
             ),
             pw.SizedBox(height: 6),
-            pw.Text('Repairs To Be Done', style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
-            pw.Text(repairNotes.text.trim().isEmpty ? 'No repair items entered.' : repairNotes.text.trim()),
+            pw.Text(
+              'Repairs To Be Done',
+              style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
+            ),
+            pw.Text(
+              repairNotes.text.trim().isEmpty
+                  ? 'No repair items entered.'
+                  : repairNotes.text.trim(),
+            ),
             pw.SizedBox(height: 8),
             pw.Text(
               'Technical Geometry: width ${measurements.widthFt.toStringAsFixed(2)} ft • '

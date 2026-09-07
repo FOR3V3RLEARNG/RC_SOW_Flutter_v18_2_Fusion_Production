@@ -774,7 +774,6 @@ class RcSowRepository {
     );
   }
 
-
   Future<Map<String, dynamic>> uiConfig(UserProfile profile) async {
     final keys = <String>[
       if (!profile.canViewAllParishes && profile.parish.isNotEmpty)
@@ -842,10 +841,15 @@ class RcSowRepository {
 
   Future<Map<String, dynamic>?> houseBoq(String houseCode) async {
     try {
-      final row = await client.from('house_boq').select()
-          .eq('house_code', houseCode.trim().toUpperCase()).maybeSingle();
+      final row = await client
+          .from('house_boq')
+          .select()
+          .eq('house_code', houseCode.trim().toUpperCase())
+          .maybeSingle();
       return row == null ? null : Map<String, dynamic>.from(row);
-    } catch (_) { return null; }
+    } catch (_) {
+      return null;
+    }
   }
 
   Future<void> saveHouseBoq({
@@ -872,10 +876,15 @@ class RcSowRepository {
 
   Future<Map<String, dynamic>?> houseInventory(String houseCode) async {
     try {
-      final row = await client.from('house_inventory').select()
-          .eq('house_code', houseCode.trim().toUpperCase()).maybeSingle();
+      final row = await client
+          .from('house_inventory')
+          .select()
+          .eq('house_code', houseCode.trim().toUpperCase())
+          .maybeSingle();
       return row == null ? null : Map<String, dynamic>.from(row);
-    } catch (_) { return null; }
+    } catch (_) {
+      return null;
+    }
   }
 
   Future<void> saveHouseInventory({
@@ -897,7 +906,8 @@ class RcSowRepository {
   Future<List<Map<String, dynamic>>> authorizedAccounts() async {
     final result = await client.rpc('list_authorized_accounts');
     return (result as List? ?? const [])
-        .map((e) => Map<String, dynamic>.from(e as Map)).toList();
+        .map((e) => Map<String, dynamic>.from(e as Map))
+        .toList();
   }
 
   Future<void> manageAuthorizedAccount({
@@ -908,47 +918,61 @@ class RcSowRepository {
     bool active = true,
     bool notifyOnIssue = true,
   }) async {
-    await client.rpc('manage_authorized_account', params: {
-      'p_email': email.trim().toLowerCase(),
-      'p_label': label.trim(),
-      'p_role': role,
-      'p_parish': parish,
-      'p_active': active,
-      'p_notify_on_issue': notifyOnIssue,
-    });
+    await client.rpc(
+      'manage_authorized_account',
+      params: {
+        'p_email': email.trim().toLowerCase(),
+        'p_label': label.trim(),
+        'p_role': role,
+        'p_parish': parish,
+        'p_active': active,
+        'p_notify_on_issue': notifyOnIssue,
+      },
+    );
   }
 
   Future<void> deleteAuthorizedAccount(String email) async {
-    await client.rpc('delete_authorized_account',
-        params: {'p_email': email.trim().toLowerCase()});
+    await client.rpc(
+      'delete_authorized_account',
+      params: {'p_email': email.trim().toLowerCase()},
+    );
   }
 
   Future<List<Map<String, dynamic>>> staffDirectory() async {
     final result = await client.rpc('list_staff_directory');
     return (result as List? ?? const [])
-        .map((e) => Map<String, dynamic>.from(e as Map)).toList();
+        .map((e) => Map<String, dynamic>.from(e as Map))
+        .toList();
   }
 
   Future<Map<String, dynamic>> setHouseConstructionStage({
     required String houseCode,
     required String stage,
   }) async {
-    final result = await client.rpc('set_house_construction_stage', params: {
-      'p_house_code': houseCode.trim().toUpperCase(),
-      'p_stage': stage,
-    });
+    final result = await client.rpc(
+      'set_house_construction_stage',
+      params: {
+        'p_house_code': houseCode.trim().toUpperCase(),
+        'p_stage': stage,
+      },
+    );
     return Map<String, dynamic>.from(result as Map? ?? const {});
   }
 
   Future<List<Map<String, dynamic>>> houseProgressHistory(
-    String houseCode, {int limit = 30}
-  ) async {
-    final result = await client.rpc('house_progress_history_for', params: {
-      'p_house_code': houseCode.trim().toUpperCase(),
-      'p_limit': limit,
-    });
+    String houseCode, {
+    int limit = 30,
+  }) async {
+    final result = await client.rpc(
+      'house_progress_history_for',
+      params: {
+        'p_house_code': houseCode.trim().toUpperCase(),
+        'p_limit': limit,
+      },
+    );
     return (result as List? ?? const [])
-        .map((e) => Map<String, dynamic>.from(e as Map)).toList();
+        .map((e) => Map<String, dynamic>.from(e as Map))
+        .toList();
   }
 
   Future<List<Map<String, dynamic>>> gmailInbox({int maxResults = 20}) async {

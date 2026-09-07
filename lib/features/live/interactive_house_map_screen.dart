@@ -27,8 +27,9 @@ class _InteractiveHouseMapScreenState extends State<InteractiveHouseMapScreen> {
 
   Future<void> _refresh() async {
     setState(
-      () => future =
-          widget.state.repository.houseLocations(widget.state.profile!),
+      () => future = widget.state.repository.houseLocations(
+        widget.state.profile!,
+      ),
     );
     await future;
   }
@@ -123,16 +124,17 @@ class _InteractiveHouseMapScreenState extends State<InteractiveHouseMapScreen> {
                                   Material(
                                     elevation: 3,
                                     shape: const CircleBorder(),
-                                    color:
-                                        Theme.of(context).colorScheme.primary,
+                                    color: Theme.of(
+                                      context,
+                                    ).colorScheme.primary,
                                     child: Padding(
                                       padding: const EdgeInsets.all(9),
                                       child: Icon(
                                         Icons.home_work_rounded,
                                         size: 22,
-                                        color: Theme.of(context)
-                                            .colorScheme
-                                            .onPrimary,
+                                        color: Theme.of(
+                                          context,
+                                        ).colorScheme.onPrimary,
                                       ),
                                     ),
                                   ),

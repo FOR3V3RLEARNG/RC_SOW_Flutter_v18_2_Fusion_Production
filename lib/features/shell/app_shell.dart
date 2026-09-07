@@ -553,18 +553,14 @@ Future<void> showRcMoreMenu(BuildContext context, AppState state) async {
                   );
                 }),
                 if (profile.canViewAdmin)
-                  _MoreTile(
-                    'Operations Admin',
-                    Icons.tune_rounded,
-                    () {
-                      Navigator.pop(context);
-                      Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (_) => OperationsAdminScreen(state: state),
-                        ),
-                      );
-                    },
-                  ),
+                  _MoreTile('Operations Admin', Icons.tune_rounded, () {
+                    Navigator.pop(context);
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (_) => OperationsAdminScreen(state: state),
+                      ),
+                    );
+                  }),
                 if (profile.canViewAdmin)
                   _MoreTile(
                     'Admin Control Centre',

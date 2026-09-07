@@ -104,8 +104,9 @@ class _HouseOperationsControlScreenState
 
           final open = data.records.where((r) => !r.isClosed).length;
           final attention = data.records.where((r) => r.needsAttention).length;
-          final completion =
-              data.records.where((r) => r.eventType == 'notice').length;
+          final completion = data.records
+              .where((r) => r.eventType == 'notice')
+              .length;
           final payment = data.records
               .where((r) => r.eventType == 'payment' && r.status != 'Paid')
               .length;
@@ -145,7 +146,10 @@ class _HouseOperationsControlScreenState
                     onTap: () {},
                   ),
                   _PulseTile(
-                    label: widget.state.uiText('needActionLabel', 'Need Attention'),
+                    label: widget.state.uiText(
+                      'needActionLabel',
+                      'Need Attention',
+                    ),
                     value: '$attention',
                     icon: Icons.priority_high_rounded,
                     color: attention == 0 ? RcColors.success : RcColors.warning,
@@ -208,7 +212,9 @@ class _HouseOperationsControlScreenState
                         width: 220,
                         child: DropdownButtonFormField<String?>(
                           initialValue: parish,
-                          decoration: const InputDecoration(labelText: 'Parish'),
+                          decoration: const InputDecoration(
+                            labelText: 'Parish',
+                          ),
                           items: [
                             const DropdownMenuItem<String?>(
                               value: null,
@@ -221,8 +227,7 @@ class _HouseOperationsControlScreenState
                               ),
                             ),
                           ],
-                          onChanged: (value) =>
-                              setState(() => parish = value),
+                          onChanged: (value) => setState(() => parish = value),
                         ),
                       ),
                   ],
@@ -238,12 +243,12 @@ class _HouseOperationsControlScreenState
                     final effective = constraints.maxWidth < 620
                         ? 1
                         : constraints.maxWidth < 950
-                            ? columns.clamp(1, 2)
-                            : columns;
+                        ? columns.clamp(1, 2)
+                        : columns;
                     final gap = 10.0;
                     final width =
                         (constraints.maxWidth - gap * (effective - 1)) /
-                            effective;
+                        effective;
                     return Wrap(
                       spacing: gap,
                       runSpacing: gap,
@@ -349,7 +354,8 @@ class _HouseControlWorkspaceByCodeScreenState
   Future<HouseRecord?> _load() async {
     final houses = await widget.state.repository.houses(widget.state.profile!);
     for (final house in houses) {
-      if (house.code.toUpperCase() == widget.houseCode.toUpperCase()) return house;
+      if (house.code.toUpperCase() == widget.houseCode.toUpperCase())
+        return house;
     }
     return null;
   }
@@ -504,7 +510,9 @@ class _HouseControlWorkspaceScreenState
 
   void _snack(String message) {
     if (!mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(message)));
   }
 
   @override
@@ -523,13 +531,14 @@ class _HouseControlWorkspaceScreenState
             final normalizedStage = rcHouseStages.containsKey(historyStage)
                 ? historyStage
                 : rcHouseStages.containsKey(widget.house.stage)
-                    ? widget.house.stage
-                    : 'Not Started';
+                ? widget.house.stage
+                : 'Not Started';
             final progress =
                 (latest?['progress'] as num?)?.toInt() ??
-                    rcHouseStages[normalizedStage] ??
-                    widget.house.progress;
-            final canStage = profile.isCarpenter ||
+                rcHouseStages[normalizedStage] ??
+                widget.house.progress;
+            final canStage =
+                profile.isCarpenter ||
                 profile.hasPrivilege('editControl') ||
                 profile.hasPrivilege('reviewControl');
             final notes = data.records
@@ -554,7 +563,9 @@ class _HouseControlWorkspaceScreenState
                 const SizedBox(height: 14),
                 RcExpressiveSurface(
                   shape: RcSurfaceShape.hero,
-                  tone: theme.colorScheme.primaryContainer.withValues(alpha: .30),
+                  tone: theme.colorScheme.primaryContainer.withValues(
+                    alpha: .30,
+                  ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
@@ -590,8 +601,9 @@ class _HouseControlWorkspaceScreenState
                               ),
                             )
                             .toList(),
-                        onChanged:
-                            !canStage || busy ? null : (v) => _setStage(v!),
+                        onChanged: !canStage || busy
+                            ? null
+                            : (v) => _setStage(v!),
                       ),
                       const SizedBox(height: 8),
                       Row(
@@ -606,7 +618,9 @@ class _HouseControlWorkspaceScreenState
                           const SizedBox(width: 8),
                           IconButton.filledTonal(
                             tooltip: 'Redo stage',
-                            onPressed: busy || redoStages.isEmpty ? null : _redo,
+                            onPressed: busy || redoStages.isEmpty
+                                ? null
+                                : _redo,
                             icon: const Icon(Icons.redo_rounded),
                           ),
                           const SizedBox(width: 10),
@@ -637,7 +651,9 @@ class _HouseControlWorkspaceScreenState
                     _ActionTile(
                       'House Inventory',
                       Icons.inventory_2_outlined,
-                      data.inventory == null ? 'No delivery record' : 'BOQ comparison',
+                      data.inventory == null
+                          ? 'No delivery record'
+                          : 'BOQ comparison',
                       _openInventory,
                     ),
                     _ActionTile(
@@ -700,20 +716,24 @@ class _HouseControlWorkspaceScreenState
                       ),
                       if (notes.isNotEmpty) ...[
                         const Divider(height: 24),
-                        ...notes.take(8).map(
-                          (record) => ListTile(
-                            contentPadding: EdgeInsets.zero,
-                            leading: const Icon(Icons.sticky_note_2_outlined),
-                            title: Text(record.summary),
-                            subtitle: Text(
-                              record.updatedAt
-                                  .toLocal()
-                                  .toString()
-                                  .split('.')
-                                  .first,
+                        ...notes
+                            .take(8)
+                            .map(
+                              (record) => ListTile(
+                                contentPadding: EdgeInsets.zero,
+                                leading: const Icon(
+                                  Icons.sticky_note_2_outlined,
+                                ),
+                                title: Text(record.summary),
+                                subtitle: Text(
+                                  record.updatedAt
+                                      .toLocal()
+                                      .toString()
+                                      .split('.')
+                                      .first,
+                                ),
+                              ),
                             ),
-                          ),
-                        ),
                       ],
                     ],
                   ),
@@ -725,21 +745,23 @@ class _HouseControlWorkspaceScreenState
                   const RcExpressiveSurface(
                     child: Text('No production records for this house yet.'),
                   ),
-                ...data.records.take(80).map(
-                  (record) => Card(
-                    child: ListTile(
-                      leading: Icon(_iconFor(record.eventType)),
-                      title: Text(record.title),
-                      subtitle: Text(
-                        '${record.status}${record.summary.isEmpty ? '' : ' • ${record.summary}'}',
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
+                ...data.records
+                    .take(80)
+                    .map(
+                      (record) => Card(
+                        child: ListTile(
+                          leading: Icon(_iconFor(record.eventType)),
+                          title: Text(record.title),
+                          subtitle: Text(
+                            '${record.status}${record.summary.isEmpty ? '' : ' • ${record.summary}'}',
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          trailing: const Icon(Icons.chevron_right),
+                          onTap: () => _openModule(record.eventType),
+                        ),
                       ),
-                      trailing: const Icon(Icons.chevron_right),
-                      onTap: () => _openModule(record.eventType),
                     ),
-                  ),
-                ),
               ],
             );
           },
@@ -808,16 +830,16 @@ class _HouseControlWorkspaceScreenState
   }
 
   IconData _iconFor(String eventType) => switch (eventType) {
-        'notice' => Icons.verified_outlined,
-        'payment' => Icons.payments_outlined,
-        'crewAttendance' => Icons.how_to_reg_outlined,
-        'inventory' => Icons.inventory_2_outlined,
-        'monitoring' => Icons.fact_check_outlined,
-        'siteVisit' => Icons.location_on_outlined,
-        'dailyLog' => Icons.menu_book_outlined,
-        'workLog' => Icons.edit_note_outlined,
-        _ => Icons.description_outlined,
-      };
+    'notice' => Icons.verified_outlined,
+    'payment' => Icons.payments_outlined,
+    'crewAttendance' => Icons.how_to_reg_outlined,
+    'inventory' => Icons.inventory_2_outlined,
+    'monitoring' => Icons.fact_check_outlined,
+    'siteVisit' => Icons.location_on_outlined,
+    'dailyLog' => Icons.menu_book_outlined,
+    'workLog' => Icons.edit_note_outlined,
+    _ => Icons.description_outlined,
+  };
 }
 
 class HouseBoqDirectoryScreen extends StatelessWidget {
@@ -867,11 +889,7 @@ class HouseBoqDirectoryScreen extends StatelessWidget {
 }
 
 class HouseBoqScreen extends StatefulWidget {
-  const HouseBoqScreen({
-    super.key,
-    required this.state,
-    required this.house,
-  });
+  const HouseBoqScreen({super.key, required this.state, required this.house});
   final AppState state;
   final HouseRecord house;
 
@@ -948,7 +966,9 @@ class _HouseBoqScreenState extends State<HouseBoqScreen> {
 
   void _snack(String message) {
     if (!mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(message)));
   }
 
   @override
@@ -1021,7 +1041,10 @@ class _HouseBoqScreenState extends State<HouseBoqScreen> {
                             },
                             itemBuilder: (_) => const [
                               PopupMenuItem(value: 'edit', child: Text('Edit')),
-                              PopupMenuItem(value: 'delete', child: Text('Delete')),
+                              PopupMenuItem(
+                                value: 'delete',
+                                child: Text('Delete'),
+                              ),
                             ],
                           )
                         : null,
@@ -1040,13 +1063,15 @@ class _HouseBoqScreenState extends State<HouseBoqScreen> {
         ? <String, dynamic>{}
         : Map<String, dynamic>.from(items[index]);
     final code = TextEditingController(text: '${original['itemCode'] ?? ''}');
-    final description =
-        TextEditingController(text: '${original['description'] ?? ''}');
+    final description = TextEditingController(
+      text: '${original['description'] ?? ''}',
+    );
     final unit = TextEditingController(text: '${original['unit'] ?? ''}');
     final size = TextEditingController(text: '${original['size'] ?? ''}');
     final length = TextEditingController(text: '${original['length'] ?? ''}');
-    final quantity =
-        TextEditingController(text: '${original['boqQuantity'] ?? ''}');
+    final quantity = TextEditingController(
+      text: '${original['boqQuantity'] ?? ''}',
+    );
     final saved = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
@@ -1055,22 +1080,45 @@ class _HouseBoqScreenState extends State<HouseBoqScreen> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              TextField(controller: code, decoration: const InputDecoration(labelText: 'Item code')),
-              TextField(controller: description, decoration: const InputDecoration(labelText: 'Description')),
-              TextField(controller: unit, decoration: const InputDecoration(labelText: 'Unit')),
-              TextField(controller: size, decoration: const InputDecoration(labelText: 'Size')),
-              TextField(controller: length, decoration: const InputDecoration(labelText: 'Length')),
+              TextField(
+                controller: code,
+                decoration: const InputDecoration(labelText: 'Item code'),
+              ),
+              TextField(
+                controller: description,
+                decoration: const InputDecoration(labelText: 'Description'),
+              ),
+              TextField(
+                controller: unit,
+                decoration: const InputDecoration(labelText: 'Unit'),
+              ),
+              TextField(
+                controller: size,
+                decoration: const InputDecoration(labelText: 'Size'),
+              ),
+              TextField(
+                controller: length,
+                decoration: const InputDecoration(labelText: 'Length'),
+              ),
               TextField(
                 controller: quantity,
-                keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                keyboardType: const TextInputType.numberWithOptions(
+                  decimal: true,
+                ),
                 decoration: const InputDecoration(labelText: 'BOQ quantity'),
               ),
             ],
           ),
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Cancel')),
-          FilledButton(onPressed: () => Navigator.pop(context, true), child: const Text('Save')),
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Cancel'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('Save'),
+          ),
         ],
       ),
     );
@@ -1147,11 +1195,14 @@ class _HouseInventoryScreenState extends State<HouseInventoryScreen> {
     if (loaded) return;
     loaded = true;
     final existing = <String, Map<String, dynamic>>{};
-    for (final raw in (data.inventory?['items'] as List? ?? const []).whereType<Map>()) {
+    for (final raw
+        in (data.inventory?['items'] as List? ?? const []).whereType<Map>()) {
       final item = Map<String, dynamic>.from(raw);
       existing[_key(item)] = item;
     }
-    rows = (data.boq?['items'] as List? ?? const []).whereType<Map>().map((raw) {
+    rows = (data.boq?['items'] as List? ?? const []).whereType<Map>().map((
+      raw,
+    ) {
       final boq = Map<String, dynamic>.from(raw);
       final saved = existing[_key(boq)];
       return {
@@ -1166,7 +1217,9 @@ class _HouseInventoryScreenState extends State<HouseInventoryScreen> {
 
   String _key(Map<String, dynamic> item) {
     final code = '${item['itemCode'] ?? ''}'.trim().toLowerCase();
-    return code.isNotEmpty ? code : '${item['description'] ?? ''}'.trim().toLowerCase();
+    return code.isNotEmpty
+        ? code
+        : '${item['description'] ?? ''}'.trim().toLowerCase();
   }
 
   Future<void> _save() async {
@@ -1187,7 +1240,9 @@ class _HouseInventoryScreenState extends State<HouseInventoryScreen> {
 
   void _snack(String message) {
     if (!mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(message)));
   }
 
   @override
@@ -1261,11 +1316,13 @@ class _HouseInventoryScreenState extends State<HouseInventoryScreen> {
 
   Future<void> _edit(int index) async {
     final row = rows[index];
-    final received =
-        TextEditingController(text: '${row['receivedQuantity'] ?? 0}');
+    final received = TextEditingController(
+      text: '${row['receivedQuantity'] ?? 0}',
+    );
     final used = TextEditingController(text: '${row['usedQuantity'] ?? 0}');
-    final returned =
-        TextEditingController(text: '${row['returnedQuantity'] ?? 0}');
+    final returned = TextEditingController(
+      text: '${row['returnedQuantity'] ?? 0}',
+    );
     final notes = TextEditingController(text: '${row['notes'] ?? ''}');
     final saved = await showDialog<bool>(
       context: context,
@@ -1277,17 +1334,23 @@ class _HouseInventoryScreenState extends State<HouseInventoryScreen> {
             children: [
               TextField(
                 controller: received,
-                keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                keyboardType: const TextInputType.numberWithOptions(
+                  decimal: true,
+                ),
                 decoration: const InputDecoration(labelText: 'Received'),
               ),
               TextField(
                 controller: used,
-                keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                keyboardType: const TextInputType.numberWithOptions(
+                  decimal: true,
+                ),
                 decoration: const InputDecoration(labelText: 'Used'),
               ),
               TextField(
                 controller: returned,
-                keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                keyboardType: const TextInputType.numberWithOptions(
+                  decimal: true,
+                ),
                 decoration: const InputDecoration(labelText: 'Returned'),
               ),
               TextField(
@@ -1300,8 +1363,14 @@ class _HouseInventoryScreenState extends State<HouseInventoryScreen> {
           ),
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Cancel')),
-          FilledButton(onPressed: () => Navigator.pop(context, true), child: const Text('Apply')),
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Cancel'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('Apply'),
+          ),
         ],
       ),
     );
@@ -1356,14 +1425,15 @@ class HouseMapDirectoryScreen extends StatelessWidget {
                 final url = rawUrl.isNotEmpty
                     ? rawUrl
                     : lat != null && lon != null
-                        ? 'https://www.google.com/maps/dir/?api=1&destination=$lat,$lon'
-                        : '';
+                    ? 'https://www.google.com/maps/dir/?api=1&destination=$lat,$lon'
+                    : '';
                 return Card(
                   child: ListTile(
                     leading: const Icon(Icons.location_on_outlined),
                     title: Text('$code • $beneficiary'),
-                    subtitle:
-                        Text('${row['parish'] ?? ''} • ${row['cluster'] ?? ''}'),
+                    subtitle: Text(
+                      '${row['parish'] ?? ''} • ${row['cluster'] ?? ''}',
+                    ),
                     trailing: Wrap(
                       spacing: 2,
                       children: [
@@ -1387,14 +1457,14 @@ class HouseMapDirectoryScreen extends StatelessWidget {
                           onPressed: code.isEmpty
                               ? null
                               : () => Navigator.of(context).push(
-                                    MaterialPageRoute(
-                                      builder: (_) =>
-                                          HouseControlWorkspaceByCodeScreen(
-                                        state: state,
-                                        houseCode: code,
-                                      ),
-                                    ),
+                                  MaterialPageRoute(
+                                    builder: (_) =>
+                                        HouseControlWorkspaceByCodeScreen(
+                                          state: state,
+                                          houseCode: code,
+                                        ),
                                   ),
+                                ),
                           icon: const Icon(Icons.home_work_outlined),
                         ),
                       ],
@@ -1433,9 +1503,9 @@ class _ModuleGrid extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final schemas = RcProductRegistry.visibleSchemas(state.profile!)
-        .where((schema) => schema.eventType != 'crewAttendance')
-        .toList();
+    final schemas = RcProductRegistry.visibleSchemas(
+      state.profile!,
+    ).where((schema) => schema.eventType != 'crewAttendance').toList();
     final configuredOrder = state.controlModuleOrder;
     if (configuredOrder.isNotEmpty) {
       schemas.sort((a, b) {
@@ -1452,8 +1522,8 @@ class _ModuleGrid extends StatelessWidget {
         final effective = constraints.maxWidth < 620
             ? 1
             : constraints.maxWidth < 950
-                ? columns.clamp(1, 2)
-                : columns;
+            ? columns.clamp(1, 2)
+            : columns;
         final gap = 10.0;
         final width =
             (constraints.maxWidth - gap * (effective - 1)) / effective;
@@ -1565,9 +1635,9 @@ class _PulseTile extends StatelessWidget {
           Text(
             value,
             style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                  color: color,
-                  fontWeight: FontWeight.w900,
-                ),
+              color: color,
+              fontWeight: FontWeight.w900,
+            ),
           ),
         ],
       ),

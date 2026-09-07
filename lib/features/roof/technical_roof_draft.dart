@@ -30,20 +30,28 @@ class _TechnicalRoofDraftScreenState extends State<TechnicalRoofDraftScreen> {
   @override
   void initState() {
     super.initState();
-    width = TextEditingController(text: _initial(widget.initialMeasurements.widthFt));
-    length = TextEditingController(text: _initial(widget.initialMeasurements.lengthFt));
-    wallHeight = TextEditingController(text: _initial(widget.initialMeasurements.wallHeightFt));
+    width = TextEditingController(
+      text: _initial(widget.initialMeasurements.widthFt),
+    );
+    length = TextEditingController(
+      text: _initial(widget.initialMeasurements.lengthFt),
+    );
+    wallHeight = TextEditingController(
+      text: _initial(widget.initialMeasurements.wallHeightFt),
+    );
     pitch = TextEditingController(
       text: widget.initialMeasurements.pitchRisePer12 == 0
           ? '4'
           : _initial(widget.initialMeasurements.pitchRisePer12),
     );
-    roofType = const ['Gable', 'Hip', 'Pitched'].contains(widget.initialRoofType)
+    roofType =
+        const ['Gable', 'Hip', 'Pitched'].contains(widget.initialRoofType)
         ? widget.initialRoofType
         : 'Gable';
   }
 
-  String _initial(double v) => v == 0 ? '' : v.toStringAsFixed(v % 1 == 0 ? 0 : 2);
+  String _initial(double v) =>
+      v == 0 ? '' : v.toStringAsFixed(v % 1 == 0 ? 0 : 2);
 
   @override
   void dispose() {
@@ -54,14 +62,15 @@ class _TechnicalRoofDraftScreenState extends State<TechnicalRoofDraftScreen> {
     super.dispose();
   }
 
-  double _number(TextEditingController c) => double.tryParse(c.text.trim()) ?? 0;
+  double _number(TextEditingController c) =>
+      double.tryParse(c.text.trim()) ?? 0;
 
   RoofMeasurements get measurements => RoofMeasurements(
-        widthFt: _number(width),
-        lengthFt: _number(length),
-        wallHeightFt: _number(wallHeight),
-        pitchRisePer12: _number(pitch),
-      );
+    widthFt: _number(width),
+    lengthFt: _number(length),
+    wallHeightFt: _number(wallHeight),
+    pitchRisePer12: _number(pitch),
+  );
 
   @override
   Widget build(BuildContext context) {
@@ -123,13 +132,20 @@ class _TechnicalRoofDraftScreenState extends State<TechnicalRoofDraftScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Framing calculations', style: Theme.of(context).textTheme.titleLarge),
+                Text(
+                  'Framing calculations',
+                  style: Theme.of(context).textTheme.titleLarge,
+                ),
                 const SizedBox(height: 10),
                 _result('Half span / run', m.halfSpanFt, 'ft'),
                 _result('Rise wall plate → ridge', m.ridgeRiseFt, 'ft'),
                 _result('Ridge height from floor', m.ridgeHeightFt, 'ft'),
                 _result('Common rafter length', m.rafterLengthFt, 'ft'),
-                _result('Approx. roof plan area', m.widthFt * m.lengthFt, 'sq ft'),
+                _result(
+                  'Approx. roof plan area',
+                  m.widthFt * m.lengthFt,
+                  'sq ft',
+                ),
                 if (m.lengthFt > 0)
                   _result(
                     'Approx. rafter pairs @ 2 ft',
@@ -145,27 +161,27 @@ class _TechnicalRoofDraftScreenState extends State<TechnicalRoofDraftScreen> {
   }
 
   Widget _field(TextEditingController controller, String label) => SizedBox(
-        width: 155,
-        child: TextField(
-          controller: controller,
-          keyboardType: const TextInputType.numberWithOptions(decimal: true),
-          decoration: InputDecoration(labelText: label),
-          onChanged: (_) => setState(() {}),
-        ),
-      );
+    width: 155,
+    child: TextField(
+      controller: controller,
+      keyboardType: const TextInputType.numberWithOptions(decimal: true),
+      decoration: InputDecoration(labelText: label),
+      onChanged: (_) => setState(() {}),
+    ),
+  );
 
   Widget _result(String label, double value, String unit) => Padding(
-        padding: const EdgeInsets.symmetric(vertical: 4),
-        child: Row(
-          children: [
-            Expanded(child: Text(label)),
-            Text(
-              '${value.isFinite ? value.toStringAsFixed(2) : '0.00'} $unit',
-              style: const TextStyle(fontWeight: FontWeight.w900),
-            ),
-          ],
+    padding: const EdgeInsets.symmetric(vertical: 4),
+    child: Row(
+      children: [
+        Expanded(child: Text(label)),
+        Text(
+          '${value.isFinite ? value.toStringAsFixed(2) : '0.00'} $unit',
+          style: const TextStyle(fontWeight: FontWeight.w900),
         ),
-      );
+      ],
+    ),
+  );
 }
 
 class TechnicalRoofPainter extends CustomPainter {
@@ -228,7 +244,12 @@ class TechnicalRoofPainter extends CustomPainter {
       canvas.drawLine(Offset(x, ridgeY), Offset(x, plan.bottom), line);
     }
 
-    _label(canvas, 'PLAN • $roofType', Offset(plan.left, plan.top - 22), accent);
+    _label(
+      canvas,
+      'PLAN • $roofType',
+      Offset(plan.left, plan.top - 22),
+      accent,
+    );
     _label(canvas, 'RIDGE', Offset(plan.center.dx - 22, ridgeY - 22), accent);
 
     final baseY = size.height * .83;
@@ -264,7 +285,12 @@ class TechnicalRoofPainter extends CustomPainter {
     );
     _label(canvas, 'WALL PLATE', Offset(left, wallTopY + 10), foreground);
     _label(canvas, 'RIDGE BEAM', Offset(mid - 38, ridge.dy - 20), accent);
-    _label(canvas, 'FASCIA / BLOCKING', Offset(right - 105, wallTopY - 26), foreground);
+    _label(
+      canvas,
+      'FASCIA / BLOCKING',
+      Offset(right - 105, wallTopY - 26),
+      foreground,
+    );
     _label(canvas, 'ELEVATION', Offset(left, size.height * .5), accent);
     if (measurements.ridgeRiseFt > 0) {
       _label(
@@ -280,7 +306,11 @@ class TechnicalRoofPainter extends CustomPainter {
     final painter = TextPainter(
       text: TextSpan(
         text: text,
-        style: TextStyle(color: color, fontSize: 10, fontWeight: FontWeight.w800),
+        style: TextStyle(
+          color: color,
+          fontSize: 10,
+          fontWeight: FontWeight.w800,
+        ),
       ),
       textDirection: TextDirection.ltr,
     )..layout();
