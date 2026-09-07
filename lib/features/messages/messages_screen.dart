@@ -5,6 +5,7 @@ import '../../core/design_tokens.dart';
 import '../../core/rc_components.dart';
 import '../../models/app_models.dart';
 import '../../state/app_state.dart';
+import '../control/house_operations_control_screen.dart';
 
 Future<void> showMessageDrawer(BuildContext context, AppState state) {
   return showGeneralDialog<void>(
@@ -545,8 +546,16 @@ class _MessagesDrawerBodyState extends State<MessagesDrawerBody> {
                   if (message.houseCode != null)
                     OutlinedButton.icon(
                       onPressed: () {
+                        final code = message.houseCode!;
                         Navigator.pop(context);
-                        widget.state.selectTab(3);
+                        Navigator.of(this.context).push(
+                          MaterialPageRoute(
+                            builder: (_) => HouseControlWorkspaceByCodeScreen(
+                              state: widget.state,
+                              houseCode: code,
+                            ),
+                          ),
+                        );
                       },
                       icon: const Icon(Icons.home_work_outlined),
                       label: Text('Open ${message.houseCode}'),

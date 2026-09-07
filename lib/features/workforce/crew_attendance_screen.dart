@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
 
 import '../../core/design_tokens.dart';
 import '../../core/rc_components.dart';
@@ -67,6 +68,7 @@ class _CrewAttendanceScreenState extends State<CrewAttendanceScreen> {
     }
     setState(() => busy = true);
     try {
+      final location = await _captureLocation();
       await widget.state.repository.submitOwnAttendance(
         profile: profile,
         houseCode: house,
@@ -74,6 +76,10 @@ class _CrewAttendanceScreenState extends State<CrewAttendanceScreen> {
         status: status,
         clockAction: action,
         note: note.text.trim().isEmpty ? null : note.text.trim(),
+        latitude: location.$1,
+        longitude: location.$2,
+        accuracyM: location.$3,
+        locationStatus: location.$4,
       );
       await widget.state.feedback(strong: true);
       _snack(
@@ -88,6 +94,33 @@ class _CrewAttendanceScreenState extends State<CrewAttendanceScreen> {
       );
     } finally {
       if (mounted) setState(() => busy = false);
+    }
+  }
+
+
+  Future<(double?, double?, double?, String)> _captureLocation() async {
+    try {
+      final enabled = await Geolocator.isLocationServiceEnabled();
+      if (!enabled) return (null, null, null, 'service_disabled');
+      var permission = await Geolocator.checkPermission();
+      if (permission == LocationPermission.denied) {
+        permission = await Geolocator.requestPermission();
+      }
+      if (permission == LocationPermission.denied) {
+        return (null, null, null, 'permission_denied');
+      }
+      if (permission == LocationPermission.deniedForever) {
+        return (null, null, null, 'permission_denied_forever');
+      }
+      final position = await Geolocator.getCurrentPosition(
+        locationSettings: const LocationSettings(
+          accuracy: LocationAccuracy.high,
+          timeLimit: Duration(seconds: 12),
+        ),
+      );
+      return (position.latitude, position.longitude, position.accuracy, 'captured');
+    } catch (_) {
+      return (null, null, null, 'unavailable');
     }
   }
 
@@ -350,6 +383,14 @@ class _CrewAttendanceScreenState extends State<CrewAttendanceScreen> {
                                   const SizedBox(height: 5),
                                   Text(
                                     'In ${_time(row['clock_in'])} • Out ${_time(row['clock_out'])}',
+                                    style: theme.textTheme.bodySmall,
+                                  ),
+                                ],
+                                if ('${row['location_status'] ?? ''}'.trim().isNotEmpty) ...[
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    'GPS audit: ${row['location_status']}'
+                                    '${row['location_accuracy_m'] == null ? '' : ' • ±${row['location_accuracy_m']} m'}',
                                     style: theme.textTheme.bodySmall,
                                   ),
                                 ],

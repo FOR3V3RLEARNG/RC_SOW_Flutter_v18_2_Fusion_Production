@@ -4,11 +4,13 @@ import '../../core/design_tokens.dart';
 import '../../core/record_schemas.dart';
 import '../../core/product_registry.dart';
 import '../../core/rc_components.dart';
+import '../../core/text_helpers.dart';
 import '../../models/app_models.dart';
 import '../../state/app_state.dart';
 import '../admin/admin_screen.dart';
 import '../control/control_screen.dart';
 import '../messages/messages_screen.dart';
+import '../settings/settings_screen.dart';
 import '../workforce/crew_attendance_screen.dart';
 
 class DashboardScreen extends StatefulWidget {
@@ -82,8 +84,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
             children: [
               RcPageHeading(
                 eyebrow: experience.eyebrow,
-                title: 'Good day, ${profile.displayName}',
-                subtitle: experience.subtitle,
+                title: 'Welcome, ${rcTitleCase(profile.displayName)}',
+                subtitle:
+                    '${rcTitleCase(profile.canViewAllParishes ? 'All Parishes' : profile.parish)} • '
+                    '${rcTitleCase(profile.role)}\n${experience.subtitle}',
                 trailing: RcStatusPill(
                   label: profile.canViewAllParishes
                       ? 'ALL PARISHES'
@@ -114,6 +118,18 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   paymentsDue.length,
                   actionRequired.length,
                 ),
+              ),
+              const SizedBox(height: 16),
+              _DashboardCommandStrip(
+                onMessages: () => showMessageDrawer(context, widget.state),
+                onSettings: () => Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (_) => SettingsScreen(state: widget.state),
+                  ),
+                ),
+                onControl: () => widget.state.selectTab(2),
+                onHouses: () => widget.state.selectTab(3),
+                canManageCrew: profile.hasPrivilege('manageCrew'),
               ),
               const SizedBox(height: 20),
               _MessagePreview(
@@ -414,6 +430,41 @@ class _ProductionChainNav extends StatelessWidget {
       ),
     );
   }
+}
+
+
+class _DashboardCommandStrip extends StatelessWidget {
+  const _DashboardCommandStrip({
+    required this.onMessages,
+    required this.onSettings,
+    required this.onControl,
+    required this.onHouses,
+    required this.canManageCrew,
+  });
+  final VoidCallback onMessages;
+  final VoidCallback onSettings;
+  final VoidCallback onControl;
+  final VoidCallback onHouses;
+  final bool canManageCrew;
+
+  @override
+  Widget build(BuildContext context) => RcExpressiveSurface(
+    shape: RcSurfaceShape.offset,
+    child: Wrap(
+      spacing: 8,
+      runSpacing: 8,
+      children: [
+        ActionChip(avatar: const Icon(Icons.notifications_outlined), label: const Text('Notifications'), onPressed: onMessages),
+        ActionChip(avatar: const Icon(Icons.forum_outlined), label: const Text('Messages'), onPressed: onMessages),
+        ActionChip(avatar: const Icon(Icons.settings_outlined), label: const Text('Settings'), onPressed: onSettings),
+        ActionChip(
+          avatar: Icon(canManageCrew ? Icons.groups_2_outlined : Icons.home_work_outlined),
+          label: Text(canManageCrew ? 'Crew Assignment' : 'My Houses'),
+          onPressed: canManageCrew ? onControl : onHouses,
+        ),
+      ],
+    ),
+  );
 }
 
 class _MessagePreview extends StatelessWidget {

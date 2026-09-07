@@ -28,6 +28,29 @@ class AppState extends ChangeNotifier {
   RcDesignDna designDna = RcDesignDna.redCrossClassic;
   int selectedTab = 0;
   String? lastAuthDiagnostic;
+  Map<String, dynamic> remoteUiConfig = const {};
+
+  String uiText(String key, String fallback) {
+    final value = '${remoteUiConfig[key] ?? ''}'.trim();
+    return value.isEmpty ? fallback : value;
+  }
+
+  int get controlColumns {
+    final raw = remoteUiConfig['controlColumns'];
+    final value = raw is num ? raw.toInt() : int.tryParse('$raw') ?? 2;
+    return value.clamp(1, 3);
+  }
+
+  String get controlDefaultView {
+    final value = '${remoteUiConfig['controlDefaultView'] ?? 'houses'}';
+    return value == 'modules' ? 'modules' : 'houses';
+  }
+
+  List<String> get controlModuleOrder =>
+      (remoteUiConfig['controlModuleOrder'] as List? ?? const [])
+          .map((value) => '$value')
+          .where((value) => value.isNotEmpty)
+          .toList();
 
   bool _authSyncInFlight = false;
   bool _authSyncQueued = false;
@@ -63,6 +86,7 @@ class AppState extends ChangeNotifier {
       _authSyncInFlight = true;
       try {
         profile = await repository.currentProfile();
+        await _loadRemoteUiConfig();
         await _submitPendingRoleRequestIfNeeded();
         lastAuthDiagnostic = signedIn
             ? 'Session synchronized ($reason)'
@@ -76,6 +100,25 @@ class AppState extends ChangeNotifier {
         notifyListeners();
       }
     } while (_authSyncQueued);
+  }
+
+
+  Future<void> refreshUiConfig() async {
+    await _loadRemoteUiConfig();
+    notifyListeners();
+  }
+
+  Future<void> _loadRemoteUiConfig() async {
+    final current = profile;
+    if (current == null) {
+      remoteUiConfig = const {};
+      return;
+    }
+    try {
+      remoteUiConfig = await repository.uiConfig(current);
+    } catch (_) {
+      remoteUiConfig = const {};
+    }
   }
 
   Future<void> refreshProfile() =>

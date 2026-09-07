@@ -139,6 +139,8 @@ class RcSowRepository {
     String? parish,
     String? houseCode,
     String priority = 'Normal',
+    String category = 'General',
+    int pushTtlSeconds = 259200,
     String? replyTo,
   }) async {
     if (recipients.isEmpty) {
@@ -159,6 +161,8 @@ class RcSowRepository {
         'fromEmail': profile.email,
         'fromRole': profile.role,
         'priority': priority,
+        'category': category,
+        'pushTtlSeconds': pushTtlSeconds,
         'readBy': [profile.email],
         if (houseCode != null && houseCode.isNotEmpty) 'houseCode': houseCode,
         'replyTo': ?replyTo,
@@ -322,6 +326,10 @@ class RcSowRepository {
     required String clockAction,
     String? note,
     String? evidencePath,
+    double? latitude,
+    double? longitude,
+    double? accuracyM,
+    String? locationStatus,
   }) async {
     final result = await client.rpc(
       'upsert_crew_attendance',
@@ -332,6 +340,10 @@ class RcSowRepository {
         'p_clock_action': clockAction,
         'p_note': note,
         'p_evidence_path': evidencePath,
+        'p_latitude': latitude,
+        'p_longitude': longitude,
+        'p_accuracy_m': accuracyM,
+        'p_location_status': locationStatus,
       },
     );
     final row = Map<String, dynamic>.from(result as Map? ?? const {});
@@ -357,6 +369,12 @@ class RcSowRepository {
         'clockOut': row['clock_out'],
         'verified': row['verified'] == true,
         'evidencePath': row['evidence_path'],
+        'clockInLatitude': row['clock_in_latitude'],
+        'clockInLongitude': row['clock_in_longitude'],
+        'clockOutLatitude': row['clock_out_latitude'],
+        'clockOutLongitude': row['clock_out_longitude'],
+        'locationAccuracyM': row['location_accuracy_m'],
+        'locationStatus': row['location_status'],
       },
     );
     return row;
@@ -754,6 +772,183 @@ class RcSowRepository {
       'set_parish_live_tracker',
       params: {'p_parish': parish, 'p_url': url, 'p_enabled': true},
     );
+  }
+
+
+  Future<Map<String, dynamic>> uiConfig(UserProfile profile) async {
+    final keys = <String>[
+      if (!profile.canViewAllParishes && profile.parish.isNotEmpty)
+        'parish:${profile.parish}',
+      'global',
+    ];
+    for (final key in keys) {
+      try {
+        final row = await client
+            .from('app_ui_config')
+            .select('config')
+            .eq('config_key', key)
+            .maybeSingle();
+        if (row != null) {
+          return Map<String, dynamic>.from(row['config'] as Map? ?? const {});
+        }
+      } catch (_) {}
+    }
+    return const {};
+  }
+
+  Future<void> saveUiConfig({
+    required String configKey,
+    String? parish,
+    required Map<String, dynamic> config,
+  }) async {
+    await client.from('app_ui_config').upsert({
+      'config_key': configKey,
+      'parish': parish,
+      'config': config,
+      'updated_by': user?.id,
+      'updated_at': DateTime.now().toUtc().toIso8601String(),
+    }, onConflict: 'config_key');
+  }
+
+  Future<List<Map<String, dynamic>>> boqTemplates(UserProfile profile) async {
+    var query = client.from('boq_templates').select().eq('active', true);
+    if (!profile.canViewAllParishes && profile.parish.isNotEmpty) {
+      query = query.or('parish.is.null,parish.eq.${profile.parish}');
+    }
+    final rows = await query.order('name');
+    return rows.map((e) => Map<String, dynamic>.from(e)).toList();
+  }
+
+  Future<void> saveBoqTemplate({
+    String? id,
+    required String name,
+    String? parish,
+    String? sourceFileName,
+    required List<Map<String, dynamic>> items,
+  }) async {
+    final payload = <String, dynamic>{
+      if (id != null && id.isNotEmpty) 'id': id,
+      'name': name.trim(),
+      'parish': parish,
+      'source_file_name': sourceFileName,
+      'items': items,
+      'active': true,
+      'updated_by': user?.id,
+      'updated_at': DateTime.now().toUtc().toIso8601String(),
+    };
+    if (id == null || id.isEmpty) payload['created_by'] = user?.id;
+    await client.from('boq_templates').upsert(payload);
+  }
+
+  Future<Map<String, dynamic>?> houseBoq(String houseCode) async {
+    try {
+      final row = await client.from('house_boq').select()
+          .eq('house_code', houseCode.trim().toUpperCase()).maybeSingle();
+      return row == null ? null : Map<String, dynamic>.from(row);
+    } catch (_) { return null; }
+  }
+
+  Future<void> saveHouseBoq({
+    required String houseCode,
+    required String parish,
+    required List<Map<String, dynamic>> items,
+    String? sourceFileName,
+    String? templateId,
+  }) async {
+    final existing = await houseBoq(houseCode);
+    final revision = ((existing?['revision'] as num?)?.toInt() ?? 0) + 1;
+    await client.from('house_boq').upsert({
+      'house_code': houseCode.trim().toUpperCase(),
+      'parish': parish,
+      'template_id': templateId,
+      'source_file_name': sourceFileName,
+      'items': items,
+      'revision': revision,
+      'status': 'Active',
+      'updated_by': user?.id,
+      'updated_at': DateTime.now().toUtc().toIso8601String(),
+    }, onConflict: 'house_code');
+  }
+
+  Future<Map<String, dynamic>?> houseInventory(String houseCode) async {
+    try {
+      final row = await client.from('house_inventory').select()
+          .eq('house_code', houseCode.trim().toUpperCase()).maybeSingle();
+      return row == null ? null : Map<String, dynamic>.from(row);
+    } catch (_) { return null; }
+  }
+
+  Future<void> saveHouseInventory({
+    required String houseCode,
+    required String parish,
+    required List<Map<String, dynamic>> items,
+    String? notes,
+  }) async {
+    await client.from('house_inventory').upsert({
+      'house_code': houseCode.trim().toUpperCase(),
+      'parish': parish,
+      'items': items,
+      'notes': notes,
+      'updated_by': user?.id,
+      'updated_at': DateTime.now().toUtc().toIso8601String(),
+    }, onConflict: 'house_code');
+  }
+
+  Future<List<Map<String, dynamic>>> authorizedAccounts() async {
+    final result = await client.rpc('list_authorized_accounts');
+    return (result as List? ?? const [])
+        .map((e) => Map<String, dynamic>.from(e as Map)).toList();
+  }
+
+  Future<void> manageAuthorizedAccount({
+    required String email,
+    required String label,
+    required String role,
+    required String parish,
+    bool active = true,
+    bool notifyOnIssue = true,
+  }) async {
+    await client.rpc('manage_authorized_account', params: {
+      'p_email': email.trim().toLowerCase(),
+      'p_label': label.trim(),
+      'p_role': role,
+      'p_parish': parish,
+      'p_active': active,
+      'p_notify_on_issue': notifyOnIssue,
+    });
+  }
+
+  Future<void> deleteAuthorizedAccount(String email) async {
+    await client.rpc('delete_authorized_account',
+        params: {'p_email': email.trim().toLowerCase()});
+  }
+
+  Future<List<Map<String, dynamic>>> staffDirectory() async {
+    final result = await client.rpc('list_staff_directory');
+    return (result as List? ?? const [])
+        .map((e) => Map<String, dynamic>.from(e as Map)).toList();
+  }
+
+  Future<Map<String, dynamic>> setHouseConstructionStage({
+    required String houseCode,
+    required String stage,
+  }) async {
+    final result = await client.rpc('set_house_construction_stage', params: {
+      'p_house_code': houseCode.trim().toUpperCase(),
+      'p_stage': stage,
+    });
+    return Map<String, dynamic>.from(result as Map? ?? const {});
+  }
+
+  Future<List<Map<String, dynamic>>> houseProgressHistory(
+    String houseCode, {int limit = 30}
+  ) async {
+    final result = await client.rpc('house_progress_history_for', params: {
+      'p_house_code': houseCode.trim().toUpperCase(),
+      'p_limit': limit,
+    });
+    return (result as List? ?? const [])
+        .map((e) => Map<String, dynamic>.from(e as Map)).toList();
   }
 
   Future<List<Map<String, dynamic>>> gmailInbox({int maxResults = 20}) async {

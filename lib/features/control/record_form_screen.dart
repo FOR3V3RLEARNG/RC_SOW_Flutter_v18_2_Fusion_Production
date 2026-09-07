@@ -39,6 +39,7 @@ class _RecordFormScreenState extends State<RecordFormScreen> {
   bool busy = false;
   bool paymentCalculating = false;
   BeneficiaryRecord? beneficiary;
+  List<Map<String, dynamic>> staffDirectory = const [];
 
   UserProfile get profile => widget.state.profile!;
 
@@ -46,6 +47,7 @@ class _RecordFormScreenState extends State<RecordFormScreen> {
   void initState() {
     super.initState();
     values.addAll(widget.record?.item ?? const {});
+    _loadStaffDirectory();
     for (final field in widget.schema.fields) {
       if (_usesController(field.kind)) {
         final initial = values[field.key] ?? field.defaultValue ?? '';
@@ -64,6 +66,99 @@ class _RecordFormScreenState extends State<RecordFormScreen> {
         }
       }
     }
+  }
+
+
+  Future<void> _loadStaffDirectory() async {
+    try {
+      final rows = await widget.state.repository.staffDirectory();
+      if (!mounted) return;
+      setState(() => staffDirectory = rows);
+    } catch (_) {}
+  }
+
+  bool _isStaffField(RcFormFieldDef field) {
+    final text = '${field.key} ${field.label}'.toLowerCase();
+    return text.contains('carpenter') || text.contains('supervisor') ||
+        text.contains('apprentice') || text.contains('assistant') ||
+        text.contains('worker') || text.contains('technical team');
+  }
+
+  Set<String> _staffRolesFor(RcFormFieldDef field) {
+    final text = '${field.key} ${field.label}'.toLowerCase();
+    if (text.contains('carpenter')) return const {'Carpenter'};
+    if (text.contains('site supervisor') || text.contains('supervisor')) return const {'Site Supervisor'};
+    if (text.contains('apprentice')) return const {'Apprentice'};
+    if (text.contains('assistant') || text.contains('worker')) return const {'Worker'};
+    if (text.contains('technical team')) return const {'Site Supervisor','Technical Admin','Construction Specialist','Construction Engineer','Regional Supervisor'};
+    return const {};
+  }
+
+  Widget _staffField(RcFormFieldDef field) {
+    final controller = controllers[field.key]!;
+    final allowed = _staffRolesFor(field);
+    final parish = '${values['parish'] ?? widget.record?.parish ?? profile.parish}';
+    final candidates = staffDirectory.where((row) {
+      final role = '${row['role'] ?? ''}';
+      final rowParish = '${row['parish'] ?? ''}';
+      return (allowed.isEmpty || allowed.contains(role)) &&
+          (profile.canViewAllParishes || parish.isEmpty || rowParish == parish || rowParish == 'All Parishes') &&
+          row['active'] != false;
+    }).toList();
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        DropdownButtonFormField<String>(
+          decoration: InputDecoration(labelText: '${field.label} • Staff Directory', helperText: field.helper),
+          items: candidates.map((row) => DropdownMenuItem(
+            value: '${row['full_name'] ?? row['email']}',
+            child: Text('${row['full_name'] ?? row['email']} • ${row['role'] ?? ''}'),
+          )).toList(),
+          onChanged: candidates.isEmpty ? null : (value) {
+            if (value == null) return;
+            setState(() { controller.text = value; values[field.key] = value; });
+          },
+        ),
+        const SizedBox(height: 6),
+        TextFormField(
+          controller: controller,
+          decoration: InputDecoration(labelText: '${field.label} • Manual / Custom'),
+          validator: field.required ? (value) => value == null || value.trim().isEmpty ? '${field.label} is required.' : null : null,
+        ),
+      ],
+    );
+  }
+
+  static const _constructionProgress = <String, int>{
+    'Not Started': 0, 'Site Preparation': 5, 'Demolition': 15,
+    'Wall Plate': 30, 'Rafters / Collars': 45, 'Battens': 58,
+    'Roof Sheeting': 72, 'Fascia & Blocking': 84, 'Finishing': 92,
+    'Final Inspection': 97, 'Completed': 100,
+  };
+
+  Future<void> _loadAttendanceIntoDailyLog() async {
+    final house = controllers['houseCode']?.text.trim().toUpperCase() ?? '';
+    if (house.isEmpty) { _snack('Choose a house before loading attendance.'); return; }
+    final rawDate = '${values['date'] ?? ''}';
+    final date = DateTime.tryParse(rawDate) ?? DateTime.now();
+    try {
+      final rows = await widget.state.repository.crewAttendance(
+        profile: profile, houseCode: house, startDate: date, endDate: date,
+      );
+      if (rows.isEmpty) { _snack('No crew attendance exists for $house on this date.'); return; }
+      final lines = rows.map((row) {
+        final name = '${row['member_name'] ?? row['member_email'] ?? 'Crew'}';
+        final role = '${row['member_role'] ?? ''}';
+        final status = '${row['status'] ?? ''}';
+        final verified = row['verified'] == true ? 'Verified' : 'Pending';
+        return '$name • $role • $status • $verified';
+      }).join('\n');
+      _setController('workersPresent', lines);
+      values['attendanceLinked'] = true;
+      values['attendanceRows'] = rows;
+      if (mounted) setState(() {});
+      _snack('Crew attendance linked to the Daily Site Log.');
+    } catch (_) { _snack('Attendance could not be loaded.'); }
   }
 
   bool _usesController(RcFieldKind kind) => const {
@@ -138,6 +233,18 @@ class _RecordFormScreenState extends State<RecordFormScreen> {
         recordId: widget.record?.id,
         item: data,
       );
+      final constructionStage = '${data['constructionStage'] ?? ''}';
+      final canSynchronizeHouseStage = profile.isCarpenter ||
+          profile.hasPrivilege('editControl') ||
+          profile.hasPrivilege('reviewControl');
+      if (canSynchronizeHouseStage &&
+          _constructionProgress.containsKey(constructionStage) &&
+          const {'siteVisit', 'dailyLog'}.contains(widget.schema.eventType)) {
+        await widget.state.repository.setHouseConstructionStage(
+          houseCode: house,
+          stage: constructionStage,
+        );
+      }
       await widget.state.feedback(strong: true);
       if (!mounted) return;
       _snack('Saved and synchronized.');
@@ -572,6 +679,27 @@ class _RecordFormScreenState extends State<RecordFormScreen> {
               ),
             ),
             const SizedBox(height: 16),
+            if (widget.schema.eventType == 'dailyLog') ...[
+              RcExpressiveSurface(
+                shape: RcSurfaceShape.offset,
+                child: Row(
+                  children: [
+                    const Icon(Icons.how_to_reg_outlined),
+                    const SizedBox(width: 10),
+                    const Expanded(child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text('Crew Attendance Link', style: TextStyle(fontWeight: FontWeight.w900)),
+                        SizedBox(height: 3),
+                        Text('Import the selected house/date attendance into Workers Present.'),
+                      ],
+                    )),
+                    FilledButton.tonal(onPressed: _loadAttendanceIntoDailyLog, child: const Text('Load')),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 14),
+            ],
             if (widget.schema.eventType == 'payment') ...[
               RcExpressiveSurface(
                 shape: RcSurfaceShape.offset,
@@ -640,6 +768,9 @@ class _RecordFormScreenState extends State<RecordFormScreen> {
 
   Widget _field(RcFormFieldDef field) {
     final controller = controllers[field.key];
+    if (_isStaffField(field) && controller != null && field.kind == RcFieldKind.text) {
+      return _staffField(field);
+    }
     switch (field.kind) {
       case RcFieldKind.text:
       case RcFieldKind.number:

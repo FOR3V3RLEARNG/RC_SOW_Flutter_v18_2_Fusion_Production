@@ -13,6 +13,7 @@ import '../../models/app_models.dart';
 import '../../services/export_service.dart';
 import '../../state/app_state.dart';
 import '../shared/signature_pad.dart';
+import '../roof/technical_roof_draft.dart';
 
 enum RoofDrawTool { wall, ridge, hip, valley, drain, freehand, select }
 
@@ -70,6 +71,16 @@ class _ScopeScreenState extends State<ScopeScreen>
   final wallHeight = TextEditingController();
   final pitch = TextEditingController(text: '4');
   final repairNotes = TextEditingController();
+  String repairPreset = 'Replace damaged roof sheeting';
+  static const repairPresets = <String>[
+    'Replace damaged roof sheeting', 'Replace / repair wall plate',
+    'Replace rafters', 'Install / replace collar ties', 'Replace battens',
+    'Install hurricane straps', 'Repair ridge beam',
+    'Install / replace fascia board', 'Install / replace blocking board',
+    'Install flashing', 'Repair gable', 'Repair veranda roof',
+    'Install / repair gutters', 'Concrete / ring beam repair',
+    'Other / custom repair',
+  ];
 
   String parish = 'Hanover';
   String roofType = 'Gable';
@@ -296,12 +307,32 @@ class _ScopeScreenState extends State<ScopeScreen>
                 value: t111Ceiling,
                 onChanged: (v) => setState(() => t111Ceiling = v),
               ),
+              DropdownButtonFormField<String>(
+                initialValue: repairPreset,
+                decoration: const InputDecoration(labelText: 'Quick Repair Selection'),
+                items: repairPresets.map((repair) => DropdownMenuItem(value: repair, child: Text(repair))).toList(),
+                onChanged: (value) => setState(() => repairPreset = value!),
+              ),
+              const SizedBox(height: 8),
+              Align(
+                alignment: Alignment.centerLeft,
+                child: OutlinedButton.icon(
+                  onPressed: () {
+                    final existing = repairNotes.text.trim();
+                    setState(() => repairNotes.text = existing.isEmpty ? '• $repairPreset' : '$existing\n• $repairPreset');
+                  },
+                  icon: const Icon(Icons.add),
+                  label: const Text('Add Repair'),
+                ),
+              ),
+              const SizedBox(height: 8),
               TextField(
                 controller: repairNotes,
-                minLines: 3,
-                maxLines: 6,
+                minLines: 4,
+                maxLines: 9,
                 decoration: const InputDecoration(
-                  labelText: 'Repairs needed / technical notes',
+                  labelText: 'Repairs To Be Done / Technical Notes',
+                  helperText: 'Add quick repairs, then customize the wording as required.',
                 ),
               ),
             ],
@@ -404,6 +435,19 @@ class _ScopeScreenState extends State<ScopeScreen>
                 ],
               ),
               const SizedBox(height: 10),
+              FilledButton.tonalIcon(
+                onPressed: () => Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (_) => TechnicalRoofDraftScreen(
+                      initialMeasurements: measurements,
+                      initialRoofType: roofType,
+                    ),
+                  ),
+                ),
+                icon: const Icon(Icons.architecture_outlined),
+                label: const Text('Open Stable Technical Roof Draft'),
+              ),
+              const SizedBox(height: 10),
               AspectRatio(
                 aspectRatio: 1.25,
                 child: Container(
@@ -415,20 +459,16 @@ class _ScopeScreenState extends State<ScopeScreen>
                   clipBehavior: Clip.antiAlias,
                   child: GestureDetector(
                     behavior: HitTestBehavior.opaque,
-                    onPanStart: (d) =>
-                        setState(() => current = [d.localPosition]),
-                    onPanUpdate: (d) => setState(() {
-                      if (drawTool == RoofDrawTool.freehand) {
-                        current.add(d.localPosition);
-                      } else if (current.isEmpty) {
-                        current = [d.localPosition];
-                      } else if (current.length == 1) {
-                        current.add(d.localPosition);
-                      } else {
-                        current[current.length - 1] = d.localPosition;
-                      }
-                    }),
-                    onPanEnd: (_) => _finishStroke(),
+                    onTapUp: drawTool == RoofDrawTool.freehand
+                        ? null
+                        : (details) => _placeTechnicalPoint(details.localPosition),
+                    onPanStart: drawTool == RoofDrawTool.freehand
+                        ? (details) => setState(() => current = [details.localPosition])
+                        : null,
+                    onPanUpdate: drawTool == RoofDrawTool.freehand
+                        ? (details) => setState(() => current.add(details.localPosition))
+                        : null,
+                    onPanEnd: drawTool == RoofDrawTool.freehand ? (_) => _finishStroke() : null,
                     child: CustomPaint(
                       painter: RoofCanvasPainter(
                         strokes: strokes,
@@ -443,7 +483,7 @@ class _ScopeScreenState extends State<ScopeScreen>
               ),
               const SizedBox(height: 8),
               Text(
-                'Tip: Wall/Ridge/Hip/Valley tools create straight technical segments. Drain draws an arrow. Freehand follows your finger. Tap a segment below to edit its measurement label.',
+                'Stable mode: tap once for the start point and tap again for the end point of Wall/Ridge/Hip/Valley/Drain segments. Freehand still follows your finger. Tap a saved segment below to edit its measurement.',
                 style: theme.textTheme.bodySmall?.copyWith(
                   color: theme.colorScheme.onSurfaceVariant,
                 ),
@@ -586,6 +626,18 @@ class _ScopeScreenState extends State<ScopeScreen>
               _line('Parish', parish),
               _line('Community', cluster.text),
               _line('Finished Roof Style', roofType),
+              const SizedBox(height: 10),
+              Text('Repairs To Be Done', style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w900)),
+              const SizedBox(height: 5),
+              Text(repairNotes.text.trim().isEmpty ? 'No repair items entered.' : repairNotes.text.trim()),
+              const SizedBox(height: 10),
+              OutlinedButton.icon(
+                onPressed: () => Navigator.of(context).push(MaterialPageRoute(
+                  builder: (_) => TechnicalRoofDraftScreen(initialMeasurements: measurements, initialRoofType: roofType),
+                )),
+                icon: const Icon(Icons.architecture_outlined),
+                label: const Text('View Technical Roof Draft'),
+              ),
               const Divider(height: 28),
               ...[
                 'Beneficiary',
@@ -795,6 +847,18 @@ class _ScopeScreenState extends State<ScopeScreen>
     });
   }
 
+
+  Future<void> _placeTechnicalPoint(Offset point) async {
+    if (drawTool == RoofDrawTool.select || drawTool == RoofDrawTool.freehand) return;
+    if (current.isEmpty) {
+      setState(() { current = [point]; redo.clear(); });
+      return;
+    }
+    final stroke = RoofStroke(tool: drawTool, points: [current.first, point]);
+    setState(() { strokes.add(stroke); current = []; redo.clear(); });
+    if (drawTool != RoofDrawTool.drain) await _editMeasurement(stroke);
+  }
+
   Future<void> _finishStroke() async {
     if (current.length < 2) {
       setState(() => current = []);
@@ -942,6 +1006,17 @@ class _ScopeScreenState extends State<ScopeScreen>
               'Official Finished Roof Style: $roofType',
               style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
             ),
+            pw.SizedBox(height: 6),
+            pw.Text('Repairs To Be Done', style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
+            pw.Text(repairNotes.text.trim().isEmpty ? 'No repair items entered.' : repairNotes.text.trim()),
+            pw.SizedBox(height: 8),
+            pw.Text(
+              'Technical Geometry: width ${measurements.widthFt.toStringAsFixed(2)} ft • '
+              'length ${measurements.lengthFt.toStringAsFixed(2)} ft • '
+              'wall height ${measurements.wallHeightFt.toStringAsFixed(2)} ft • '
+              'ridge rise ${measurements.ridgeRiseFt.toStringAsFixed(2)} ft • '
+              'rafter ${measurements.rafterLengthFt.toStringAsFixed(2)} ft',
+            ),
             pw.SizedBox(height: 10),
             _pdfStandardRoof(),
             pw.SizedBox(height: 16),
@@ -986,7 +1061,11 @@ class _ScopeScreenState extends State<ScopeScreen>
 <line x1="370" y1="113" x2="300" y2="43" stroke="#12805C" stroke-width="2"/>
 <line x1="420" y1="113" x2="300" y2="43" stroke="#12805C" stroke-width="2"/>
 <line x1="470" y1="113" x2="300" y2="43" stroke="#12805C" stroke-width="2"/>
-<text x="300" y="200" text-anchor="middle" font-size="18" font-weight="700" fill="#C91F2C">JRC STANDARD FINISHED ROOF STYLE</text>
+<text x="300" y="192" text-anchor="middle" font-size="16" font-weight="700" fill="#C91F2C">JRC STANDARD FINISHED ROOF STYLE</text>
+<text x="302" y="25" text-anchor="middle" font-size="11" font-weight="700" fill="#101828">RIDGE BEAM</text>
+<text x="115" y="96" font-size="10" font-weight="700" fill="#101828">FASCIA / BLOCKING</text>
+<text x="113" y="127" font-size="10" font-weight="700" fill="#101828">WALL PLATE</text>
+<text x="430" y="80" font-size="10" font-weight="700" fill="#12805C">RAFTERS</text>
 </svg>''',
     ),
   );

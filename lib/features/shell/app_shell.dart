@@ -6,11 +6,15 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../core/design_tokens.dart';
 import '../../core/navigation.dart';
 import '../../core/rc_components.dart';
+import '../../core/text_helpers.dart';
 import '../../state/app_state.dart';
 import '../admin/admin_screen.dart';
+import '../admin/operations_admin_screen.dart';
 import '../beneficiaries/beneficiary_search_screen.dart';
 import '../community/community_screen.dart';
 import '../control/control_screen.dart';
+import '../control/house_operations_control_screen.dart';
+import '../live/interactive_house_map_screen.dart';
 import '../dashboard/dashboard_screen.dart';
 import '../gmail/gmail_screen.dart';
 import '../houses/houses_screen.dart';
@@ -33,7 +37,7 @@ class AppShell extends StatelessWidget {
     final pages = <Widget>[
       DashboardScreen(state: state),
       ScopeScreen(state: state),
-      ControlScreen(state: state),
+      HouseOperationsControlScreen(state: state),
       HousesScreen(state: state),
       CommunityScreen(state: state),
     ];
@@ -277,6 +281,27 @@ class _SlidingNavigationIsland extends StatelessWidget {
                 ),
               ),
               _NavButton(
+                label: 'Map',
+                icon: Icons.map_outlined,
+                selected: false,
+                onTap: () async {
+                  final result = await Navigator.of(context).push<String>(
+                    MaterialPageRoute(
+                      builder: (_) => InteractiveHouseMapScreen(state: state),
+                    ),
+                  );
+                  if (result == 'tracker' && context.mounted) {
+                    RcNavigator.liveTracker(context, state);
+                  }
+                },
+              ),
+              _NavButton(
+                label: 'Tracker',
+                icon: Icons.location_searching,
+                selected: false,
+                onTap: () => RcNavigator.liveTracker(context, state),
+              ),
+              _NavButton(
                 label: 'More',
                 icon: Icons.more_horiz,
                 selected: false,
@@ -367,17 +392,21 @@ class RcHeader extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 9),
           child: Row(
             children: [
-              ClipRRect(
-                borderRadius: const BorderRadius.only(
-                  topLeft: Radius.circular(16),
-                  topRight: Radius.circular(9),
-                  bottomLeft: Radius.circular(9),
-                  bottomRight: Radius.circular(16),
-                ),
-                child: Image.asset(
-                  'assets/brand/rc_sow_house_icon.png',
-                  width: 44,
-                  height: 44,
+              InkWell(
+                onTap: () => state.selectTab(0),
+                borderRadius: BorderRadius.circular(16),
+                child: ClipRRect(
+                  borderRadius: const BorderRadius.only(
+                    topLeft: Radius.circular(16),
+                    topRight: Radius.circular(9),
+                    bottomLeft: Radius.circular(9),
+                    bottomRight: Radius.circular(16),
+                  ),
+                  child: Image.asset(
+                    'assets/brand/rc_sow_house_icon.png',
+                    width: 44,
+                    height: 44,
+                  ),
                 ),
               ),
               const SizedBox(width: 9),
@@ -386,13 +415,15 @@ class RcHeader extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'RC SOW',
+                      state.uiText('appTitle', 'Red Cross Scope Of Work'),
                       style: theme.textTheme.titleLarge?.copyWith(
                         color: theme.colorScheme.primary,
                       ),
                     ),
                     Text(
-                      '${p.role} • ${p.canViewAllParishes ? 'All Parishes' : p.parish}',
+                      'Welcome, ${rcTitleCase(p.displayName)} • '
+                      '${rcTitleCase(p.canViewAllParishes ? 'All Parishes' : p.parish)} • '
+                      '${rcTitleCase(p.role)}',
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: theme.textTheme.labelSmall?.copyWith(
@@ -422,21 +453,22 @@ class RcHeader extends StatelessWidget {
                 icon: const Icon(Icons.map_outlined, size: RcIconSize.sm),
               ),
               IconButton(
-                tooltip: 'Messages',
+                tooltip: 'Live Tracker',
+                onPressed: () => RcNavigator.liveTracker(context, state),
+                icon: const Icon(Icons.location_searching, size: RcIconSize.sm),
+              ),
+              IconButton(
+                tooltip: 'Messages / Notifications',
                 onPressed: () => showMessageDrawer(context, state),
                 icon: const Badge(
                   child: Icon(Icons.forum_outlined, size: RcIconSize.sm),
                 ),
               ),
-              if (MediaQuery.sizeOf(context).width >= 650)
-                IconButton(
-                  tooltip: 'Settings',
-                  onPressed: () => RcNavigator.settings(context, state),
-                  icon: const Icon(
-                    Icons.settings_outlined,
-                    size: RcIconSize.sm,
-                  ),
-                ),
+              IconButton(
+                tooltip: 'Settings',
+                onPressed: () => RcNavigator.settings(context, state),
+                icon: const Icon(Icons.settings_outlined, size: RcIconSize.sm),
+              ),
             ],
           ),
         ),
@@ -520,6 +552,19 @@ Future<void> showRcMoreMenu(BuildContext context, AppState state) async {
                     ),
                   );
                 }),
+                if (profile.canViewAdmin)
+                  _MoreTile(
+                    'Operations Admin',
+                    Icons.tune_rounded,
+                    () {
+                      Navigator.pop(context);
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (_) => OperationsAdminScreen(state: state),
+                        ),
+                      );
+                    },
+                  ),
                 if (profile.canViewAdmin)
                   _MoreTile(
                     'Admin Control Centre',

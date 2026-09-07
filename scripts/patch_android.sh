@@ -37,12 +37,18 @@ host = parsed.netloc
 if not scheme or not host:
     raise SystemExit(f'Invalid oauthRedirectUri: {callback}')
 
-permission = '    <uses-permission android:name="android.permission.INTERNET"/>'
-if 'android.permission.INTERNET' not in s:
-    end = s.find('>')
-    if end < 0:
-        raise SystemExit('Could not locate manifest root tag')
-    s = s[:end + 1] + '\n' + permission + s[end + 1:]
+permissions = [
+    'android.permission.INTERNET',
+    'android.permission.ACCESS_COARSE_LOCATION',
+    'android.permission.ACCESS_FINE_LOCATION',
+]
+for permission_name in permissions:
+    if permission_name not in s:
+        end = s.find('>')
+        if end < 0:
+            raise SystemExit('Could not locate manifest root tag')
+        permission = f'    <uses-permission android:name="{permission_name}"/>'
+        s = s[:end + 1] + '\n' + permission + s[end + 1:]
 
 if f'android:scheme="{scheme}"' not in s or f'android:host="{host}"' not in s:
     marker = '            <intent-filter>\n                <action android:name="android.intent.action.MAIN"/>'

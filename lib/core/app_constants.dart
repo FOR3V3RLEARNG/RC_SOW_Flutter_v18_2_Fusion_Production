@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 abstract final class RcApp {
   static const name = 'RC SOW';
-  static const versionLabel = '20.4.1 Fusion Production Bugfix';
+  static const versionLabel = '20.5.0 House Operations Upgrade';
 
   static const parishes = <String>[
     'Hanover',

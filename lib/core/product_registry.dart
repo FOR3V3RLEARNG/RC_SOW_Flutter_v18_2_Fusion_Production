@@ -70,10 +70,10 @@ abstract final class RcProductRegistry {
   static RcRoleExperience experience(UserProfile profile) {
     if (profile.isAdmin) {
       return const RcRoleExperience(
-        eyebrow: 'National production command',
+        eyebrow: 'Red Cross Scope Of Work',
         subtitle:
             'Users, privileges, parishes, templates, alerts, production, completion and finance in one controlled view.',
-        heroTitle: 'National production control',
+        heroTitle: 'Red Cross Scope Of Work',
         allowedRecordTypes: {},
         metrics: [
           RcDashboardMetricKey.activeHouses,
@@ -107,6 +107,7 @@ abstract final class RcProductRegistry {
           RcQuickActionKey.workProjection,
           RcQuickActionKey.constructionSchedule,
           RcQuickActionKey.crewAttendance,
+          RcQuickActionKey.dailyLog,
           RcQuickActionKey.payment,
         ],
         showPaymentReceived: true,
@@ -136,6 +137,7 @@ abstract final class RcProductRegistry {
           RcQuickActionKey.workProjection,
           RcQuickActionKey.constructionSchedule,
           RcQuickActionKey.crewAttendance,
+          RcQuickActionKey.dailyLog,
           RcQuickActionKey.payment,
         ],
         showPaymentReceived: true,

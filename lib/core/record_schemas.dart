@@ -146,11 +146,33 @@ abstract final class RcRecordSchemas {
         ...commonHouseFields,
         RcFormFieldDef(key: 'village', label: 'Village'),
         RcFormFieldDef(
-          key: 'crewAssignments',
-          label: 'Crew assignments',
-          kind: RcFieldKind.lineItems,
+          key: 'leadCarpenterName',
+          label: 'Lead Carpenter',
           required: true,
-          helper: 'One line per role: C / W / A • staff code • staff name',
+          helper: 'Choose an approved Carpenter or enter a custom name.',
+        ),
+        RcFormFieldDef(
+          key: 'siteSupervisorName',
+          label: 'Site Supervisor',
+          required: true,
+          helper: 'Choose an approved Site Supervisor.',
+        ),
+        RcFormFieldDef(
+          key: 'assistantName',
+          label: 'Assistant / Worker',
+          helper: 'Choose an approved Worker / Assistant.',
+        ),
+        RcFormFieldDef(
+          key: 'apprenticeName',
+          label: 'Apprentice',
+          helper: 'Choose an approved Apprentice.',
+        ),
+        RcFormFieldDef(
+          key: 'crewAssignments',
+          label: 'Additional Crew Assignments',
+          kind: RcFieldKind.lineItems,
+          helper:
+              'Optional additional crew: role • staff code/email • staff name',
         ),
         RcFormFieldDef(
           key: 'startingDate',
@@ -316,9 +338,25 @@ abstract final class RcRecordSchemas {
           label: 'Technical Team Participants',
         ),
         RcFormFieldDef(
-          key: 'estimatedCompletion',
-          label: 'Estimated % completion',
-          kind: RcFieldKind.percentage,
+          key: 'constructionStage',
+          label: 'Estimated Completion / Roof Framing Phase',
+          kind: RcFieldKind.dropdown,
+          required: true,
+          options: [
+            'Not Started',
+            'Site Preparation',
+            'Demolition',
+            'Wall Plate',
+            'Rafters / Collars',
+            'Battens',
+            'Roof Sheeting',
+            'Fascia & Blocking',
+            'Finishing',
+            'Final Inspection',
+            'Completed',
+          ],
+          helper:
+              'Selecting the construction phase automatically controls the house completion percentage.',
         ),
         RcFormFieldDef(
           key: 'status',
@@ -371,9 +409,24 @@ abstract final class RcRecordSchemas {
           required: true,
         ),
         RcFormFieldDef(
-          key: 'estimatedAdvance',
-          label: 'Estimated advance %',
-          kind: RcFieldKind.percentage,
+          key: 'constructionStage',
+          label: 'Construction Stage / Estimated Advance',
+          kind: RcFieldKind.dropdown,
+          options: [
+            'Not Started',
+            'Site Preparation',
+            'Demolition',
+            'Wall Plate',
+            'Rafters / Collars',
+            'Battens',
+            'Roof Sheeting',
+            'Fascia & Blocking',
+            'Finishing',
+            'Final Inspection',
+            'Completed',
+          ],
+          helper:
+              'The selected stage is synchronized with the house completion percentage.',
         ),
         RcFormFieldDef(
           key: 'materialsNeeded',
@@ -523,7 +576,7 @@ abstract final class RcRecordSchemas {
     ),
     RcRecordSchema(
       id: 'inventory',
-      title: 'COM / Inventory',
+      title: 'House Inventory',
       eventType: 'inventory',
       phase: 'Delivery',
       icon: Icons.warehouse_outlined,
@@ -551,11 +604,11 @@ abstract final class RcRecordSchemas {
         ),
         RcFormFieldDef(
           key: 'items',
-          label: 'COM inventory movement',
+          label: 'House Inventory / BOQ comparison',
           kind: RcFieldKind.lineItems,
           required: true,
           helper:
-              'Item • size • length • unit • BOQ quantity • delivered • additional quantities • leftovers • total • warehouse/storage',
+              'Item • size • length • unit • BOQ quantity • received quantity • used • returned • variance • storage/location',
         ),
         RcFormFieldDef(
           key: 'jrcAcceptanceSignature',
