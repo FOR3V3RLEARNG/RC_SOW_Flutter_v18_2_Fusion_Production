@@ -887,8 +887,9 @@ class _ScopeScreenState extends State<ScopeScreen>
   }
 
   Future<void> _placeTechnicalPoint(Offset point) async {
-    if (drawTool == RoofDrawTool.select || drawTool == RoofDrawTool.freehand)
+    if (drawTool == RoofDrawTool.select || drawTool == RoofDrawTool.freehand) {
       return;
+    }
     if (current.isEmpty) {
       setState(() {
         current = [point];

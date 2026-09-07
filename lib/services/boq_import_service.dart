@@ -111,8 +111,9 @@ abstract final class BoqImportService {
         'boqQuantity': double.tryParse(match?.group(0) ?? '') ?? 0,
       });
     }
-    if (items.isEmpty)
+    if (items.isEmpty) {
       throw const FormatException('No BOQ material rows were found.');
+    }
     return BoqImportResult(
       items: items,
       sheetName: selectedName,

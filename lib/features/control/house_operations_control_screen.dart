@@ -354,8 +354,9 @@ class _HouseControlWorkspaceByCodeScreenState
   Future<HouseRecord?> _load() async {
     final houses = await widget.state.repository.houses(widget.state.profile!);
     for (final house in houses) {
-      if (house.code.toUpperCase() == widget.houseCode.toUpperCase())
+      if (house.code.toUpperCase() == widget.houseCode.toUpperCase()) {
         return house;
+      }
     }
     return null;
   }
@@ -1185,10 +1186,7 @@ class _HouseInventoryScreenState extends State<HouseInventoryScreen> {
       widget.state.repository.houseBoq(widget.house.code),
       widget.state.repository.houseInventory(widget.house.code),
     ]);
-    return _InventoryData(
-      boq: result[0] as Map<String, dynamic>?,
-      inventory: result[1] as Map<String, dynamic>?,
-    );
+    return _InventoryData(boq: result[0], inventory: result[1]);
   }
 
   void _hydrate(_InventoryData data) {

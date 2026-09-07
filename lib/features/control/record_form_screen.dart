@@ -89,12 +89,14 @@ class _RecordFormScreenState extends State<RecordFormScreen> {
   Set<String> _staffRolesFor(RcFormFieldDef field) {
     final text = '${field.key} ${field.label}'.toLowerCase();
     if (text.contains('carpenter')) return const {'Carpenter'};
-    if (text.contains('site supervisor') || text.contains('supervisor'))
+    if (text.contains('site supervisor') || text.contains('supervisor')) {
       return const {'Site Supervisor'};
+    }
     if (text.contains('apprentice')) return const {'Apprentice'};
-    if (text.contains('assistant') || text.contains('worker'))
+    if (text.contains('assistant') || text.contains('worker')) {
       return const {'Worker'};
-    if (text.contains('technical team'))
+    }
+    if (text.contains('technical team')) {
       return const {
         'Site Supervisor',
         'Technical Admin',
@@ -102,6 +104,7 @@ class _RecordFormScreenState extends State<RecordFormScreen> {
         'Construction Engineer',
         'Regional Supervisor',
       };
+    }
     return const {};
   }
 
