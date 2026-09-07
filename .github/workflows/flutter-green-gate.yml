@@ -174,7 +174,7 @@ jobs:
       - name: Upload APK, AAB and checksums
         uses: actions/upload-artifact@v6
         with:
-          name: rc-sow-v20-4-production-${{ github.run_number }}
+          name: rc-sow-v20-5-production-${{ github.run_number }}
           path: |
             build/app/outputs/flutter-apk/app-release.apk
             build/app/outputs/bundle/release/app-release.aab
