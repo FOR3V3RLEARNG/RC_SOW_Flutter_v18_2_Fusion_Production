@@ -8,3 +8,7 @@ android/local.properties
 key.properties
 .env
 .env.*
+
+# Python cache
+__pycache__/
+*.py[cod]
