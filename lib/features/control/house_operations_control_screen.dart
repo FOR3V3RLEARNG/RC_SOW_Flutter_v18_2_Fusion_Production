@@ -927,17 +927,20 @@ class _HouseBoqScreenState extends State<HouseBoqScreen> {
   }
 
   Future<void> _import() async {
-    final file = await FilePicker.platform.pickFiles(
+    final file = await FilePicker.pickFile(
       type: FileType.custom,
       allowedExtensions: ['xlsx'],
-      withData: true,
     );
-    if (file == null || file.files.single.bytes == null) return;
+    if (file == null) return;
+
+    final bytes = await file.readAsBytes();
+    if (!mounted) return;
+
     try {
-      final parsed = BoqImportService.parse(file.files.single.bytes!);
+      final parsed = BoqImportService.parse(bytes);
       setState(() {
         items = parsed.items;
-        sourceFile = file.files.single.name;
+        sourceFile = file.name;
       });
     } catch (error) {
       _snack('BOQ import failed: $error');

@@ -101,15 +101,17 @@ class _BoqTemplatesState extends State<_BoqTemplates> {
   }
 
   Future<void> _importExcel() async {
-    final picked = await FilePicker.platform.pickFiles(
+    final file = await FilePicker.pickFile(
       type: FileType.custom,
       allowedExtensions: ['xlsx'],
-      withData: true,
     );
-    if (picked == null || picked.files.single.bytes == null) return;
+    if (file == null) return;
+
+    final bytes = await file.readAsBytes();
+    if (!mounted) return;
+
     try {
-      final file = picked.files.single;
-      final parsed = BoqImportService.parse(file.bytes!);
+      final parsed = BoqImportService.parse(bytes);
       String scope = 'All Parishes';
       final chosen = await showDialog<String>(
         context: context,
@@ -649,8 +651,8 @@ class _InterfaceConfigState extends State<_InterfaceConfig> {
                 child: ReorderableListView.builder(
                   padding: const EdgeInsets.fromLTRB(12, 4, 12, 20),
                   itemCount: draft.length,
-                  onReorder: (oldIndex, newIndex) => setSheetState(() {
-                    if (newIndex > oldIndex) newIndex--;
+                  onReorderItem: (oldIndex, newIndex) =>
+                      setSheetState(() {
                     final item = draft.removeAt(oldIndex);
                     draft.insert(newIndex, item);
                   }),
