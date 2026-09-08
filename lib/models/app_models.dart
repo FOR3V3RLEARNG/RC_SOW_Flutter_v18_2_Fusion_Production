@@ -191,6 +191,7 @@ class MessageRecord {
     required this.unread,
     this.houseCode,
     this.priority = 'Normal',
+    this.category = 'General',
     this.recipients = const [],
   });
 
@@ -204,6 +205,7 @@ class MessageRecord {
   final bool unread;
   final String? houseCode;
   final String priority;
+  final String category;
   final List<Map<String, dynamic>> recipients;
 
   factory MessageRecord.fromEvent(Map<String, dynamic> row, String email) {
@@ -224,6 +226,7 @@ class MessageRecord {
       unread: !readBy.contains(email),
       houseCode: (row['house_code'] ?? item['houseCode'])?.toString(),
       priority: '${item['priority'] ?? 'Normal'}',
+      category: '${item['category'] ?? 'General'}',
       recipients: recipientRaw
           .whereType<Map>()
           .map((e) => Map<String, dynamic>.from(e))

@@ -7,11 +7,11 @@ import '../../models/app_models.dart';
 import '../../state/app_state.dart';
 import '../control/house_operations_control_screen.dart';
 
-Future<void> showMessageDrawer(BuildContext context, AppState state) {
+Future<void> showNotificationCentre(BuildContext context, AppState state) {
   return showGeneralDialog<void>(
     context: context,
     barrierDismissible: true,
-    barrierLabel: 'Messages',
+    barrierLabel: 'Notification Centre',
     barrierColor: Colors.black38,
     transitionDuration: state.reduceMotion ? Duration.zero : RcMotion.medium,
     pageBuilder: (context, animation, secondaryAnimation) => Align(
@@ -65,6 +65,9 @@ Future<void> showMessageDrawer(BuildContext context, AppState state) {
     },
   );
 }
+
+Future<void> showMessageDrawer(BuildContext context, AppState state) =>
+    showNotificationCentre(context, state);
 
 Future<void> showComposeMessage(
   BuildContext context,
@@ -294,13 +297,25 @@ class MessagesDrawerBody extends StatefulWidget {
 
 class _MessagesDrawerBodyState extends State<MessagesDrawerBody> {
   late Future<List<MessageRecord>> future;
+  String filter = 'All';
+
+  static const filters = <String>[
+    'All',
+    'Message',
+    'Push',
+    'Production',
+    'Action',
+    'Signature',
+    'Safety',
+    'Payment',
+  ];
 
   @override
   void initState() {
     super.initState();
     future = widget.state.repository.messages(
       widget.state.profile!,
-      limit: widget.embedded ? 30 : 100,
+      limit: widget.embedded ? 60 : 120,
     );
   }
 
@@ -308,11 +323,82 @@ class _MessagesDrawerBodyState extends State<MessagesDrawerBody> {
     setState(
       () => future = widget.state.repository.messages(
         widget.state.profile!,
-        limit: widget.embedded ? 30 : 100,
+        limit: widget.embedded ? 60 : 120,
       ),
     );
     await future;
   }
+
+  _NotificationVisual _visual(MessageRecord message) {
+    final category = message.category.trim().toLowerCase();
+    final subject = message.subject.toLowerCase();
+    final priority = message.priority.toLowerCase();
+
+    if (category.contains('signature') ||
+        subject.contains('signature required')) {
+      return const _NotificationVisual(
+        filter: 'Signature',
+        label: 'SIGNATURE REQUIRED',
+        icon: Icons.draw_rounded,
+        color: RcColors.purple,
+      );
+    }
+    if (category.contains('safety')) {
+      return const _NotificationVisual(
+        filter: 'Safety',
+        label: 'SAFETY ALERT',
+        icon: Icons.health_and_safety_rounded,
+        color: RcColors.danger,
+      );
+    }
+    if (category.contains('payment')) {
+      return const _NotificationVisual(
+        filter: 'Payment',
+        label: 'PAYMENT ALERT',
+        icon: Icons.payments_rounded,
+        color: RcColors.success,
+      );
+    }
+    if (category.contains('production') ||
+        category.contains('house') ||
+        category.contains('completion') ||
+        subject.contains('production alert')) {
+      return const _NotificationVisual(
+        filter: 'Production',
+        label: 'PRODUCTION ALERT',
+        icon: Icons.construction_rounded,
+        color: RcColors.warning,
+      );
+    }
+    if (category.contains('push') || category.contains('notice')) {
+      return const _NotificationVisual(
+        filter: 'Push',
+        label: 'PUSH NOTICE',
+        icon: Icons.notifications_active_rounded,
+        color: RcColors.teal,
+      );
+    }
+    if (category.contains('call to action') ||
+        category.contains('action') ||
+        priority.contains('action') ||
+        priority.contains('urgent')) {
+      return const _NotificationVisual(
+        filter: 'Action',
+        label: 'CALL TO ACTION',
+        icon: Icons.priority_high_rounded,
+        color: RcColors.brand,
+      );
+    }
+    return const _NotificationVisual(
+      filter: 'Message',
+      label: 'MESSAGE',
+      icon: Icons.forum_rounded,
+      color: RcColors.blue,
+    );
+  }
+
+  bool _matches(MessageRecord message) =>
+      filter == 'All' || _visual(message).filter == filter;
 
   @override
   Widget build(BuildContext context) {
@@ -324,13 +410,29 @@ class _MessagesDrawerBodyState extends State<MessagesDrawerBody> {
             padding: const EdgeInsets.fromLTRB(18, 16, 12, 8),
             child: Row(
               children: [
+                Container(
+                  width: 46,
+                  height: 46,
+                  decoration: BoxDecoration(
+                    color: theme.colorScheme.primaryContainer,
+                    borderRadius: BorderRadius.circular(17),
+                  ),
+                  child: Icon(
+                    Icons.notifications_active_rounded,
+                    color: theme.colorScheme.onPrimaryContainer,
+                  ),
+                ),
+                const SizedBox(width: 11),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('Messages', style: theme.textTheme.titleLarge),
                       Text(
-                        'Operational communication without leaving RC SOW',
+                        'Notification Centre',
+                        style: theme.textTheme.titleLarge,
+                      ),
+                      Text(
+                        'Messages, push notices, production alerts, required actions and signatures.',
                         style: theme.textTheme.bodySmall?.copyWith(
                           color: theme.colorScheme.onSurfaceVariant,
                         ),
@@ -339,27 +441,49 @@ class _MessagesDrawerBodyState extends State<MessagesDrawerBody> {
                   ),
                 ),
                 IconButton.filledTonal(
+                  tooltip: 'Compose message',
                   onPressed: () => showComposeMessage(context, widget.state),
                   icon: const Icon(Icons.edit_outlined),
                 ),
                 IconButton(
+                  tooltip: 'Close',
                   onPressed: () => Navigator.maybePop(context),
                   icon: const Icon(Icons.close),
                 ),
               ],
             ),
           ),
+        Padding(
+          padding: const EdgeInsets.fromLTRB(12, 4, 12, 9),
+          child: SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              children: filters.map((value) {
+                return Padding(
+                  padding: const EdgeInsets.only(right: 6),
+                  child: FilterChip(
+                    selected: filter == value,
+                    label: Text(value),
+                    onSelected: (_) => setState(() => filter = value),
+                  ),
+                );
+              }).toList(),
+            ),
+          ),
+        ),
         Expanded(
           child: RefreshIndicator(
             onRefresh: refresh,
             child: FutureBuilder<List<MessageRecord>>(
               future: future,
               builder: (_, snap) {
-                final messages = snap.data ?? const <MessageRecord>[];
+                final allMessages = snap.data ?? const <MessageRecord>[];
+                final messages = allMessages.where(_matches).toList();
+
                 if (snap.connectionState == ConnectionState.waiting &&
-                    messages.isEmpty) {
+                    allMessages.isEmpty) {
                   return ListView(
-                    children: [
+                    children: const [
                       Padding(
                         padding: EdgeInsets.all(32),
                         child: Center(child: CircularProgressIndicator()),
@@ -373,11 +497,11 @@ class _MessagesDrawerBodyState extends State<MessagesDrawerBody> {
                       Padding(
                         padding: const EdgeInsets.all(24),
                         child: RcExpressiveSurface(
-                          tone: Theme.of(context).colorScheme.errorContainer,
+                          tone: theme.colorScheme.errorContainer,
                           child: Column(
                             children: [
                               const Text(
-                                'Messages could not be loaded. Your existing data is unchanged.',
+                                'Notifications could not be loaded. Your existing data is unchanged.',
                               ),
                               const SizedBox(height: 12),
                               OutlinedButton.icon(
@@ -396,88 +520,123 @@ class _MessagesDrawerBodyState extends State<MessagesDrawerBody> {
                   return ListView(
                     children: [
                       Padding(
-                        padding: EdgeInsets.all(24),
+                        padding: const EdgeInsets.all(24),
                         child: RcExpressiveSurface(
                           child: Text(
-                            'No messages are visible for this account.',
+                            filter == 'All'
+                                ? 'No notifications are visible for this account.'
+                                : 'No $filter notifications are visible.',
                           ),
                         ),
                       ),
                     ],
                   );
                 }
+
                 return ListView.separated(
                   padding: const EdgeInsets.fromLTRB(12, 4, 12, 80),
                   itemCount: messages.length,
-                  separatorBuilder: (_, _) => const SizedBox(height: 7),
+                  separatorBuilder: (_, _) => const SizedBox(height: 9),
                   itemBuilder: (_, index) {
                     final message = messages[index];
+                    final visual = _visual(message);
                     return RcExpressiveSurface(
                       shape: RcSurfaceShape.offset,
                       tone: message.unread
-                          ? theme.colorScheme.primaryContainer.withValues(
-                              alpha: .32,
-                            )
+                          ? visual.color.withValues(alpha: .09)
                           : null,
                       onTap: () => _openMessage(message),
                       child: Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          CircleAvatar(
-                            backgroundColor:
-                                theme.colorScheme.secondaryContainer,
-                            child: Text(
-                              message.sender.isEmpty
-                                  ? '?'
-                                  : message.sender[0].toUpperCase(),
+                          Container(
+                            width: 48,
+                            height: 48,
+                            decoration: BoxDecoration(
+                              color: visual.color.withValues(alpha: .12),
+                              borderRadius: BorderRadius.circular(17),
                             ),
+                            child: Icon(visual.icon, color: visual.color),
                           ),
                           const SizedBox(width: 12),
                           Expanded(
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Row(
+                                Wrap(
+                                  spacing: 6,
+                                  runSpacing: 6,
+                                  crossAxisAlignment: WrapCrossAlignment.center,
                                   children: [
-                                    Expanded(
-                                      child: Text(
-                                        message.subject,
-                                        style: theme.textTheme.titleMedium,
-                                      ),
+                                    RcStatusPill(
+                                      label: visual.label,
+                                      color: visual.color,
                                     ),
+                                    if (message.priority.toLowerCase() !=
+                                        'normal')
+                                      RcStatusPill(
+                                        label: message.priority.toUpperCase(),
+                                        color: message.priority
+                                                .toLowerCase()
+                                                .contains('urgent')
+                                            ? RcColors.danger
+                                            : RcColors.warning,
+                                      ),
                                     if (message.unread)
-                                      Container(
-                                        width: 8,
-                                        height: 8,
-                                        decoration: BoxDecoration(
-                                          color: theme.colorScheme.primary,
-                                          shape: BoxShape.circle,
-                                        ),
+                                      RcStatusPill(
+                                        label: 'NEW',
+                                        color: theme.colorScheme.primary,
                                       ),
                                   ],
                                 ),
-                                const SizedBox(height: 2),
+                                const SizedBox(height: 7),
+                                Text(
+                                  message.subject,
+                                  style: theme.textTheme.titleMedium,
+                                ),
+                                const SizedBox(height: 3),
                                 Text(
                                   '${message.sender}${message.senderRole.isEmpty ? '' : ' • ${message.senderRole}'}',
                                   style: theme.textTheme.labelMedium?.copyWith(
                                     color: theme.colorScheme.onSurfaceVariant,
                                   ),
                                 ),
-                                const SizedBox(height: 4),
+                                const SizedBox(height: 6),
                                 Text(
                                   message.body,
-                                  maxLines: 2,
+                                  maxLines: 3,
                                   overflow: TextOverflow.ellipsis,
                                 ),
-                                if (message.houseCode != null &&
-                                    message.houseCode!.isNotEmpty) ...[
-                                  const SizedBox(height: 5),
-                                  RcStatusPill(
-                                    label: message.houseCode!,
-                                    icon: Icons.home_outlined,
-                                    color: RcColors.blue,
-                                  ),
-                                ],
+                                const SizedBox(height: 8),
+                                Wrap(
+                                  spacing: 7,
+                                  runSpacing: 7,
+                                  children: [
+                                    if (message.houseCode != null &&
+                                        message.houseCode!.isNotEmpty)
+                                      RcStatusPill(
+                                        label: message.houseCode!,
+                                        icon: Icons.home_outlined,
+                                        color: RcColors.blue,
+                                      ),
+                                    TextButton.icon(
+                                      onPressed: () => _openMessage(message),
+                                      icon: Icon(
+                                        visual.filter == 'Signature'
+                                            ? Icons.draw_outlined
+                                            : Icons.open_in_new_rounded,
+                                        size: 17,
+                                      ),
+                                      label: Text(
+                                        visual.filter == 'Signature'
+                                            ? 'Complete action'
+                                            : message.houseCode != null
+                                                ? 'View & act'
+                                                : 'Open',
+                                      ),
+                                    ),
+                                  ],
+                                ),
                               ],
                             ),
                           ),
@@ -504,6 +663,8 @@ class _MessagesDrawerBodyState extends State<MessagesDrawerBody> {
       } catch (_) {}
     }
     if (!mounted) return;
+
+    final visual = _visual(message);
     await showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
@@ -514,6 +675,15 @@ class _MessagesDrawerBodyState extends State<MessagesDrawerBody> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
+              Align(
+                alignment: Alignment.centerLeft,
+                child: RcStatusPill(
+                  label: visual.label,
+                  icon: visual.icon,
+                  color: visual.color,
+                ),
+              ),
+              const SizedBox(height: 10),
               Text(
                 message.subject,
                 style: Theme.of(context).textTheme.headlineSmall?.copyWith(
@@ -525,7 +695,10 @@ class _MessagesDrawerBodyState extends State<MessagesDrawerBody> {
                 '${message.sender} • ${message.senderRole} • ${message.priority}',
               ),
               const Divider(height: 28),
-              Text(message.body),
+              Text(
+                message.body,
+                style: Theme.of(context).textTheme.bodyLarge,
+              ),
               const SizedBox(height: 20),
               Wrap(
                 spacing: 8,
@@ -544,7 +717,7 @@ class _MessagesDrawerBodyState extends State<MessagesDrawerBody> {
                     label: const Text('Reply'),
                   ),
                   if (message.houseCode != null)
-                    OutlinedButton.icon(
+                    FilledButton.icon(
                       onPressed: () {
                         final code = message.houseCode!;
                         Navigator.pop(context);
@@ -557,8 +730,16 @@ class _MessagesDrawerBodyState extends State<MessagesDrawerBody> {
                           ),
                         );
                       },
-                      icon: const Icon(Icons.home_work_outlined),
-                      label: Text('Open ${message.houseCode}'),
+                      icon: Icon(
+                        visual.filter == 'Signature'
+                            ? Icons.draw_outlined
+                            : Icons.home_work_outlined,
+                      ),
+                      label: Text(
+                        visual.filter == 'Signature'
+                            ? 'Open ${message.houseCode} for signature'
+                            : 'Open ${message.houseCode}',
+                      ),
                     ),
                 ],
               ),
@@ -569,4 +750,18 @@ class _MessagesDrawerBodyState extends State<MessagesDrawerBody> {
     );
     await refresh();
   }
+}
+
+class _NotificationVisual {
+  const _NotificationVisual({
+    required this.filter,
+    required this.label,
+    required this.icon,
+    required this.color,
+  });
+
+  final String filter;
+  final String label;
+  final IconData icon;
+  final Color color;
 }

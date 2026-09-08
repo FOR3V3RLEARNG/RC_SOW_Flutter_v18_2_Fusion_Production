@@ -895,6 +895,8 @@ class RcSowRepository {
         'fromEmail': profile.email,
         'fromRole': profile.role,
         'priority': 'Action Required',
+        'category': 'Signature Required',
+        'actionType': 'signature',
         'readBy': [profile.email],
         'houseCode': houseCode,
         'linkedRecordType': recordType,

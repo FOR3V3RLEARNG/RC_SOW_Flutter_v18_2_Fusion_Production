@@ -193,7 +193,7 @@ class _ScopeScreenState extends State<ScopeScreen>
             eyebrow: 'Assessment & Scope',
             title: 'Scope of Work',
             subtitle:
-                'Protected Shelter beneficiary autofill, a blank technical canvas, editable geometry, official beneficiary roof printout, signatures and export.',
+                'Protected Shelter beneficiary data, internal technical Scope drafting, and a separate beneficiary repair agreement with representative roof architecture.',
             trailing: IconButton.filledTonal(
               tooltip: 'IA Shelter beneficiary autofill',
               onPressed: _chooseBeneficiary,
@@ -211,7 +211,7 @@ class _ScopeScreenState extends State<ScopeScreen>
           tabs: const [
             Tab(text: 'House Info'),
             Tab(text: 'Roof Canvas'),
-            Tab(text: 'Beneficiary Print'),
+            Tab(text: 'Beneficiary Agreement'),
             Tab(text: 'Files & Export'),
           ],
         ),
@@ -674,8 +674,25 @@ class _ScopeScreenState extends State<ScopeScreen>
     ),
   );
 
+  String get _agreementRoofStyle {
+    final value = roofType.toLowerCase();
+    if (value.contains('hip')) return 'Hip';
+    if (value.contains('shed') || value.contains('pitch')) return 'Pitched';
+    return 'Gable';
+  }
+
+  static const String _beneficiaryAgreementText =
+      'I acknowledge the repair work described in this agreement and permit '
+      'the Jamaica Red Cross and its authorized construction team to carry '
+      'out the stated roof repairs. I understand that the roof illustration '
+      'is a representative Red Cross construction concept for the selected '
+      'roof style. It is not the editable field Scope drawing, a measurement '
+      'record, or a substitute for final site decisions made by the '
+      'authorized technical team.';
+
   Widget _printout() {
     final theme = Theme.of(context);
+    final style = _agreementRoofStyle;
     return ListView(
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 110),
       children: [
@@ -684,59 +701,117 @@ class _ScopeScreenState extends State<ScopeScreen>
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              const Center(
-                child: Text(
-                  'BENEFICIARY ROOF AGREEMENT',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900),
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: theme.colorScheme.primaryContainer.withValues(
+                    alpha: .52,
+                  ),
+                  borderRadius: BorderRadius.circular(24),
+                ),
+                child: Column(
+                  children: [
+                    Icon(
+                      Icons.handshake_outlined,
+                      size: 34,
+                      color: theme.colorScheme.primary,
+                    ),
+                    const SizedBox(height: 7),
+                    Text(
+                      'BENEFICIARY REPAIR AGREEMENT',
+                      textAlign: TextAlign.center,
+                      style: theme.textTheme.titleLarge?.copyWith(
+                        color: theme.colorScheme.primary,
+                      ),
+                    ),
+                    const SizedBox(height: 5),
+                    Text(
+                      'A beneficiary-facing agreement. This document is separate from the editable Scope drawing and internal measurement canvas.',
+                      textAlign: TextAlign.center,
+                      style: theme.textTheme.bodyMedium,
+                    ),
+                  ],
                 ),
               ),
-              const SizedBox(height: 8),
-              Text(
-                'The diagram below is the official finished roof-style template the beneficiary is expected to receive. It is intentionally separate from the assessment drawing canvas.',
-                textAlign: TextAlign.center,
-                style: theme.textTheme.bodySmall,
-              ),
-              const SizedBox(height: 14),
-              const AspectRatio(
-                aspectRatio: 1.65,
-                child: CustomPaint(
-                  painter: StandardRoofPainter(),
-                  child: SizedBox.expand(),
-                ),
-              ),
-              const SizedBox(height: 14),
+              const SizedBox(height: 16),
               _line('House Code', house.text),
               _line('Beneficiary', beneficiary.text),
               _line('Parish', parish),
               _line('Community', cluster.text),
-              _line('Finished Roof Style', roofType),
-              const SizedBox(height: 10),
-              Text(
-                'Repairs To Be Done',
-                style: theme.textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.w900,
+              _line('Roof Concept', style),
+              const SizedBox(height: 16),
+              Text('Repairs To Be Done', style: theme.textTheme.titleLarge),
+              const SizedBox(height: 7),
+              Container(
+                padding: const EdgeInsets.all(15),
+                decoration: BoxDecoration(
+                  color: theme.colorScheme.surfaceContainerLow,
+                  borderRadius: BorderRadius.circular(18),
+                  border: Border.all(
+                    color: theme.colorScheme.outlineVariant,
+                  ),
                 ),
+                child: Text(
+                  repairNotes.text.trim().isEmpty
+                      ? 'Repair items will be inserted here before beneficiary agreement.'
+                      : repairNotes.text.trim(),
+                  style: theme.textTheme.bodyLarge,
+                ),
+              ),
+              const SizedBox(height: 18),
+              Row(
+                children: [
+                  Icon(
+                    Icons.architecture_rounded,
+                    color: theme.colorScheme.primary,
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      'Red Cross Roof Construction Concept • $style',
+                      style: theme.textTheme.titleLarge,
+                    ),
+                  ),
+                ],
               ),
               const SizedBox(height: 5),
               Text(
-                repairNotes.text.trim().isEmpty
-                    ? 'No repair items entered.'
-                    : repairNotes.text.trim(),
+                'Representative architectural illustration only — not the field Scope canvas and not site measurements.',
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: theme.colorScheme.onSurfaceVariant,
+                ),
               ),
               const SizedBox(height: 10),
-              OutlinedButton.icon(
-                onPressed: () => Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (_) => TechnicalRoofDraftScreen(
-                      initialMeasurements: measurements,
-                      initialRoofType: roofType,
+              AspectRatio(
+                aspectRatio: 1.55,
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFF7FAFF),
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(
+                      color: theme.colorScheme.outlineVariant,
                     ),
                   ),
+                  clipBehavior: Clip.antiAlias,
+                  child: CustomPaint(
+                    painter: BeneficiaryAgreementRoofPainter(
+                      roofStyle: style,
+                    ),
+                    child: const SizedBox.expand(),
+                  ),
                 ),
-                icon: const Icon(Icons.architecture_outlined),
-                label: const Text('View Technical Roof Draft'),
               ),
-              const Divider(height: 28),
+              const SizedBox(height: 18),
+              Text(
+                'Beneficiary acknowledgement',
+                style: theme.textTheme.titleLarge,
+              ),
+              const SizedBox(height: 7),
+              Text(
+                _beneficiaryAgreementText,
+                style: theme.textTheme.bodyLarge,
+              ),
+              const Divider(height: 30),
               ...[
                 'Beneficiary',
                 'Carpenter',
@@ -748,7 +823,7 @@ class _ScopeScreenState extends State<ScopeScreen>
               FilledButton.icon(
                 onPressed: _printBeneficiaryPdf,
                 icon: const Icon(Icons.picture_as_pdf_outlined),
-                label: const Text('Print / Share Beneficiary PDF'),
+                label: const Text('Print / Share Beneficiary Agreement'),
               ),
             ],
           ),
@@ -1345,112 +1420,238 @@ class _ScopeScreenState extends State<ScopeScreen>
   }
 
   Future<void> _printBeneficiaryPdf() async {
+    final style = _agreementRoofStyle;
     final doc = pw.Document();
     doc.addPage(
-      pw.Page(
+      pw.MultiPage(
         pageFormat: PdfPageFormat.a4,
-        margin: const pw.EdgeInsets.all(34),
-        build: (_) => pw.Column(
-          crossAxisAlignment: pw.CrossAxisAlignment.start,
-          children: [
-            pw.Center(
-              child: pw.Text(
-                'JAMAICA RED CROSS',
-                style: pw.TextStyle(
-                  fontWeight: pw.FontWeight.bold,
-                  fontSize: 14,
-                ),
+        margin: const pw.EdgeInsets.all(32),
+        build: (_) => [
+          pw.Center(
+            child: pw.Text(
+              'JAMAICA RED CROSS',
+              style: pw.TextStyle(
+                fontWeight: pw.FontWeight.bold,
+                fontSize: 13,
+                color: PdfColors.red900,
               ),
             ),
-            pw.Center(
-              child: pw.Text(
-                'BENEFICIARY ROOF AGREEMENT',
-                style: pw.TextStyle(
-                  fontWeight: pw.FontWeight.bold,
-                  fontSize: 18,
-                ),
+          ),
+          pw.SizedBox(height: 4),
+          pw.Center(
+            child: pw.Text(
+              'BENEFICIARY REPAIR AGREEMENT',
+              style: pw.TextStyle(
+                fontWeight: pw.FontWeight.bold,
+                fontSize: 19,
               ),
             ),
-            pw.SizedBox(height: 16),
-            pw.Text('House Code: ${house.text}'),
-            pw.Text('Beneficiary: ${beneficiary.text}'),
-            pw.Text('Parish: $parish'),
-            pw.Text('Community: ${cluster.text}'),
-            pw.SizedBox(height: 14),
-            pw.Text(
-              'Official Finished Roof Style: $roofType',
-              style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
+          ),
+          pw.SizedBox(height: 5),
+          pw.Center(
+            child: pw.Text(
+              'Roof repair acknowledgement and representative construction concept',
+              style: const pw.TextStyle(fontSize: 9.5),
             ),
-            pw.SizedBox(height: 6),
-            pw.Text(
-              'Repairs To Be Done',
-              style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
+          ),
+          pw.SizedBox(height: 16),
+          pw.TableHelper.fromTextArray(
+            border: pw.TableBorder.all(
+              color: PdfColors.grey400,
+              width: .7,
             ),
-            pw.Text(
+            cellPadding: const pw.EdgeInsets.all(6),
+            data: [
+              ['House Code', house.text.trim()],
+              ['Beneficiary', beneficiary.text.trim()],
+              ['Parish', parish],
+              ['Community', cluster.text.trim()],
+              ['Roof Concept', style],
+            ],
+          ),
+          pw.SizedBox(height: 14),
+          pw.Text(
+            'REPAIRS TO BE DONE',
+            style: pw.TextStyle(
+              fontWeight: pw.FontWeight.bold,
+              fontSize: 11,
+            ),
+          ),
+          pw.SizedBox(height: 5),
+          pw.Container(
+            width: double.infinity,
+            padding: const pw.EdgeInsets.all(10),
+            decoration: pw.BoxDecoration(
+              border: pw.Border.all(color: PdfColors.grey400),
+              color: PdfColors.grey100,
+            ),
+            child: pw.Text(
               repairNotes.text.trim().isEmpty
-                  ? 'No repair items entered.'
+                  ? 'Repair items to be confirmed before signing.'
                   : repairNotes.text.trim(),
             ),
-            pw.SizedBox(height: 8),
-            pw.Text(
-              'Technical Geometry: width ${measurements.widthFt.toStringAsFixed(2)} ft • '
-              'length ${measurements.lengthFt.toStringAsFixed(2)} ft • '
-              'wall height ${measurements.wallHeightFt.toStringAsFixed(2)} ft • '
-              'ridge rise ${measurements.ridgeRiseFt.toStringAsFixed(2)} ft • '
-              'rafter ${measurements.rafterLengthFt.toStringAsFixed(2)} ft',
+          ),
+          pw.SizedBox(height: 14),
+          pw.Text(
+            'RED CROSS ROOF CONSTRUCTION CONCEPT • ${style.toUpperCase()}',
+            style: pw.TextStyle(
+              fontWeight: pw.FontWeight.bold,
+              fontSize: 11,
+              color: PdfColors.blue800,
             ),
-            pw.SizedBox(height: 10),
-            _pdfStandardRoof(),
-            pw.SizedBox(height: 16),
-            for (final role in [
-              'Beneficiary',
-              'Carpenter',
-              'Site Supervisor',
-              'Regional Supervisor',
-              'Construction Specialist',
-            ]) ...[
-              pw.Text(
-                '$role Signature',
-                style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
-              ),
-              if (signatures[role] != null)
-                pw.Image(pw.MemoryImage(signatures[role]!), height: 48)
-              else
-                pw.SizedBox(height: 38),
-              pw.Divider(),
-            ],
+          ),
+          pw.SizedBox(height: 4),
+          pw.Text(
+            'Representative architectural illustration only. This is not the editable Scope drawing and does not display field measurements.',
+            style: const pw.TextStyle(fontSize: 8.5),
+          ),
+          pw.SizedBox(height: 8),
+          _pdfAgreementRoof(style),
+          pw.SizedBox(height: 14),
+          pw.Text(
+            'BENEFICIARY ACKNOWLEDGEMENT',
+            style: pw.TextStyle(
+              fontWeight: pw.FontWeight.bold,
+              fontSize: 11,
+            ),
+          ),
+          pw.SizedBox(height: 5),
+          pw.Text(
+            _beneficiaryAgreementText,
+            style: const pw.TextStyle(fontSize: 9.5),
+          ),
+          pw.SizedBox(height: 16),
+          for (final role in [
+            'Beneficiary',
+            'Carpenter',
+            'Site Supervisor',
+            'Regional Supervisor',
+            'Construction Specialist',
+          ]) ...[
+            pw.Row(
+              crossAxisAlignment: pw.CrossAxisAlignment.end,
+              children: [
+                pw.Expanded(
+                  child: pw.Column(
+                    crossAxisAlignment: pw.CrossAxisAlignment.start,
+                    children: [
+                      pw.Text(
+                        role,
+                        style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
+                      ),
+                      if (signatures[role] != null)
+                        pw.Image(
+                          pw.MemoryImage(signatures[role]!),
+                          height: 38,
+                        )
+                      else
+                        pw.SizedBox(height: 32),
+                      pw.Container(height: .8, color: PdfColors.grey600),
+                    ],
+                  ),
+                ),
+                pw.SizedBox(width: 22),
+                pw.SizedBox(
+                  width: 125,
+                  child: pw.Column(
+                    crossAxisAlignment: pw.CrossAxisAlignment.start,
+                    children: [
+                      pw.SizedBox(height: 32),
+                      pw.Container(height: .8, color: PdfColors.grey600),
+                      pw.SizedBox(height: 2),
+                      pw.Text(
+                        'Date',
+                        style: const pw.TextStyle(fontSize: 8),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            pw.SizedBox(height: 12),
           ],
-        ),
+        ],
       ),
     );
+
     await Printing.sharePdf(
       bytes: await doc.save(),
-      filename: 'RC_SOW_Beneficiary_${house.text.trim()}.pdf',
+      filename: 'RC_SOW_Beneficiary_Agreement_${house.text.trim()}.pdf',
     );
   }
 
-  pw.Widget _pdfStandardRoof() => pw.Container(
-    height: 165,
-    child: pw.SvgImage(
-      svg:
-          '''<svg xmlns="http://www.w3.org/2000/svg" width="600" height="210" viewBox="0 0 600 210">
-<rect x="110" y="100" width="380" height="75" fill="none" stroke="#101828" stroke-width="4"/>
-<path d="M95 105 L300 35 L505 105" fill="none" stroke="#C91F2C" stroke-width="6"/>
-<line x1="95" y1="113" x2="505" y2="113" stroke="#12805C" stroke-width="3"/>
-<line x1="130" y1="113" x2="300" y2="43" stroke="#12805C" stroke-width="2"/>
-<line x1="180" y1="113" x2="300" y2="43" stroke="#12805C" stroke-width="2"/>
-<line x1="230" y1="113" x2="300" y2="43" stroke="#12805C" stroke-width="2"/>
-<line x1="370" y1="113" x2="300" y2="43" stroke="#12805C" stroke-width="2"/>
-<line x1="420" y1="113" x2="300" y2="43" stroke="#12805C" stroke-width="2"/>
-<line x1="470" y1="113" x2="300" y2="43" stroke="#12805C" stroke-width="2"/>
-<text x="300" y="192" text-anchor="middle" font-size="16" font-weight="700" fill="#C91F2C">JRC STANDARD FINISHED ROOF STYLE</text>
-<text x="302" y="25" text-anchor="middle" font-size="11" font-weight="700" fill="#101828">RIDGE BEAM</text>
-<text x="115" y="96" font-size="10" font-weight="700" fill="#101828">FASCIA / BLOCKING</text>
-<text x="113" y="127" font-size="10" font-weight="700" fill="#101828">WALL PLATE</text>
-<text x="430" y="80" font-size="10" font-weight="700" fill="#12805C">RAFTERS</text>
-</svg>''',
-    ),
+  pw.Widget _pdfAgreementRoof(String style) => pw.Container(
+    height: 190,
+    child: pw.SvgImage(svg: _beneficiaryRoofSvg(style)),
   );
+
+  String _beneficiaryRoofSvg(String style) {
+    final normalized = style.toLowerCase();
+
+    if (normalized == 'hip') {
+      return '''<svg xmlns="http://www.w3.org/2000/svg" width="680" height="245" viewBox="0 0 680 245">
+<rect width="680" height="245" fill="#F7FAFF"/>
+<text x="30" y="27" font-size="15" font-weight="700" fill="#175CD3">HIP ROOF - REPRESENTATIVE ARCHITECTURAL CONCEPT</text>
+<polygon points="110,165 260,68 505,102 575,180 310,205" fill="none" stroke="#101828" stroke-width="3"/>
+<line x1="260" y1="68" x2="430" y2="92" stroke="#C91F2C" stroke-width="5"/>
+<line x1="260" y1="68" x2="110" y2="165" stroke="#6941C6" stroke-width="3"/>
+<line x1="260" y1="68" x2="310" y2="205" stroke="#6941C6" stroke-width="3"/>
+<line x1="430" y1="92" x2="505" y2="102" stroke="#6941C6" stroke-width="3"/>
+<line x1="430" y1="92" x2="575" y2="180" stroke="#6941C6" stroke-width="3"/>
+<line x1="110" y1="165" x2="310" y2="205" stroke="#12805C" stroke-width="4"/>
+<line x1="505" y1="102" x2="575" y2="180" stroke="#12805C" stroke-width="4"/>
+<line x1="310" y1="205" x2="575" y2="180" stroke="#12805C" stroke-width="4"/>
+<line x1="190" y1="122" x2="340" y2="185" stroke="#667085" stroke-width="1.5"/>
+<line x1="235" y1="93" x2="400" y2="175" stroke="#667085" stroke-width="1.5"/>
+<line x1="310" y1="76" x2="455" y2="159" stroke="#667085" stroke-width="1.5"/>
+<line x1="375" y1="85" x2="510" y2="145" stroke="#667085" stroke-width="1.5"/>
+<text x="322" y="62" font-size="11" font-weight="700" fill="#C91F2C">RIDGE</text>
+<text x="115" y="186" font-size="10" font-weight="700" fill="#12805C">FASCIA / EAVE</text>
+<text x="490" y="83" font-size="10" font-weight="700" fill="#6941C6">HIP RAFTERS</text>
+<text x="250" y="230" font-size="10" fill="#344054">Beneficiary concept only - not field dimensions</text>
+</svg>''';
+    }
+
+    if (normalized == 'pitched') {
+      return '''<svg xmlns="http://www.w3.org/2000/svg" width="680" height="245" viewBox="0 0 680 245">
+<rect width="680" height="245" fill="#F7FAFF"/>
+<text x="30" y="27" font-size="15" font-weight="700" fill="#175CD3">PITCHED / MONO-PITCH ROOF - REPRESENTATIVE CONCEPT</text>
+<rect x="145" y="112" width="370" height="82" fill="none" stroke="#101828" stroke-width="3"/>
+<line x1="115" y1="120" x2="535" y2="55" stroke="#C91F2C" stroke-width="6"/>
+<line x1="145" y1="124" x2="515" y2="66" stroke="#12805C" stroke-width="4"/>
+<line x1="175" y1="119" x2="175" y2="194" stroke="#667085" stroke-width="1.4"/>
+<line x1="235" y1="110" x2="235" y2="194" stroke="#667085" stroke-width="1.4"/>
+<line x1="295" y1="100" x2="295" y2="194" stroke="#667085" stroke-width="1.4"/>
+<line x1="355" y1="91" x2="355" y2="194" stroke="#667085" stroke-width="1.4"/>
+<line x1="415" y1="82" x2="415" y2="194" stroke="#667085" stroke-width="1.4"/>
+<line x1="475" y1="72" x2="475" y2="194" stroke="#667085" stroke-width="1.4"/>
+<text x="450" y="50" font-size="11" font-weight="700" fill="#C91F2C">ROOF COVERING / HIGH EDGE</text>
+<text x="150" y="139" font-size="10" font-weight="700" fill="#12805C">WALL PLATE / SUPPORT LINE</text>
+<text x="112" y="112" font-size="10" font-weight="700" fill="#101828">FASCIA / LOW EAVE</text>
+<text x="248" y="230" font-size="10" fill="#344054">Beneficiary concept only - not field dimensions</text>
+</svg>''';
+    }
+
+    return '''<svg xmlns="http://www.w3.org/2000/svg" width="680" height="245" viewBox="0 0 680 245">
+<rect width="680" height="245" fill="#F7FAFF"/>
+<text x="30" y="27" font-size="15" font-weight="700" fill="#175CD3">GABLE ROOF - REPRESENTATIVE ARCHITECTURAL CONCEPT</text>
+<rect x="145" y="120" width="390" height="76" fill="none" stroke="#101828" stroke-width="3"/>
+<path d="M115 126 L340 52 L565 126" fill="none" stroke="#C91F2C" stroke-width="6"/>
+<line x1="132" y1="126" x2="548" y2="126" stroke="#12805C" stroke-width="4"/>
+<line x1="340" y1="52" x2="340" y2="126" stroke="#667085" stroke-width="2"/>
+<line x1="165" y1="120" x2="340" y2="57" stroke="#667085" stroke-width="1.5"/>
+<line x1="215" y1="120" x2="340" y2="57" stroke="#667085" stroke-width="1.5"/>
+<line x1="265" y1="120" x2="340" y2="57" stroke="#667085" stroke-width="1.5"/>
+<line x1="415" y1="120" x2="340" y2="57" stroke="#667085" stroke-width="1.5"/>
+<line x1="465" y1="120" x2="340" y2="57" stroke="#667085" stroke-width="1.5"/>
+<line x1="515" y1="120" x2="340" y2="57" stroke="#667085" stroke-width="1.5"/>
+<text x="310" y="44" font-size="11" font-weight="700" fill="#C91F2C">RIDGE</text>
+<text x="150" y="144" font-size="10" font-weight="700" fill="#12805C">WALL PLATE</text>
+<text x="458" y="91" font-size="10" font-weight="700" fill="#667085">RAFTERS</text>
+<text x="115" y="116" font-size="10" font-weight="700" fill="#101828">FASCIA / EAVE</text>
+<text x="250" y="230" font-size="10" fill="#344054">Beneficiary concept only - not field dimensions</text>
+</svg>''';
+  }
 
   Widget _line(String key, String value) => Padding(
     padding: const EdgeInsets.symmetric(vertical: 4),
@@ -1717,55 +1918,149 @@ class RoofCanvasPainter extends CustomPainter {
   bool shouldRepaint(covariant RoofCanvasPainter oldDelegate) => true;
 }
 
-class StandardRoofPainter extends CustomPainter {
-  const StandardRoofPainter();
+class BeneficiaryAgreementRoofPainter extends CustomPainter {
+  const BeneficiaryAgreementRoofPainter({required this.roofStyle});
+
+  final String roofStyle;
+
   @override
   void paint(Canvas canvas, Size size) {
-    final line = Paint()
+    final ink = Paint()
       ..color = RcColors.ink
-      ..strokeWidth = 2.6
+      ..strokeWidth = 2.4
+      ..strokeCap = StrokeCap.round
+      ..strokeJoin = StrokeJoin.round
       ..style = PaintingStyle.stroke;
-    final red = Paint()
+    final primary = Paint()
       ..color = RcColors.brand
-      ..strokeWidth = 3
+      ..strokeWidth = 4
+      ..strokeCap = StrokeCap.round
       ..style = PaintingStyle.stroke;
-    final green = Paint()
+    final support = Paint()
       ..color = RcColors.success
-      ..strokeWidth = 1.5;
-    final left = size.width * .15,
-        right = size.width * .85,
-        wallTop = size.height * .58,
-        bottom = size.height * .84,
-        ridge = Offset(size.width * .5, size.height * .2);
-    canvas.drawRect(Rect.fromLTRB(left, wallTop, right, bottom), line);
-    canvas.drawLine(Offset(left - 10, wallTop), ridge, red);
-    canvas.drawLine(ridge, Offset(right + 10, wallTop), red);
-    canvas.drawLine(
-      Offset(left - 10, wallTop + 8),
-      Offset(right + 10, wallTop + 8),
-      green,
-    );
-    for (double x = left; x <= right; x += 22) {
+      ..strokeWidth = 2.4
+      ..strokeCap = StrokeCap.round
+      ..style = PaintingStyle.stroke;
+    final framing = Paint()
+      ..color = RcColors.muted
+      ..strokeWidth = 1.2
+      ..strokeCap = StrokeCap.round
+      ..style = PaintingStyle.stroke;
+
+    final normalized = roofStyle.toLowerCase();
+
+    if (normalized == 'hip') {
+      final a = Offset(size.width * .14, size.height * .66);
+      final b = Offset(size.width * .38, size.height * .27);
+      final c = Offset(size.width * .66, size.height * .36);
+      final d = Offset(size.width * .86, size.height * .72);
+      final e = Offset(size.width * .44, size.height * .83);
+      final shell = Path()
+        ..moveTo(a.dx, a.dy)
+        ..lineTo(b.dx, b.dy)
+        ..lineTo(c.dx, c.dy)
+        ..lineTo(d.dx, d.dy)
+        ..lineTo(e.dx, e.dy)
+        ..close();
+      canvas.drawPath(shell, ink);
+      canvas.drawLine(b, c, primary);
+      canvas.drawLine(b, a, support);
+      canvas.drawLine(b, e, support);
+      canvas.drawLine(c, d, support);
+      for (var i = 1; i <= 4; i++) {
+        final t = i / 5;
+        canvas.drawLine(
+          Offset.lerp(a, b, t)!,
+          Offset.lerp(e, c, t)!,
+          framing,
+        );
+      }
+      _label(canvas, 'RIDGE', Offset(size.width * .48, size.height * .20));
+      _label(canvas, 'HIP RAFTERS', Offset(size.width * .68, size.height * .31));
+      _label(canvas, 'FASCIA / EAVE', Offset(size.width * .14, size.height * .78));
+    } else if (normalized == 'pitched') {
+      final left = size.width * .18;
+      final right = size.width * .82;
+      final wallTop = size.height * .54;
+      final bottom = size.height * .82;
+      canvas.drawRect(Rect.fromLTRB(left, wallTop, right, bottom), ink);
       canvas.drawLine(
-        Offset(x, wallTop + 8),
-        Offset(size.width * .5 + (x - size.width * .5) * .55, ridge.dy + 8),
-        green,
+        Offset(left - 18, wallTop + 4),
+        Offset(right + 18, size.height * .24),
+        primary,
       );
+      canvas.drawLine(
+        Offset(left, wallTop + 10),
+        Offset(right, size.height * .28),
+        support,
+      );
+      for (var i = 0; i < 6; i++) {
+        final x = left + (right - left) * i / 5;
+        final y = wallTop + 10 - (wallTop + 10 - size.height * .28) * i / 5;
+        canvas.drawLine(Offset(x, y), Offset(x, bottom), framing);
+      }
+      _label(canvas, 'HIGH EDGE / ROOF COVERING', Offset(size.width * .53, size.height * .16));
+      _label(canvas, 'LOW EAVE / FASCIA', Offset(size.width * .13, size.height * .47));
+    } else {
+      final left = size.width * .16;
+      final right = size.width * .84;
+      final wallTop = size.height * .58;
+      final bottom = size.height * .83;
+      final ridge = Offset(size.width * .5, size.height * .22);
+      canvas.drawRect(Rect.fromLTRB(left, wallTop, right, bottom), ink);
+      canvas.drawLine(Offset(left - 14, wallTop), ridge, primary);
+      canvas.drawLine(ridge, Offset(right + 14, wallTop), primary);
+      canvas.drawLine(
+        Offset(left, wallTop + 8),
+        Offset(right, wallTop + 8),
+        support,
+      );
+      for (double x = left + 18; x < right - 10; x += 30) {
+        canvas.drawLine(
+          Offset(x, wallTop + 8),
+          Offset(
+            size.width * .5 + (x - size.width * .5) * .45,
+            ridge.dy + 10,
+          ),
+          framing,
+        );
+      }
+      _label(canvas, 'RIDGE', Offset(size.width * .44, size.height * .13));
+      _label(canvas, 'RAFTERS', Offset(size.width * .69, size.height * .37));
+      _label(canvas, 'WALL PLATE', Offset(size.width * .18, size.height * .62));
     }
+
+    _label(
+      canvas,
+      '$roofStyle • RED CROSS ROOF CONCEPT',
+      Offset(size.width * .28, size.height * .91),
+      color: RcColors.blue,
+      fontSize: 10.5,
+    );
+  }
+
+  void _label(
+    Canvas canvas,
+    String text,
+    Offset position, {
+    Color color = RcColors.ink,
+    double fontSize = 9.5,
+  }) {
     final tp = TextPainter(
-      text: const TextSpan(
-        text: 'JRC STANDARD FINISHED ROOF STYLE',
+      text: TextSpan(
+        text: text,
         style: TextStyle(
-          color: RcColors.brand,
-          fontSize: 11,
+          color: color,
+          fontSize: fontSize,
           fontWeight: FontWeight.w900,
         ),
       ),
       textDirection: TextDirection.ltr,
-    )..layout();
-    tp.paint(canvas, Offset(size.width / 2 - tp.width / 2, size.height - 22));
+    )..layout(maxWidth: 230);
+    tp.paint(canvas, position);
   }
 
   @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+  bool shouldRepaint(covariant BeneficiaryAgreementRoofPainter oldDelegate) =>
+      oldDelegate.roofStyle != roofStyle;
 }

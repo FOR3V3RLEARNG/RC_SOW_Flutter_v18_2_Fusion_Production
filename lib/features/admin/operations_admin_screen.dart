@@ -943,12 +943,16 @@ class _NotificationCentreState extends State<_NotificationCentre> {
           items:
               const [
                     'General',
-                    'House',
+                    'Push Notice',
+                    'Production Alert',
+                    'Call To Action',
+                    'Signature Required',
+                    'House Update',
+                    'Safety Alert',
+                    'Payment Alert',
+                    'Completion Alert',
                     'Meeting',
                     'Event',
-                    'Safety',
-                    'Payment',
-                    'Completion',
                   ]
                   .map(
                     (value) =>

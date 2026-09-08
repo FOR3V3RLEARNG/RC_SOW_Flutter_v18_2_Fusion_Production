@@ -457,11 +457,14 @@ class RcHeader extends StatelessWidget {
                 onPressed: () => RcNavigator.liveTracker(context, state),
                 icon: const Icon(Icons.location_searching, size: RcIconSize.sm),
               ),
-              IconButton(
-                tooltip: 'Messages / Notifications',
-                onPressed: () => showMessageDrawer(context, state),
+              IconButton.filledTonal(
+                tooltip: 'Notification Centre',
+                onPressed: () => showNotificationCentre(context, state),
                 icon: const Badge(
-                  child: Icon(Icons.forum_outlined, size: RcIconSize.sm),
+                  child: Icon(
+                    Icons.notifications_active_outlined,
+                    size: RcIconSize.md,
+                  ),
                 ),
               ),
               IconButton(
@@ -516,10 +519,14 @@ Future<void> showRcMoreMenu(BuildContext context, AppState state) async {
             RcResponsiveGrid(
               minTileWidth: 180,
               children: [
-                _MoreTile('Messages', Icons.forum_outlined, () {
-                  Navigator.pop(context);
-                  showMessageDrawer(context, state);
-                }),
+                _MoreTile(
+                  'Notification Centre',
+                  Icons.notifications_active_outlined,
+                  () {
+                    Navigator.pop(context);
+                    showNotificationCentre(context, state);
+                  },
+                ),
                 _MoreTile('Users online', Icons.group_outlined, () {
                   Navigator.pop(context);
                   showUsersOnlinePanel(context, state);

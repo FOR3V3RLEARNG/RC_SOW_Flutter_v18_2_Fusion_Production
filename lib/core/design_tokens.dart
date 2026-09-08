@@ -21,6 +21,10 @@ abstract final class RcColors {
   static const blueSoft = Color(0xFFEFF8FF);
   static const purple = Color(0xFF6941C6);
   static const purpleSoft = Color(0xFFF4F3FF);
+  static const teal = Color(0xFF087E8B);
+  static const tealSoft = Color(0xFFEAFBFC);
+  static const gold = Color(0xFF9A6700);
+  static const goldSoft = Color(0xFFFFF7D6);
   static const danger = Color(0xFFB42318);
   static const dangerSoft = Color(0xFFFEF3F2);
 }
@@ -120,7 +124,7 @@ ThemeData buildRcTheme({
     iconButtonTheme: IconButtonThemeData(
       style: IconButton.styleFrom(
         iconSize: RcIconSize.md,
-        minimumSize: const Size(44, 44),
+        minimumSize: const Size(48, 48),
         tapTargetSize: MaterialTapTargetSize.padded,
       ),
     ),
@@ -131,19 +135,51 @@ ThemeData buildRcTheme({
       displaySmall: base.textTheme.displaySmall?.copyWith(
         fontWeight: FontWeight.w900,
         letterSpacing: -1.2,
+        height: 1.05,
       ),
       headlineMedium: base.textTheme.headlineMedium?.copyWith(
         fontWeight: FontWeight.w900,
         letterSpacing: -0.7,
+        height: 1.10,
+      ),
+      headlineSmall: base.textTheme.headlineSmall?.copyWith(
+        fontWeight: FontWeight.w900,
+        letterSpacing: -0.45,
+        height: 1.12,
       ),
       titleLarge: base.textTheme.titleLarge?.copyWith(
+        fontSize: 22,
         fontWeight: FontWeight.w900,
         letterSpacing: -0.35,
+        height: 1.18,
       ),
       titleMedium: base.textTheme.titleMedium?.copyWith(
+        fontSize: 17,
         fontWeight: FontWeight.w800,
+        height: 1.22,
+      ),
+      bodyLarge: base.textTheme.bodyLarge?.copyWith(
+        fontSize: 16.5,
+        fontWeight: FontWeight.w600,
+        height: 1.45,
+      ),
+      bodyMedium: base.textTheme.bodyMedium?.copyWith(
+        fontSize: 15,
+        fontWeight: FontWeight.w500,
+        height: 1.42,
+      ),
+      bodySmall: base.textTheme.bodySmall?.copyWith(
+        fontSize: 13.5,
+        fontWeight: FontWeight.w600,
+        height: 1.38,
       ),
       labelLarge: base.textTheme.labelLarge?.copyWith(
+        fontSize: 15,
+        fontWeight: FontWeight.w900,
+        letterSpacing: .05,
+      ),
+      labelMedium: base.textTheme.labelMedium?.copyWith(
+        fontSize: 13.5,
         fontWeight: FontWeight.w800,
       ),
     ),
@@ -169,7 +205,16 @@ ThemeData buildRcTheme({
         borderRadius: BorderRadius.circular(RcRadius.md),
         borderSide: BorderSide(color: scheme.primary, width: 2),
       ),
-      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 15),
+      labelStyle: TextStyle(
+        color: scheme.onSurfaceVariant,
+        fontWeight: FontWeight.w800,
+        fontSize: 15,
+      ),
+      hintStyle: TextStyle(
+        color: scheme.onSurfaceVariant.withValues(alpha: .78),
+        fontWeight: FontWeight.w600,
+      ),
+      contentPadding: const EdgeInsets.symmetric(horizontal: 17, vertical: 17),
     ),
     cardTheme: CardThemeData(
       color: scheme.surface,
@@ -203,21 +248,81 @@ ThemeData buildRcTheme({
     ),
     filledButtonTheme: FilledButtonThemeData(
       style: FilledButton.styleFrom(
-        minimumSize: const Size(48, 50),
+        minimumSize: const Size(52, 56),
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(RcRadius.md),
+          borderRadius: BorderRadius.circular(22),
         ),
-        textStyle: const TextStyle(fontWeight: FontWeight.w900),
+        textStyle: const TextStyle(
+          fontSize: 15,
+          fontWeight: FontWeight.w900,
+          letterSpacing: .1,
+        ),
       ),
     ),
     outlinedButtonTheme: OutlinedButtonThemeData(
       style: OutlinedButton.styleFrom(
-        minimumSize: const Size(48, 50),
+        minimumSize: const Size(52, 54),
+        padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(RcRadius.md),
+          borderRadius: BorderRadius.circular(21),
         ),
-        side: BorderSide(color: border),
-        textStyle: const TextStyle(fontWeight: FontWeight.w800),
+        side: BorderSide(color: border, width: 1.35),
+        textStyle: const TextStyle(
+          fontSize: 15,
+          fontWeight: FontWeight.w900,
+        ),
+      ),
+    ),
+    textButtonTheme: TextButtonThemeData(
+      style: TextButton.styleFrom(
+        minimumSize: const Size(48, 48),
+        padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 12),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(18),
+        ),
+        textStyle: const TextStyle(
+          fontSize: 15,
+          fontWeight: FontWeight.w900,
+        ),
+      ),
+    ),
+    elevatedButtonTheme: ElevatedButtonThemeData(
+      style: ElevatedButton.styleFrom(
+        minimumSize: const Size(52, 56),
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+        elevation: 1,
+        shadowColor: scheme.shadow.withValues(alpha: .14),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(22),
+        ),
+        textStyle: const TextStyle(
+          fontSize: 15,
+          fontWeight: FontWeight.w900,
+        ),
+      ),
+    ),
+    floatingActionButtonTheme: FloatingActionButtonThemeData(
+      elevation: 2,
+      highlightElevation: 4,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(22),
+      ),
+      extendedTextStyle: const TextStyle(
+        fontSize: 15,
+        fontWeight: FontWeight.w900,
+      ),
+    ),
+    snackBarTheme: SnackBarThemeData(
+      behavior: SnackBarBehavior.floating,
+      backgroundColor: scheme.inverseSurface,
+      contentTextStyle: TextStyle(
+        color: scheme.onInverseSurface,
+        fontSize: 15,
+        fontWeight: FontWeight.w700,
+      ),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(18),
       ),
     ),
     chipTheme: base.chipTheme.copyWith(
@@ -225,7 +330,10 @@ ThemeData buildRcTheme({
         borderRadius: BorderRadius.circular(RcRadius.sm),
       ),
       side: BorderSide(color: border),
-      labelStyle: const TextStyle(fontWeight: FontWeight.w800),
+      labelStyle: const TextStyle(
+        fontSize: 14,
+        fontWeight: FontWeight.w900,
+      ),
     ),
     dividerTheme: DividerThemeData(color: scheme.outlineVariant),
   );

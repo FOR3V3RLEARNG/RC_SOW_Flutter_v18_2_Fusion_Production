@@ -9,7 +9,6 @@ import '../../models/app_models.dart';
 import '../../state/app_state.dart';
 import '../admin/admin_screen.dart';
 import '../control/control_screen.dart';
-import '../messages/messages_screen.dart';
 import '../settings/settings_screen.dart';
 import '../workforce/crew_attendance_screen.dart';
 
@@ -35,12 +34,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
     final data = await Future.wait([
       widget.state.repository.houses(profile),
       widget.state.repository.productionRecords(profile),
-      widget.state.repository.messages(profile, limit: 12),
     ]);
     return _DashboardData(
       houses: data[0] as List<HouseRecord>,
       records: data[1] as List<ProductionRecord>,
-      messages: data[2] as List<MessageRecord>,
     );
   }
 
@@ -60,7 +57,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
         future: future,
         builder: (_, snap) {
           final data = snap.data ?? const _DashboardData();
-          final unread = data.messages.where((m) => m.unread).length;
           final paymentsDue = data.records
               .where((r) => r.eventType == 'payment' && r.status != 'Paid')
               .toList();
@@ -114,14 +110,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 children: _metrics(
                   profile,
                   data,
-                  unread,
                   paymentsDue.length,
                   actionRequired.length,
                 ),
               ),
               const SizedBox(height: 16),
               _DashboardCommandStrip(
-                onMessages: () => showMessageDrawer(context, widget.state),
                 onSettings: () => Navigator.of(context).push(
                   MaterialPageRoute(
                     builder: (_) => SettingsScreen(state: widget.state),
@@ -130,12 +124,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 onControl: () => widget.state.selectTab(2),
                 onHouses: () => widget.state.selectTab(3),
                 canManageCrew: profile.hasPrivilege('manageCrew'),
-              ),
-              const SizedBox(height: 20),
-              _MessagePreview(
-                messages: data.messages,
-                onOpen: () => showMessageDrawer(context, widget.state),
-                onCompose: () => showComposeMessage(context, widget.state),
               ),
               if (recentHouse != null) ...[
                 const SizedBox(height: 18),
@@ -203,7 +191,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
   List<Widget> _metrics(
     UserProfile profile,
     _DashboardData data,
-    int unread,
     int paymentDue,
     int actions,
   ) {
@@ -217,13 +204,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
         theme.colorScheme.primary,
         () => widget.state.selectTab(3),
       ),
-      RcDashboardMetricKey.unreadMessages => _Metric(
-        'Unread messages',
-        '$unread',
-        Icons.mark_email_unread_outlined,
-        theme.colorScheme.secondary,
-        () => showMessageDrawer(context, widget.state),
-      ),
+      RcDashboardMetricKey.unreadMessages => const SizedBox.shrink(),
       RcDashboardMetricKey.attendance => _Metric(
         'Attendance',
         '${data.records.where((r) => r.eventType == 'crewAttendance').length}',
@@ -260,7 +241,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
         () => _openModule('payment'),
       ),
     };
-    return experience.metrics.map(buildMetric).toList();
+    return experience.metrics
+        .where((key) => key != RcDashboardMetricKey.unreadMessages)
+        .map(buildMetric)
+        .toList();
   }
 
   void _openPhase(String phase) {
@@ -299,11 +283,9 @@ class _DashboardData {
   const _DashboardData({
     this.houses = const [],
     this.records = const [],
-    this.messages = const [],
   });
   final List<HouseRecord> houses;
   final List<ProductionRecord> records;
-  final List<MessageRecord> messages;
 }
 
 class _RoleHero extends StatelessWidget {
@@ -434,13 +416,11 @@ class _ProductionChainNav extends StatelessWidget {
 
 class _DashboardCommandStrip extends StatelessWidget {
   const _DashboardCommandStrip({
-    required this.onMessages,
     required this.onSettings,
     required this.onControl,
     required this.onHouses,
     required this.canManageCrew,
   });
-  final VoidCallback onMessages;
   final VoidCallback onSettings;
   final VoidCallback onControl;
   final VoidCallback onHouses;
@@ -453,16 +433,6 @@ class _DashboardCommandStrip extends StatelessWidget {
       spacing: 8,
       runSpacing: 8,
       children: [
-        ActionChip(
-          avatar: const Icon(Icons.notifications_outlined),
-          label: const Text('Notifications'),
-          onPressed: onMessages,
-        ),
-        ActionChip(
-          avatar: const Icon(Icons.forum_outlined),
-          label: const Text('Messages'),
-          onPressed: onMessages,
-        ),
         ActionChip(
           avatar: const Icon(Icons.settings_outlined),
           label: const Text('Settings'),
@@ -478,78 +448,6 @@ class _DashboardCommandStrip extends StatelessWidget {
       ],
     ),
   );
-}
-
-class _MessagePreview extends StatelessWidget {
-  const _MessagePreview({
-    required this.messages,
-    required this.onOpen,
-    required this.onCompose,
-  });
-  final List<MessageRecord> messages;
-  final VoidCallback onOpen;
-  final VoidCallback onCompose;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return RcExpressiveSurface(
-      shape: RcSurfaceShape.offset,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Icon(
-                Icons.forum_outlined,
-                size: RcIconSize.sm,
-                color: theme.colorScheme.primary,
-              ),
-              const SizedBox(width: 8),
-              Expanded(
-                child: Text('Messages', style: theme.textTheme.titleLarge),
-              ),
-              IconButton(
-                onPressed: onCompose,
-                icon: const Icon(Icons.edit_outlined),
-              ),
-              IconButton(
-                onPressed: onOpen,
-                icon: const Icon(Icons.expand_more_rounded),
-              ),
-            ],
-          ),
-          if (messages.isEmpty)
-            const Text('No recent messages.')
-          else
-            ...messages
-                .take(3)
-                .map(
-                  (m) => ListTile(
-                    contentPadding: EdgeInsets.zero,
-                    dense: true,
-                    leading: Icon(
-                      m.unread
-                          ? Icons.mark_email_unread_outlined
-                          : Icons.mail_outline,
-                    ),
-                    title: Text(
-                      m.subject,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    subtitle: Text(
-                      '${m.sender} • ${m.body}',
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    onTap: onOpen,
-                  ),
-                ),
-        ],
-      ),
-    );
-  }
 }
 
 class _RecentHouseCard extends StatelessWidget {
