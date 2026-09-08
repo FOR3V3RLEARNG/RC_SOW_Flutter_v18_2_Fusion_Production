@@ -277,19 +277,9 @@ class _CrewAttendanceScreenState extends State<CrewAttendanceScreen> {
                 const SizedBox(height: 14),
 
                 if (profile.isCrew)
-                  _selfRegister(
-                    context,
-                    theme,
-                    data,
-                    houseCodes,
-                  )
+                  _selfRegister(context, theme, data, houseCodes)
                 else if (canVerify)
-                  _supervisorRegister(
-                    context,
-                    theme,
-                    data,
-                    activeAssignments,
-                  )
+                  _supervisorRegister(context, theme, data, activeAssignments)
                 else
                   const RcExpressiveSurface(
                     child: Text(
@@ -325,12 +315,7 @@ class _CrewAttendanceScreenState extends State<CrewAttendanceScreen> {
                   ),
 
                 ...data.rows.map(
-                  (row) => _attendanceRow(
-                    context,
-                    theme,
-                    row,
-                    canVerify,
-                  ),
+                  (row) => _attendanceRow(context, theme, row, canVerify),
                 ),
 
                 if (snap.hasError) ...[
@@ -542,8 +527,7 @@ class _CrewAttendanceScreenState extends State<CrewAttendanceScreen> {
           const SizedBox(height: 14),
 
           FilledButton.icon(
-            onPressed:
-                busy || assignments.isEmpty || selectedCrewEmail == null
+            onPressed: busy || assignments.isEmpty || selectedCrewEmail == null
                 ? null
                 : () => _recordSupervisor(data, 'status_only'),
             icon: const Icon(Icons.fact_check_outlined),
@@ -606,12 +590,7 @@ class _CrewAttendanceScreenState extends State<CrewAttendanceScreen> {
         prefixIcon: Icon(Icons.how_to_reg_outlined),
       ),
       items: const ['Present', 'Half day', 'Absent', 'Excused']
-          .map(
-            (value) => DropdownMenuItem(
-              value: value,
-              child: Text(value),
-            ),
-          )
+          .map((value) => DropdownMenuItem(value: value, child: Text(value)))
           .toList(),
       onChanged: busy
           ? null
@@ -660,9 +639,7 @@ class _CrewAttendanceScreenState extends State<CrewAttendanceScreen> {
                   ? RcColors.success.withValues(alpha: .12)
                   : RcColors.warning.withValues(alpha: .12),
               child: Icon(
-                verified
-                    ? Icons.verified_outlined
-                    : Icons.schedule_outlined,
+                verified ? Icons.verified_outlined : Icons.schedule_outlined,
                 color: verified ? RcColors.success : RcColors.warning,
               ),
             ),
@@ -687,9 +664,7 @@ class _CrewAttendanceScreenState extends State<CrewAttendanceScreen> {
                       ),
                       RcStatusPill(
                         label: verified ? 'VERIFIED' : 'PENDING',
-                        color: verified
-                            ? RcColors.success
-                            : RcColors.warning,
+                        color: verified ? RcColors.success : RcColors.warning,
                       ),
                     ],
                   ),
@@ -697,8 +672,7 @@ class _CrewAttendanceScreenState extends State<CrewAttendanceScreen> {
                     const SizedBox(height: 6),
                     Text('${row['note']}'),
                   ],
-                  if (row['clock_in'] != null ||
-                      row['clock_out'] != null) ...[
+                  if (row['clock_in'] != null || row['clock_out'] != null) ...[
                     const SizedBox(height: 5),
                     Text(
                       'In ${_time(row['clock_in'])} • Out ${_time(row['clock_out'])}',
@@ -714,9 +688,7 @@ class _CrewAttendanceScreenState extends State<CrewAttendanceScreen> {
                       style: theme.textTheme.bodySmall,
                     ),
                   ],
-                  if ('${row['location_status'] ?? ''}'
-                      .trim()
-                      .isNotEmpty) ...[
+                  if ('${row['location_status'] ?? ''}'.trim().isNotEmpty) ...[
                     const SizedBox(height: 4),
                     Text(
                       'GPS audit: ${row['location_status']}'
