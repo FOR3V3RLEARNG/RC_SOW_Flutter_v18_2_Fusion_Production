@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 import '../../core/app_constants.dart';
-import '../../core/design_tokens.dart';
 import '../../core/rc_components.dart';
 import '../../models/app_models.dart';
 import '../../state/app_state.dart';
@@ -61,8 +60,8 @@ class _CrewAssignmentPanelState extends State<CrewAssignmentPanel> {
 
     return _CrewAssignmentData(
       houses: houses,
-      users: results[0] as List<Map<String, dynamic>>,
-      assignments: results[1] as List<Map<String, dynamic>>,
+      users: results[0],
+      assignments: results[1],
     );
   }
 
