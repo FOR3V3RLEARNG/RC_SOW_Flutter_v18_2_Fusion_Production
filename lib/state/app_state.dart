@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -29,6 +31,7 @@ class AppState extends ChangeNotifier {
   int selectedTab = 0;
   String? lastAuthDiagnostic;
   Map<String, dynamic> remoteUiConfig = const {};
+  String presenceStatus = 'active';
 
   String uiText(String key, String fallback) {
     final value = '${remoteUiConfig[key] ?? ''}'.trim();
@@ -54,6 +57,7 @@ class AppState extends ChangeNotifier {
 
   bool _authSyncInFlight = false;
   bool _authSyncQueued = false;
+  Timer? _presenceTimer;
 
   bool get signedIn => Supabase.instance.client.auth.currentSession != null;
 
@@ -86,6 +90,9 @@ class AppState extends ChangeNotifier {
       _authSyncInFlight = true;
       try {
         profile = await repository.currentProfile();
+        if (profile != null) {
+          presenceStatus = await repository.myPresenceStatus();
+        }
         await _loadRemoteUiConfig();
         await _submitPendingRoleRequestIfNeeded();
         lastAuthDiagnostic = signedIn
@@ -97,6 +104,7 @@ class AppState extends ChangeNotifier {
         if (!signedIn) profile = null;
       } finally {
         _authSyncInFlight = false;
+        _ensurePresenceHeartbeat();
         notifyListeners();
       }
     } while (_authSyncQueued);
@@ -150,6 +158,34 @@ class AppState extends ChangeNotifier {
     } catch (_) {
       // Retain request for retry after connectivity/auth recovery.
     }
+  }
+
+  void _ensurePresenceHeartbeat() {
+    final current = profile;
+    if (!signedIn ||
+        current == null ||
+        !current.approved ||
+        !current.active) {
+      _presenceTimer?.cancel();
+      _presenceTimer = null;
+      return;
+    }
+    if (_presenceTimer != null) return;
+    unawaited(repository.touchPresence());
+    _presenceTimer = Timer.periodic(const Duration(seconds: 45), (_) {
+      if (signedIn) unawaited(repository.touchPresence());
+    });
+  }
+
+  Future<void> setPresenceStatus(String value) async {
+    final normalized = value.toLowerCase();
+    if (!const {'active', 'busy', 'invisible'}.contains(normalized)) {
+      return;
+    }
+    await repository.setPresenceStatus(normalized);
+    presenceStatus = normalized;
+    await repository.touchPresence();
+    notifyListeners();
   }
 
   void selectTab(int value) {
@@ -216,6 +252,12 @@ class AppState extends ChangeNotifier {
     'dark' => ThemeMode.dark,
     _ => ThemeMode.system,
   };
+
+  @override
+  void dispose() {
+    _presenceTimer?.cancel();
+    super.dispose();
+  }
 
   RcDesignDna _dnaFromString(String? value) => RcDesignDna.values.firstWhere(
     (dna) => dna.name == value,

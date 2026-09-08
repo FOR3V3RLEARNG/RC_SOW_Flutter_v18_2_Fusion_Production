@@ -41,6 +41,7 @@ permissions = [
     'android.permission.INTERNET',
     'android.permission.ACCESS_COARSE_LOCATION',
     'android.permission.ACCESS_FINE_LOCATION',
+    'android.permission.POST_NOTIFICATIONS',
 ]
 for permission_name in permissions:
     if permission_name not in s:
@@ -73,7 +74,9 @@ mkdir -p \
   "$RES/values-v31" \
   "$RES/values-night-v31" \
   "$RES/drawable" \
-  "$RES/drawable-v21"
+  "$RES/drawable-v21" \
+  "$RES/raw" \
+  "android/app/src/main/kotlin/org/jamaicaredcross/rc_sow_flutter"
 
 cat > "$RES/values/colors.xml" <<'EOF_COLORS'
 <?xml version="1.0" encoding="utf-8"?>
@@ -139,4 +142,55 @@ else
   printf '\n# RC SOW CI stability: avoid duplicate Android VFS watcher crashes.\norg.gradle.vfs.watch=false\n' >> "$GRADLE_PROPS"
 fi
 
-echo "Android native splash resources patched without flutter_native_splash plugin."
+
+cp assets/sounds/construction_alert.wav "$RES/raw/construction_alert.wav"
+
+cat > "android/app/src/main/kotlin/org/jamaicaredcross/rc_sow_flutter/MainActivity.kt" <<'EOF_MAIN'
+package org.jamaicaredcross.rc_sow_flutter
+
+import android.Manifest
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.content.pm.PackageManager
+import android.media.AudioAttributes
+import android.net.Uri
+import android.os.Build
+import android.os.Bundle
+import io.flutter.embedding.android.FlutterActivity
+
+class MainActivity : FlutterActivity() {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        createOperationsNotificationChannel()
+        if (
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
+            checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED
+        ) {
+            requestPermissions(arrayOf(Manifest.permission.POST_NOTIFICATIONS), 2048)
+        }
+    }
+
+    private fun createOperationsNotificationChannel() {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return
+        val manager = getSystemService(NotificationManager::class.java)
+        val sound = Uri.parse("android.resource://$packageName/${R.raw.construction_alert}")
+        val audio = AudioAttributes.Builder()
+            .setUsage(AudioAttributes.USAGE_NOTIFICATION)
+            .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+            .build()
+        val channel = NotificationChannel(
+            "operations_construction",
+            "RC SOW Construction Alerts",
+            NotificationManager.IMPORTANCE_HIGH,
+        ).apply {
+            description = "Messages, production alerts, signatures and construction actions"
+            enableVibration(true)
+            vibrationPattern = longArrayOf(0, 120, 80, 180)
+            setSound(sound, audio)
+        }
+        manager.createNotificationChannel(channel)
+    }
+}
+EOF_MAIN
+
+echo "Android native splash + construction notification channel patched."

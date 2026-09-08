@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
@@ -87,17 +88,7 @@ class AppShell extends StatelessWidget {
       ),
       extendBody: !wide,
       bottomNavigationBar: wide ? null : _SlidingNavigationIsland(state: state),
-      floatingActionButton: FloatingActionButton.extended(
-        heroTag: 'users-online-popup',
-        onPressed: () {
-          state.feedback();
-          showUsersOnlinePanel(context, state);
-        },
-        icon: const Icon(Icons.group_outlined, size: RcIconSize.sm),
-        label: width < 420 ? const Text('Online') : const Text('Users online'),
-        backgroundColor: Theme.of(context).colorScheme.tertiaryContainer,
-        foregroundColor: Theme.of(context).colorScheme.onTertiaryContainer,
-      ),
+      floatingActionButton: _OnlineUsersFab(state: state),
     );
   }
 }
@@ -527,7 +518,7 @@ Future<void> showRcMoreMenu(BuildContext context, AppState state) async {
                     showNotificationCentre(context, state);
                   },
                 ),
-                _MoreTile('Users online', Icons.group_outlined, () {
+                _MoreTile('Presence', Icons.visibility_outlined, () {
                   Navigator.pop(context);
                   showUsersOnlinePanel(context, state);
                 }),
@@ -620,4 +611,56 @@ class _MoreTile extends StatelessWidget {
       ],
     ),
   );
+}
+
+class _OnlineUsersFab extends StatefulWidget {
+  const _OnlineUsersFab({required this.state});
+  final AppState state;
+
+  @override
+  State<_OnlineUsersFab> createState() => _OnlineUsersFabState();
+}
+
+class _OnlineUsersFabState extends State<_OnlineUsersFab> {
+  Timer? timer;
+  int count = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _refresh();
+    timer = Timer.periodic(const Duration(seconds: 30), (_) => _refresh());
+  }
+
+  @override
+  void dispose() {
+    timer?.cancel();
+    super.dispose();
+  }
+
+  Future<void> _refresh() async {
+    try {
+      final users = await widget.state.repository.activeUsers();
+      if (mounted && users.length != count) {
+        setState(() => count = users.length);
+      }
+    } catch (_) {}
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (count == 0) return const SizedBox.shrink();
+    return FloatingActionButton.extended(
+      heroTag: 'users-online-popup',
+      onPressed: () async {
+        widget.state.feedback();
+        await showUsersOnlinePanel(context, widget.state);
+        await _refresh();
+      },
+      icon: const Icon(Icons.group_outlined, size: RcIconSize.sm),
+      label: Text('$count online'),
+      backgroundColor: Theme.of(context).colorScheme.tertiaryContainer,
+      foregroundColor: Theme.of(context).colorScheme.onTertiaryContainer,
+    );
+  }
 }

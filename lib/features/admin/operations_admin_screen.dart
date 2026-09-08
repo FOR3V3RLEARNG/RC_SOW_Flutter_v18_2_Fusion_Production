@@ -24,7 +24,7 @@ class _OperationsAdminScreenState extends State<OperationsAdminScreen>
   @override
   void initState() {
     super.initState();
-    tabs = TabController(length: 6, vsync: this);
+    tabs = TabController(length: 7, vsync: this);
   }
 
   @override
@@ -59,6 +59,7 @@ class _OperationsAdminScreenState extends State<OperationsAdminScreen>
             ),
             Tab(text: 'Staff', icon: Icon(Icons.badge_outlined)),
             Tab(text: 'Tracker', icon: Icon(Icons.location_searching)),
+            Tab(text: 'Map', icon: Icon(Icons.map_outlined)),
           ],
         ),
       ),
@@ -71,6 +72,7 @@ class _OperationsAdminScreenState extends State<OperationsAdminScreen>
           _NotificationCentre(state: widget.state),
           _StaffDirectory(state: widget.state),
           _TrackerConfig(state: widget.state),
+          _ParishMapConfig(state: widget.state),
         ],
       ),
     );
@@ -1319,6 +1321,257 @@ class _TrackerConfigState extends State<_TrackerConfig> {
         const RcExpressiveSurface(
           child: Text(
             'Google Drive uses the server-side RC SOW Drive API/service account. OneDrive uses Microsoft Graph when private-file credentials are configured, with share-link download fallback. Live Tracker sync never writes beneficiary GPS or map records.',
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _ParishMapConfig extends StatefulWidget {
+  const _ParishMapConfig({required this.state});
+  final AppState state;
+
+  @override
+  State<_ParishMapConfig> createState() => _ParishMapConfigState();
+}
+
+class _ParishMapConfigState extends State<_ParishMapConfig> {
+  String parish = 'Hanover';
+  final url = TextEditingController();
+  List<Map<String, dynamic>> sources = const [];
+  bool loading = true;
+  bool busy = false;
+
+  Map<String, dynamic>? get current {
+    for (final row in sources) {
+      if ('${row['parish'] ?? ''}' == parish) return row;
+    }
+    return null;
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _refresh();
+  }
+
+  @override
+  void dispose() {
+    url.dispose();
+    super.dispose();
+  }
+
+  Future<void> _refresh() async {
+    try {
+      final rows = await widget.state.repository.parishMapSources(
+        widget.state.profile!,
+        includeDisabled: true,
+      );
+      if (!mounted) return;
+      sources = rows;
+      url.text = '${current?['url'] ?? ''}';
+      setState(() => loading = false);
+    } catch (error) {
+      if (!mounted) return;
+      setState(() => loading = false);
+      _snack('Parish maps could not be loaded: $error');
+    }
+  }
+
+  void _selectParish(String value) {
+    parish = value;
+    url.text = '${current?['url'] ?? ''}';
+    setState(() {});
+  }
+
+  bool get validUrl {
+    final uri = Uri.tryParse(url.text.trim());
+    return uri != null &&
+        uri.scheme == 'https' &&
+        uri.host.contains('google.com') &&
+        uri.path.contains('/maps/d/');
+  }
+
+  Future<void> _save() async {
+    if (!validUrl) {
+      _snack('Paste the Google My Maps viewer/share URL for $parish.');
+      return;
+    }
+    setState(() => busy = true);
+    try {
+      await widget.state.repository.setParishMapSource(
+        parish: parish,
+        url: url.text.trim(),
+      );
+      await _refresh();
+      _snack('$parish map source saved.');
+    } catch (error) {
+      _snack('Map source could not be saved: $error');
+    } finally {
+      if (mounted) setState(() => busy = false);
+    }
+  }
+
+  Future<void> _sync() async {
+    if (!validUrl) {
+      _snack('Enter a valid Google My Maps URL first.');
+      return;
+    }
+    setState(() => busy = true);
+    try {
+      await widget.state.repository.setParishMapSource(
+        parish: parish,
+        url: url.text.trim(),
+      );
+      final result = await widget.state.repository.syncParishMap(parish);
+      await _refresh();
+      _snack(
+        '$parish map synced: ${result['points'] ?? 0} points, '
+        '${result['linkedHouseCodes'] ?? 0} linked house codes.',
+      );
+    } catch (error) {
+      _snack('Google My Maps sync failed: $error');
+    } finally {
+      if (mounted) setState(() => busy = false);
+    }
+  }
+
+  Future<void> _open() async {
+    final uri = Uri.tryParse(url.text.trim());
+    if (uri == null) return;
+    await launchUrl(uri, mode: LaunchMode.externalApplication);
+  }
+
+  void _snack(String message) {
+    if (!mounted) return;
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(message)));
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final source = current;
+    final status = '${source?['last_sync_status'] ?? 'Never synced'}';
+    final points = (source?['point_count'] as num?)?.toInt() ?? 0;
+    final linked = (source?['linked_house_count'] as num?)?.toInt() ?? 0;
+
+    return ListView(
+      padding: const EdgeInsets.fromLTRB(16, 14, 16, 90),
+      children: [
+        const RcPageHeading(
+          eyebrow: 'Field navigation',
+          title: 'Parish Google My Maps',
+          subtitle:
+              'Every parish has its own independent Google My Maps URL. '
+              'Map coordinates come from that parish map and are joined to '
+              'Shelter beneficiary information by house code.',
+        ),
+        const SizedBox(height: 12),
+        Wrap(
+          spacing: 6,
+          runSpacing: 6,
+          children: RcApp.parishes.map((value) {
+            final configured = sources.any(
+              (row) =>
+                  '${row['parish'] ?? ''}' == value &&
+                  '${row['url'] ?? ''}'.trim().isNotEmpty,
+            );
+            return FilterChip(
+              selected: parish == value,
+              avatar: Icon(
+                configured ? Icons.map_rounded : Icons.map_outlined,
+                size: 18,
+              ),
+              label: Text(value),
+              onSelected: busy ? null : (_) => _selectParish(value),
+            );
+          }).toList(),
+        ),
+        const SizedBox(height: 14),
+        TextField(
+          controller: url,
+          enabled: !busy,
+          keyboardType: TextInputType.url,
+          decoration: InputDecoration(
+            labelText: '$parish Google My Maps URL',
+            hintText: 'https://www.google.com/maps/d/viewer?mid=...',
+            prefixIcon: const Icon(Icons.map_outlined),
+          ),
+        ),
+        const SizedBox(height: 12),
+        RcExpressiveSurface(
+          tone: theme.colorScheme.surfaceContainerLow,
+          child: loading
+              ? const Center(child: CircularProgressIndicator())
+              : Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      '$parish Map Status',
+                      style: theme.textTheme.titleMedium,
+                    ),
+                    const SizedBox(height: 7),
+                    Wrap(
+                      spacing: 7,
+                      runSpacing: 7,
+                      children: [
+                        RcStatusPill(
+                          label: status.toUpperCase(),
+                          color: status.toLowerCase() == 'success'
+                              ? RcColors.success
+                              : status.toLowerCase().contains('fail')
+                              ? RcColors.danger
+                              : RcColors.warning,
+                        ),
+                        RcStatusPill(
+                          label: '$points map points',
+                          color: RcColors.blue,
+                        ),
+                        RcStatusPill(
+                          label: '$linked linked houses',
+                          color: RcColors.success,
+                        ),
+                      ],
+                    ),
+                    if ('${source?['last_sync_message'] ?? ''}'
+                        .trim()
+                        .isNotEmpty) ...[
+                      const SizedBox(height: 8),
+                      Text('${source!['last_sync_message']}'),
+                    ],
+                  ],
+                ),
+        ),
+        const SizedBox(height: 12),
+        Wrap(
+          spacing: 8,
+          runSpacing: 8,
+          children: [
+            FilledButton.icon(
+              onPressed: busy ? null : _sync,
+              icon: const Icon(Icons.sync_rounded),
+              label: Text(busy ? 'Syncing…' : 'Save & Sync Map'),
+            ),
+            FilledButton.tonalIcon(
+              onPressed: busy ? null : _save,
+              icon: const Icon(Icons.save_outlined),
+              label: const Text('Save URL'),
+            ),
+            OutlinedButton.icon(
+              onPressed: url.text.trim().isEmpty ? null : _open,
+              icon: const Icon(Icons.open_in_new),
+              label: const Text('Open My Map'),
+            ),
+          ],
+        ),
+        const SizedBox(height: 14),
+        const RcExpressiveSurface(
+          child: Text(
+            'Map is separate from Live Tracker. Live Tracker remains '
+            'production/inventory. Parish Map remains field navigation.',
           ),
         ),
       ],

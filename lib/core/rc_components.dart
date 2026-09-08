@@ -6,7 +6,7 @@ import 'design_tokens.dart';
 
 enum RcSurfaceShape { standard, hero, offset, pill }
 
-class RcExpressiveSurface extends StatelessWidget {
+class RcExpressiveSurface extends StatefulWidget {
   const RcExpressiveSurface({
     super.key,
     required this.child,
@@ -24,7 +24,14 @@ class RcExpressiveSurface extends StatelessWidget {
   final VoidCallback? onTap;
   final String? semanticLabel;
 
-  BorderRadius _radius() => switch (shape) {
+  @override
+  State<RcExpressiveSurface> createState() => _RcExpressiveSurfaceState();
+}
+
+class _RcExpressiveSurfaceState extends State<RcExpressiveSurface> {
+  bool pressed = false;
+
+  BorderRadius _radius() => switch (widget.shape) {
     RcSurfaceShape.standard => BorderRadius.circular(RcRadius.lg),
     RcSurfaceShape.hero => const BorderRadius.only(
       topLeft: Radius.circular(36),
@@ -45,22 +52,62 @@ class RcExpressiveSurface extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final radius = _radius();
-    final surface = DecoratedBox(
-      decoration: BoxDecoration(
-        color: tone ?? theme.colorScheme.surface,
-        borderRadius: radius,
-        border: Border.all(color: theme.colorScheme.outlineVariant),
-      ),
-      child: Padding(padding: padding, child: child),
+    final base = widget.tone ?? theme.colorScheme.surface;
+    final pressedTone = Color.alphaBlend(
+      theme.colorScheme.primary.withValues(alpha: .085),
+      base,
     );
-    if (onTap == null) return surface;
-    return Semantics(
-      button: true,
-      label: semanticLabel,
+    final interactive = widget.onTap != null;
+
+    final surface = AnimatedContainer(
+      duration: const Duration(milliseconds: 115),
+      curve: Curves.easeOutCubic,
+      transform: Matrix4.translationValues(0, pressed ? 2.5 : 0, 0),
+      decoration: BoxDecoration(
+        color: pressed ? pressedTone : base,
+        borderRadius: radius,
+        border: Border.all(
+          color: pressed
+              ? theme.colorScheme.primary.withValues(alpha: .34)
+              : theme.colorScheme.outlineVariant,
+          width: pressed ? 1.35 : 1,
+        ),
+        boxShadow: interactive
+            ? [
+                BoxShadow(
+                  color: theme.colorScheme.shadow.withValues(
+                    alpha: pressed ? .035 : .10,
+                  ),
+                  blurRadius: pressed ? 5 : 16,
+                  offset: Offset(0, pressed ? 2 : 7),
+                ),
+              ]
+            : null,
+      ),
+      clipBehavior: Clip.antiAlias,
       child: Material(
         color: Colors.transparent,
-        child: InkWell(borderRadius: radius, onTap: onTap, child: surface),
+        child: InkWell(
+          borderRadius: radius,
+          onTap: widget.onTap,
+          onHighlightChanged: interactive
+              ? (value) {
+                  if (mounted) setState(() => pressed = value);
+                }
+              : null,
+          child: Padding(
+            padding: widget.padding,
+            child: widget.child,
+          ),
+        ),
       ),
+    );
+
+    if (!interactive) return surface;
+    return Semantics(
+      button: true,
+      label: widget.semanticLabel,
+      child: surface,
     );
   }
 }

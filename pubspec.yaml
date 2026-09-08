@@ -1,5 +1,5 @@
 name: rc_sow_flutter
-version: 20.5.7+214
+version: 20.5.8+215
 description: RC SOW production management system — expressive Material 3, field operations, beneficiary agreements and categorized notifications.
 publish_to: none
 
@@ -36,6 +36,7 @@ flutter:
   uses-material-design: true
   assets:
     - assets/brand/rc_sow_house_icon.png
+    - assets/sounds/construction_alert.wav
 
 flutter_launcher_icons:
   android: true

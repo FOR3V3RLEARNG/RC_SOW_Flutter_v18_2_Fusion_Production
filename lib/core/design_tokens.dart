@@ -246,6 +246,33 @@ ThemeData buildRcTheme({
       useIndicator: true,
       selectedLabelTextStyle: const TextStyle(fontWeight: FontWeight.w900),
     ),
+    segmentedButtonTheme: SegmentedButtonThemeData(
+      style: ButtonStyle(
+        backgroundColor: WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.selected)) {
+            return scheme.primaryContainer;
+          }
+          if (states.contains(WidgetState.pressed)) {
+            return scheme.surfaceContainer;
+          }
+          return scheme.surface;
+        }),
+        foregroundColor: WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.disabled)) {
+            return scheme.onSurface.withValues(alpha: .38);
+          }
+          return states.contains(WidgetState.selected)
+              ? scheme.onPrimaryContainer
+              : scheme.onSurface;
+        }),
+        overlayColor: WidgetStatePropertyAll(
+          scheme.primary.withValues(alpha: .08),
+        ),
+        textStyle: const WidgetStatePropertyAll(
+          TextStyle(fontSize: 14, fontWeight: FontWeight.w900),
+        ),
+      ),
+    ),
     filledButtonTheme: FilledButtonThemeData(
       style: FilledButton.styleFrom(
         minimumSize: const Size(52, 56),

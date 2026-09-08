@@ -178,6 +178,29 @@ class RcSowRepository {
         .toList();
   }
 
+  Future<String> myPresenceStatus() async {
+    final id = user?.id;
+    if (id == null) return 'active';
+    final row = await client
+        .from('profiles')
+        .select('presence_status')
+        .eq('user_id', id)
+        .maybeSingle();
+    final value = '${row?['presence_status'] ?? 'active'}'.toLowerCase();
+    return const {'active', 'busy', 'invisible'}.contains(value)
+        ? value
+        : 'active';
+  }
+
+  Future<void> setPresenceStatus(String status) async {
+    await client.rpc('set_presence_status', params: {'p_status': status});
+  }
+
+  Future<void> touchPresence() async {
+    await client.rpc('touch_presence');
+  }
+
+
   Future<List<Map<String, dynamic>>> crewDirectory({String? parish}) async {
     final result = await client.rpc(
       'list_crew_directory',
@@ -317,6 +340,127 @@ class RcSowRepository {
         .order('description')
         .limit(limit);
     return rows.map((row) => Map<String, dynamic>.from(row)).toList();
+  }
+
+  Future<List<Map<String, dynamic>>> parishMapSources(
+    UserProfile profile, {
+    bool includeDisabled = false,
+  }) async {
+    var query = client.from('parish_map_sources').select();
+    if (!includeDisabled) query = query.eq('enabled', true);
+    if (!profile.canViewAllParishes && profile.parish.isNotEmpty) {
+      query = query.eq('parish', profile.parish);
+    }
+    final rows = await query.order('parish');
+    return rows.map((e) => Map<String, dynamic>.from(e)).toList();
+  }
+
+  Future<Map<String, dynamic>?> parishMapSource(
+    UserProfile profile, {
+    required String parish,
+  }) async {
+    if (!profile.canViewAllParishes &&
+        profile.parish.isNotEmpty &&
+        profile.parish.toLowerCase() != parish.toLowerCase()) {
+      return null;
+    }
+    final row = await client
+        .from('parish_map_sources')
+        .select()
+        .eq('parish', parish)
+        .eq('enabled', true)
+        .maybeSingle();
+    return row == null ? null : Map<String, dynamic>.from(row);
+  }
+
+  Future<void> setParishMapSource({
+    required String parish,
+    required String url,
+  }) async {
+    await client.rpc(
+      'set_parish_map_source',
+      params: {
+        'p_parish': parish,
+        'p_url': url.trim(),
+        'p_provider': 'Google My Maps',
+        'p_enabled': true,
+      },
+    );
+  }
+
+  Future<Map<String, dynamic>> syncParishMap(String parish) async {
+    final response = await client.functions.invoke(
+      'sync-parish-map',
+      body: {'parish': parish},
+    );
+    final raw = response.data;
+    final data = raw is Map
+        ? Map<String, dynamic>.from(raw)
+        : <String, dynamic>{};
+    if (data['error'] != null) throw StateError('${data['error']}');
+    return data;
+  }
+
+  Future<List<Map<String, dynamic>>> parishMapPoints(
+    UserProfile profile, {
+    required String parish,
+  }) async {
+    if (!profile.canViewAllParishes &&
+        profile.parish.isNotEmpty &&
+        profile.parish.toLowerCase() != parish.toLowerCase()) {
+      return const [];
+    }
+
+    final rawPoints = await client
+        .from('parish_map_points')
+        .select()
+        .eq('parish', parish)
+        .order('marker_name');
+
+    final beneficiaryRows = await client
+        .from('beneficiary_directory')
+        .select('house_code,beneficiary_name,cluster')
+        .eq('parish', parish)
+        .limit(2500);
+
+    final beneficiaries = <String, Map<String, dynamic>>{};
+    for (final raw in beneficiaryRows) {
+      final row = Map<String, dynamic>.from(raw);
+      final code = '${row['house_code'] ?? ''}'.trim().toUpperCase();
+      if (code.isNotEmpty) beneficiaries[code] = row;
+    }
+
+    Set<String>? crewCodes;
+    if (profile.isCrew) {
+      crewCodes = (await houses(profile))
+          .map((house) => house.code.trim().toUpperCase())
+          .where((code) => code.isNotEmpty)
+          .toSet();
+    }
+
+    final points = <Map<String, dynamic>>[];
+    for (final raw in rawPoints) {
+      final row = Map<String, dynamic>.from(raw);
+      final code = '${row['house_code'] ?? ''}'.trim().toUpperCase();
+      if (crewCodes != null &&
+          (code.isEmpty || !crewCodes.contains(code))) {
+        continue;
+      }
+      final beneficiary = beneficiaries[code];
+      final payload = Map<String, dynamic>.from(
+        row['source_payload'] as Map? ?? const {},
+      );
+      points.add({
+        ...row,
+        'house_code': code,
+        'beneficiary_name': beneficiary?['beneficiary_name'] ??
+            payload['beneficiaryName'] ??
+            '',
+        'cluster': beneficiary?['cluster'] ?? payload['cluster'] ?? '',
+        'location_source': 'google_my_maps',
+      });
+    }
+    return points;
   }
 
   Future<List<Map<String, dynamic>>> houseLocations(UserProfile profile) async {

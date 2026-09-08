@@ -1646,6 +1646,7 @@ class _PulseTile extends StatelessWidget {
   Widget build(BuildContext context) {
     return RcExpressiveSurface(
       shape: RcSurfaceShape.offset,
+      tone: color.withValues(alpha: .075),
       onTap: onTap,
       child: Row(
         children: [

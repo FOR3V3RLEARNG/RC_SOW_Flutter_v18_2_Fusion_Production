@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import '../../core/design_tokens.dart';
 import '../../core/rc_components.dart';
 import '../../state/app_state.dart';
 import '../messages/messages_screen.dart';
@@ -9,7 +10,7 @@ Future<void> showUsersOnlinePanel(BuildContext context, AppState state) async {
   await showGeneralDialog<void>(
     context: context,
     barrierDismissible: true,
-    barrierLabel: 'Users online',
+    barrierLabel: 'Team presence',
     barrierColor: Colors.black26,
     transitionDuration: state.reduceMotion
         ? Duration.zero
@@ -20,14 +21,12 @@ Future<void> showUsersOnlinePanel(BuildContext context, AppState state) async {
         child: Material(
           color: Colors.transparent,
           child: Container(
-            width: MediaQuery.sizeOf(
-              context,
-            ).width.clamp(0.0, 390.0).toDouble(),
-            height: MediaQuery.sizeOf(context).height * .72,
+            width: MediaQuery.sizeOf(context).width.clamp(0.0, 400.0),
+            height: MediaQuery.sizeOf(context).height * .76,
             margin: const EdgeInsets.fromLTRB(12, 12, 12, 86),
             decoration: BoxDecoration(
               color: Theme.of(context).colorScheme.surface,
-              borderRadius: BorderRadius.circular(28),
+              borderRadius: BorderRadius.circular(30),
               border: Border.all(
                 color: Theme.of(context).colorScheme.outlineVariant,
               ),
@@ -45,19 +44,6 @@ Future<void> showUsersOnlinePanel(BuildContext context, AppState state) async {
         ),
       ),
     ),
-    transitionBuilder: (_, animation, _, child) {
-      final curve = CurvedAnimation(
-        parent: animation,
-        curve: Curves.easeOutBack,
-      );
-      return SlideTransition(
-        position: Tween(
-          begin: const Offset(.04, .15),
-          end: Offset.zero,
-        ).animate(curve),
-        child: FadeTransition(opacity: animation, child: child),
-      );
-    },
   );
 }
 
@@ -66,12 +52,10 @@ class ActiveUsersScreen extends StatelessWidget {
   final AppState state;
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Users online')),
-      body: ActiveUsersBody(state: state),
-    );
-  }
+  Widget build(BuildContext context) => Scaffold(
+    appBar: AppBar(title: const Text('Team Presence')),
+    body: ActiveUsersBody(state: state),
+  );
 }
 
 class ActiveUsersBody extends StatefulWidget {
@@ -80,6 +64,7 @@ class ActiveUsersBody extends StatefulWidget {
     required this.state,
     this.showClose = false,
   });
+
   final AppState state;
   final bool showClose;
 
@@ -89,6 +74,7 @@ class ActiveUsersBody extends StatefulWidget {
 
 class _ActiveUsersBodyState extends State<ActiveUsersBody> {
   late Future<List<Map<String, dynamic>>> future;
+  bool changing = false;
 
   @override
   void initState() {
@@ -96,9 +82,31 @@ class _ActiveUsersBodyState extends State<ActiveUsersBody> {
     future = widget.state.repository.activeUsers();
   }
 
+  Future<void> _refresh() async {
+    setState(() => future = widget.state.repository.activeUsers());
+    await future;
+  }
+
+  Future<void> _changePresence(String value) async {
+    setState(() => changing = true);
+    try {
+      await widget.state.setPresenceStatus(value);
+      await _refresh();
+    } catch (error) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Presence could not be changed: $error')),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => changing = false);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+
     return Column(
       children: [
         Padding(
@@ -109,9 +117,9 @@ class _ActiveUsersBodyState extends State<ActiveUsersBody> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('Users Online', style: theme.textTheme.titleLarge),
+                    Text('Team Presence', style: theme.textTheme.titleLarge),
                     Text(
-                      'Tap a user to message or view context.',
+                      'Only people active in RC SOW within the last 2 minutes are shown.',
                       style: theme.textTheme.bodySmall,
                     ),
                   ],
@@ -125,126 +133,169 @@ class _ActiveUsersBodyState extends State<ActiveUsersBody> {
             ],
           ),
         ),
+        Padding(
+          padding: const EdgeInsets.fromLTRB(12, 4, 12, 10),
+          child: RcExpressiveSurface(
+            shape: RcSurfaceShape.pill,
+            tone: theme.colorScheme.surfaceContainerLow,
+            padding: const EdgeInsets.all(8),
+            child: SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: SegmentedButton<String>(
+                segments: const [
+                  ButtonSegment(
+                    value: 'active',
+                    icon: Icon(Icons.circle, color: RcColors.success),
+                    label: Text('Active'),
+                  ),
+                  ButtonSegment(
+                    value: 'busy',
+                    icon: Icon(Icons.circle, color: RcColors.warning),
+                    label: Text('Busy'),
+                  ),
+                  ButtonSegment(
+                    value: 'invisible',
+                    icon: Icon(Icons.visibility_off_outlined),
+                    label: Text('Invisible'),
+                  ),
+                ],
+                selected: {widget.state.presenceStatus},
+                showSelectedIcon: false,
+                onSelectionChanged: changing
+                    ? null
+                    : (selection) => _changePresence(selection.first),
+              ),
+            ),
+          ),
+        ),
         Expanded(
-          child: FutureBuilder<List<Map<String, dynamic>>>(
-            future: future,
-            builder: (_, snap) {
-              final users = snap.data ?? const <Map<String, dynamic>>[];
-              if (snap.connectionState == ConnectionState.waiting &&
-                  users.isEmpty) {
-                return const Center(child: CircularProgressIndicator());
-              }
-              if (snap.hasError) {
-                return Center(
-                  child: Padding(
-                    padding: const EdgeInsets.all(24),
-                    child: RcExpressiveSurface(
-                      tone: theme.colorScheme.errorContainer,
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          const Text('User presence could not be loaded.'),
-                          const SizedBox(height: 12),
-                          OutlinedButton.icon(
-                            onPressed: () => setState(
-                              () => future = widget.state.repository
-                                  .activeUsers(),
-                            ),
-                            icon: const Icon(Icons.refresh),
-                            label: const Text('Retry'),
-                          ),
-                        ],
+          child: RefreshIndicator(
+            onRefresh: _refresh,
+            child: FutureBuilder<List<Map<String, dynamic>>>(
+              future: future,
+              builder: (_, snap) {
+                final users = snap.data ?? const <Map<String, dynamic>>[];
+
+                if (snap.connectionState == ConnectionState.waiting &&
+                    users.isEmpty) {
+                  return const ListView(
+                    children: [
+                      Padding(
+                        padding: EdgeInsets.all(32),
+                        child: Center(child: CircularProgressIndicator()),
                       ),
-                    ),
-                  ),
-                );
-              }
-              if (users.isEmpty) {
-                return const Center(
-                  child: Padding(
-                    padding: EdgeInsets.all(24),
-                    child: Text(
-                      'No active approved users are currently visible.',
-                    ),
-                  ),
-                );
-              }
-              return ListView.separated(
-                padding: const EdgeInsets.fromLTRB(10, 4, 10, 22),
-                itemCount: users.length,
-                separatorBuilder: (_, _) => const SizedBox(height: 6),
-                itemBuilder: (_, index) {
-                  final user = users[index];
-                  final active = user['active'] == true;
-                  final name = '${user['full_name'] ?? ''}'.trim();
-                  final email = '${user['email'] ?? ''}';
-                  return RcExpressiveSurface(
-                    shape: RcSurfaceShape.offset,
-                    padding: const EdgeInsets.all(10),
-                    onTap: () => _openUser(user),
-                    child: Row(
-                      children: [
-                        Stack(
-                          children: [
-                            CircleAvatar(
-                              child: Text(
-                                (name.isNotEmpty ? name : email).isEmpty
-                                    ? '?'
-                                    : (name.isNotEmpty ? name : email)[0]
-                                          .toUpperCase(),
-                              ),
-                            ),
-                            Positioned(
-                              right: 0,
-                              bottom: 0,
-                              child: Container(
-                                width: 11,
-                                height: 11,
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  color: active
-                                      ? Colors.green
-                                      : theme.colorScheme.outline,
-                                  border: Border.all(
-                                    color: theme.colorScheme.surface,
-                                    width: 2,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ],
+                    ],
+                  );
+                }
+
+                if (snap.hasError) {
+                  return ListView(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.all(24),
+                        child: RcExpressiveSurface(
+                          tone: theme.colorScheme.errorContainer,
+                          child: const Text(
+                            'Team presence could not be loaded.',
+                          ),
                         ),
-                        const SizedBox(width: 11),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
+                      ),
+                    ],
+                  );
+                }
+
+                if (users.isEmpty) {
+                  return const ListView(
+                    children: [
+                      Padding(
+                        padding: EdgeInsets.all(28),
+                        child: Center(
+                          child: Text(
+                            'No other users are online right now.',
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                      ),
+                    ],
+                  );
+                }
+
+                return ListView.separated(
+                  padding: const EdgeInsets.fromLTRB(10, 4, 10, 22),
+                  itemCount: users.length,
+                  separatorBuilder: (_, _) => const SizedBox(height: 7),
+                  itemBuilder: (_, index) {
+                    final user = users[index];
+                    final status =
+                        '${user['presence_status'] ?? 'active'}'.toLowerCase();
+                    final busy = status == 'busy';
+                    final color = busy ? RcColors.warning : RcColors.success;
+                    final name = '${user['full_name'] ?? ''}'.trim();
+                    final email = '${user['email'] ?? ''}'.trim();
+
+                    return RcExpressiveSurface(
+                      shape: RcSurfaceShape.offset,
+                      padding: const EdgeInsets.all(11),
+                      onTap: () => _openUser(user),
+                      child: Row(
+                        children: [
+                          Stack(
                             children: [
-                              Text(
-                                name.isEmpty ? email : name,
-                                style: theme.textTheme.titleSmall?.copyWith(
-                                  fontWeight: FontWeight.w800,
+                              CircleAvatar(
+                                child: Text(
+                                  (name.isNotEmpty ? name : email).isEmpty
+                                      ? '?'
+                                      : (name.isNotEmpty ? name : email)[0]
+                                            .toUpperCase(),
                                 ),
                               ),
-                              Text(
-                                '${user['role'] ?? ''} • ${user['parish'] ?? ''}',
-                                style: theme.textTheme.bodySmall?.copyWith(
-                                  color: theme.colorScheme.onSurfaceVariant,
+                              Positioned(
+                                right: 0,
+                                bottom: 0,
+                                child: Container(
+                                  width: 12,
+                                  height: 12,
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    color: color,
+                                    border: Border.all(
+                                      color: theme.colorScheme.surface,
+                                      width: 2,
+                                    ),
+                                  ),
                                 ),
                               ),
                             ],
                           ),
-                        ),
-                        Icon(
-                          active
-                              ? Icons.chat_bubble_outline
-                              : Icons.chevron_right,
-                        ),
-                      ],
-                    ),
-                  );
-                },
-              );
-            },
+                          const SizedBox(width: 11),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  name.isEmpty ? email : name,
+                                  style: theme.textTheme.titleMedium,
+                                ),
+                                Text(
+                                  '${user['role'] ?? ''} • ${user['parish'] ?? ''}',
+                                  style: theme.textTheme.bodySmall?.copyWith(
+                                    color: theme.colorScheme.onSurfaceVariant,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          RcStatusPill(
+                            label: busy ? 'BUSY' : 'ACTIVE',
+                            color: color,
+                          ),
+                        ],
+                      ),
+                    );
+                  },
+                );
+              },
+            ),
           ),
         ),
       ],
@@ -255,6 +306,9 @@ class _ActiveUsersBodyState extends State<ActiveUsersBody> {
     final email = '${user['email'] ?? ''}';
     final role = '${user['role'] ?? ''}';
     final name = '${user['full_name'] ?? email}';
+    final busy =
+        '${user['presence_status'] ?? 'active'}'.toLowerCase() == 'busy';
+
     await showModalBottomSheet<void>(
       context: context,
       showDragHandle: true,
@@ -264,24 +318,10 @@ class _ActiveUsersBodyState extends State<ActiveUsersBody> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Row(
-              children: [
-                CircleAvatar(
-                  radius: 28,
-                  child: Text(name.isEmpty ? '?' : name[0].toUpperCase()),
-                ),
-                const SizedBox(width: 14),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(name, style: Theme.of(context).textTheme.titleLarge),
-                      Text('$role • ${user['parish'] ?? ''}'),
-                    ],
-                  ),
-                ),
-              ],
-            ),
+            Text(name, style: Theme.of(context).textTheme.titleLarge),
+            const SizedBox(height: 4),
+            Text('$role • ${user['parish'] ?? ''}'),
+            Text(busy ? 'Busy' : 'Active now'),
             const SizedBox(height: 18),
             FilledButton.icon(
               onPressed: () {
