@@ -1,7 +1,9 @@
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../core/app_constants.dart';
+import '../../core/design_tokens.dart';
 import '../../core/record_schemas.dart';
 import '../../core/rc_components.dart';
 import '../../services/boq_import_service.dart';
@@ -1048,7 +1050,17 @@ class _TrackerConfig extends StatefulWidget {
 
 class _TrackerConfigState extends State<_TrackerConfig> {
   String parish = 'Hanover';
+  String provider = 'Google Drive';
   final url = TextEditingController();
+  List<Map<String, dynamic>> sources = const [];
+  bool loading = true;
+  bool busy = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _refresh();
+  }
 
   @override
   void dispose() {
@@ -1056,51 +1068,237 @@ class _TrackerConfigState extends State<_TrackerConfig> {
     super.dispose();
   }
 
+  Map<String, dynamic>? get current {
+    for (final row in sources) {
+      if ('${row['parish'] ?? ''}' == parish) return row;
+    }
+    return null;
+  }
+
+  Future<void> _refresh() async {
+    try {
+      final rows = await widget.state.repository.liveTrackers(widget.state.profile!);
+      if (!mounted) return;
+      sources = rows;
+      _loadCurrent();
+      setState(() => loading = false);
+    } catch (error) {
+      if (!mounted) return;
+      setState(() => loading = false);
+      _snack('Tracker configuration could not load: $error');
+    }
+  }
+
+  void _loadCurrent() {
+    final row = current;
+    final stored = '${row?['provider'] ?? ''}';
+    provider = stored == 'OneDrive' || stored == 'SharePoint'
+        ? 'OneDrive'
+        : stored == 'Other'
+            ? 'Direct URL'
+            : 'Google Drive';
+    url.text = '${row?['url'] ?? ''}';
+  }
+
+  void _selectParish(String value) {
+    parish = value;
+    _loadCurrent();
+    setState(() {});
+  }
+
+  bool get _validUrl {
+    final uri = Uri.tryParse(url.text.trim());
+    return uri != null &&
+        (uri.scheme == 'https' || uri.scheme == 'http') &&
+        uri.host.isNotEmpty;
+  }
+
   Future<void> _save() async {
-    if (url.text.trim().isEmpty) return;
-    await widget.state.repository.setParishMapUrl(
-      parish: parish,
-      url: url.text.trim(),
-    );
+    if (!_validUrl) {
+      _snack('Enter a valid workbook URL.');
+      return;
+    }
+    setState(() => busy = true);
+    try {
+      await widget.state.repository.setParishLiveTrackerSource(
+        parish: parish,
+        provider: provider,
+        url: url.text.trim(),
+      );
+      await _refresh();
+      _snack('$parish Live Tracker source saved.');
+    } catch (error) {
+      _snack('Tracker source could not be saved: $error');
+    } finally {
+      if (mounted) setState(() => busy = false);
+    }
+  }
+
+  Future<void> _sync() async {
+    if (!_validUrl) {
+      _snack('Save a valid workbook URL before syncing.');
+      return;
+    }
+    setState(() => busy = true);
+    try {
+      await widget.state.repository.setParishLiveTrackerSource(
+        parish: parish,
+        provider: provider,
+        url: url.text.trim(),
+      );
+      final result = await widget.state.repository.syncParishLiveTracker(parish);
+      await _refresh();
+      _snack(
+        '$parish synced: ${result['houses'] ?? 0} houses, '
+        '${(result['clusterSheets'] as List? ?? const []).length} clusters, '
+        '${result['inventoryRows'] ?? 0} inventory items.',
+      );
+    } catch (error) {
+      _snack('Live Tracker API sync failed: $error');
+    } finally {
+      if (mounted) setState(() => busy = false);
+    }
+  }
+
+  Future<void> _open() async {
+    final uri = Uri.tryParse(url.text.trim());
+    if (uri == null) return;
+    final opened = await launchUrl(uri, mode: LaunchMode.externalApplication);
+    if (!opened) _snack('The tracker workbook could not be opened.');
+  }
+
+  void _snack(String message) {
     if (!mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('$parish live tracker link updated.')),
-    );
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
   }
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final row = current;
+    final status = '${row?['last_sync_status'] ?? 'Never synced'}';
+    final clusters = (row?['cluster_count'] as num?)?.toInt() ?? 0;
+    final inventory = (row?['inventory_count'] as num?)?.toInt() ?? 0;
+
     return ListView(
-      padding: const EdgeInsets.fromLTRB(16, 14, 16, 80),
+      padding: const EdgeInsets.fromLTRB(16, 14, 16, 90),
       children: [
         const RcPageHeading(
-          eyebrow: 'Live tracker',
-          title: 'Google Drive / Tracker Link',
+          eyebrow: 'Dedicated parish source',
+          title: 'Live Tracker API',
           subtitle:
-              'Connect each parish Tracker icon to its live Google Drive file or approved tracker URL.',
+              'Configure a separate production/inventory workbook for each parish. This is NOT the Shelter beneficiary file and it does NOT feed the map.',
         ),
         const SizedBox(height: 12),
+        RcExpressiveSurface(
+          tone: theme.colorScheme.primaryContainer.withValues(alpha: .4),
+          child: const Text(
+            'Expected workbook: cluster worksheets with House ID, Finished, Started, BOQ, SOW, Contract, verification, rejection, comments and links; plus an optional Storage worksheet with dated IN/OUT stock movements.',
+          ),
+        ),
+        const SizedBox(height: 12),
+        Text('Parish', style: theme.textTheme.titleMedium),
+        const SizedBox(height: 7),
+        Wrap(
+          spacing: 6,
+          runSpacing: 6,
+          children: RcApp.parishes.map((value) {
+            final configured = sources.any(
+              (source) =>
+                  '${source['parish'] ?? ''}' == value &&
+                  '${source['url'] ?? ''}'.trim().isNotEmpty,
+            );
+            return FilterChip(
+              selected: parish == value,
+              avatar: Icon(
+                configured ? Icons.cloud_done_outlined : Icons.cloud_off_outlined,
+                size: 18,
+              ),
+              label: Text(value),
+              onSelected: busy ? null : (_) => _selectParish(value),
+            );
+          }).toList(),
+        ),
+        const SizedBox(height: 14),
         DropdownButtonFormField<String>(
-          initialValue: parish,
-          decoration: const InputDecoration(labelText: 'Parish'),
-          items: RcApp.parishes
-              .map((p) => DropdownMenuItem(value: p, child: Text(p)))
+          key: ValueKey('$parish-$provider'),
+          initialValue: provider,
+          decoration: const InputDecoration(labelText: 'API / File Provider'),
+          items: const ['Google Drive', 'OneDrive', 'Direct URL']
+              .map((value) => DropdownMenuItem(value: value, child: Text(value)))
               .toList(),
-          onChanged: (v) => setState(() => parish = v!),
+          onChanged: busy ? null : (value) => setState(() => provider = value!),
         ),
         const SizedBox(height: 9),
         TextField(
           controller: url,
+          enabled: !busy,
           keyboardType: TextInputType.url,
           decoration: const InputDecoration(
-            labelText: 'Google Drive / Live Tracker URL',
+            labelText: 'Live Tracker workbook URL',
+            hintText: 'Google Drive, OneDrive or direct XLSX link',
+            prefixIcon: Icon(Icons.link),
           ),
         ),
+        const SizedBox(height: 12),
+        RcExpressiveSurface(
+          child: loading
+              ? const Center(child: CircularProgressIndicator())
+              : Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('$parish API Status', style: theme.textTheme.titleMedium),
+                    const SizedBox(height: 7),
+                    Wrap(
+                      spacing: 7,
+                      runSpacing: 7,
+                      children: [
+                        RcStatusPill(
+                          label: status.toUpperCase(),
+                          color: status.toLowerCase() == 'success'
+                              ? RcColors.success
+                              : status.toLowerCase().contains('fail')
+                                  ? RcColors.danger
+                                  : RcColors.warning,
+                        ),
+                        RcStatusPill(label: '$clusters clusters', color: RcColors.purple),
+                        RcStatusPill(label: '$inventory inventory items', color: RcColors.success),
+                      ],
+                    ),
+                    if ('${row?['last_sync_message'] ?? ''}'.trim().isNotEmpty) ...[
+                      const SizedBox(height: 8),
+                      Text('${row!['last_sync_message']}'),
+                    ],
+                  ],
+                ),
+        ),
+        const SizedBox(height: 12),
+        Wrap(
+          spacing: 8,
+          runSpacing: 8,
+          children: [
+            FilledButton.icon(
+              onPressed: busy ? null : _sync,
+              icon: const Icon(Icons.sync_rounded),
+              label: Text(busy ? 'Syncing…' : 'Save & Sync API'),
+            ),
+            FilledButton.tonalIcon(
+              onPressed: busy ? null : _save,
+              icon: const Icon(Icons.save_outlined),
+              label: const Text('Save Source'),
+            ),
+            OutlinedButton.icon(
+              onPressed: url.text.trim().isEmpty ? null : _open,
+              icon: const Icon(Icons.open_in_new),
+              label: const Text('Open Workbook'),
+            ),
+          ],
+        ),
         const SizedBox(height: 14),
-        FilledButton.icon(
-          onPressed: _save,
-          icon: const Icon(Icons.link),
-          label: const Text('Save Tracker Link'),
+        const RcExpressiveSurface(
+          child: Text(
+            'Google Drive uses the server-side RC SOW Drive API/service account. OneDrive uses Microsoft Graph when private-file credentials are configured, with share-link download fallback. Live Tracker sync never writes beneficiary GPS or map records.',
+          ),
         ),
       ],
     );

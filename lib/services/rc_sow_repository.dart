@@ -247,6 +247,72 @@ class RcSowRepository {
     return rows.map((e) => Map<String, dynamic>.from(e)).toList();
   }
 
+  Future<void> setParishLiveTrackerSource({
+    required String parish,
+    required String provider,
+    required String url,
+  }) async {
+    final databaseProvider = provider == 'Direct URL' ? 'Other' : provider;
+    await client.rpc(
+      'set_parish_live_tracker_source',
+      params: {
+        'p_parish': parish,
+        'p_url': url.trim(),
+        'p_provider': databaseProvider,
+        'p_label': '$parish Live Tracker',
+        'p_beneficiary_sheet': null,
+        'p_inventory_sheet': null,
+        'p_enabled': true,
+      },
+    );
+  }
+
+  Future<Map<String, dynamic>> syncParishLiveTracker(String parish) async {
+    final response = await client.functions.invoke(
+      'sync-live-tracker',
+      body: {'parish': parish},
+    );
+    final raw = response.data;
+    final data = raw is Map ? Map<String, dynamic>.from(raw) : <String, dynamic>{};
+    if (data['error'] != null) throw StateError('${data['error']}');
+    return data;
+  }
+
+  Future<Map<String, dynamic>?> liveTrackerSnapshot(
+    UserProfile profile, {
+    required String parish,
+  }) async {
+    if (!profile.canViewAllParishes && profile.parish.isNotEmpty && profile.parish != parish) {
+      return null;
+    }
+    final rows = await client
+        .from('app_events')
+        .select()
+        .eq('event_type', 'liveTrackerSnapshot')
+        .eq('parish', parish)
+        .order('updated_at', ascending: false)
+        .limit(1);
+    if (rows.isEmpty) return null;
+    return Map<String, dynamic>.from(rows.first);
+  }
+
+  Future<List<Map<String, dynamic>>> liveTrackerParishInventory(
+    UserProfile profile, {
+    required String parish,
+    int limit = 500,
+  }) async {
+    if (!profile.canViewAllParishes && profile.parish.isNotEmpty && profile.parish != parish) {
+      return const [];
+    }
+    final rows = await client
+        .from('parish_inventory')
+        .select()
+        .eq('parish', parish)
+        .order('description')
+        .limit(limit);
+    return rows.map((row) => Map<String, dynamic>.from(row)).toList();
+  }
+
   Future<List<Map<String, dynamic>>> houseLocations(UserProfile profile) async {
     final byCode = <String, Map<String, dynamic>>{};
 
