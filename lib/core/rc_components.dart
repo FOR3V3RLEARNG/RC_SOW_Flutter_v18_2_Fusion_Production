@@ -33,8 +33,9 @@ class _RcExpressiveSurfaceState extends State<RcExpressiveSurface> {
   bool pressed = false;
 
   BorderRadius _radius(double expression) => switch (widget.shape) {
-    RcSurfaceShape.standard =>
-      BorderRadius.circular(RcRadius.lg + expression * 3),
+    RcSurfaceShape.standard => BorderRadius.circular(
+      RcRadius.lg + expression * 3,
+    ),
     RcSurfaceShape.hero => BorderRadius.only(
       topLeft: Radius.circular(34 + expression * 8),
       topRight: Radius.circular(18 + expression * 4),
@@ -83,9 +84,7 @@ class _RcExpressiveSurfaceState extends State<RcExpressiveSurface> {
     final ambientShadow = ui.depth * (pressed ? 5.0 : 20.0);
 
     final surface = AnimatedContainer(
-      duration: Duration(
-        milliseconds: 95 + (ui.expressiveness * 65).round(),
-      ),
+      duration: Duration(milliseconds: 95 + (ui.expressiveness * 65).round()),
       curve: Curves.easeOutCubic,
       transformAlignment: Alignment.center,
       transform: Matrix4.identity()
@@ -147,11 +146,7 @@ class _RcExpressiveSurfaceState extends State<RcExpressiveSurface> {
     );
 
     if (!interactive) return surface;
-    return Semantics(
-      button: true,
-      label: widget.semanticLabel,
-      child: surface,
-    );
+    return Semantics(button: true, label: widget.semanticLabel, child: surface);
   }
 }
 
@@ -193,10 +188,7 @@ class RcIconWell extends StatelessWidget {
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [
-            c.withValues(alpha: .19),
-            c.withValues(alpha: .10),
-          ],
+          colors: [c.withValues(alpha: .19), c.withValues(alpha: .10)],
         ),
         borderRadius: _radius(ui.iconShape),
         border: Border.all(
@@ -210,11 +202,7 @@ class RcIconWell extends StatelessWidget {
           ),
         ],
       ),
-      child: Icon(
-        icon,
-        size: iconSize ?? size * .46,
-        color: c,
-      ),
+      child: Icon(icon, size: iconSize ?? size * .46, color: c),
     );
   }
 }

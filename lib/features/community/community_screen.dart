@@ -87,23 +87,22 @@ Future<bool?> showCommunityComposer(
             DropdownButtonFormField<String>(
               initialValue: category,
               decoration: const InputDecoration(labelText: 'Content type'),
-              items: const [
-                'News',
-                'Event',
-                'Meeting',
-                'Live Stream',
-                'Recognition',
-                'Training',
-                'Safety',
-                'Urgent',
-              ]
-                  .map(
-                    (value) => DropdownMenuItem(
-                      value: value,
-                      child: Text(value),
-                    ),
-                  )
-                  .toList(),
+              items:
+                  const [
+                        'News',
+                        'Event',
+                        'Meeting',
+                        'Live Stream',
+                        'Recognition',
+                        'Training',
+                        'Safety',
+                        'Urgent',
+                      ]
+                      .map(
+                        (value) =>
+                            DropdownMenuItem(value: value, child: Text(value)),
+                      )
+                      .toList(),
               onChanged: (value) =>
                   setSheetState(() => category = value ?? 'News'),
             ),
@@ -114,15 +113,12 @@ Future<bool?> showCommunityComposer(
                 decoration: const InputDecoration(labelText: 'Audience'),
                 items: ['All Parishes', ...RcApp.parishes]
                     .map(
-                      (value) => DropdownMenuItem(
-                        value: value,
-                        child: Text(value),
-                      ),
+                      (value) =>
+                          DropdownMenuItem(value: value, child: Text(value)),
                     )
                     .toList(),
-                onChanged: (value) => setSheetState(
-                  () => parish = value ?? 'All Parishes',
-                ),
+                onChanged: (value) =>
+                    setSheetState(() => parish = value ?? 'All Parishes'),
               ),
             if (state.profile!.canViewAllParishes) const SizedBox(height: 9),
             TextField(
@@ -178,24 +174,23 @@ Future<bool?> showCommunityComposer(
             DropdownButtonFormField<String>(
               initialValue: mediaType,
               decoration: const InputDecoration(labelText: 'Media type'),
-              items: const [
-                'None',
-                'Image',
-                'YouTube',
-                'Live Stream',
-                'Microsoft Teams',
-                'Zoom',
-                'Video',
-                'Document / File',
-                'Website',
-              ]
-                  .map(
-                    (value) => DropdownMenuItem(
-                      value: value,
-                      child: Text(value),
-                    ),
-                  )
-                  .toList(),
+              items:
+                  const [
+                        'None',
+                        'Image',
+                        'YouTube',
+                        'Live Stream',
+                        'Microsoft Teams',
+                        'Zoom',
+                        'Video',
+                        'Document / File',
+                        'Website',
+                      ]
+                      .map(
+                        (value) =>
+                            DropdownMenuItem(value: value, child: Text(value)),
+                      )
+                      .toList(),
               onChanged: (value) =>
                   setSheetState(() => mediaType = value ?? 'None'),
             ),
@@ -238,7 +233,10 @@ Future<bool?> showCommunityComposer(
               onChanged: (value) => setSheetState(() => featured = value),
             ),
             const SizedBox(height: 8),
-            Text('Call to action', style: Theme.of(context).textTheme.titleMedium),
+            Text(
+              'Call to action',
+              style: Theme.of(context).textTheme.titleMedium,
+            ),
             const SizedBox(height: 8),
             TextField(
               controller: ctaLabel,
@@ -499,10 +497,7 @@ class _CommunityScreenState extends State<CommunityScreen> {
               ...posts.map(
                 (post) => Padding(
                   padding: const EdgeInsets.only(bottom: 10),
-                  child: _PostCard(
-                    post: post,
-                    onOpen: () => _openPost(post),
-                  ),
+                  child: _PostCard(post: post, onOpen: () => _openPost(post)),
                 ),
               ),
             ],
@@ -723,7 +718,10 @@ class _PostCard extends StatelessWidget {
                 ),
               ],
               const Spacer(),
-              Text(_compactDate(post.updatedAt), style: theme.textTheme.labelSmall),
+              Text(
+                _compactDate(post.updatedAt),
+                style: theme.textTheme.labelSmall,
+              ),
             ],
           ),
           const SizedBox(height: 10),
@@ -919,7 +917,10 @@ class _MediaActionCard extends StatelessWidget {
           ),
           const SizedBox(width: 10),
           Expanded(child: Text(type, style: theme.textTheme.titleMedium)),
-          Text(embed ? 'Open in app' : 'Open', style: theme.textTheme.labelLarge),
+          Text(
+            embed ? 'Open in app' : 'Open',
+            style: theme.textTheme.labelLarge,
+          ),
           const SizedBox(width: 5),
           const Icon(Icons.chevron_right_rounded),
         ],

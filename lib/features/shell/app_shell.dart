@@ -234,9 +234,9 @@ class _NavigationDock extends StatelessWidget {
               MaterialPageRoute(builder: (_) => SettingsScreen(state: state)),
             ),
             icon: Icon(
-                  state.uiIcon('header.settings', Icons.settings_outlined),
-                  size: RcIconSize.sm,
-                ),
+              state.uiIcon('header.settings', Icons.settings_outlined),
+              size: RcIconSize.sm,
+            ),
           ),
           const SizedBox(height: 10),
         ],

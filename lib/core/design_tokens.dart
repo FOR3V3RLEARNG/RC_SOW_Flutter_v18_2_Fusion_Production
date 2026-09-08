@@ -29,7 +29,13 @@ abstract final class RcColors {
   static const danger = Color(0xFFB42318);
   static const dangerSoft = Color(0xFFFEF3F2);
   static const expressivePalette = <Color>[
-    brand, blue, purple, success, gold, teal, warning,
+    brand,
+    blue,
+    purple,
+    success,
+    gold,
+    teal,
+    warning,
   ];
 }
 

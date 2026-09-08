@@ -56,10 +56,7 @@ class _OperationsAdminScreenState extends State<OperationsAdminScreen>
               text: 'Interface',
               icon: Icon(Icons.dashboard_customize_outlined),
             ),
-            Tab(
-              text: 'Community',
-              icon: Icon(Icons.live_tv_rounded),
-            ),
+            Tab(text: 'Community', icon: Icon(Icons.live_tv_rounded)),
             Tab(
               text: 'Notify',
               icon: Icon(Icons.notifications_active_outlined),
@@ -861,7 +858,10 @@ class _InterfaceConfigState extends State<_InterfaceConfig> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('Live style preview', style: theme.textTheme.titleLarge),
+                    Text(
+                      'Live style preview',
+                      style: theme.textTheme.titleLarge,
+                    ),
                     const SizedBox(height: 5),
                     Text(
                       '${surfaceFinish.toUpperCase()} • '
@@ -908,7 +908,10 @@ class _InterfaceConfigState extends State<_InterfaceConfig> {
               initialValue: surfaceFinish,
               decoration: const InputDecoration(labelText: 'Surface finish'),
               items: const [
-                DropdownMenuItem(value: 'suede', child: Text('Soft Suede / Matte')),
+                DropdownMenuItem(
+                  value: 'suede',
+                  child: Text('Soft Suede / Matte'),
+                ),
                 DropdownMenuItem(value: 'clean', child: Text('Clean Minimal')),
                 DropdownMenuItem(value: 'soft', child: Text('Soft Cloud')),
               ],
@@ -926,18 +929,24 @@ class _InterfaceConfigState extends State<_InterfaceConfig> {
                 DropdownMenuItem(value: 'gold', child: Text('Warm Gold')),
                 DropdownMenuItem(value: 'teal', child: Text('Teal')),
               ],
-              onChanged: (value) =>
-                  setState(() => accentMood = value ?? 'red'),
+              onChanged: (value) => setState(() => accentMood = value ?? 'red'),
             ),
             DropdownButtonFormField<String>(
               initialValue: iconPack,
               decoration: const InputDecoration(labelText: 'Icon pack'),
               items: const [
-                DropdownMenuItem(value: 'rounded', child: Text('Expressive Rounded')),
-                DropdownMenuItem(value: 'builder', child: Text('Construction / Builder')),
+                DropdownMenuItem(
+                  value: 'rounded',
+                  child: Text('Expressive Rounded'),
+                ),
+                DropdownMenuItem(
+                  value: 'builder',
+                  child: Text('Construction / Builder'),
+                ),
                 DropdownMenuItem(value: 'bold', child: Text('Bold Creative')),
               ],
-              onChanged: (value) => setState(() => iconPack = value ?? 'rounded'),
+              onChanged: (value) =>
+                  setState(() => iconPack = value ?? 'rounded'),
             ),
             DropdownButtonFormField<String>(
               initialValue: iconShape,
@@ -948,7 +957,8 @@ class _InterfaceConfigState extends State<_InterfaceConfig> {
                 DropdownMenuItem(value: 'pill', child: Text('Pill')),
                 DropdownMenuItem(value: 'soft', child: Text('Soft Square')),
               ],
-              onChanged: (value) => setState(() => iconShape = value ?? 'squircle'),
+              onChanged: (value) =>
+                  setState(() => iconShape = value ?? 'squircle'),
             ),
           ],
         ),
@@ -982,10 +992,12 @@ class _InterfaceConfigState extends State<_InterfaceConfig> {
           initialValue: columns,
           decoration: const InputDecoration(labelText: 'Control tile columns'),
           items: const [1, 2, 3]
-              .map((value) => DropdownMenuItem(
-                    value: value,
-                    child: Text('$value columns'),
-                  ))
+              .map(
+                (value) => DropdownMenuItem(
+                  value: value,
+                  child: Text('$value columns'),
+                ),
+              )
               .toList(),
           onChanged: (value) => setState(() => columns = value ?? 2),
         ),
@@ -995,7 +1007,10 @@ class _InterfaceConfigState extends State<_InterfaceConfig> {
           decoration: const InputDecoration(labelText: 'Default Control view'),
           items: const [
             DropdownMenuItem(value: 'houses', child: Text('House Codes')),
-            DropdownMenuItem(value: 'modules', child: Text('Production Modules')),
+            DropdownMenuItem(
+              value: 'modules',
+              child: Text('Production Modules'),
+            ),
           ],
           onChanged: (value) => setState(() => defaultView = value ?? 'houses'),
         ),
@@ -1015,7 +1030,6 @@ class _InterfaceConfigState extends State<_InterfaceConfig> {
     );
   }
 }
-
 
 class _CommunityStudio extends StatefulWidget {
   const _CommunityStudio({required this.state});
@@ -1158,8 +1172,9 @@ class _CommunityStudioState extends State<_CommunityStudio> {
                         PopupMenuButton<String>(
                           onSelected: (action) async {
                             if (action == 'delete') {
-                              await widget.state.repository
-                                  .deleteCommunityPost(record.id);
+                              await widget.state.repository.deleteCommunityPost(
+                                record.id,
+                              );
                               await _refresh();
                             }
                           },

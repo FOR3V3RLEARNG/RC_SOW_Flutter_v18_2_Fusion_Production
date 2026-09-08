@@ -87,8 +87,14 @@ class AppState extends ChangeNotifier {
 
   String get uiAccentMood {
     final value = '${remoteUiConfig['uiAccentMood'] ?? 'red'}';
-    return const {'red', 'ocean', 'forest', 'violet', 'gold', 'teal'}
-            .contains(value)
+    return const {
+          'red',
+          'ocean',
+          'forest',
+          'violet',
+          'gold',
+          'teal',
+        }.contains(value)
         ? value
         : 'red';
   }

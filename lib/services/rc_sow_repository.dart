@@ -1088,10 +1088,7 @@ class RcSowRepository {
   Future<void> deleteCommunityPost(String id) async {
     await client.rpc(
       'delete_app_event',
-      params: {
-        'p_event_type': 'communityPost',
-        'p_item_id': id,
-      },
+      params: {'p_event_type': 'communityPost', 'p_item_id': id},
     );
   }
 

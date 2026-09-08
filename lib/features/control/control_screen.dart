@@ -819,9 +819,9 @@ class _ModuleTile extends StatelessWidget {
         children: [
           RcIconWell(
             icon: state.uiIcon('module.${schema.eventType}', schema.icon),
-            color: RcColors.expressivePalette[
-              schema.icon.codePoint % RcColors.expressivePalette.length
-            ],
+            color:
+                RcColors.expressivePalette[schema.icon.codePoint %
+                    RcColors.expressivePalette.length],
             size: 48,
           ),
           const SizedBox(width: 12),

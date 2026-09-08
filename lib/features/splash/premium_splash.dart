@@ -168,11 +168,7 @@ class HouseRepairGame extends FlameGame {
       ..shader = const LinearGradient(
         begin: Alignment.topLeft,
         end: Alignment.bottomRight,
-        colors: [
-          Color(0xFFF3F7FB),
-          Color(0xFFFFF4F4),
-          Color(0xFFEAF1F7),
-        ],
+        colors: [Color(0xFFF3F7FB), Color(0xFFFFF4F4), Color(0xFFEAF1F7)],
       ).createShader(Rect.fromLTWH(0, 0, w, h));
     canvas.drawRect(Rect.fromLTWH(0, 0, w, h), bg);
 
@@ -269,11 +265,12 @@ class HouseRepairGame extends FlameGame {
         ..close();
 
       final sheetPaint = Paint()
-        ..shader = const LinearGradient(
-          colors: [Color(0xFFB6C4D3), Color(0xFFF5F8FB), Color(0xFFCDD8E4)],
-        ).createShader(
-          Rect.fromLTRB(left - 24, ridge.dy, right + 24, wallTop + 8),
-        );
+        ..shader =
+            const LinearGradient(
+              colors: [Color(0xFFB6C4D3), Color(0xFFF5F8FB), Color(0xFFCDD8E4)],
+            ).createShader(
+              Rect.fromLTRB(left - 24, ridge.dy, right + 24, wallTop + 8),
+            );
       canvas.drawPath(leftRoof, sheetPaint);
       canvas.drawPath(rightRoof, sheetPaint);
 
@@ -348,9 +345,7 @@ class HouseRepairGame extends FlameGame {
 
     // Thick construction dust briefly blankets the roof while work happens.
     if (!reduceMotion && elapsed > .52 && elapsed < 2.62) {
-      final dustStrength = math
-          .sin(stage(.52, 2.62) * math.pi)
-          .clamp(0.0, 1.0);
+      final dustStrength = math.sin(stage(.52, 2.62) * math.pi).clamp(0.0, 1.0);
       for (var i = 0; i < 30; i++) {
         final angle = i * .91 + elapsed * (.25 + (i % 4) * .04);
         final drift = 30 + (i % 7) * 12.0;
@@ -378,9 +373,9 @@ class HouseRepairGame extends FlameGame {
           height: houseH * .74,
         ),
         Paint()
-          ..color = const Color(0xFFCABBAA).withValues(
-            alpha: .09 + .11 * dustStrength,
-          ),
+          ..color = const Color(
+            0xFFCABBAA,
+          ).withValues(alpha: .09 + .11 * dustStrength),
       );
     }
 
