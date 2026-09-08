@@ -27,7 +27,7 @@ lib_text = "\n".join(read(path) for path in sources)
 
 def oversized_numeric_icons(paths: list[str], limit: int = 24) -> list[tuple[str, int]]:
     failures: list[tuple[str, int]] = []
-    pattern = re.compile(r"Icon\s*\([\s\S]{0,260}?size\s*:\s*(\d+(?:\.\d+)?)")
+    pattern = re.compile(r"\bIcon\s*\([\s\S]{0,260}?size\s*:\s*(\d+(?:\.\d+)?)")
     for rel in paths:
         text = read(ROOT / rel)
         for match in pattern.finditer(text):

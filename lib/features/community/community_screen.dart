@@ -852,6 +852,7 @@ class _CommunityMedia extends StatelessWidget {
                     icon: _mediaIcon(type),
                     color: Colors.white,
                     size: 62,
+                    iconSize: RcIconSize.lg,
                   ),
                 ),
                 Positioned(
@@ -914,6 +915,7 @@ class _MediaActionCard extends StatelessWidget {
             icon: _mediaIcon(type),
             color: theme.colorScheme.secondary,
             size: 46,
+            iconSize: RcIconSize.md,
           ),
           const SizedBox(width: 10),
           Expanded(child: Text(type, style: theme.textTheme.titleMedium)),

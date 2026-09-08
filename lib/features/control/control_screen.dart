@@ -823,6 +823,7 @@ class _ModuleTile extends StatelessWidget {
                 RcColors.expressivePalette[schema.icon.codePoint %
                     RcColors.expressivePalette.length],
             size: 48,
+            iconSize: RcIconSize.lg,
           ),
           const SizedBox(width: 12),
           Expanded(
