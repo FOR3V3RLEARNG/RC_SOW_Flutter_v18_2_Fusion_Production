@@ -747,9 +747,7 @@ class _ScopeScreenState extends State<ScopeScreen>
                 decoration: BoxDecoration(
                   color: theme.colorScheme.surfaceContainerLow,
                   borderRadius: BorderRadius.circular(18),
-                  border: Border.all(
-                    color: theme.colorScheme.outlineVariant,
-                  ),
+                  border: Border.all(color: theme.colorScheme.outlineVariant),
                 ),
                 child: Text(
                   repairNotes.text.trim().isEmpty
@@ -788,15 +786,11 @@ class _ScopeScreenState extends State<ScopeScreen>
                   decoration: BoxDecoration(
                     color: const Color(0xFFF7FAFF),
                     borderRadius: BorderRadius.circular(20),
-                    border: Border.all(
-                      color: theme.colorScheme.outlineVariant,
-                    ),
+                    border: Border.all(color: theme.colorScheme.outlineVariant),
                   ),
                   clipBehavior: Clip.antiAlias,
                   child: CustomPaint(
-                    painter: BeneficiaryAgreementRoofPainter(
-                      roofStyle: style,
-                    ),
+                    painter: BeneficiaryAgreementRoofPainter(roofStyle: style),
                     child: const SizedBox.expand(),
                   ),
                 ),
@@ -807,10 +801,7 @@ class _ScopeScreenState extends State<ScopeScreen>
                 style: theme.textTheme.titleLarge,
               ),
               const SizedBox(height: 7),
-              Text(
-                _beneficiaryAgreementText,
-                style: theme.textTheme.bodyLarge,
-              ),
+              Text(_beneficiaryAgreementText, style: theme.textTheme.bodyLarge),
               const Divider(height: 30),
               ...[
                 'Beneficiary',
@@ -1441,10 +1432,7 @@ class _ScopeScreenState extends State<ScopeScreen>
           pw.Center(
             child: pw.Text(
               'BENEFICIARY REPAIR AGREEMENT',
-              style: pw.TextStyle(
-                fontWeight: pw.FontWeight.bold,
-                fontSize: 19,
-              ),
+              style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 19),
             ),
           ),
           pw.SizedBox(height: 5),
@@ -1456,10 +1444,7 @@ class _ScopeScreenState extends State<ScopeScreen>
           ),
           pw.SizedBox(height: 16),
           pw.TableHelper.fromTextArray(
-            border: pw.TableBorder.all(
-              color: PdfColors.grey400,
-              width: .7,
-            ),
+            border: pw.TableBorder.all(color: PdfColors.grey400, width: .7),
             cellPadding: const pw.EdgeInsets.all(6),
             data: [
               ['House Code', house.text.trim()],
@@ -1472,10 +1457,7 @@ class _ScopeScreenState extends State<ScopeScreen>
           pw.SizedBox(height: 14),
           pw.Text(
             'REPAIRS TO BE DONE',
-            style: pw.TextStyle(
-              fontWeight: pw.FontWeight.bold,
-              fontSize: 11,
-            ),
+            style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 11),
           ),
           pw.SizedBox(height: 5),
           pw.Container(
@@ -1510,10 +1492,7 @@ class _ScopeScreenState extends State<ScopeScreen>
           pw.SizedBox(height: 14),
           pw.Text(
             'BENEFICIARY ACKNOWLEDGEMENT',
-            style: pw.TextStyle(
-              fontWeight: pw.FontWeight.bold,
-              fontSize: 11,
-            ),
+            style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 11),
           ),
           pw.SizedBox(height: 5),
           pw.Text(
@@ -1540,10 +1519,7 @@ class _ScopeScreenState extends State<ScopeScreen>
                         style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
                       ),
                       if (signatures[role] != null)
-                        pw.Image(
-                          pw.MemoryImage(signatures[role]!),
-                          height: 38,
-                        )
+                        pw.Image(pw.MemoryImage(signatures[role]!), height: 38)
                       else
                         pw.SizedBox(height: 32),
                       pw.Container(height: .8, color: PdfColors.grey600),
@@ -1559,10 +1535,7 @@ class _ScopeScreenState extends State<ScopeScreen>
                       pw.SizedBox(height: 32),
                       pw.Container(height: .8, color: PdfColors.grey600),
                       pw.SizedBox(height: 2),
-                      pw.Text(
-                        'Date',
-                        style: const pw.TextStyle(fontSize: 8),
-                      ),
+                      pw.Text('Date', style: const pw.TextStyle(fontSize: 8)),
                     ],
                   ),
                 ),
@@ -1969,15 +1942,19 @@ class BeneficiaryAgreementRoofPainter extends CustomPainter {
       canvas.drawLine(c, d, support);
       for (var i = 1; i <= 4; i++) {
         final t = i / 5;
-        canvas.drawLine(
-          Offset.lerp(a, b, t)!,
-          Offset.lerp(e, c, t)!,
-          framing,
-        );
+        canvas.drawLine(Offset.lerp(a, b, t)!, Offset.lerp(e, c, t)!, framing);
       }
       _label(canvas, 'RIDGE', Offset(size.width * .48, size.height * .20));
-      _label(canvas, 'HIP RAFTERS', Offset(size.width * .68, size.height * .31));
-      _label(canvas, 'FASCIA / EAVE', Offset(size.width * .14, size.height * .78));
+      _label(
+        canvas,
+        'HIP RAFTERS',
+        Offset(size.width * .68, size.height * .31),
+      );
+      _label(
+        canvas,
+        'FASCIA / EAVE',
+        Offset(size.width * .14, size.height * .78),
+      );
     } else if (normalized == 'pitched') {
       final left = size.width * .18;
       final right = size.width * .82;
@@ -1999,8 +1976,16 @@ class BeneficiaryAgreementRoofPainter extends CustomPainter {
         final y = wallTop + 10 - (wallTop + 10 - size.height * .28) * i / 5;
         canvas.drawLine(Offset(x, y), Offset(x, bottom), framing);
       }
-      _label(canvas, 'HIGH EDGE / ROOF COVERING', Offset(size.width * .53, size.height * .16));
-      _label(canvas, 'LOW EAVE / FASCIA', Offset(size.width * .13, size.height * .47));
+      _label(
+        canvas,
+        'HIGH EDGE / ROOF COVERING',
+        Offset(size.width * .53, size.height * .16),
+      );
+      _label(
+        canvas,
+        'LOW EAVE / FASCIA',
+        Offset(size.width * .13, size.height * .47),
+      );
     } else {
       final left = size.width * .16;
       final right = size.width * .84;
@@ -2018,10 +2003,7 @@ class BeneficiaryAgreementRoofPainter extends CustomPainter {
       for (double x = left + 18; x < right - 10; x += 30) {
         canvas.drawLine(
           Offset(x, wallTop + 8),
-          Offset(
-            size.width * .5 + (x - size.width * .5) * .45,
-            ridge.dy + 10,
-          ),
+          Offset(size.width * .5 + (x - size.width * .5) * .45, ridge.dy + 10),
           framing,
         );
       }

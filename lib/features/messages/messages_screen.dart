@@ -576,7 +576,8 @@ class _MessagesDrawerBodyState extends State<MessagesDrawerBody> {
                                         'normal')
                                       RcStatusPill(
                                         label: message.priority.toUpperCase(),
-                                        color: message.priority
+                                        color:
+                                            message.priority
                                                 .toLowerCase()
                                                 .contains('urgent')
                                             ? RcColors.danger
@@ -631,8 +632,8 @@ class _MessagesDrawerBodyState extends State<MessagesDrawerBody> {
                                         visual.filter == 'Signature'
                                             ? 'Complete action'
                                             : message.houseCode != null
-                                                ? 'View & act'
-                                                : 'Open',
+                                            ? 'View & act'
+                                            : 'Open',
                                       ),
                                     ),
                                   ],
@@ -695,10 +696,7 @@ class _MessagesDrawerBodyState extends State<MessagesDrawerBody> {
                 '${message.sender} • ${message.senderRole} • ${message.priority}',
               ),
               const Divider(height: 28),
-              Text(
-                message.body,
-                style: Theme.of(context).textTheme.bodyLarge,
-              ),
+              Text(message.body, style: Theme.of(context).textTheme.bodyLarge),
               const SizedBox(height: 20),
               Wrap(
                 spacing: 8,

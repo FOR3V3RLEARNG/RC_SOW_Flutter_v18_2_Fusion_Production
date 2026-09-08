@@ -280,10 +280,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
 }
 
 class _DashboardData {
-  const _DashboardData({
-    this.houses = const [],
-    this.records = const [],
-  });
+  const _DashboardData({this.houses = const [], this.records = const []});
   final List<HouseRecord> houses;
   final List<ProductionRecord> records;
 }

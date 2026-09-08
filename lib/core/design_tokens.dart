@@ -250,9 +250,7 @@ ThemeData buildRcTheme({
       style: FilledButton.styleFrom(
         minimumSize: const Size(52, 56),
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(22),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(22)),
         textStyle: const TextStyle(
           fontSize: 15,
           fontWeight: FontWeight.w900,
@@ -264,27 +262,17 @@ ThemeData buildRcTheme({
       style: OutlinedButton.styleFrom(
         minimumSize: const Size(52, 54),
         padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(21),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(21)),
         side: BorderSide(color: border, width: 1.35),
-        textStyle: const TextStyle(
-          fontSize: 15,
-          fontWeight: FontWeight.w900,
-        ),
+        textStyle: const TextStyle(fontSize: 15, fontWeight: FontWeight.w900),
       ),
     ),
     textButtonTheme: TextButtonThemeData(
       style: TextButton.styleFrom(
         minimumSize: const Size(48, 48),
         padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 12),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(18),
-        ),
-        textStyle: const TextStyle(
-          fontSize: 15,
-          fontWeight: FontWeight.w900,
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+        textStyle: const TextStyle(fontSize: 15, fontWeight: FontWeight.w900),
       ),
     ),
     elevatedButtonTheme: ElevatedButtonThemeData(
@@ -293,21 +281,14 @@ ThemeData buildRcTheme({
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
         elevation: 1,
         shadowColor: scheme.shadow.withValues(alpha: .14),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(22),
-        ),
-        textStyle: const TextStyle(
-          fontSize: 15,
-          fontWeight: FontWeight.w900,
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(22)),
+        textStyle: const TextStyle(fontSize: 15, fontWeight: FontWeight.w900),
       ),
     ),
     floatingActionButtonTheme: FloatingActionButtonThemeData(
       elevation: 2,
       highlightElevation: 4,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(22),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(22)),
       extendedTextStyle: const TextStyle(
         fontSize: 15,
         fontWeight: FontWeight.w900,
@@ -321,19 +302,14 @@ ThemeData buildRcTheme({
         fontSize: 15,
         fontWeight: FontWeight.w700,
       ),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(18),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
     ),
     chipTheme: base.chipTheme.copyWith(
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(RcRadius.sm),
       ),
       side: BorderSide(color: border),
-      labelStyle: const TextStyle(
-        fontSize: 14,
-        fontWeight: FontWeight.w900,
-      ),
+      labelStyle: const TextStyle(fontSize: 14, fontWeight: FontWeight.w900),
     ),
     dividerTheme: DividerThemeData(color: scheme.outlineVariant),
   );
