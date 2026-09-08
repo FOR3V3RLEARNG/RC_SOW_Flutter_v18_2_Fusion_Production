@@ -319,13 +319,12 @@ class _SlidingNavigationIsland extends StatelessWidget {
 
 class _NavButton extends StatelessWidget {
   const _NavButton({
-    this.destination,
     this.label,
     this.icon,
     this.selectedIcon,
     required this.selected,
     required this.onTap,
-  });
+  }) : destination = null;
   final RcDestination? destination;
   final String? label;
   final IconData? icon;
