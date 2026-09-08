@@ -438,7 +438,9 @@ class RcSowRepository {
     if (!profile.canViewAllParishes && profile.parish.isNotEmpty) {
       query = query.eq('parish', profile.parish);
     }
-    if (profile.isCrew) query = query.eq('user_id', profile.userId);
+    if (profile.isCrew) {
+      query = query.eq('member_email', profile.email.toLowerCase());
+    }
     if (startDate != null) query = query.gte('work_date', _date(startDate));
     if (endDate != null) query = query.lte('work_date', _date(endDate));
     final rows = await query.order('work_date', ascending: false).limit(limit);
@@ -504,6 +506,59 @@ class RcSowRepository {
         'locationStatus': row['location_status'],
       },
     );
+    return row;
+  }
+
+  Future<Map<String, dynamic>> recordCrewAttendance({
+    required UserProfile profile,
+    required String houseCode,
+    required String memberEmail,
+    required DateTime workDate,
+    required String status,
+    String clockAction = 'status_only',
+    String? note,
+  }) async {
+    final result = await client.rpc(
+      'record_crew_attendance',
+      params: {
+        'p_house_code': houseCode.trim().toUpperCase(),
+        'p_member_email': memberEmail.trim().toLowerCase(),
+        'p_work_date': _date(workDate),
+        'p_status': status,
+        'p_clock_action': clockAction,
+        'p_note': note,
+      },
+    );
+
+    final row = Map<String, dynamic>.from(result as Map? ?? const {});
+    final id =
+        '${row['id'] ?? 'attendance-${DateTime.now().microsecondsSinceEpoch}'}';
+
+    await _upsertEvent(
+      type: 'crewAttendance',
+      id: id,
+      parish: '${row['parish'] ?? profile.parish}',
+      houseCode: houseCode.trim().toUpperCase(),
+      item: {
+        'id': id,
+        'title': 'Crew Daily Attendance',
+        'status': row['verified'] == true ? 'Verified' : 'Pending Verification',
+        'houseCode': houseCode.trim().toUpperCase(),
+        'parish': row['parish'] ?? profile.parish,
+        'workDate': row['work_date'] ?? _date(workDate),
+        'memberEmail': row['member_email'] ?? memberEmail,
+        'memberName': row['member_name'] ?? memberEmail.split('@').first,
+        'memberRole': row['member_role'] ?? '',
+        'attendanceStatus': row['status'] ?? status,
+        'clockIn': row['clock_in'],
+        'clockOut': row['clock_out'],
+        'verified': row['verified'] == true,
+        'recordingMode': row['recording_mode'] ?? 'supervisor_register',
+        'recordedBy': row['recorded_by_email'] ?? profile.email,
+        'locationStatus': row['location_status'],
+      },
+    );
+
     return row;
   }
 
