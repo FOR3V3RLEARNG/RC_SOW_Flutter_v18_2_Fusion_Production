@@ -3,6 +3,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../../core/design_tokens.dart';
 import '../../core/rc_components.dart';
+import '../../models/app_models.dart';
 import '../../state/app_state.dart';
 import '../control/house_operations_control_screen.dart';
 
@@ -21,80 +22,385 @@ class LiveTrackerScreen extends StatefulWidget {
 }
 
 class _LiveTrackerScreenState extends State<LiveTrackerScreen> {
-  late Future<List<Map<String, dynamic>>> future;
+  Future<_TrackerData>? future;
+  String? parish;
+  String query = '';
+  String statusFilter = 'All';
+  String clusterFilter = 'All';
+  int section = 0;
+
+  UserProfile get profile => widget.state.profile!;
 
   @override
   void initState() {
     super.initState();
-    future = widget.state.repository.liveTrackers(widget.state.profile!);
+    future = _load();
+  }
+
+  Future<_TrackerData> _load() async {
+    final trackers = await widget.state.repository.liveTrackers(profile);
+
+    String selected = parish ?? '';
+    if (!profile.canViewAllParishes && profile.parish.isNotEmpty) {
+      selected = profile.parish;
+    } else if (selected.isEmpty && trackers.isNotEmpty) {
+      selected = '${trackers.first['parish'] ?? ''}'.trim();
+    }
+    parish = selected.isEmpty ? null : selected;
+
+    if (selected.isEmpty) {
+      return _TrackerData(trackers: trackers);
+    }
+
+    final result = await Future.wait([
+      widget.state.repository.liveTrackerSnapshot(
+        profile,
+        parish: selected,
+      ),
+      widget.state.repository.liveTrackerParishInventory(
+        profile,
+        parish: selected,
+      ),
+      widget.state.repository.liveTrackerHouseStatuses(
+        profile,
+        parish: selected,
+      ),
+      widget.state.repository.houses(profile),
+    ]);
+
+    final snapshot = result[0] as Map<String, dynamic>?;
+    final inventory = result[1] as List<Map<String, dynamic>>;
+    final statusRows = result[2] as List<Map<String, dynamic>>;
+    final houses = result[3] as List<HouseRecord>;
+
+    final item = Map<String, dynamic>.from(
+      snapshot?['item'] as Map? ?? const {},
+    );
+
+    final rawClusters = (item['clusters'] as List? ?? const [])
+        .whereType<Map>()
+        .map((e) => Map<String, dynamic>.from(e))
+        .toList();
+
+    final statusByTracker = <String, Map<String, dynamic>>{};
+    for (final row in statusRows) {
+      final code = '${row['tracker_house_code'] ?? ''}'
+          .trim()
+          .toUpperCase();
+      if (code.isNotEmpty) statusByTracker[code] = row;
+    }
+
+    final accessibleCodes = houses
+        .map((house) => house.code.trim().toUpperCase())
+        .where((code) => code.isNotEmpty)
+        .toSet();
+
+    final clusters = <_TrackerCluster>[];
+    for (final cluster in rawClusters) {
+      final name = '${cluster['name'] ?? 'Cluster'}'.trim();
+      final rawHouses = (cluster['houses'] as List? ?? const [])
+          .whereType<Map>()
+          .map((e) => Map<String, dynamic>.from(e))
+          .toList();
+
+      final rows = <Map<String, dynamic>>[];
+      for (final raw in rawHouses) {
+        final row = Map<String, dynamic>.from(raw);
+        final trackerCode = '${row['houseId'] ?? ''}'
+            .trim()
+            .toUpperCase();
+        final statusRow = statusByTracker[trackerCode];
+
+        final resolved = _resolveHouseCode(
+          trackerCode,
+          statusRow,
+          accessibleCodes,
+        );
+
+        final rejected =
+            row['rejected'] == true ||
+            statusRow?['rejected'] == true;
+        final redFlag = statusRow?['red_house_code'] == true;
+
+        if (profile.isCrew && resolved.isEmpty) continue;
+
+        rows.add({
+          ...row,
+          'clusterName': name,
+          'trackerHouseCode': trackerCode,
+          'resolvedHouseCode': resolved,
+          'rejected': rejected,
+          'redHouseCode': redFlag,
+          'mapExcluded':
+              statusRow?['excluded_from_map'] == true ||
+              rejected ||
+              redFlag,
+          'statusComments':
+              statusRow?['comments'] ?? row['comments'] ?? '',
+        });
+      }
+
+      clusters.add(_TrackerCluster(name: name, houses: rows));
+    }
+
+    Map<String, dynamic>? source;
+    for (final tracker in trackers) {
+      if ('${tracker['parish'] ?? ''}'.trim() == selected) {
+        source = tracker;
+        break;
+      }
+    }
+
+    return _TrackerData(
+      trackers: trackers,
+      parish: selected,
+      source: source,
+      clusters: clusters,
+      inventory: inventory,
+    );
+  }
+
+  String _resolveHouseCode(
+    String trackerCode,
+    Map<String, dynamic>? statusRow,
+    Set<String> accessibleCodes,
+  ) {
+    final backend = '${statusRow?['resolved_house_code'] ?? ''}'
+        .trim()
+        .toUpperCase();
+    if (backend.isNotEmpty && accessibleCodes.contains(backend)) {
+      return backend;
+    }
+
+    if (accessibleCodes.contains(trackerCode)) return trackerCode;
+
+    final digits = RegExp(r'\d+').firstMatch(trackerCode)?.group(0);
+    if (digits == null) return backend;
+
+    final target = int.tryParse(digits);
+    if (target == null) return backend;
+
+    final matches = accessibleCodes.where((candidate) {
+      final part = RegExp(r'\d+').firstMatch(candidate)?.group(0);
+      return part != null && int.tryParse(part) == target;
+    }).toList();
+
+    if (matches.length == 1) return matches.first;
+    return backend;
   }
 
   Future<void> _refresh() async {
-    setState(() {
-      future = widget.state.repository.liveTrackers(widget.state.profile!);
-    });
+    setState(() => future = _load());
     await future;
+  }
+
+  void _selectParish(String value) {
+    setState(() {
+      parish = value;
+      query = '';
+      clusterFilter = 'All';
+      statusFilter = 'All';
+      future = _load();
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+
     return Scaffold(
-      appBar: AppBar(title: const Text('Parish Live Tracker')),
-      body: FutureBuilder<List<Map<String, dynamic>>>(
+      appBar: AppBar(
+        title: const Text('Live Tracker'),
+        actions: [
+          IconButton(
+            tooltip: 'Refresh synced tracker data',
+            onPressed: _refresh,
+            icon: const Icon(Icons.sync_rounded),
+          ),
+        ],
+      ),
+      body: FutureBuilder<_TrackerData>(
         future: future,
         builder: (context, snap) {
-          final trackers = snap.data ?? const <Map<String, dynamic>>[];
+          if (snap.connectionState == ConnectionState.waiting &&
+              snap.data == null) {
+            return const Center(child: CircularProgressIndicator());
+          }
+
+          if (snap.hasError) {
+            return RefreshIndicator(
+              onRefresh: _refresh,
+              child: ListView(
+                padding: const EdgeInsets.fromLTRB(16, 20, 16, 100),
+                children: [
+                  RcExpressiveSurface(
+                    tone: theme.colorScheme.errorContainer,
+                    child: const Text(
+                      'Live Tracker data could not be loaded. '
+                      'The workbook source was not changed. Pull to retry.',
+                    ),
+                  ),
+                ],
+              ),
+            );
+          }
+
+          final data = snap.data ?? const _TrackerData();
+
+          if (data.trackers.isEmpty) {
+            return RefreshIndicator(
+              onRefresh: _refresh,
+              child: ListView(
+                padding: const EdgeInsets.fromLTRB(16, 20, 16, 100),
+                children: const [
+                  RcPageHeading(
+                    eyebrow: 'Excel → RC SOW',
+                    title: 'No Live Tracker source configured',
+                    subtitle:
+                        'An Admin must configure and sync the parish Live Tracker workbook in Operations Admin → Tracker.',
+                  ),
+                ],
+              ),
+            );
+          }
+
+          final allRows = data.clusters.expand((c) => c.houses).toList();
+          final finished =
+              allRows.where((row) => row['finished'] == true).length;
+          final started =
+              allRows.where((row) => row['started'] == true).length;
+          final rejected =
+              allRows.where((row) => row['rejected'] == true).length;
+          final verified = allRows
+              .where((row) => row['houseVisitedVerified'] == true)
+              .length;
+          final boqDone =
+              allRows.where((row) => row['boqDone'] == true).length;
+          final sowDone =
+              allRows.where((row) => row['sowDone'] == true).length;
+
+          final sourceStatus =
+              '${data.source?['last_sync_status'] ?? 'Never synced'}';
+          final lastSync = DateTime.tryParse(
+            '${data.source?['last_synced_at'] ?? ''}',
+          );
+
           return RefreshIndicator(
             onRefresh: _refresh,
             child: ListView(
-              padding: const EdgeInsets.fromLTRB(16, 14, 16, 90),
+              padding: const EdgeInsets.fromLTRB(16, 14, 16, 110),
               children: [
-                const RcPageHeading(
-                  eyebrow: 'Production + inventory',
-                  title: 'Live Tracker Workbooks',
+                RcPageHeading(
+                  eyebrow: 'Excel data rendered in RC SOW',
+                  title: '${data.parish ?? 'Parish'} Live Tracker',
                   subtitle:
-                      'Separate from the Shelter beneficiary source. Cluster worksheets track production and Storage tracks parish inventory. Beneficiary GPS and Field Map continue to use Shelter data only.',
+                      'Production sheets and Storage are shown natively in the app. '
+                      'Workbook configuration remains in Admin.',
                 ),
+                if (profile.canViewAllParishes) ...[
+                  const SizedBox(height: 12),
+                  DropdownButtonFormField<String>(
+                    initialValue: data.parish,
+                    decoration: const InputDecoration(
+                      labelText: 'Parish tracker',
+                      prefixIcon: Icon(Icons.account_tree_outlined),
+                    ),
+                    items: data.trackers
+                        .map(
+                          (tracker) => DropdownMenuItem(
+                            value: '${tracker['parish'] ?? ''}',
+                            child: Text('${tracker['parish'] ?? ''}'),
+                          ),
+                        )
+                        .toList(),
+                    onChanged: (value) {
+                      if (value != null && value.isNotEmpty) {
+                        _selectParish(value);
+                      }
+                    },
+                  ),
+                ],
                 const SizedBox(height: 12),
                 RcExpressiveSurface(
-                  tone: theme.colorScheme.primaryContainer.withValues(
-                    alpha: .42,
-                  ),
-                  child: const Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                  shape: RcSurfaceShape.offset,
+                  tone: theme.colorScheme.surfaceContainerLow,
+                  child: Row(
                     children: [
-                      Icon(Icons.account_tree_outlined),
-                      SizedBox(width: 10),
+                      Icon(
+                        sourceStatus.toLowerCase() == 'success'
+                            ? Icons.cloud_done_outlined
+                            : Icons.sync_problem_outlined,
+                        color: sourceStatus.toLowerCase() == 'success'
+                            ? RcColors.success
+                            : RcColors.warning,
+                      ),
+                      const SizedBox(width: 10),
                       Expanded(
-                        child: Text(
-                          'Live Tracker ≠ Beneficiary Map. Tracker sync never writes beneficiary_directory or house_locations.',
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Synced Live Tracker Data',
+                              style: theme.textTheme.titleMedium,
+                            ),
+                            Text(
+                              lastSync == null
+                                  ? sourceStatus
+                                  : '$sourceStatus • ${lastSync.toLocal()}',
+                              style: theme.textTheme.bodySmall,
+                            ),
+                          ],
                         ),
+                      ),
+                      RcStatusPill(
+                        label: sourceStatus.toUpperCase(),
+                        color: sourceStatus.toLowerCase() == 'success'
+                            ? RcColors.success
+                            : RcColors.warning,
                       ),
                     ],
                   ),
                 ),
-                const SizedBox(height: 12),
-                if (snap.hasError)
-                  RcExpressiveSurface(
-                    tone: theme.colorScheme.errorContainer,
-                    child: Text(
-                      'Tracker configuration could not load: ${snap.error}',
+                const SizedBox(height: 14),
+                SegmentedButton<int>(
+                  segments: const [
+                    ButtonSegment(
+                      value: 0,
+                      icon: Icon(Icons.dashboard_outlined),
+                      label: Text('Overview'),
                     ),
-                  ),
-                if (snap.connectionState == ConnectionState.waiting)
-                  const Padding(
-                    padding: EdgeInsets.all(30),
-                    child: Center(child: CircularProgressIndicator()),
-                  ),
-                if (trackers.isEmpty &&
-                    snap.connectionState != ConnectionState.waiting)
-                  const RcExpressiveSurface(
-                    child: Text(
-                      'No parish Live Tracker workbook is configured yet.',
+                    ButtonSegment(
+                      value: 1,
+                      icon: Icon(Icons.home_work_outlined),
+                      label: Text('Houses'),
                     ),
-                  ),
-                ...trackers.map(_trackerCard),
+                    ButtonSegment(
+                      value: 2,
+                      icon: Icon(Icons.inventory_2_outlined),
+                      label: Text('Storage'),
+                    ),
+                  ],
+                  selected: {section},
+                  showSelectedIcon: false,
+                  onSelectionChanged: (values) =>
+                      setState(() => section = values.first),
+                ),
+                const SizedBox(height: 14),
+                if (section == 0)
+                  _overview(
+                    data,
+                    total: allRows.length,
+                    finished: finished,
+                    started: started,
+                    rejected: rejected,
+                    verified: verified,
+                    boqDone: boqDone,
+                    sowDone: sowDone,
+                  )
+                else if (section == 1)
+                  _houses(data)
+                else
+                  _storage(data),
               ],
             ),
           );
@@ -103,114 +409,430 @@ class _LiveTrackerScreenState extends State<LiveTrackerScreen> {
     );
   }
 
-  Widget _trackerCard(Map<String, dynamic> tracker) {
+  Widget _overview(
+    _TrackerData data, {
+    required int total,
+    required int finished,
+    required int started,
+    required int rejected,
+    required int verified,
+    required int boqDone,
+    required int sowDone,
+  }) {
     final theme = Theme.of(context);
-    final parish = '${tracker['parish'] ?? ''}'.trim();
-    final provider = '${tracker['provider'] ?? 'Workbook'}'.trim();
-    final status = '${tracker['last_sync_status'] ?? 'Never synced'}'.trim();
-    final message = '${tracker['last_sync_message'] ?? ''}'.trim();
-    final clusters = (tracker['cluster_count'] as num?)?.toInt() ?? 0;
-    final inventory = (tracker['inventory_count'] as num?)?.toInt() ?? 0;
-    final syncedAt = DateTime.tryParse('${tracker['last_synced_at'] ?? ''}');
-    final statusColor = status.toLowerCase() == 'success'
-        ? RcColors.success
-        : status.toLowerCase().contains('fail')
-        ? RcColors.danger
-        : RcColors.warning;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        RcResponsiveGrid(
+          minTileWidth: 145,
+          childAspectRatio: 1.7,
+          children: [
+            _Metric(
+              'Houses',
+              '$total',
+              Icons.home_work_outlined,
+              theme.colorScheme.primary,
+            ),
+            _Metric(
+              'Started',
+              '$started',
+              Icons.construction_outlined,
+              RcColors.blue,
+            ),
+            _Metric(
+              'Finished',
+              '$finished',
+              Icons.verified_outlined,
+              RcColors.success,
+            ),
+            _Metric(
+              'Verified',
+              '$verified',
+              Icons.fact_check_outlined,
+              RcColors.purple,
+            ),
+            _Metric(
+              'BOQ Done',
+              '$boqDone',
+              Icons.receipt_long_outlined,
+              RcColors.blue,
+            ),
+            _Metric(
+              'SOW Done',
+              '$sowDone',
+              Icons.description_outlined,
+              RcColors.success,
+            ),
+            _Metric(
+              'Rejected',
+              '$rejected',
+              Icons.block_outlined,
+              RcColors.danger,
+            ),
+            _Metric(
+              'Storage',
+              '${data.inventory.length}',
+              Icons.inventory_2_outlined,
+              RcColors.warning,
+            ),
+          ],
+        ),
+        const SizedBox(height: 18),
+        Text('Clusters', style: theme.textTheme.titleLarge),
+        const SizedBox(height: 8),
+        ...data.clusters.map((cluster) {
+          final rows = cluster.houses;
+          final done = rows.where((row) => row['finished'] == true).length;
+          final rejected =
+              rows.where((row) => row['rejected'] == true).length;
+          final ready = rows.where(_isReady).length;
+          return Padding(
+            padding: const EdgeInsets.only(bottom: 8),
+            child: RcExpressiveSurface(
+              shape: RcSurfaceShape.offset,
+              onTap: () {
+                setState(() {
+                  clusterFilter = cluster.name;
+                  statusFilter = 'All';
+                  section = 1;
+                });
+              },
+              child: Row(
+                children: [
+                  CircleAvatar(
+                    child: Text('${rows.length}'),
+                  ),
+                  const SizedBox(width: 11),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          cluster.name,
+                          style: theme.textTheme.titleMedium,
+                        ),
+                        const SizedBox(height: 5),
+                        Wrap(
+                          spacing: 6,
+                          runSpacing: 6,
+                          children: [
+                            RcStatusPill(
+                              label: '$done FINISHED',
+                              color: RcColors.success,
+                            ),
+                            RcStatusPill(
+                              label: '$ready READY',
+                              color: RcColors.blue,
+                            ),
+                            if (rejected > 0)
+                              RcStatusPill(
+                                label: '$rejected REJECTED',
+                                color: RcColors.danger,
+                              ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                  const Icon(Icons.chevron_right),
+                ],
+              ),
+            ),
+          );
+        }),
+        const SizedBox(height: 8),
+        RcExpressiveSurface(
+          tone: theme.colorScheme.surfaceContainerLow,
+          child: const Text(
+            'Live Tracker is a synchronized operational view. '
+            'Excel source URL, provider and sync controls remain in Operations Admin → Tracker.',
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _houses(_TrackerData data) {
+    final theme = Theme.of(context);
+    final allRows = data.clusters.expand((c) => c.houses).toList();
+    final clusterNames = data.clusters.map((c) => c.name).toList();
+
+    final filtered = allRows.where((row) {
+      final code =
+          '${row['trackerHouseCode'] ?? row['houseId'] ?? ''}'.toLowerCase();
+      final resolved =
+          '${row['resolvedHouseCode'] ?? ''}'.toLowerCase();
+      final comments =
+          '${row['statusComments'] ?? row['comments'] ?? ''}'.toLowerCase();
+      final q = query.trim().toLowerCase();
+      final queryOk =
+          q.isEmpty ||
+          code.contains(q) ||
+          resolved.contains(q) ||
+          comments.contains(q);
+
+      final clusterOk =
+          clusterFilter == 'All' ||
+          '${row['clusterName'] ?? ''}' == clusterFilter;
+
+      final statusOk = switch (statusFilter) {
+        'Finished' => row['finished'] == true,
+        'Started' => row['started'] == true,
+        'Ready' => _isReady(row),
+        'Rejected' => row['rejected'] == true,
+        'Attention' =>
+          row['rejected'] != true &&
+              (row['sowDone'] != true ||
+                  row['boqDone'] != true ||
+                  row['houseVisitedVerified'] != true),
+        _ => true,
+      };
+
+      return queryOk && clusterOk && statusOk;
+    }).toList();
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        TextField(
+          decoration: const InputDecoration(
+            labelText: 'Search house or comment',
+            prefixIcon: Icon(Icons.search),
+          ),
+          onChanged: (value) => setState(() => query = value),
+        ),
+        const SizedBox(height: 10),
+        SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: Row(
+            children: ['All', 'Started', 'Ready', 'Finished', 'Rejected', 'Attention']
+                .map(
+                  (value) => Padding(
+                    padding: const EdgeInsets.only(right: 6),
+                    child: FilterChip(
+                      selected: statusFilter == value,
+                      label: Text(value),
+                      onSelected: (_) =>
+                          setState(() => statusFilter = value),
+                    ),
+                  ),
+                )
+                .toList(),
+          ),
+        ),
+        const SizedBox(height: 8),
+        SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: Row(
+            children: ['All', ...clusterNames]
+                .map(
+                  (value) => Padding(
+                    padding: const EdgeInsets.only(right: 6),
+                    child: ChoiceChip(
+                      selected: clusterFilter == value,
+                      label: Text(value),
+                      onSelected: (_) =>
+                          setState(() => clusterFilter = value),
+                    ),
+                  ),
+                )
+                .toList(),
+          ),
+        ),
+        const SizedBox(height: 12),
+        Row(
+          children: [
+            Expanded(
+              child: Text(
+                '${filtered.length} tracker houses',
+                style: theme.textTheme.titleMedium,
+              ),
+            ),
+            if (clusterFilter != 'All')
+              Text(
+                clusterFilter,
+                style: theme.textTheme.labelLarge,
+              ),
+          ],
+        ),
+        const SizedBox(height: 8),
+        if (filtered.isEmpty)
+          const RcExpressiveSurface(
+            child: Text('No houses match the current filters.'),
+          ),
+        ...filtered.map(_houseCard),
+      ],
+    );
+  }
+
+  Widget _houseCard(Map<String, dynamic> row) {
+    final theme = Theme.of(context);
+    final trackerCode =
+        '${row['trackerHouseCode'] ?? row['houseId'] ?? ''}'
+            .trim()
+            .toUpperCase();
+    final resolved =
+        '${row['resolvedHouseCode'] ?? ''}'.trim().toUpperCase();
+    final rejected = row['rejected'] == true;
+    final redFlag = row['redHouseCode'] == true;
+    final state = _houseState(row);
+    final stateColor = switch (state) {
+      'Rejected' => RcColors.danger,
+      'Finished' => RcColors.success,
+      'In Progress' => RcColors.blue,
+      'Ready' => RcColors.purple,
+      _ => RcColors.warning,
+    };
+
+    final date = '${row['projectEstimatedStartDate'] ?? ''}'.trim();
+    final comments =
+        '${row['statusComments'] ?? row['comments'] ?? ''}'.trim();
+    final link = '${row['link'] ?? ''}'.trim();
 
     return Padding(
-      padding: const EdgeInsets.only(bottom: 10),
+      padding: const EdgeInsets.only(bottom: 9),
       child: RcExpressiveSurface(
         shape: RcSurfaceShape.offset,
+        tone: rejected || redFlag
+            ? theme.colorScheme.errorContainer.withValues(alpha: .34)
+            : null,
+        onTap: resolved.isEmpty ? null : () => _openHouse(resolved),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Container(
-                  width: 50,
-                  height: 50,
-                  decoration: BoxDecoration(
-                    color: theme.colorScheme.primaryContainer,
-                    borderRadius: BorderRadius.circular(18),
-                  ),
-                  child: Icon(
-                    provider.toLowerCase().contains('one')
-                        ? Icons.cloud_outlined
-                        : Icons.table_view_rounded,
-                    color: theme.colorScheme.onPrimaryContainer,
-                  ),
+                CircleAvatar(
+                  backgroundColor: stateColor.withValues(alpha: .14),
+                  child: Icon(Icons.home_work_rounded, color: stateColor),
                 ),
-                const SizedBox(width: 12),
+                const SizedBox(width: 10),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        '$parish Live Tracker',
+                        resolved.isNotEmpty && resolved != trackerCode
+                            ? '$trackerCode → $resolved'
+                            : trackerCode,
                         style: theme.textTheme.titleLarge,
                       ),
-                      Text('$provider • external XLSX workbook'),
+                      Text(
+                        '${row['clusterName'] ?? ''}',
+                        style: theme.textTheme.bodySmall,
+                      ),
                     ],
                   ),
                 ),
-                RcStatusPill(label: status.toUpperCase(), color: statusColor),
+                RcStatusPill(
+                  label: state.toUpperCase(),
+                  color: stateColor,
+                ),
               ],
             ),
-            const SizedBox(height: 10),
+            const SizedBox(height: 9),
             Wrap(
-              spacing: 7,
-              runSpacing: 7,
+              spacing: 5,
+              runSpacing: 5,
               children: [
-                RcStatusPill(
-                  label: '$clusters clusters',
-                  icon: Icons.hub_outlined,
-                  color: RcColors.purple,
-                ),
-                RcStatusPill(
-                  label: '$inventory inventory items',
-                  icon: Icons.inventory_2_outlined,
-                  color: RcColors.success,
-                ),
+                if (row['finished'] == true)
+                  const RcStatusPill(
+                    label: 'FINISHED',
+                    color: RcColors.success,
+                  ),
+                if (row['started'] == true)
+                  const RcStatusPill(
+                    label: 'STARTED',
+                    color: RcColors.blue,
+                  ),
+                if (row['materialsOnSiteNotStarted'] == true)
+                  const RcStatusPill(
+                    label: 'MATERIALS ON SITE',
+                    color: RcColors.warning,
+                  ),
+                if (row['boqSent'] == true)
+                  const RcStatusPill(
+                    label: 'BOQ SENT',
+                    color: RcColors.blue,
+                  ),
+                if (row['boqDone'] == true)
+                  const RcStatusPill(
+                    label: 'BOQ DONE',
+                    color: RcColors.success,
+                  ),
+                if (row['sowDone'] == true)
+                  const RcStatusPill(
+                    label: 'SOW DONE',
+                    color: RcColors.success,
+                  ),
+                if (row['contractSigned'] == true)
+                  const RcStatusPill(
+                    label: 'CONTRACT SIGNED',
+                    color: RcColors.purple,
+                  ),
+                if (row['houseVisitedVerified'] == true)
+                  const RcStatusPill(
+                    label: 'SITE VERIFIED',
+                    color: RcColors.success,
+                  ),
+                if (rejected)
+                  const RcStatusPill(
+                    label: 'REJECTED',
+                    color: RcColors.danger,
+                  ),
+                if (redFlag)
+                  const RcStatusPill(
+                    label: 'RED FLAG',
+                    color: RcColors.danger,
+                  ),
               ],
             ),
-            if (message.isNotEmpty) ...[
+            if (date.isNotEmpty) ...[
               const SizedBox(height: 8),
-              Text(message),
+              Row(
+                children: [
+                  const Icon(Icons.event_outlined, size: 18),
+                  const SizedBox(width: 6),
+                  Expanded(child: Text('Estimated start: $date')),
+                ],
+              ),
             ],
-            if (syncedAt != null) ...[
-              const SizedBox(height: 5),
+            if (comments.isNotEmpty) ...[
+              const SizedBox(height: 8),
               Text(
-                'Last API sync: ${syncedAt.toLocal()}',
-                style: theme.textTheme.bodySmall?.copyWith(
-                  color: theme.colorScheme.onSurfaceVariant,
+                comments,
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  fontWeight: rejected || redFlag
+                      ? FontWeight.w700
+                      : FontWeight.normal,
                 ),
               ),
             ],
-            const SizedBox(height: 12),
-            Wrap(
-              spacing: 8,
-              runSpacing: 8,
+            const SizedBox(height: 10),
+            Row(
               children: [
-                FilledButton.icon(
-                  onPressed: parish.isEmpty
-                      ? null
-                      : () => _showProduction(parish),
-                  icon: const Icon(Icons.fact_check_outlined),
-                  label: const Text('Cluster Production'),
+                Expanded(
+                  child: FilledButton.tonalIcon(
+                    onPressed: resolved.isEmpty
+                        ? null
+                        : () => _openHouse(resolved),
+                    icon: const Icon(Icons.home_repair_service_outlined),
+                    label: Text(
+                      resolved.isEmpty
+                          ? 'House not linked'
+                          : 'Open House Workspace',
+                    ),
+                  ),
                 ),
-                FilledButton.tonalIcon(
-                  onPressed: parish.isEmpty
-                      ? null
-                      : () => _showInventory(parish),
-                  icon: const Icon(Icons.inventory_2_outlined),
-                  label: const Text('Parish Inventory'),
-                ),
-                OutlinedButton.icon(
-                  onPressed: () => _openUrl('${tracker['url'] ?? ''}'),
-                  icon: const Icon(Icons.open_in_new),
-                  label: const Text('Open Workbook'),
-                ),
+                if (link.isNotEmpty) ...[
+                  const SizedBox(width: 8),
+                  IconButton.filledTonal(
+                    tooltip: 'Open linked tracker folder/document',
+                    onPressed: () => _openUrl(link),
+                    icon: const Icon(Icons.link_outlined),
+                  ),
+                ],
               ],
             ),
           ],
@@ -219,241 +841,188 @@ class _LiveTrackerScreenState extends State<LiveTrackerScreen> {
     );
   }
 
-  Future<void> _showProduction(String parish) async {
-    final snapshot = await widget.state.repository.liveTrackerSnapshot(
-      widget.state.profile!,
-      parish: parish,
-    );
-    if (!mounted) return;
-    if (snapshot == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('$parish has no synced tracker snapshot yet.')),
-      );
-      return;
-    }
-    final item = Map<String, dynamic>.from(
-      snapshot['item'] as Map? ?? const {},
-    );
-    final clusters = (item['clusters'] as List? ?? const [])
-        .whereType<Map>()
-        .map((e) => Map<String, dynamic>.from(e))
-        .toList();
+  Widget _storage(_TrackerData data) {
+    final theme = Theme.of(context);
 
-    await showModalBottomSheet<void>(
-      context: context,
-      isScrollControlled: true,
-      showDragHandle: true,
-      builder: (sheetContext) => FractionallySizedBox(
-        heightFactor: .92,
-        child: Column(
+    if (data.inventory.isEmpty) {
+      return const RcExpressiveSurface(
+        child: Text(
+          'No Storage worksheet data has been synchronized for this parish yet.',
+        ),
+      );
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Row(
           children: [
-            Padding(
-              padding: const EdgeInsets.fromLTRB(18, 0, 10, 8),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: Text(
-                      '$parish Cluster Production',
-                      style: Theme.of(sheetContext).textTheme.titleLarge,
-                    ),
-                  ),
-                  IconButton(
-                    onPressed: () => Navigator.pop(sheetContext),
-                    icon: const Icon(Icons.close),
-                  ),
-                ],
+            Expanded(
+              child: Text(
+                'Parish Storage',
+                style: theme.textTheme.titleLarge,
               ),
             ),
-            Expanded(
-              child: ListView(
-                padding: const EdgeInsets.fromLTRB(12, 4, 12, 30),
-                children: clusters.map((cluster) {
-                  final name = '${cluster['name'] ?? 'Cluster'}';
-                  final houses = (cluster['houses'] as List? ?? const [])
-                      .whereType<Map>()
-                      .map((e) => Map<String, dynamic>.from(e))
-                      .toList();
-                  return Card(
-                    child: ExpansionTile(
-                      leading: const Icon(Icons.hub_outlined),
-                      title: Text(name),
-                      subtitle: Text('${houses.length} houses'),
-                      children: houses.map(_houseTile).toList(),
-                    ),
-                  );
-                }).toList(),
-              ),
+            Text(
+              '${data.inventory.length} material lines',
+              style: theme.textTheme.labelLarge,
             ),
           ],
         ),
-      ),
-    );
-  }
+        const SizedBox(height: 5),
+        Text(
+          'IN, OUT and balance are rendered from the workbook Storage sheet.',
+          style: theme.textTheme.bodySmall,
+        ),
+        const SizedBox(height: 10),
+        ...data.inventory.map((row) {
+          final payload = Map<String, dynamic>.from(
+            row['source_payload'] as Map? ?? const {},
+          );
+          final size = '${payload['size'] ?? ''}'.trim();
+          final length = '${payload['length'] ?? ''}'.trim();
+          final unit = '${row['unit'] ?? ''}'.trim();
+          final transactions =
+              (payload['transactions'] as List? ?? const [])
+                  .whereType<Map>()
+                  .map((e) => Map<String, dynamic>.from(e))
+                  .toList();
 
-  Widget _houseTile(Map<String, dynamic> row) {
-    final code = '${row['houseId'] ?? ''}'.trim().toUpperCase();
-    final rejected = row['rejected'] == true;
-    final statuses = <String>[
-      if (row['finished'] == true) 'Finished',
-      if (row['started'] == true) 'Started',
-      if (row['boqSent'] == true) 'BOQ Sent',
-      if (row['boqDone'] == true) 'BOQ Done',
-      if (row['sowDone'] == true) 'SOW Done',
-      if (row['contractSigned'] == true) 'Contract Signed',
-      if (row['houseVisitedVerified'] == true) 'Verified',
-      if (row['materialsOnSiteNotStarted'] == true) 'Materials On Site',
-      if (rejected) 'Rejected',
-    ];
-    return ListTile(
-      title: Text(code.isEmpty ? 'House' : code),
-      subtitle: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          if (statuses.isNotEmpty)
-            Padding(
-              padding: const EdgeInsets.only(top: 5),
-              child: Wrap(
-                spacing: 5,
-                runSpacing: 5,
-                children: statuses
-                    .map(
-                      (s) => RcStatusPill(
-                        label: s.toUpperCase(),
-                        color: s == 'Rejected'
-                            ? RcColors.danger
-                            : s == 'Finished'
-                            ? RcColors.success
-                            : RcColors.blue,
-                      ),
-                    )
-                    .toList(),
-              ),
-            ),
-          if ('${row['comments'] ?? ''}'.trim().isNotEmpty) ...[
-            const SizedBox(height: 5),
-            Text('${row['comments']}'),
-          ],
-        ],
-      ),
-      trailing: PopupMenuButton<String>(
-        onSelected: (value) {
-          if (value == 'control' && code.isNotEmpty) {
-            Navigator.of(context).push(
-              MaterialPageRoute(
-                builder: (_) => HouseControlWorkspaceByCodeScreen(
-                  state: widget.state,
-                  houseCode: code,
-                ),
-              ),
-            );
-          } else if (value == 'link') {
-            _openUrl('${row['link'] ?? ''}');
-          }
-        },
-        itemBuilder: (_) => [
-          if (code.isNotEmpty)
-            const PopupMenuItem(
-              value: 'control',
-              child: Text('Open Control Of Works'),
-            ),
-          if ('${row['link'] ?? ''}'.trim().isNotEmpty)
-            const PopupMenuItem(
-              value: 'link',
-              child: Text('Open Tracker Link'),
-            ),
-        ],
-      ),
-    );
-  }
-
-  Future<void> _showInventory(String parish) async {
-    final rows = await widget.state.repository.liveTrackerParishInventory(
-      widget.state.profile!,
-      parish: parish,
-    );
-    if (!mounted) return;
-    await showModalBottomSheet<void>(
-      context: context,
-      isScrollControlled: true,
-      showDragHandle: true,
-      builder: (sheetContext) => FractionallySizedBox(
-        heightFactor: .9,
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.fromLTRB(18, 0, 10, 8),
-              child: Row(
+          return Padding(
+            padding: const EdgeInsets.only(bottom: 8),
+            child: RcExpressiveSurface(
+              shape: RcSurfaceShape.offset,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  Expanded(
-                    child: Text(
-                      '$parish Parish Inventory',
-                      style: Theme.of(sheetContext).textTheme.titleLarge,
-                    ),
-                  ),
-                  IconButton(
-                    onPressed: () => Navigator.pop(sheetContext),
-                    icon: const Icon(Icons.close),
-                  ),
-                ],
-              ),
-            ),
-            Expanded(
-              child: rows.isEmpty
-                  ? const Center(
-                      child: Text('No Storage worksheet has been synced yet.'),
-                    )
-                  : ListView.separated(
-                      padding: const EdgeInsets.fromLTRB(12, 4, 12, 30),
-                      itemCount: rows.length,
-                      separatorBuilder: (_, _) => const SizedBox(height: 6),
-                      itemBuilder: (_, index) {
-                        final row = rows[index];
-                        final payload = Map<String, dynamic>.from(
-                          row['source_payload'] as Map? ?? const {},
-                        );
-                        final unit = '${row['unit'] ?? ''}'.trim();
-                        final size = '${payload['size'] ?? ''}'.trim();
-                        final length = '${payload['length'] ?? ''}'.trim();
-                        final movements =
-                            (payload['transactions'] as List? ?? const [])
-                                .length;
-                        return Card(
-                          child: ListTile(
-                            leading: const Icon(Icons.inventory_2_outlined),
-                            title: Text('${row['description'] ?? 'Material'}'),
-                            subtitle: Text(
+                  Row(
+                    children: [
+                      const CircleAvatar(
+                        child: Icon(Icons.inventory_2_outlined),
+                      ),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              '${row['description'] ?? 'Material'}',
+                              style: theme.textTheme.titleMedium,
+                            ),
+                            Text(
                               [
                                 if (size.isNotEmpty) size,
                                 if (length.isNotEmpty) length,
-                                'IN ${_qty(row['received'])}',
-                                'OUT ${_qty(row['issued'])}',
-                                '$movements movements',
+                                if (unit.isNotEmpty) unit,
                               ].join(' • '),
+                              style: theme.textTheme.bodySmall,
                             ),
-                            trailing: Text(
-                              '${_qty(row['balance'])}${unit.isEmpty ? '' : ' $unit'}',
-                              style: Theme.of(
-                                sheetContext,
-                              ).textTheme.titleMedium,
-                            ),
+                          ],
+                        ),
+                      ),
+                      Text(
+                        '${_qty(row['balance'])}${unit.isEmpty ? '' : ' $unit'}',
+                        style: theme.textTheme.titleLarge?.copyWith(
+                          fontWeight: FontWeight.w900,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  Wrap(
+                    spacing: 7,
+                    runSpacing: 7,
+                    children: [
+                      RcStatusPill(
+                        label: 'IN ${_qty(row['received'])}',
+                        color: RcColors.success,
+                      ),
+                      RcStatusPill(
+                        label: 'OUT ${_qty(row['issued'])}',
+                        color: RcColors.warning,
+                      ),
+                      RcStatusPill(
+                        label: '${transactions.length} MOVEMENTS',
+                        color: RcColors.blue,
+                      ),
+                    ],
+                  ),
+                  if (transactions.isNotEmpty) ...[
+                    const SizedBox(height: 8),
+                    ExpansionTile(
+                      tilePadding: EdgeInsets.zero,
+                      childrenPadding: EdgeInsets.zero,
+                      title: const Text('Movement history'),
+                      children: transactions.map((tx) {
+                        final direction = '${tx['direction'] ?? ''}'.trim();
+                        return ListTile(
+                          dense: true,
+                          contentPadding: EdgeInsets.zero,
+                          leading: Icon(
+                            direction.toUpperCase() == 'IN'
+                                ? Icons.south_west_rounded
+                                : Icons.north_east_rounded,
+                          ),
+                          title: Text(
+                            '$direction ${_qty(tx['quantity'])}',
+                          ),
+                          subtitle: Text(
+                            [
+                              if ('${tx['date'] ?? ''}'.trim().isNotEmpty)
+                                '${tx['date']}',
+                              if ('${tx['fromTo'] ?? ''}'.trim().isNotEmpty)
+                                '${tx['fromTo']}',
+                            ].join(' • '),
                           ),
                         );
-                      },
+                      }).toList(),
                     ),
+                  ],
+                ],
+              ),
             ),
-          ],
+          );
+        }),
+      ],
+    );
+  }
+
+  bool _isReady(Map<String, dynamic> row) =>
+      row['rejected'] != true &&
+      row['houseVisitedVerified'] == true &&
+      row['sowDone'] == true &&
+      row['boqDone'] == true;
+
+  String _houseState(Map<String, dynamic> row) {
+    if (row['rejected'] == true) return 'Rejected';
+    if (row['finished'] == true) return 'Finished';
+    if (row['started'] == true) return 'In Progress';
+    if (_isReady(row)) return 'Ready';
+    return 'Pending';
+  }
+
+  Future<void> _openHouse(String code) async {
+    await Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => HouseControlWorkspaceByCodeScreen(
+          state: widget.state,
+          houseCode: code,
         ),
       ),
     );
+    await _refresh();
   }
 
   Future<void> _openUrl(String raw) async {
     final uri = Uri.tryParse(raw.trim());
     if (uri == null || !uri.hasScheme) return;
-    final opened = await launchUrl(uri, mode: LaunchMode.externalApplication);
+    final opened = await launchUrl(
+      uri,
+      mode: LaunchMode.externalApplication,
+    );
     if (!opened && mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('The external link could not be opened.')),
+        const SnackBar(content: Text('The linked document could not be opened.')),
       );
     }
   }
@@ -466,4 +1035,66 @@ class _LiveTrackerScreenState extends State<LiveTrackerScreen> {
         ? '${value.toInt()}'
         : value.toStringAsFixed(2);
   }
+}
+
+class _Metric extends StatelessWidget {
+  const _Metric(this.label, this.value, this.icon, this.color);
+
+  final String label;
+  final String value;
+  final IconData icon;
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) {
+    return RcExpressiveSurface(
+      shape: RcSurfaceShape.offset,
+      tone: color.withValues(alpha: .075),
+      child: Row(
+        children: [
+          Icon(icon, color: color),
+          const SizedBox(width: 9),
+          Expanded(
+            child: Text(
+              label,
+              style: Theme.of(context).textTheme.labelLarge,
+            ),
+          ),
+          Text(
+            value,
+            style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+              color: color,
+              fontWeight: FontWeight.w900,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _TrackerCluster {
+  const _TrackerCluster({
+    required this.name,
+    this.houses = const [],
+  });
+
+  final String name;
+  final List<Map<String, dynamic>> houses;
+}
+
+class _TrackerData {
+  const _TrackerData({
+    this.trackers = const [],
+    this.parish,
+    this.source,
+    this.clusters = const [],
+    this.inventory = const [],
+  });
+
+  final List<Map<String, dynamic>> trackers;
+  final String? parish;
+  final Map<String, dynamic>? source;
+  final List<_TrackerCluster> clusters;
+  final List<Map<String, dynamic>> inventory;
 }
