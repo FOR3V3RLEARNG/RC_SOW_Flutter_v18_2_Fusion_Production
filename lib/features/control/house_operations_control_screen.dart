@@ -1485,10 +1485,7 @@ class HouseMapDirectoryScreen extends StatelessWidget {
 }
 
 class _ControlColumnsGrid extends StatelessWidget {
-  const _ControlColumnsGrid({
-    required this.columns,
-    required this.children,
-  });
+  const _ControlColumnsGrid({required this.columns, required this.children});
 
   final int columns;
   final List<Widget> children;

@@ -274,8 +274,7 @@ class RcSowRepository {
         row['house_code'] = code;
         row['latitude'] = point.latitude;
         row['longitude'] = point.longitude;
-        row['maps_url'] =
-            '${row['maps_url'] ?? ''}'.trim().isEmpty
+        row['maps_url'] = '${row['maps_url'] ?? ''}'.trim().isEmpty
             ? point.searchUrl
             : row['maps_url'];
         row['location_source'] = 'house_locations';
@@ -300,9 +299,7 @@ class RcSowRepository {
 
         final point =
             rcGpsPoint(beneficiary.latitude, beneficiary.longitude) ??
-            rcParseGpsPoint(
-              '${beneficiary.gps} ${beneficiary.mapsUrl ?? ''}',
-            );
+            rcParseGpsPoint('${beneficiary.gps} ${beneficiary.mapsUrl ?? ''}');
         if (point == null) continue;
 
         final beneficiaryRow = <String, dynamic>{
@@ -313,8 +310,7 @@ class RcSowRepository {
           'gps': beneficiary.gps,
           'latitude': point.latitude,
           'longitude': point.longitude,
-          'maps_url':
-              (beneficiary.mapsUrl ?? '').trim().isNotEmpty
+          'maps_url': (beneficiary.mapsUrl ?? '').trim().isNotEmpty
               ? beneficiary.mapsUrl
               : point.searchUrl,
           'location_source': 'beneficiary_directory',
@@ -326,10 +322,7 @@ class RcSowRepository {
           continue;
         }
 
-        final merged = <String, dynamic>{
-          ...beneficiaryRow,
-          ...existing,
-        };
+        final merged = <String, dynamic>{...beneficiaryRow, ...existing};
 
         for (final key in [
           'beneficiary_name',
@@ -352,9 +345,8 @@ class RcSowRepository {
 
     final result = byCode.values.toList()
       ..sort(
-        (a, b) => '${a['house_code'] ?? ''}'.compareTo(
-          '${b['house_code'] ?? ''}',
-        ),
+        (a, b) =>
+            '${a['house_code'] ?? ''}'.compareTo('${b['house_code'] ?? ''}'),
       );
     return result;
   }
