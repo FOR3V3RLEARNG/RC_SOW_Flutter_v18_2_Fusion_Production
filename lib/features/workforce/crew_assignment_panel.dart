@@ -38,15 +38,31 @@ class _CrewAssignmentPanelState extends State<CrewAssignmentPanel> {
   }
 
   Future<_CrewAssignmentData> _load() async {
+    final houses = await widget.state.repository.houses(profile);
+
+    if ((selectedHouse == null ||
+            !houses.any((house) => house.code == selectedHouse)) &&
+        houses.isNotEmpty) {
+      final preferred = widget.initialHouseCode?.trim().toUpperCase();
+      selectedHouse =
+          preferred != null && houses.any((house) => house.code == preferred)
+          ? preferred
+          : houses.first.code;
+    }
+
+    final selected = houses
+        .where((house) => house.code == selectedHouse)
+        .firstOrNull;
+
     final results = await Future.wait([
-      widget.state.repository.houses(profile),
-      widget.state.repository.activeUsers(),
+      widget.state.repository.crewDirectory(parish: selected?.parish),
       widget.state.repository.crewAssignments(houseCode: selectedHouse),
     ]);
+
     return _CrewAssignmentData(
-      houses: results[0] as List<HouseRecord>,
-      users: results[1] as List<Map<String, dynamic>>,
-      assignments: results[2] as List<Map<String, dynamic>>,
+      houses: houses,
+      users: results[0] as List<Map<String, dynamic>>,
+      assignments: results[1] as List<Map<String, dynamic>>,
     );
   }
 
@@ -62,48 +78,180 @@ class _CrewAssignmentPanelState extends State<CrewAssignmentPanel> {
         email == null ||
         houseCode.isEmpty ||
         email.isEmpty) {
+      _snack('Select a house and crew member first.');
       return;
     }
+
     final house = data.houses.where((h) => h.code == houseCode).firstOrNull;
     final member = data.users
         .where(
           (u) => '${u['email'] ?? ''}'.toLowerCase() == email.toLowerCase(),
         )
         .firstOrNull;
-    if (house == null || member == null) return;
+
+    if (house == null || member == null) {
+      _snack('Crew member or house is no longer available. Refresh and retry.');
+      return;
+    }
+
     final role = '${member['role'] ?? ''}';
-    if (!RcApp.crewRoles.contains(role)) return;
+    if (!RcApp.crewRoles.contains(role)) {
+      _snack('Only Carpenter, Worker or Apprentice can be assigned as crew.');
+      return;
+    }
+
     setState(() => saving = true);
     try {
       await widget.state.repository.assignCrew(
         houseCode: house.code,
         parish: house.parish,
-        userId: '${member['user_id'] ?? ''}',
+        userId: member['user_id']?.toString(),
         email: '${member['email'] ?? ''}',
         memberName: '${member['full_name'] ?? member['email'] ?? ''}',
         role: role,
       );
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              '${member['full_name'] ?? member['email']} assigned to ${house.code}.',
-            ),
-          ),
-        );
-      }
+
+      _snack(
+        '${member['full_name'] ?? member['email']} assigned to ${house.code}.',
+      );
+      selectedEmail = null;
       await _refresh();
-    } catch (_) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text(
-              'Crew assignment could not be saved. Check permissions and retry.',
+    } catch (error) {
+      _snack('Crew assignment could not be saved: $error');
+    } finally {
+      if (mounted) setState(() => saving = false);
+    }
+  }
+
+  Future<void> _createAndAssign(_CrewAssignmentData data) async {
+    if (!profile.canManageUsers) {
+      _snack('Admin user-management privilege is required to create crew.');
+      return;
+    }
+
+    final house = data.houses
+        .where((candidate) => candidate.code == selectedHouse)
+        .firstOrNull;
+    if (house == null) {
+      _snack('Choose a house first.');
+      return;
+    }
+
+    final name = TextEditingController();
+    final email = TextEditingController();
+    var role = 'Carpenter';
+
+    final create = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => StatefulBuilder(
+        builder: (dialogContext, setDialogState) => AlertDialog(
+          title: Text('Add crew • ${house.code}'),
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  '${house.parish} • Crew will be authorized by email and assigned immediately.',
+                ),
+                const SizedBox(height: 12),
+                TextField(
+                  controller: name,
+                  textCapitalization: TextCapitalization.words,
+                  decoration: const InputDecoration(
+                    labelText: 'Crew member name',
+                    prefixIcon: Icon(Icons.badge_outlined),
+                  ),
+                ),
+                const SizedBox(height: 10),
+                TextField(
+                  controller: email,
+                  keyboardType: TextInputType.emailAddress,
+                  autocorrect: false,
+                  decoration: const InputDecoration(
+                    labelText: 'Email',
+                    prefixIcon: Icon(Icons.alternate_email),
+                  ),
+                ),
+                const SizedBox(height: 10),
+                DropdownButtonFormField<String>(
+                  initialValue: role,
+                  decoration: const InputDecoration(
+                    labelText: 'Crew role',
+                    prefixIcon: Icon(Icons.engineering_outlined),
+                  ),
+                  items: RcApp.crewRoles
+                      .map(
+                        (crewRole) => DropdownMenuItem(
+                          value: crewRole,
+                          child: Text(crewRole),
+                        ),
+                      )
+                      .toList(),
+                  onChanged: (value) {
+                    if (value != null) {
+                      setDialogState(() => role = value);
+                    }
+                  },
+                ),
+              ],
             ),
           ),
-        );
-      }
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(dialogContext, false),
+              child: const Text('Cancel'),
+            ),
+            FilledButton.icon(
+              onPressed: () {
+                if (name.text.trim().isEmpty ||
+                    !email.text.trim().contains('@')) {
+                  return;
+                }
+                Navigator.pop(dialogContext, true);
+              },
+              icon: const Icon(Icons.person_add_alt_1_outlined),
+              label: const Text('Create & assign'),
+            ),
+          ],
+        ),
+      ),
+    );
+
+    if (create != true) {
+      name.dispose();
+      email.dispose();
+      return;
+    }
+
+    final memberName = name.text.trim();
+    final memberEmail = email.text.trim().toLowerCase();
+
+    setState(() => saving = true);
+    try {
+      await widget.state.repository.manageAuthorizedAccount(
+        email: memberEmail,
+        label: memberName,
+        role: role,
+        parish: house.parish,
+        active: true,
+      );
+
+      await widget.state.repository.assignCrew(
+        houseCode: house.code,
+        parish: house.parish,
+        userId: null,
+        email: memberEmail,
+        memberName: memberName,
+        role: role,
+      );
+
+      _snack('$memberName created and assigned to ${house.code}.');
+      await _refresh();
+    } catch (error) {
+      _snack('Crew member could not be created/assigned: $error');
     } finally {
+      name.dispose();
+      email.dispose();
       if (mounted) setState(() => saving = false);
     }
   }
@@ -114,24 +262,26 @@ class _CrewAssignmentPanelState extends State<CrewAssignmentPanel> {
       await widget.state.repository.assignCrew(
         houseCode: '${assignment['house_code'] ?? ''}',
         parish: '${assignment['parish'] ?? ''}',
-        userId: '${assignment['user_id'] ?? ''}',
+        userId: assignment['user_id']?.toString(),
         email: '${assignment['email'] ?? ''}',
         memberName: '${assignment['member_name'] ?? ''}',
         role: '${assignment['role'] ?? ''}',
         active: false,
       );
+      _snack('${assignment['member_name'] ?? assignment['email']} removed.');
       await _refresh();
-    } catch (_) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Crew assignment could not be removed.'),
-          ),
-        );
-      }
+    } catch (error) {
+      _snack('Crew assignment could not be removed: $error');
     } finally {
       if (mounted) setState(() => saving = false);
     }
+  }
+
+  void _snack(String message) {
+    if (!mounted) return;
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(message)));
   }
 
   String _initial(String value) =>
@@ -139,25 +289,22 @@ class _CrewAssignmentPanelState extends State<CrewAssignmentPanel> {
 
   @override
   Widget build(BuildContext context) {
-    if (!profile.hasPrivilege('manageCrew')) return const SizedBox.shrink();
+    if (!profile.canManageCrew) {
+      return const SizedBox.shrink();
+    }
+
     final theme = Theme.of(context);
+
     return FutureBuilder<_CrewAssignmentData>(
       future: future,
       builder: (context, snap) {
         final data = snap.data ?? const _CrewAssignmentData();
         final houses = data.houses;
-        if ((selectedHouse == null ||
-                !houses.any((h) => h.code == selectedHouse)) &&
-            houses.isNotEmpty) {
-          selectedHouse =
-              widget.initialHouseCode != null &&
-                  houses.any((h) => h.code == widget.initialHouseCode)
-              ? widget.initialHouseCode
-              : houses.first.code;
-        }
+
         final selectedHouseRecord = houses
             .where((h) => h.code == selectedHouse)
             .firstOrNull;
+
         final crew = data.users.where((u) {
           final role = '${u['role'] ?? ''}';
           if (!RcApp.crewRoles.contains(role)) return false;
@@ -166,6 +313,7 @@ class _CrewAssignmentPanelState extends State<CrewAssignmentPanel> {
           }
           return '${u['parish'] ?? ''}' == selectedHouseRecord.parish;
         }).toList();
+
         final assignments = data.assignments
             .where((a) => a['active'] != false)
             .toList();
@@ -176,6 +324,7 @@ class _CrewAssignmentPanelState extends State<CrewAssignmentPanel> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Icon(
                     Icons.groups_2_outlined,
@@ -187,23 +336,54 @@ class _CrewAssignmentPanelState extends State<CrewAssignmentPanel> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'House crew assignment',
+                          'House Crew',
                           style: theme.textTheme.titleMedium?.copyWith(
                             fontWeight: FontWeight.w900,
                           ),
                         ),
                         const SizedBox(height: 2),
                         const Text(
-                          'Connect the construction schedule to the actual Carpenter / Worker / Apprentice team.',
+                          'Authorize and assign the Carpenter / Worker / Apprentice team to this house.',
                         ),
                       ],
                     ),
                   ),
+                  if (profile.canManageUsers)
+                    IconButton.filledTonal(
+                      tooltip: 'Create crew member',
+                      onPressed:
+                          saving || selectedHouseRecord == null
+                          ? null
+                          : () => _createAndAssign(data),
+                      icon: const Icon(Icons.person_add_alt_1_outlined),
+                    ),
                 ],
               ),
               const SizedBox(height: 12),
+
               if (snap.connectionState == ConnectionState.waiting)
                 const LinearProgressIndicator()
+              else if (snap.hasError)
+                RcExpressiveSurface(
+                  tone: theme.colorScheme.errorContainer,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        'Crew data could not be loaded.',
+                        style: TextStyle(fontWeight: FontWeight.w900),
+                      ),
+                      const SizedBox(height: 4),
+                      Text('${snap.error}'),
+                      const SizedBox(height: 8),
+                      OutlinedButton.icon(
+                        onPressed: _refresh,
+                        icon: const Icon(Icons.refresh),
+                        label: const Text('Retry'),
+                      ),
+                    ],
+                  ),
+                )
               else if (houses.isEmpty)
                 const Text(
                   'No active houses are available in your access scope.',
@@ -212,7 +392,10 @@ class _CrewAssignmentPanelState extends State<CrewAssignmentPanel> {
                 DropdownButtonFormField<String>(
                   key: ValueKey('crew-house-${selectedHouse ?? ''}'),
                   initialValue: selectedHouse,
-                  decoration: const InputDecoration(labelText: 'House'),
+                  decoration: const InputDecoration(
+                    labelText: 'House',
+                    prefixIcon: Icon(Icons.home_work_outlined),
+                  ),
                   items: houses
                       .map(
                         (h) => DropdownMenuItem(
@@ -232,41 +415,83 @@ class _CrewAssignmentPanelState extends State<CrewAssignmentPanel> {
                         },
                 ),
                 const SizedBox(height: 10),
-                DropdownButtonFormField<String>(
-                  key: ValueKey(
-                    'crew-member-${selectedHouse ?? ''}-${selectedEmail ?? ''}',
-                  ),
-                  initialValue:
-                      crew.any((u) => '${u['email'] ?? ''}' == selectedEmail)
-                      ? selectedEmail
-                      : null,
-                  decoration: const InputDecoration(labelText: 'Crew member'),
-                  items: crew
-                      .map(
-                        (u) => DropdownMenuItem(
-                          value: '${u['email'] ?? ''}',
+
+                if (crew.isEmpty)
+                  RcExpressiveSurface(
+                    tone: theme.colorScheme.surfaceContainerLow,
+                    child: Row(
+                      children: [
+                        const Icon(Icons.person_search_outlined),
+                        const SizedBox(width: 10),
+                        Expanded(
                           child: Text(
-                            '${u['full_name'] ?? u['email']} • ${u['role'] ?? ''}',
+                            profile.canManageUsers
+                                ? 'No authorized Carpenter, Worker or Apprentice is available for ${selectedHouseRecord?.parish ?? 'this parish'}. Tap + to create one.'
+                                : 'No authorized crew is available for ${selectedHouseRecord?.parish ?? 'this parish'}. Ask an Admin to authorize the crew email first.',
                           ),
                         ),
-                      )
-                      .toList(),
-                  onChanged: saving
-                      ? null
-                      : (value) => setState(() => selectedEmail = value),
-                ),
-                const SizedBox(height: 10),
-                Align(
-                  alignment: Alignment.centerRight,
-                  child: FilledButton.tonalIcon(
-                    onPressed: saving || selectedEmail == null
+                      ],
+                    ),
+                  )
+                else
+                  DropdownButtonFormField<String>(
+                    key: ValueKey(
+                      'crew-member-${selectedHouse ?? ''}-${selectedEmail ?? ''}',
+                    ),
+                    initialValue:
+                        crew.any(
+                          (u) =>
+                              '${u['email'] ?? ''}'.toLowerCase() ==
+                              selectedEmail?.toLowerCase(),
+                        )
+                        ? selectedEmail
+                        : null,
+                    decoration: const InputDecoration(
+                      labelText: 'Crew member',
+                      prefixIcon: Icon(Icons.engineering_outlined),
+                    ),
+                    items: crew.map((u) {
+                      final accountStatus =
+                          '${u['account_status'] ?? ''}'.trim();
+                      return DropdownMenuItem(
+                        value: '${u['email'] ?? ''}',
+                        child: Text(
+                          '${u['full_name'] ?? u['email']} • '
+                          '${u['role'] ?? ''}'
+                          '${accountStatus.isEmpty ? '' : ' • $accountStatus'}',
+                        ),
+                      );
+                    }).toList(),
+                    onChanged: saving
                         ? null
-                        : () => _assign(data),
-                    icon: const Icon(Icons.person_add_alt_1_outlined),
-                    label: Text(saving ? 'Saving…' : 'Assign to house'),
+                        : (value) => setState(() => selectedEmail = value),
                   ),
+
+                const SizedBox(height: 10),
+                Row(
+                  children: [
+                    if (profile.canManageUsers)
+                      OutlinedButton.icon(
+                        onPressed:
+                            saving || selectedHouseRecord == null
+                            ? null
+                            : () => _createAndAssign(data),
+                        icon: const Icon(Icons.person_add_alt_1_outlined),
+                        label: const Text('Add crew'),
+                      ),
+                    const Spacer(),
+                    FilledButton.tonalIcon(
+                      onPressed:
+                          saving || selectedEmail == null
+                          ? null
+                          : () => _assign(data),
+                      icon: const Icon(Icons.link_outlined),
+                      label: Text(saving ? 'Saving…' : 'Assign to house'),
+                    ),
+                  ],
                 ),
               ],
+
               if (assignments.isNotEmpty) ...[
                 const SizedBox(height: 14),
                 Text(
@@ -287,7 +512,8 @@ class _CrewAssignmentPanelState extends State<CrewAssignmentPanel> {
                       '${a['member_name'] ?? a['email'] ?? 'Crew member'}',
                     ),
                     subtitle: Text(
-                      '${a['role'] ?? ''} • ${a['house_code'] ?? ''}',
+                      '${a['role'] ?? ''} • ${a['house_code'] ?? ''}'
+                      '${a['user_id'] == null ? ' • Awaiting first sign-in' : ''}',
                     ),
                     trailing: IconButton(
                       tooltip: 'Remove assignment',
@@ -295,13 +521,6 @@ class _CrewAssignmentPanelState extends State<CrewAssignmentPanel> {
                       icon: const Icon(Icons.person_remove_outlined),
                     ),
                   ),
-                ),
-              ],
-              if (snap.hasError) ...[
-                const SizedBox(height: 8),
-                const Text(
-                  'Crew assignments require the v20.3 workforce backend.',
-                  style: TextStyle(color: RcColors.warning),
                 ),
               ],
             ],

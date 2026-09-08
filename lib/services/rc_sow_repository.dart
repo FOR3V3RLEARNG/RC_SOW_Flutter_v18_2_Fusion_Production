@@ -178,6 +178,16 @@ class RcSowRepository {
         .toList();
   }
 
+  Future<List<Map<String, dynamic>>> crewDirectory({String? parish}) async {
+    final result = await client.rpc(
+      'list_crew_directory',
+      params: {'p_parish': parish},
+    );
+    return (result as List? ?? const [])
+        .map((e) => Map<String, dynamic>.from(e as Map))
+        .toList();
+  }
+
   Future<List<ManagedUser>> managedUsers() async {
     final result = await client.rpc('list_managed_users');
     return (result as List? ?? const [])
@@ -391,18 +401,22 @@ class RcSowRepository {
   Future<void> assignCrew({
     required String houseCode,
     required String parish,
-    required String userId,
+    String? userId,
     required String email,
     required String memberName,
     required String role,
     bool active = true,
   }) async {
+    final normalizedUserId = userId?.trim();
     await client.rpc(
       'assign_house_crew',
       params: {
         'p_house_code': houseCode.trim().toUpperCase(),
         'p_parish': parish,
-        'p_user_id': userId,
+        'p_user_id':
+            normalizedUserId == null || normalizedUserId.isEmpty
+            ? null
+            : normalizedUserId,
         'p_email': email.trim().toLowerCase(),
         'p_member_name': memberName.trim(),
         'p_role': role,
