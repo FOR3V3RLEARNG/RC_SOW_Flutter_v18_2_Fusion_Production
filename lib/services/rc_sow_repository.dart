@@ -273,7 +273,9 @@ class RcSowRepository {
       body: {'parish': parish},
     );
     final raw = response.data;
-    final data = raw is Map ? Map<String, dynamic>.from(raw) : <String, dynamic>{};
+    final data = raw is Map
+        ? Map<String, dynamic>.from(raw)
+        : <String, dynamic>{};
     if (data['error'] != null) throw StateError('${data['error']}');
     return data;
   }
@@ -282,7 +284,9 @@ class RcSowRepository {
     UserProfile profile, {
     required String parish,
   }) async {
-    if (!profile.canViewAllParishes && profile.parish.isNotEmpty && profile.parish != parish) {
+    if (!profile.canViewAllParishes &&
+        profile.parish.isNotEmpty &&
+        profile.parish != parish) {
       return null;
     }
     final rows = await client
@@ -301,7 +305,9 @@ class RcSowRepository {
     required String parish,
     int limit = 500,
   }) async {
-    if (!profile.canViewAllParishes && profile.parish.isNotEmpty && profile.parish != parish) {
+    if (!profile.canViewAllParishes &&
+        profile.parish.isNotEmpty &&
+        profile.parish != parish) {
       return const [];
     }
     final rows = await client

@@ -58,7 +58,9 @@ class _LiveTrackerScreenState extends State<LiveTrackerScreen> {
                 ),
                 const SizedBox(height: 12),
                 RcExpressiveSurface(
-                  tone: theme.colorScheme.primaryContainer.withValues(alpha: .42),
+                  tone: theme.colorScheme.primaryContainer.withValues(
+                    alpha: .42,
+                  ),
                   child: const Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -76,16 +78,21 @@ class _LiveTrackerScreenState extends State<LiveTrackerScreen> {
                 if (snap.hasError)
                   RcExpressiveSurface(
                     tone: theme.colorScheme.errorContainer,
-                    child: Text('Tracker configuration could not load: ${snap.error}'),
+                    child: Text(
+                      'Tracker configuration could not load: ${snap.error}',
+                    ),
                   ),
                 if (snap.connectionState == ConnectionState.waiting)
                   const Padding(
                     padding: EdgeInsets.all(30),
                     child: Center(child: CircularProgressIndicator()),
                   ),
-                if (trackers.isEmpty && snap.connectionState != ConnectionState.waiting)
+                if (trackers.isEmpty &&
+                    snap.connectionState != ConnectionState.waiting)
                   const RcExpressiveSurface(
-                    child: Text('No parish Live Tracker workbook is configured yet.'),
+                    child: Text(
+                      'No parish Live Tracker workbook is configured yet.',
+                    ),
                   ),
                 ...trackers.map(_trackerCard),
               ],
@@ -108,8 +115,8 @@ class _LiveTrackerScreenState extends State<LiveTrackerScreen> {
     final statusColor = status.toLowerCase() == 'success'
         ? RcColors.success
         : status.toLowerCase().contains('fail')
-            ? RcColors.danger
-            : RcColors.warning;
+        ? RcColors.danger
+        : RcColors.warning;
 
     return Padding(
       padding: const EdgeInsets.only(bottom: 10),
@@ -139,7 +146,10 @@ class _LiveTrackerScreenState extends State<LiveTrackerScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('$parish Live Tracker', style: theme.textTheme.titleLarge),
+                      Text(
+                        '$parish Live Tracker',
+                        style: theme.textTheme.titleLarge,
+                      ),
                       Text('$provider • external XLSX workbook'),
                     ],
                   ),
@@ -152,8 +162,16 @@ class _LiveTrackerScreenState extends State<LiveTrackerScreen> {
               spacing: 7,
               runSpacing: 7,
               children: [
-                RcStatusPill(label: '$clusters clusters', icon: Icons.hub_outlined, color: RcColors.purple),
-                RcStatusPill(label: '$inventory inventory items', icon: Icons.inventory_2_outlined, color: RcColors.success),
+                RcStatusPill(
+                  label: '$clusters clusters',
+                  icon: Icons.hub_outlined,
+                  color: RcColors.purple,
+                ),
+                RcStatusPill(
+                  label: '$inventory inventory items',
+                  icon: Icons.inventory_2_outlined,
+                  color: RcColors.success,
+                ),
               ],
             ),
             if (message.isNotEmpty) ...[
@@ -164,7 +182,9 @@ class _LiveTrackerScreenState extends State<LiveTrackerScreen> {
               const SizedBox(height: 5),
               Text(
                 'Last API sync: ${syncedAt.toLocal()}',
-                style: theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.onSurfaceVariant),
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: theme.colorScheme.onSurfaceVariant,
+                ),
               ),
             ],
             const SizedBox(height: 12),
@@ -173,12 +193,16 @@ class _LiveTrackerScreenState extends State<LiveTrackerScreen> {
               runSpacing: 8,
               children: [
                 FilledButton.icon(
-                  onPressed: parish.isEmpty ? null : () => _showProduction(parish),
+                  onPressed: parish.isEmpty
+                      ? null
+                      : () => _showProduction(parish),
                   icon: const Icon(Icons.fact_check_outlined),
                   label: const Text('Cluster Production'),
                 ),
                 FilledButton.tonalIcon(
-                  onPressed: parish.isEmpty ? null : () => _showInventory(parish),
+                  onPressed: parish.isEmpty
+                      ? null
+                      : () => _showInventory(parish),
                   icon: const Icon(Icons.inventory_2_outlined),
                   label: const Text('Parish Inventory'),
                 ),
@@ -207,7 +231,9 @@ class _LiveTrackerScreenState extends State<LiveTrackerScreen> {
       );
       return;
     }
-    final item = Map<String, dynamic>.from(snapshot['item'] as Map? ?? const {});
+    final item = Map<String, dynamic>.from(
+      snapshot['item'] as Map? ?? const {},
+    );
     final clusters = (item['clusters'] as List? ?? const [])
         .whereType<Map>()
         .map((e) => Map<String, dynamic>.from(e))
@@ -225,8 +251,16 @@ class _LiveTrackerScreenState extends State<LiveTrackerScreen> {
               padding: const EdgeInsets.fromLTRB(18, 0, 10, 8),
               child: Row(
                 children: [
-                  Expanded(child: Text('$parish Cluster Production', style: Theme.of(sheetContext).textTheme.titleLarge)),
-                  IconButton(onPressed: () => Navigator.pop(sheetContext), icon: const Icon(Icons.close)),
+                  Expanded(
+                    child: Text(
+                      '$parish Cluster Production',
+                      style: Theme.of(sheetContext).textTheme.titleLarge,
+                    ),
+                  ),
+                  IconButton(
+                    onPressed: () => Navigator.pop(sheetContext),
+                    icon: const Icon(Icons.close),
+                  ),
                 ],
               ),
             ),
@@ -282,14 +316,16 @@ class _LiveTrackerScreenState extends State<LiveTrackerScreen> {
                 spacing: 5,
                 runSpacing: 5,
                 children: statuses
-                    .map((s) => RcStatusPill(
-                          label: s.toUpperCase(),
-                          color: s == 'Rejected'
-                              ? RcColors.danger
-                              : s == 'Finished'
-                                  ? RcColors.success
-                                  : RcColors.blue,
-                        ))
+                    .map(
+                      (s) => RcStatusPill(
+                        label: s.toUpperCase(),
+                        color: s == 'Rejected'
+                            ? RcColors.danger
+                            : s == 'Finished'
+                            ? RcColors.success
+                            : RcColors.blue,
+                      ),
+                    )
                     .toList(),
               ),
             ),
@@ -316,9 +352,15 @@ class _LiveTrackerScreenState extends State<LiveTrackerScreen> {
         },
         itemBuilder: (_) => [
           if (code.isNotEmpty)
-            const PopupMenuItem(value: 'control', child: Text('Open Control Of Works')),
+            const PopupMenuItem(
+              value: 'control',
+              child: Text('Open Control Of Works'),
+            ),
           if ('${row['link'] ?? ''}'.trim().isNotEmpty)
-            const PopupMenuItem(value: 'link', child: Text('Open Tracker Link')),
+            const PopupMenuItem(
+              value: 'link',
+              child: Text('Open Tracker Link'),
+            ),
         ],
       ),
     );
@@ -342,39 +384,57 @@ class _LiveTrackerScreenState extends State<LiveTrackerScreen> {
               padding: const EdgeInsets.fromLTRB(18, 0, 10, 8),
               child: Row(
                 children: [
-                  Expanded(child: Text('$parish Parish Inventory', style: Theme.of(sheetContext).textTheme.titleLarge)),
-                  IconButton(onPressed: () => Navigator.pop(sheetContext), icon: const Icon(Icons.close)),
+                  Expanded(
+                    child: Text(
+                      '$parish Parish Inventory',
+                      style: Theme.of(sheetContext).textTheme.titleLarge,
+                    ),
+                  ),
+                  IconButton(
+                    onPressed: () => Navigator.pop(sheetContext),
+                    icon: const Icon(Icons.close),
+                  ),
                 ],
               ),
             ),
             Expanded(
               child: rows.isEmpty
-                  ? const Center(child: Text('No Storage worksheet has been synced yet.'))
+                  ? const Center(
+                      child: Text('No Storage worksheet has been synced yet.'),
+                    )
                   : ListView.separated(
                       padding: const EdgeInsets.fromLTRB(12, 4, 12, 30),
                       itemCount: rows.length,
                       separatorBuilder: (_, _) => const SizedBox(height: 6),
                       itemBuilder: (_, index) {
                         final row = rows[index];
-                        final payload = Map<String, dynamic>.from(row['source_payload'] as Map? ?? const {});
+                        final payload = Map<String, dynamic>.from(
+                          row['source_payload'] as Map? ?? const {},
+                        );
                         final unit = '${row['unit'] ?? ''}'.trim();
                         final size = '${payload['size'] ?? ''}'.trim();
                         final length = '${payload['length'] ?? ''}'.trim();
-                        final movements = (payload['transactions'] as List? ?? const []).length;
+                        final movements =
+                            (payload['transactions'] as List? ?? const [])
+                                .length;
                         return Card(
                           child: ListTile(
                             leading: const Icon(Icons.inventory_2_outlined),
                             title: Text('${row['description'] ?? 'Material'}'),
-                            subtitle: Text([
-                              if (size.isNotEmpty) size,
-                              if (length.isNotEmpty) length,
-                              'IN ${_qty(row['received'])}',
-                              'OUT ${_qty(row['issued'])}',
-                              '$movements movements',
-                            ].join(' • ')),
+                            subtitle: Text(
+                              [
+                                if (size.isNotEmpty) size,
+                                if (length.isNotEmpty) length,
+                                'IN ${_qty(row['received'])}',
+                                'OUT ${_qty(row['issued'])}',
+                                '$movements movements',
+                              ].join(' • '),
+                            ),
                             trailing: Text(
                               '${_qty(row['balance'])}${unit.isEmpty ? '' : ' $unit'}',
-                              style: Theme.of(sheetContext).textTheme.titleMedium,
+                              style: Theme.of(
+                                sheetContext,
+                              ).textTheme.titleMedium,
                             ),
                           ),
                         );
@@ -399,7 +459,11 @@ class _LiveTrackerScreenState extends State<LiveTrackerScreen> {
   }
 
   String _qty(Object? raw) {
-    final value = raw is num ? raw.toDouble() : double.tryParse('${raw ?? ''}') ?? 0;
-    return value == value.roundToDouble() ? '${value.toInt()}' : value.toStringAsFixed(2);
+    final value = raw is num
+        ? raw.toDouble()
+        : double.tryParse('${raw ?? ''}') ?? 0;
+    return value == value.roundToDouble()
+        ? '${value.toInt()}'
+        : value.toStringAsFixed(2);
   }
 }

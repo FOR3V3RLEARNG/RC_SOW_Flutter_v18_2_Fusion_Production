@@ -1077,7 +1077,9 @@ class _TrackerConfigState extends State<_TrackerConfig> {
 
   Future<void> _refresh() async {
     try {
-      final rows = await widget.state.repository.liveTrackers(widget.state.profile!);
+      final rows = await widget.state.repository.liveTrackers(
+        widget.state.profile!,
+      );
       if (!mounted) return;
       sources = rows;
       _loadCurrent();
@@ -1095,8 +1097,8 @@ class _TrackerConfigState extends State<_TrackerConfig> {
     provider = stored == 'OneDrive' || stored == 'SharePoint'
         ? 'OneDrive'
         : stored == 'Other'
-            ? 'Direct URL'
-            : 'Google Drive';
+        ? 'Direct URL'
+        : 'Google Drive';
     url.text = '${row?['url'] ?? ''}';
   }
 
@@ -1146,7 +1148,9 @@ class _TrackerConfigState extends State<_TrackerConfig> {
         provider: provider,
         url: url.text.trim(),
       );
-      final result = await widget.state.repository.syncParishLiveTracker(parish);
+      final result = await widget.state.repository.syncParishLiveTracker(
+        parish,
+      );
       await _refresh();
       _snack(
         '$parish synced: ${result['houses'] ?? 0} houses, '
@@ -1169,7 +1173,9 @@ class _TrackerConfigState extends State<_TrackerConfig> {
 
   void _snack(String message) {
     if (!mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(message)));
   }
 
   @override
@@ -1211,7 +1217,9 @@ class _TrackerConfigState extends State<_TrackerConfig> {
             return FilterChip(
               selected: parish == value,
               avatar: Icon(
-                configured ? Icons.cloud_done_outlined : Icons.cloud_off_outlined,
+                configured
+                    ? Icons.cloud_done_outlined
+                    : Icons.cloud_off_outlined,
                 size: 18,
               ),
               label: Text(value),
@@ -1225,7 +1233,9 @@ class _TrackerConfigState extends State<_TrackerConfig> {
           initialValue: provider,
           decoration: const InputDecoration(labelText: 'API / File Provider'),
           items: const ['Google Drive', 'OneDrive', 'Direct URL']
-              .map((value) => DropdownMenuItem(value: value, child: Text(value)))
+              .map(
+                (value) => DropdownMenuItem(value: value, child: Text(value)),
+              )
               .toList(),
           onChanged: busy ? null : (value) => setState(() => provider = value!),
         ),
@@ -1247,7 +1257,10 @@ class _TrackerConfigState extends State<_TrackerConfig> {
               : Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('$parish API Status', style: theme.textTheme.titleMedium),
+                    Text(
+                      '$parish API Status',
+                      style: theme.textTheme.titleMedium,
+                    ),
                     const SizedBox(height: 7),
                     Wrap(
                       spacing: 7,
@@ -1258,14 +1271,22 @@ class _TrackerConfigState extends State<_TrackerConfig> {
                           color: status.toLowerCase() == 'success'
                               ? RcColors.success
                               : status.toLowerCase().contains('fail')
-                                  ? RcColors.danger
-                                  : RcColors.warning,
+                              ? RcColors.danger
+                              : RcColors.warning,
                         ),
-                        RcStatusPill(label: '$clusters clusters', color: RcColors.purple),
-                        RcStatusPill(label: '$inventory inventory items', color: RcColors.success),
+                        RcStatusPill(
+                          label: '$clusters clusters',
+                          color: RcColors.purple,
+                        ),
+                        RcStatusPill(
+                          label: '$inventory inventory items',
+                          color: RcColors.success,
+                        ),
                       ],
                     ),
-                    if ('${row?['last_sync_message'] ?? ''}'.trim().isNotEmpty) ...[
+                    if ('${row?['last_sync_message'] ?? ''}'
+                        .trim()
+                        .isNotEmpty) ...[
                       const SizedBox(height: 8),
                       Text('${row!['last_sync_message']}'),
                     ],
