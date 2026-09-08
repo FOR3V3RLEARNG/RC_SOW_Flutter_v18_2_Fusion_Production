@@ -1,5 +1,7 @@
 import 'package:excel/excel.dart';
 
+import '../core/gps_coordinates.dart';
+
 class ShelterImportResult {
   const ShelterImportResult({
     required this.rows,
@@ -112,8 +114,12 @@ abstract final class ShelterImportService {
           : _find(raw, ['parish']);
       final community = _find(raw, ['community', 'village', 'cluster']);
       final gps = _find(raw, ['gps', 'gis']);
-      final latitude = _number(_find(raw, ['latitude', 'lat']));
-      final longitude = _number(_find(raw, ['longitude', 'long', 'lng']));
+      final gpsPoint = rcParseGpsPoint(gps);
+      final latitude =
+          _number(_find(raw, ['latitude', 'lat'])) ?? gpsPoint?.latitude;
+      final longitude =
+          _number(_find(raw, ['longitude', 'long', 'lng'])) ??
+          gpsPoint?.longitude;
       final phone = _find(raw, ['phone', 'mobile', 'contact number']);
 
       if (houseCode.isEmpty || name.isEmpty) continue;

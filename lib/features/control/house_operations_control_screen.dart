@@ -47,7 +47,10 @@ class _HouseOperationsControlScreenState
   late RcControlView view;
   String query = '';
   String? parish;
-  int columns = 2;
+  int? columnsOverride;
+
+  int get columns =>
+      (columnsOverride ?? widget.state.controlColumns).clamp(1, 3);
 
   @override
   void initState() {
@@ -55,7 +58,6 @@ class _HouseOperationsControlScreenState
     view = widget.state.controlDefaultView == 'modules'
         ? RcControlView.modules
         : RcControlView.houses;
-    columns = widget.state.controlColumns.clamp(1, 3);
     future = _load();
   }
 
@@ -74,7 +76,7 @@ class _HouseOperationsControlScreenState
   Future<void> _refresh() async {
     await widget.state.refreshUiConfig();
     setState(() {
-      columns = widget.state.controlColumns.clamp(1, 3);
+      columnsOverride = null;
       future = _load();
     });
     await future;
@@ -124,7 +126,8 @@ class _HouseOperationsControlScreenState
                 trailing: PopupMenuButton<int>(
                   tooltip: 'Tile layout',
                   initialValue: columns,
-                  onSelected: (value) => setState(() => columns = value),
+                  onSelected: (value) =>
+                      setState(() => columnsOverride = value),
                   itemBuilder: (_) => const [
                     PopupMenuItem(value: 1, child: Text('1 column')),
                     PopupMenuItem(value: 2, child: Text('2 columns')),
@@ -134,9 +137,8 @@ class _HouseOperationsControlScreenState
                 ),
               ),
               const SizedBox(height: 14),
-              RcResponsiveGrid(
-                minTileWidth: 150,
-                childAspectRatio: 1.8,
+              _ControlColumnsGrid(
+                columns: columns,
                 children: [
                   _PulseTile(
                     label: widget.state.uiText('openLabel', 'Open'),
@@ -240,11 +242,7 @@ class _HouseOperationsControlScreenState
                   ),
                 LayoutBuilder(
                   builder: (context, constraints) {
-                    final effective = constraints.maxWidth < 620
-                        ? 1
-                        : constraints.maxWidth < 950
-                        ? columns.clamp(1, 2)
-                        : columns;
+                    final effective = columns.clamp(1, 3);
                     final gap = 10.0;
                     final width =
                         (constraints.maxWidth - gap * (effective - 1)) /
@@ -1423,11 +1421,9 @@ class HouseMapDirectoryScreen extends StatelessWidget {
                 final rawUrl = '${row['maps_url'] ?? ''}';
                 final lat = row['latitude'];
                 final lon = row['longitude'];
-                final url = rawUrl.isNotEmpty
-                    ? rawUrl
-                    : lat != null && lon != null
+                final url = lat != null && lon != null
                     ? 'https://www.google.com/maps/dir/?api=1&destination=$lat,$lon'
-                    : '';
+                    : rawUrl;
                 return Card(
                   child: ListTile(
                     leading: const Icon(Icons.location_on_outlined),
@@ -1488,6 +1484,36 @@ class HouseMapDirectoryScreen extends StatelessWidget {
   }
 }
 
+class _ControlColumnsGrid extends StatelessWidget {
+  const _ControlColumnsGrid({
+    required this.columns,
+    required this.children,
+  });
+
+  final int columns;
+  final List<Widget> children;
+
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final effective = columns.clamp(1, 3);
+        final gap = effective == 3 ? 7.0 : 10.0;
+        final tileWidth =
+            (constraints.maxWidth - gap * (effective - 1)) / effective;
+
+        return Wrap(
+          spacing: gap,
+          runSpacing: gap,
+          children: children
+              .map((child) => SizedBox(width: tileWidth, child: child))
+              .toList(),
+        );
+      },
+    );
+  }
+}
+
 class _ModuleGrid extends StatelessWidget {
   const _ModuleGrid({
     required this.state,
@@ -1520,11 +1546,7 @@ class _ModuleGrid extends StatelessWidget {
     }
     return LayoutBuilder(
       builder: (context, constraints) {
-        final effective = constraints.maxWidth < 620
-            ? 1
-            : constraints.maxWidth < 950
-            ? columns.clamp(1, 2)
-            : columns;
+        final effective = columns.clamp(1, 3);
         final gap = 10.0;
         final width =
             (constraints.maxWidth - gap * (effective - 1)) / effective;

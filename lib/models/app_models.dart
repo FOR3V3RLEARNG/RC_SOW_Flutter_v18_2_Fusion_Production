@@ -1,4 +1,5 @@
 import '../core/app_constants.dart';
+import '../core/gps_coordinates.dart';
 
 class UserProfile {
   const UserProfile({
@@ -104,16 +105,23 @@ class BeneficiaryRecord {
     );
     double? d(Object? value) =>
         value is num ? value.toDouble() : double.tryParse('$value');
+
+    final gps = '${map['gps'] ?? ''}'.trim();
+    final mapsUrl = map['maps_url']?.toString();
+    final point =
+        rcGpsPoint(d(map['latitude']), d(map['longitude'])) ??
+        rcParseGpsPoint('$gps ${mapsUrl ?? ''}');
+
     return BeneficiaryRecord(
       houseCode: '${map['house_code'] ?? ''}',
       beneficiaryName: '${map['beneficiary_name'] ?? ''}',
       parish: '${map['parish'] ?? ''}',
       cluster: '${map['cluster'] ?? ''}',
       phone: '${map['phone'] ?? ''}',
-      gps: '${map['gps'] ?? ''}',
-      latitude: d(map['latitude']),
-      longitude: d(map['longitude']),
-      mapsUrl: map['maps_url'] as String?,
+      gps: gps,
+      latitude: point?.latitude,
+      longitude: point?.longitude,
+      mapsUrl: mapsUrl,
       roofLength: d(source['roof_length'] ?? source['roofLength']),
       roofWidth: d(source['roof_width'] ?? source['roofWidth']),
       wallHeight: d(source['wall_height'] ?? source['wallHeight']),

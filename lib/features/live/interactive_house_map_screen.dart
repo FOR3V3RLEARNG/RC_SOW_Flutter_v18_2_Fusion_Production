@@ -38,7 +38,7 @@ class _InteractiveHouseMapScreenState extends State<InteractiveHouseMapScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('House Map'),
+        title: const Text('Beneficiary & House Map'),
         actions: [
           IconButton(
             tooltip: 'Live Tracker',
@@ -76,7 +76,7 @@ class _InteractiveHouseMapScreenState extends State<InteractiveHouseMapScreen> {
                     eyebrow: 'Field Navigation',
                     title: 'House Map',
                     subtitle:
-                        'No geocoded house locations are available yet. Add latitude/longitude through beneficiary or house-location data.',
+                        'No usable GPS points are visible yet. The map automatically reads beneficiary GPS/latitude/longitude data and dedicated house-location records.',
                   ),
                 ],
               ),
@@ -188,7 +188,7 @@ class _InteractiveHouseMapScreenState extends State<InteractiveHouseMapScreen> {
                         const SizedBox(width: 8),
                         Expanded(
                           child: Text(
-                            '${rows.length} mapped house${rows.length == 1 ? '' : 's'} • tap a house for directions or Control of Works',
+                            '${rows.length} mapped beneficiar${rows.length == 1 ? 'y/house' : 'ies/houses'} • beneficiary GPS + house locations • tap a marker for directions or Control of Works',
                           ),
                         ),
                         IconButton(
@@ -231,6 +231,8 @@ class _InteractiveHouseMapScreenState extends State<InteractiveHouseMapScreen> {
     final lat = _double(row['latitude']);
     final lon = _double(row['longitude']);
     final savedUrl = '${row['maps_url'] ?? ''}'.trim();
+    final gps = '${row['gps'] ?? ''}'.trim();
+    final source = '${row['location_source'] ?? ''}'.trim();
 
     await showModalBottomSheet<void>(
       context: context,
@@ -247,6 +249,18 @@ class _InteractiveHouseMapScreenState extends State<InteractiveHouseMapScreen> {
             ),
             const SizedBox(height: 4),
             Text('$parish${cluster.isEmpty ? '' : ' • $cluster'}'),
+            if (gps.isNotEmpty) ...[
+              const SizedBox(height: 4),
+              Text('GPS: $gps'),
+            ],
+            if (source.isNotEmpty) ...[
+              const SizedBox(height: 4),
+              Text(
+                source == 'beneficiary_directory'
+                    ? 'Location source: Beneficiary assessment'
+                    : 'Location source: House location record',
+              ),
+            ],
             const SizedBox(height: 14),
             FilledButton.icon(
               onPressed: code.isEmpty
@@ -270,9 +284,9 @@ class _InteractiveHouseMapScreenState extends State<InteractiveHouseMapScreen> {
               onPressed: lat == null && savedUrl.isEmpty
                   ? null
                   : () async {
-                      final raw = savedUrl.isNotEmpty
-                          ? savedUrl
-                          : 'https://www.google.com/maps/dir/?api=1&destination=$lat,$lon';
+                      final raw = lat != null && lon != null
+                          ? 'https://www.google.com/maps/dir/?api=1&destination=$lat,$lon'
+                          : savedUrl;
                       final uri = Uri.tryParse(raw);
                       if (uri == null) return;
                       await launchUrl(

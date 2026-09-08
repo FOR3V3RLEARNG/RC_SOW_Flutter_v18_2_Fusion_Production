@@ -4,6 +4,7 @@ import 'dart:typed_data';
 import 'package:http/http.dart' as http;
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import '../core/gps_coordinates.dart';
 import '../models/app_models.dart';
 
 class RcSowRepository {
@@ -237,12 +238,133 @@ class RcSowRepository {
   }
 
   Future<List<Map<String, dynamic>>> houseLocations(UserProfile profile) async {
-    var query = client.from('house_locations').select();
-    if (!profile.canViewAllParishes && profile.parish.isNotEmpty) {
-      query = query.eq('parish', profile.parish);
+    final byCode = <String, Map<String, dynamic>>{};
+
+    Set<String>? allowedCrewCodes;
+    if (profile.isCrew) {
+      try {
+        allowedCrewCodes = (await houses(profile))
+            .map((house) => house.code.trim().toUpperCase())
+            .where((code) => code.isNotEmpty)
+            .toSet();
+      } catch (_) {
+        allowedCrewCodes = <String>{};
+      }
     }
-    final rows = await query.order('house_code');
-    return rows.map((e) => Map<String, dynamic>.from(e)).toList();
+
+    bool canUseHouse(String code) =>
+        allowedCrewCodes == null || allowedCrewCodes.contains(code);
+
+    // Dedicated house-location rows remain authoritative when available.
+    try {
+      var query = client.from('house_locations').select();
+      if (!profile.canViewAllParishes && profile.parish.isNotEmpty) {
+        query = query.eq('parish', profile.parish);
+      }
+      final rows = await query.order('house_code');
+
+      for (final raw in rows) {
+        final row = Map<String, dynamic>.from(raw);
+        final code = '${row['house_code'] ?? ''}'.trim().toUpperCase();
+        if (code.isEmpty || !canUseHouse(code)) continue;
+
+        final point = _locationPoint(row);
+        if (point == null) continue;
+
+        row['house_code'] = code;
+        row['latitude'] = point.latitude;
+        row['longitude'] = point.longitude;
+        row['maps_url'] =
+            '${row['maps_url'] ?? ''}'.trim().isEmpty
+            ? point.searchUrl
+            : row['maps_url'];
+        row['location_source'] = 'house_locations';
+        byCode[code] = row;
+      }
+    } catch (_) {
+      // Beneficiary GPS remains a complete fallback if this table is
+      // unavailable or has no accessible rows.
+    }
+
+    // Every beneficiary with a valid GPS point is also a map location.
+    try {
+      final beneficiaries = await searchBeneficiaries(
+        profile,
+        query: '',
+        limit: 500,
+      );
+
+      for (final beneficiary in beneficiaries) {
+        final code = beneficiary.houseCode.trim().toUpperCase();
+        if (code.isEmpty || !canUseHouse(code)) continue;
+
+        final point =
+            rcGpsPoint(beneficiary.latitude, beneficiary.longitude) ??
+            rcParseGpsPoint(
+              '${beneficiary.gps} ${beneficiary.mapsUrl ?? ''}',
+            );
+        if (point == null) continue;
+
+        final beneficiaryRow = <String, dynamic>{
+          'house_code': code,
+          'beneficiary_name': beneficiary.beneficiaryName,
+          'parish': beneficiary.parish,
+          'cluster': beneficiary.cluster,
+          'gps': beneficiary.gps,
+          'latitude': point.latitude,
+          'longitude': point.longitude,
+          'maps_url':
+              (beneficiary.mapsUrl ?? '').trim().isNotEmpty
+              ? beneficiary.mapsUrl
+              : point.searchUrl,
+          'location_source': 'beneficiary_directory',
+        };
+
+        final existing = byCode[code];
+        if (existing == null) {
+          byCode[code] = beneficiaryRow;
+          continue;
+        }
+
+        final merged = <String, dynamic>{
+          ...beneficiaryRow,
+          ...existing,
+        };
+
+        for (final key in [
+          'beneficiary_name',
+          'parish',
+          'cluster',
+          'gps',
+          'maps_url',
+        ]) {
+          if ('${existing[key] ?? ''}'.trim().isEmpty &&
+              '${beneficiaryRow[key] ?? ''}'.trim().isNotEmpty) {
+            merged[key] = beneficiaryRow[key];
+          }
+        }
+
+        byCode[code] = merged;
+      }
+    } catch (_) {
+      // Keep any dedicated house-location rows already loaded.
+    }
+
+    final result = byCode.values.toList()
+      ..sort(
+        (a, b) => '${a['house_code'] ?? ''}'.compareTo(
+          '${b['house_code'] ?? ''}',
+        ),
+      );
+    return result;
+  }
+
+  RcGpsPoint? _locationPoint(Map<String, dynamic> row) {
+    double? d(Object? raw) =>
+        raw is num ? raw.toDouble() : double.tryParse('${raw ?? ''}');
+
+    return rcGpsPoint(d(row['latitude']), d(row['longitude'])) ??
+        rcParseGpsPoint('${row['gps'] ?? ''} ${row['maps_url'] ?? ''}');
   }
 
   Future<int> importBeneficiaryRows(List<Map<String, dynamic>> rows) async {
