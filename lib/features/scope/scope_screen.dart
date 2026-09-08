@@ -1078,10 +1078,7 @@ class _ScopeScreenState extends State<ScopeScreen>
     final lengthSquared = ab.dx * ab.dx + ab.dy * ab.dy;
     if (lengthSquared == 0) return ap.distance;
 
-    final t = ((ap.dx * ab.dx + ap.dy * ab.dy) / lengthSquared).clamp(
-      0.0,
-      1.0,
-    );
+    final t = ((ap.dx * ab.dx + ap.dy * ab.dy) / lengthSquared).clamp(0.0, 1.0);
     final projection = Offset(a.dx + ab.dx * t, a.dy + ab.dy * t);
     return (p - projection).distance;
   }
@@ -1181,10 +1178,7 @@ class _ScopeScreenState extends State<ScopeScreen>
 
     if (mode == _CanvasDragMode.vertex) {
       final excluded = _dragBindings.map((binding) => binding.key).toSet();
-      final target = _snapPoint(
-        position,
-        excludedEndpoints: excluded,
-      );
+      final target = _snapPoint(position, excludedEndpoints: excluded);
 
       setState(() {
         for (final binding in _dragBindings) {
@@ -1213,8 +1207,9 @@ class _ScopeScreenState extends State<ScopeScreen>
         if (binding.strokeIndex >= strokes.length) continue;
         final stroke = strokes[binding.strokeIndex];
         if (binding.pointIndex >= stroke.points.length) continue;
-        stroke.points[binding.pointIndex] =
-            binding.group == 0 ? movedStart : movedEnd;
+        stroke.points[binding.pointIndex] = binding.group == 0
+            ? movedStart
+            : movedEnd;
       }
     });
   }
@@ -1546,12 +1541,7 @@ class RoofCanvasPainter extends CustomPainter {
       }
     }
     for (var i = 0; i < strokes.length; i++) {
-      _drawStroke(
-        canvas,
-        strokes[i],
-        size,
-        selected: i == selectedStrokeIndex,
-      );
+      _drawStroke(canvas, strokes[i], size, selected: i == selectedStrokeIndex);
     }
 
     if (current.length == 1) {
@@ -1679,7 +1669,11 @@ class RoofCanvasPainter extends CustomPainter {
 
     canvas.drawCircle(
       point,
-      selected ? 5.5 : connected ? 4.2 : 3.2,
+      selected
+          ? 5.5
+          : connected
+          ? 4.2
+          : 3.2,
       Paint()
         ..color = nodeColor
         ..style = PaintingStyle.fill,
@@ -1687,7 +1681,11 @@ class RoofCanvasPainter extends CustomPainter {
 
     canvas.drawCircle(
       point,
-      selected ? 9 : connected ? 7 : 5.5,
+      selected
+          ? 9
+          : connected
+          ? 7
+          : 5.5,
       Paint()
         ..color = nodeColor.withValues(alpha: .14)
         ..style = PaintingStyle.fill,
