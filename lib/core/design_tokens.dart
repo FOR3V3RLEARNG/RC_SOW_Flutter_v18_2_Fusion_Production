@@ -1,4 +1,5 @@
 import 'app_constants.dart';
+import 'ui_studio.dart';
 import 'package:flutter/material.dart';
 
 abstract final class RcColors {
@@ -27,6 +28,9 @@ abstract final class RcColors {
   static const goldSoft = Color(0xFFFFF7D6);
   static const danger = Color(0xFFB42318);
   static const dangerSoft = Color(0xFFFEF3F2);
+  static const expressivePalette = <Color>[
+    brand, blue, purple, success, gold, teal, warning,
+  ];
 }
 
 abstract final class RcRadius {
@@ -76,20 +80,27 @@ ThemeData buildRcTheme({
   bool compactDensity = false,
   Brightness brightness = Brightness.light,
   RcDesignDna designDna = RcDesignDna.redCrossClassic,
+  double expressiveness = .78,
+  double depth = .72,
+  String surfaceFinish = 'suede',
+  String iconPack = 'rounded',
+  String iconShape = 'squircle',
+  String accentMood = 'red',
 }) {
+  final themeSeed = RcUiVisuals.accentFor(accentMood, designDna.seed);
   final dark = brightness == Brightness.dark || designDna.prefersDark;
   final effectiveBrightness = dark ? Brightness.dark : brightness;
   final scheme =
       ColorScheme.fromSeed(
-        seedColor: designDna.seed,
+        seedColor: themeSeed,
         brightness: effectiveBrightness,
       ).copyWith(
         primary: dark
             ? ColorScheme.fromSeed(
-                seedColor: designDna.seed,
+                seedColor: themeSeed,
                 brightness: Brightness.dark,
               ).primary
-            : designDna.seed,
+            : themeSeed,
         onPrimary: dark ? const Color(0xFF680014) : Colors.white,
         secondary: dark ? const Color(0xFFADC6FF) : RcColors.blue,
         error: dark ? const Color(0xFFFFB4AB) : RcColors.danger,
@@ -117,6 +128,17 @@ ThemeData buildRcTheme({
     visualDensity: compactDensity
         ? VisualDensity.compact
         : VisualDensity.standard,
+    extensions: <ThemeExtension<dynamic>>[
+      RcUiVisuals(
+        expressiveness: expressiveness.clamp(.25, 1.0).toDouble(),
+        depth: depth.clamp(.20, 1.0).toDouble(),
+        surfaceFinish: surfaceFinish,
+        iconPack: iconPack,
+        iconShape: iconShape,
+        accentMood: accentMood,
+        accent: themeSeed,
+      ),
+    ],
     iconTheme: IconThemeData(
       size: RcIconSize.md,
       color: scheme.onSurfaceVariant,
@@ -277,7 +299,11 @@ ThemeData buildRcTheme({
       style: FilledButton.styleFrom(
         minimumSize: const Size(52, 56),
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(22)),
+        elevation: 1.2 + depth * 2.8,
+        shadowColor: themeSeed.withValues(alpha: .18),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(18 + expressiveness * 7),
+        ),
         textStyle: const TextStyle(
           fontSize: 15,
           fontWeight: FontWeight.w900,

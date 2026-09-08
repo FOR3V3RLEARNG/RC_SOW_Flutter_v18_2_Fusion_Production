@@ -65,9 +65,42 @@ if f'android:scheme="{scheme}"' not in s or f'android:host="{host}"' not in s:
         raise SystemExit('Could not locate main intent-filter marker')
     s = s.replace(marker, deeplink + marker, 1)
 
+application_match = re.search(r'<application\b[^>]*>', s)
+if not application_match:
+    raise SystemExit('Could not locate Android application tag')
+application_tag = application_match.group(0)
+if 'android:label=' in application_tag:
+    application_tag = re.sub(
+        r'android:label="[^"]*"',
+        'android:label="Red Cross Scope of Work"',
+        application_tag,
+        count=1,
+    )
+else:
+    application_tag = application_tag[:-1] + ' android:label="Red Cross Scope of Work">'
+s = s[:application_match.start()] + application_tag + s[application_match.end():]
+
 manifest.write_text(s)
 print(f'Android OAuth callback patched: {scheme}://{host}')
+print('Android install name: Red Cross Scope of Work')
 PY_OAUTH
+
+# RC SOW embedded media: Android minSdk 24 for modern WebView support.
+python3 - <<'PY_MINSDK'
+from pathlib import Path
+import re
+
+for path in [Path('android/app/build.gradle.kts'), Path('android/app/build.gradle')]:
+    if not path.exists():
+        continue
+    text = path.read_text()
+    original = text
+    text = re.sub(r'minSdk\s*=\s*flutter\.minSdkVersion', 'minSdk = 24', text)
+    text = re.sub(r'minSdkVersion\s+flutter\.minSdkVersion', 'minSdkVersion 24', text)
+    if text != original:
+        path.write_text(text)
+        print(f'Android minSdk patched to 24: {path}')
+PY_MINSDK
 
 mkdir -p \
   "$RES/values" \

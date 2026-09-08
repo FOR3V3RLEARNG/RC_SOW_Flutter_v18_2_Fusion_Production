@@ -192,6 +192,7 @@ class _ControlScreenState extends State<ControlScreen> {
                           .where((r) => r.eventType == schema.eventType)
                           .length;
                       return _ModuleTile(
+                        state: widget.state,
                         schema: schema,
                         count: count,
                         onTap: () => _openModule(schema),
@@ -797,10 +798,12 @@ class _PhaseRail extends StatelessWidget {
 
 class _ModuleTile extends StatelessWidget {
   const _ModuleTile({
+    required this.state,
     required this.schema,
     required this.count,
     required this.onTap,
   });
+  final AppState state;
   final RcRecordSchema schema;
   final int count;
   final VoidCallback onTap;
@@ -814,17 +817,12 @@ class _ModuleTile extends StatelessWidget {
       semanticLabel: schema.title,
       child: Row(
         children: [
-          Container(
-            padding: const EdgeInsets.all(10),
-            decoration: BoxDecoration(
-              color: theme.colorScheme.primaryContainer,
-              borderRadius: BorderRadius.circular(16),
-            ),
-            child: Icon(
-              schema.icon,
-              size: RcIconSize.sm,
-              color: theme.colorScheme.onPrimaryContainer,
-            ),
+          RcIconWell(
+            icon: state.uiIcon('module.${schema.eventType}', schema.icon),
+            color: RcColors.expressivePalette[
+              schema.icon.codePoint % RcColors.expressivePalette.length
+            ],
+            size: 48,
           ),
           const SizedBox(width: 12),
           Expanded(

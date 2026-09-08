@@ -3,6 +3,7 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 
 import 'design_tokens.dart';
+import 'ui_studio.dart';
 
 enum RcSurfaceShape { standard, hero, offset, pill }
 
@@ -31,19 +32,20 @@ class RcExpressiveSurface extends StatefulWidget {
 class _RcExpressiveSurfaceState extends State<RcExpressiveSurface> {
   bool pressed = false;
 
-  BorderRadius _radius() => switch (widget.shape) {
-    RcSurfaceShape.standard => BorderRadius.circular(RcRadius.lg),
-    RcSurfaceShape.hero => const BorderRadius.only(
-      topLeft: Radius.circular(36),
-      topRight: Radius.circular(18),
-      bottomLeft: Radius.circular(18),
-      bottomRight: Radius.circular(36),
+  BorderRadius _radius(double expression) => switch (widget.shape) {
+    RcSurfaceShape.standard =>
+      BorderRadius.circular(RcRadius.lg + expression * 3),
+    RcSurfaceShape.hero => BorderRadius.only(
+      topLeft: Radius.circular(34 + expression * 8),
+      topRight: Radius.circular(18 + expression * 4),
+      bottomLeft: Radius.circular(18 + expression * 4),
+      bottomRight: Radius.circular(34 + expression * 8),
     ),
-    RcSurfaceShape.offset => const BorderRadius.only(
-      topLeft: Radius.circular(14),
-      topRight: Radius.circular(30),
-      bottomLeft: Radius.circular(30),
-      bottomRight: Radius.circular(14),
+    RcSurfaceShape.offset => BorderRadius.only(
+      topLeft: Radius.circular(13 + expression * 4),
+      topRight: Radius.circular(27 + expression * 7),
+      bottomLeft: Radius.circular(27 + expression * 7),
+      bottomRight: Radius.circular(13 + expression * 4),
     ),
     RcSurfaceShape.pill => BorderRadius.circular(999),
   };
@@ -51,35 +53,77 @@ class _RcExpressiveSurfaceState extends State<RcExpressiveSurface> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final radius = _radius();
+    final ui = theme.extension<RcUiVisuals>() ?? const RcUiVisuals();
+    final radius = _radius(ui.expressiveness);
     final base = widget.tone ?? theme.colorScheme.surface;
+    final interactive = widget.onTap != null;
+    final accent = ui.accent;
+
     final pressedTone = Color.alphaBlend(
-      theme.colorScheme.primary.withValues(alpha: .085),
+      accent.withValues(alpha: .07 + ui.expressiveness * .07),
       base,
     );
-    final interactive = widget.onTap != null;
+    final topLift = Color.alphaBlend(
+      Colors.white.withValues(
+        alpha: ui.surfaceFinish == 'clean'
+            ? .015
+            : .035 + ui.expressiveness * .035,
+      ),
+      pressed ? pressedTone : base,
+    );
+    final bottomTint = Color.alphaBlend(
+      accent.withValues(
+        alpha: ui.surfaceFinish == 'suede'
+            ? .020 + ui.expressiveness * .018
+            : .010,
+      ),
+      pressed ? pressedTone : base,
+    );
+    final contactShadow = ui.depth * (pressed ? 2.0 : 7.5);
+    final ambientShadow = ui.depth * (pressed ? 5.0 : 20.0);
 
     final surface = AnimatedContainer(
-      duration: const Duration(milliseconds: 115),
+      duration: Duration(
+        milliseconds: 95 + (ui.expressiveness * 65).round(),
+      ),
       curve: Curves.easeOutCubic,
-      transform: Matrix4.translationValues(0, pressed ? 2.5 : 0, 0),
+      transformAlignment: Alignment.center,
+      transform: Matrix4.identity()
+        ..translate(0.0, pressed ? 2.2 + ui.depth * 1.5 : 0.0)
+        ..scale(pressed ? .994 : 1.0),
       decoration: BoxDecoration(
-        color: pressed ? pressedTone : base,
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: ui.surfaceFinish == 'clean'
+              ? [pressed ? pressedTone : base, pressed ? pressedTone : base]
+              : [topLift, pressed ? pressedTone : base, bottomTint],
+          stops: ui.surfaceFinish == 'clean' ? null : const [0, .52, 1],
+        ),
         borderRadius: radius,
         border: Border.all(
           color: pressed
-              ? theme.colorScheme.primary.withValues(alpha: .34)
-              : theme.colorScheme.outlineVariant,
+              ? accent.withValues(alpha: .28 + ui.expressiveness * .15)
+              : theme.colorScheme.outlineVariant.withValues(
+                  alpha: .78 + ui.depth * .18,
+                ),
           width: pressed ? 1.35 : 1,
         ),
-        boxShadow: interactive
+        boxShadow: interactive || ui.depth > .45
             ? [
                 BoxShadow(
                   color: theme.colorScheme.shadow.withValues(
-                    alpha: pressed ? .035 : .10,
+                    alpha: pressed ? .025 : .035 + ui.depth * .065,
                   ),
-                  blurRadius: pressed ? 5 : 16,
-                  offset: Offset(0, pressed ? 2 : 7),
+                  blurRadius: ambientShadow,
+                  offset: Offset(0, pressed ? 2 : 8 * ui.depth),
+                ),
+                BoxShadow(
+                  color: accent.withValues(
+                    alpha: pressed ? .015 : .018 + ui.depth * .025,
+                  ),
+                  blurRadius: contactShadow,
+                  offset: Offset(0, pressed ? 1 : 2.5),
                 ),
               ]
             : null,
@@ -89,6 +133,8 @@ class _RcExpressiveSurfaceState extends State<RcExpressiveSurface> {
         color: Colors.transparent,
         child: InkWell(
           borderRadius: radius,
+          splashColor: accent.withValues(alpha: .10),
+          highlightColor: accent.withValues(alpha: .055),
           onTap: widget.onTap,
           onHighlightChanged: interactive
               ? (value) {
@@ -101,7 +147,75 @@ class _RcExpressiveSurfaceState extends State<RcExpressiveSurface> {
     );
 
     if (!interactive) return surface;
-    return Semantics(button: true, label: widget.semanticLabel, child: surface);
+    return Semantics(
+      button: true,
+      label: widget.semanticLabel,
+      child: surface,
+    );
+  }
+}
+
+class RcIconWell extends StatelessWidget {
+  const RcIconWell({
+    super.key,
+    required this.icon,
+    this.color,
+    this.size = 48,
+    this.iconSize,
+  });
+
+  final IconData icon;
+  final Color? color;
+  final double size;
+  final double? iconSize;
+
+  BorderRadius _radius(String shape) => switch (shape) {
+    'circle' => BorderRadius.circular(999),
+    'pill' => BorderRadius.circular(size * .48),
+    'soft' => BorderRadius.circular(size * .22),
+    _ => BorderRadius.only(
+      topLeft: Radius.circular(size * .32),
+      topRight: Radius.circular(size * .18),
+      bottomLeft: Radius.circular(size * .18),
+      bottomRight: Radius.circular(size * .32),
+    ),
+  };
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final ui = theme.extension<RcUiVisuals>() ?? const RcUiVisuals();
+    final c = color ?? ui.accent;
+    return Container(
+      width: size,
+      height: size,
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            c.withValues(alpha: .19),
+            c.withValues(alpha: .10),
+          ],
+        ),
+        borderRadius: _radius(ui.iconShape),
+        border: Border.all(
+          color: c.withValues(alpha: .20 + ui.expressiveness * .13),
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: c.withValues(alpha: .07 + ui.depth * .06),
+            blurRadius: 8 + ui.depth * 8,
+            offset: Offset(0, 2 + ui.depth * 3),
+          ),
+        ],
+      ),
+      child: Icon(
+        icon,
+        size: iconSize ?? size * .46,
+        color: c,
+      ),
+    );
   }
 }
 

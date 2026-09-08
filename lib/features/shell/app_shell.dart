@@ -209,8 +209,14 @@ class _NavigationDock extends StatelessWidget {
               destinations: RcDestination.values
                   .map(
                     (d) => NavigationRailDestination(
-                      icon: Icon(d.icon, size: RcIconSize.sm),
-                      selectedIcon: Icon(d.selectedIcon, size: RcIconSize.sm),
+                      icon: Icon(
+                        state.uiIcon('nav.${d.name}', d.icon),
+                        size: RcIconSize.sm,
+                      ),
+                      selectedIcon: Icon(
+                        state.uiIcon('nav.${d.name}', d.selectedIcon),
+                        size: RcIconSize.sm,
+                      ),
                       label: Text(d.label),
                     ),
                   )
@@ -227,7 +233,10 @@ class _NavigationDock extends StatelessWidget {
             onPressed: () => Navigator.of(context).push(
               MaterialPageRoute(builder: (_) => SettingsScreen(state: state)),
             ),
-            icon: const Icon(Icons.settings_outlined, size: RcIconSize.sm),
+            icon: Icon(
+                  state.uiIcon('header.settings', Icons.settings_outlined),
+                  size: RcIconSize.sm,
+                ),
           ),
           const SizedBox(height: 10),
         ],
@@ -266,14 +275,16 @@ class _SlidingNavigationIsland extends StatelessWidget {
             children: [
               ...RcDestination.values.map(
                 (d) => _NavButton(
-                  destination: d,
+                  label: d.label,
+                  icon: state.uiIcon('nav.${d.name}', d.icon),
+                  selectedIcon: state.uiIcon('nav.${d.name}', d.selectedIcon),
                   selected: state.selectedTab == d.index,
                   onTap: () => state.selectTab(d.index),
                 ),
               ),
               _NavButton(
                 label: 'Map',
-                icon: Icons.map_outlined,
+                icon: state.uiIcon('nav.map', Icons.map_outlined),
                 selected: false,
                 onTap: () async {
                   final result = await Navigator.of(context).push<String>(
@@ -288,7 +299,7 @@ class _SlidingNavigationIsland extends StatelessWidget {
               ),
               _NavButton(
                 label: 'Tracker',
-                icon: Icons.location_searching,
+                icon: state.uiIcon('nav.tracker', Icons.location_searching),
                 selected: false,
                 onTap: () => RcNavigator.liveTracker(context, state),
               ),
@@ -311,12 +322,14 @@ class _NavButton extends StatelessWidget {
     this.destination,
     this.label,
     this.icon,
+    this.selectedIcon,
     required this.selected,
     required this.onTap,
   });
   final RcDestination? destination;
   final String? label;
   final IconData? icon;
+  final IconData? selectedIcon;
   final bool selected;
   final VoidCallback onTap;
 
@@ -341,7 +354,9 @@ class _NavButton extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(
-              selected ? (d?.selectedIcon ?? icon) : (d?.icon ?? icon),
+              selected
+                  ? (selectedIcon ?? d?.selectedIcon ?? icon)
+                  : (d?.icon ?? icon),
               size: RcIconSize.sm,
               color: selected
                   ? theme.colorScheme.onPrimaryContainer
@@ -441,19 +456,28 @@ class RcHeader extends StatelessWidget {
                 tooltip: 'Field map',
                 onPressed: () =>
                     RcNavigator.liveTracker(context, state, mapFirst: true),
-                icon: const Icon(Icons.map_outlined, size: RcIconSize.sm),
+                icon: Icon(
+                  state.uiIcon('nav.map', Icons.map_outlined),
+                  size: RcIconSize.sm,
+                ),
               ),
               IconButton(
                 tooltip: 'Live Tracker',
                 onPressed: () => RcNavigator.liveTracker(context, state),
-                icon: const Icon(Icons.location_searching, size: RcIconSize.sm),
+                icon: Icon(
+                  state.uiIcon('nav.tracker', Icons.location_searching),
+                  size: RcIconSize.sm,
+                ),
               ),
               IconButton.filledTonal(
                 tooltip: 'Notification Centre',
                 onPressed: () => showNotificationCentre(context, state),
-                icon: const Badge(
+                icon: Badge(
                   child: Icon(
-                    Icons.notifications_active_outlined,
+                    state.uiIcon(
+                      'header.messages',
+                      Icons.notifications_active_outlined,
+                    ),
                     size: RcIconSize.md,
                   ),
                 ),
@@ -461,7 +485,10 @@ class RcHeader extends StatelessWidget {
               IconButton(
                 tooltip: 'Settings',
                 onPressed: () => RcNavigator.settings(context, state),
-                icon: const Icon(Icons.settings_outlined, size: RcIconSize.sm),
+                icon: Icon(
+                  state.uiIcon('header.settings', Icons.settings_outlined),
+                  size: RcIconSize.sm,
+                ),
               ),
             ],
           ),
@@ -598,10 +625,10 @@ class _MoreTile extends StatelessWidget {
     onTap: onTap,
     child: Row(
       children: [
-        Icon(
-          icon,
-          size: RcIconSize.sm,
+        RcIconWell(
+          icon: icon,
           color: Theme.of(context).colorScheme.primary,
+          size: 44,
         ),
         const SizedBox(width: 10),
         Expanded(

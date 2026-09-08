@@ -1565,7 +1565,10 @@ class _ModuleGrid extends StatelessWidget {
                 width: width,
                 child: _ActionTile(
                   schema.title,
-                  schema.icon,
+                  state.uiIcon(
+                    'module.${schema.eventType}',
+                    schema.icon,
+                  ),
                   '${records.where((r) => r.eventType == schema.eventType).length} records • ${schema.phase}',
                   () => onOpenModule(schema.eventType),
                 ),
@@ -1680,7 +1683,13 @@ class _ActionTile extends StatelessWidget {
       onTap: onTap,
       child: Row(
         children: [
-          CircleAvatar(child: Icon(icon)),
+          RcIconWell(
+            icon: icon,
+            color: RcColors.expressivePalette[
+              icon.codePoint % RcColors.expressivePalette.length
+            ],
+            size: 46,
+          ),
           const SizedBox(width: 10),
           Expanded(
             child: Column(

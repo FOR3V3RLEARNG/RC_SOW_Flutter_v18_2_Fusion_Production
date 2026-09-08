@@ -47,7 +47,7 @@ class _RcSowAppState extends State<RcSowApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'RC SOW',
+      title: 'Red Cross Scope of Work',
       debugShowCheckedModeBanner: false,
       themeMode: state.themeMode,
       theme: buildRcTheme(
@@ -55,12 +55,24 @@ class _RcSowAppState extends State<RcSowApp> {
         compactDensity: state.compactDensity,
         brightness: Brightness.light,
         designDna: state.designDna,
+        expressiveness: state.uiExpressiveness,
+        depth: state.uiDepth,
+        surfaceFinish: state.uiSurfaceFinish,
+        iconPack: state.uiIconPack,
+        iconShape: state.uiIconShape,
+        accentMood: state.uiAccentMood,
       ),
       darkTheme: buildRcTheme(
         highContrast: state.highContrast,
         compactDensity: state.compactDensity,
         brightness: Brightness.dark,
         designDna: state.designDna,
+        expressiveness: state.uiExpressiveness,
+        depth: state.uiDepth,
+        surfaceFinish: state.uiSurfaceFinish,
+        iconPack: state.uiIconPack,
+        iconShape: state.uiIconShape,
+        accentMood: state.uiAccentMood,
       ),
       home: !splashDone
           ? PremiumSplash(

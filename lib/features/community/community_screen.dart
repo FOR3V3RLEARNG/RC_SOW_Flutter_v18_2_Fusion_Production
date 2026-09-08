@@ -1,10 +1,328 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:webview_flutter/webview_flutter.dart';
 
+import '../../core/app_constants.dart';
 import '../../core/design_tokens.dart';
 import '../../core/rc_components.dart';
 import '../../models/app_models.dart';
 import '../../state/app_state.dart';
+
+Future<bool?> showCommunityComposer(
+  BuildContext context,
+  AppState state, {
+  bool adminMode = false,
+}) async {
+  final title = TextEditingController();
+  final body = TextEditingController();
+  final mediaUrl = TextEditingController();
+  final thumbnailUrl = TextEditingController();
+  final location = TextEditingController();
+  final ctaLabel = TextEditingController();
+  final ctaUrl = TextEditingController();
+
+  String category = 'News';
+  String mediaType = 'None';
+  String parish = state.profile!.canViewAllParishes
+      ? 'All Parishes'
+      : state.profile!.parish;
+  bool featured = false;
+  bool embed = true;
+  DateTime? eventStart;
+
+  Future<DateTime?> chooseDateTime(
+    BuildContext sheetContext,
+    DateTime? current,
+  ) async {
+    final now = DateTime.now();
+    final date = await showDatePicker(
+      context: sheetContext,
+      firstDate: DateTime(now.year - 1),
+      lastDate: DateTime(now.year + 4),
+      initialDate: current ?? now,
+    );
+    if (date == null || !sheetContext.mounted) return current;
+    final time = await showTimePicker(
+      context: sheetContext,
+      initialTime: TimeOfDay.fromDateTime(current ?? now),
+    );
+    if (time == null) return DateTime(date.year, date.month, date.day);
+    return DateTime(date.year, date.month, date.day, time.hour, time.minute);
+  }
+
+  final saved = await showModalBottomSheet<bool>(
+    context: context,
+    isScrollControlled: true,
+    showDragHandle: true,
+    builder: (sheetContext) => StatefulBuilder(
+      builder: (context, setSheetState) => FractionallySizedBox(
+        heightFactor: .94,
+        child: ListView(
+          padding: EdgeInsets.fromLTRB(
+            18,
+            0,
+            18,
+            22 + MediaQuery.viewInsetsOf(context).bottom,
+          ),
+          children: [
+            Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    adminMode
+                        ? 'Community Media Studio'
+                        : 'Publish Community Update',
+                    style: Theme.of(context).textTheme.headlineSmall,
+                  ),
+                ),
+                if (adminMode)
+                  const RcStatusPill(
+                    label: 'ADMIN CONTROLLED',
+                    icon: Icons.admin_panel_settings_outlined,
+                  ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            DropdownButtonFormField<String>(
+              initialValue: category,
+              decoration: const InputDecoration(labelText: 'Content type'),
+              items: const [
+                'News',
+                'Event',
+                'Meeting',
+                'Live Stream',
+                'Recognition',
+                'Training',
+                'Safety',
+                'Urgent',
+              ]
+                  .map(
+                    (value) => DropdownMenuItem(
+                      value: value,
+                      child: Text(value),
+                    ),
+                  )
+                  .toList(),
+              onChanged: (value) =>
+                  setSheetState(() => category = value ?? 'News'),
+            ),
+            const SizedBox(height: 9),
+            if (state.profile!.canViewAllParishes)
+              DropdownButtonFormField<String>(
+                initialValue: parish,
+                decoration: const InputDecoration(labelText: 'Audience'),
+                items: ['All Parishes', ...RcApp.parishes]
+                    .map(
+                      (value) => DropdownMenuItem(
+                        value: value,
+                        child: Text(value),
+                      ),
+                    )
+                    .toList(),
+                onChanged: (value) => setSheetState(
+                  () => parish = value ?? 'All Parishes',
+                ),
+              ),
+            if (state.profile!.canViewAllParishes) const SizedBox(height: 9),
+            TextField(
+              controller: title,
+              decoration: const InputDecoration(
+                labelText: 'Title',
+                prefixIcon: Icon(Icons.title_rounded),
+              ),
+            ),
+            const SizedBox(height: 9),
+            TextField(
+              controller: body,
+              minLines: 4,
+              maxLines: 9,
+              decoration: const InputDecoration(
+                labelText: 'Description / agenda / update',
+              ),
+            ),
+            const SizedBox(height: 12),
+            Text(
+              'Event & meeting details',
+              style: Theme.of(context).textTheme.titleMedium,
+            ),
+            const SizedBox(height: 8),
+            OutlinedButton.icon(
+              onPressed: () async {
+                final picked = await chooseDateTime(context, eventStart);
+                if (picked != null) {
+                  setSheetState(() => eventStart = picked);
+                }
+              },
+              icon: const Icon(Icons.calendar_month_rounded),
+              label: Text(
+                eventStart == null
+                    ? 'Add event date & time'
+                    : _dateTimeLabel(eventStart!),
+              ),
+            ),
+            const SizedBox(height: 9),
+            TextField(
+              controller: location,
+              decoration: const InputDecoration(
+                labelText: 'Location / meeting place',
+                prefixIcon: Icon(Icons.location_on_outlined),
+              ),
+            ),
+            const SizedBox(height: 12),
+            Text(
+              'Media & live connection',
+              style: Theme.of(context).textTheme.titleMedium,
+            ),
+            const SizedBox(height: 8),
+            DropdownButtonFormField<String>(
+              initialValue: mediaType,
+              decoration: const InputDecoration(labelText: 'Media type'),
+              items: const [
+                'None',
+                'Image',
+                'YouTube',
+                'Live Stream',
+                'Microsoft Teams',
+                'Zoom',
+                'Video',
+                'Document / File',
+                'Website',
+              ]
+                  .map(
+                    (value) => DropdownMenuItem(
+                      value: value,
+                      child: Text(value),
+                    ),
+                  )
+                  .toList(),
+              onChanged: (value) =>
+                  setSheetState(() => mediaType = value ?? 'None'),
+            ),
+            const SizedBox(height: 9),
+            TextField(
+              controller: mediaUrl,
+              keyboardType: TextInputType.url,
+              decoration: const InputDecoration(
+                labelText: 'Display / media / meeting URL',
+                hintText:
+                    'YouTube, Teams, Zoom, livestream, document or web URL',
+                prefixIcon: Icon(Icons.link_rounded),
+              ),
+            ),
+            const SizedBox(height: 9),
+            TextField(
+              controller: thumbnailUrl,
+              keyboardType: TextInputType.url,
+              decoration: const InputDecoration(
+                labelText: 'Thumbnail / preview image URL (optional)',
+                prefixIcon: Icon(Icons.image_outlined),
+              ),
+            ),
+            SwitchListTile.adaptive(
+              contentPadding: EdgeInsets.zero,
+              title: const Text('Open inside Red Cross Scope of Work'),
+              subtitle: const Text(
+                'YouTube, Teams, Zoom, websites and livestreams use the embedded viewer when supported, with an external-app fallback.',
+              ),
+              value: embed,
+              onChanged: (value) => setSheetState(() => embed = value),
+            ),
+            SwitchListTile.adaptive(
+              contentPadding: EdgeInsets.zero,
+              title: const Text('Feature this update'),
+              subtitle: const Text(
+                'Featured items receive stronger visual treatment and priority.',
+              ),
+              value: featured,
+              onChanged: (value) => setSheetState(() => featured = value),
+            ),
+            const SizedBox(height: 8),
+            Text('Call to action', style: Theme.of(context).textTheme.titleMedium),
+            const SizedBox(height: 8),
+            TextField(
+              controller: ctaLabel,
+              decoration: const InputDecoration(
+                labelText: 'Button label (optional)',
+                hintText: 'Join meeting, Watch live, View file…',
+              ),
+            ),
+            const SizedBox(height: 9),
+            TextField(
+              controller: ctaUrl,
+              keyboardType: TextInputType.url,
+              decoration: const InputDecoration(
+                labelText: 'Button URL (optional)',
+              ),
+            ),
+            const SizedBox(height: 16),
+            FilledButton.icon(
+              onPressed: () async {
+                if (title.text.trim().isEmpty || body.text.trim().isEmpty) {
+                  return;
+                }
+                try {
+                  await state.repository.submitCommunityPost(
+                    profile: state.profile!,
+                    title: title.text.trim(),
+                    body: body.text.trim(),
+                    category: category,
+                    mediaUrl: mediaUrl.text.trim().isEmpty
+                        ? null
+                        : mediaUrl.text.trim(),
+                    mediaType: mediaType,
+                    thumbnailUrl: thumbnailUrl.text.trim().isEmpty
+                        ? null
+                        : thumbnailUrl.text.trim(),
+                    location: location.text.trim().isEmpty
+                        ? null
+                        : location.text.trim(),
+                    eventStart: eventStart,
+                    ctaLabel: ctaLabel.text.trim().isEmpty
+                        ? null
+                        : ctaLabel.text.trim(),
+                    ctaUrl: ctaUrl.text.trim().isEmpty
+                        ? null
+                        : ctaUrl.text.trim(),
+                    embed: embed,
+                    featured: featured,
+                    parish: parish,
+                  );
+                  if (context.mounted) Navigator.pop(context, true);
+                } catch (error) {
+                  if (context.mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(
+                          'Community item could not be published: $error',
+                        ),
+                      ),
+                    );
+                  }
+                }
+              },
+              icon: const Icon(Icons.publish_rounded),
+              label: const Text('Publish Community Item'),
+            ),
+          ],
+        ),
+      ),
+    ),
+  );
+
+  for (final controller in [
+    title,
+    body,
+    mediaUrl,
+    thumbnailUrl,
+    location,
+    ctaLabel,
+    ctaUrl,
+  ]) {
+    controller.dispose();
+  }
+  return saved;
+}
 
 class CommunityScreen extends StatefulWidget {
   const CommunityScreen({super.key, required this.state});
@@ -36,6 +354,7 @@ class _CommunityScreenState extends State<CommunityScreen> {
   Widget build(BuildContext context) {
     final profile = widget.state.profile!;
     final theme = Theme.of(context);
+
     return RefreshIndicator(
       onRefresh: refresh,
       child: FutureBuilder<List<ProductionRecord>>(
@@ -43,8 +362,10 @@ class _CommunityScreenState extends State<CommunityScreen> {
         builder: (_, snap) {
           final records = snap.data ?? const <ProductionRecord>[];
           final posts = records
-              .where((r) => r.eventType == 'communityPost')
+              .where((record) => record.eventType == 'communityPost')
               .toList();
+          final upcoming = _upcoming(posts);
+
           if (snap.hasError) {
             return ListView(
               padding: const EdgeInsets.all(18),
@@ -54,7 +375,7 @@ class _CommunityScreenState extends State<CommunityScreen> {
                   child: Column(
                     children: [
                       const Text(
-                        'Community Board could not be loaded. Existing posts are unchanged.',
+                        'Community could not be loaded. Existing posts were not changed.',
                       ),
                       const SizedBox(height: 12),
                       OutlinedButton.icon(
@@ -68,58 +389,103 @@ class _CommunityScreenState extends State<CommunityScreen> {
               ],
             );
           }
+
           return ListView(
             padding: const EdgeInsets.fromLTRB(16, 18, 16, 124),
             children: [
               RcPageHeading(
                 eyebrow: 'Team community',
-                title: 'Community Board',
+                title: 'Community',
                 subtitle: profile.canViewAllParishes
-                    ? 'All-parish team news, events, recognition and field coordination.'
-                    : '${profile.parish} team news, events and recognition.',
+                    ? 'All-parish events, meetings, livestreams, recognition, files and team updates.'
+                    : '${profile.parish} events, meetings, livestreams, recognition and team updates.',
                 trailing: profile.canCreateCommunityEvent
                     ? IconButton.filledTonal(
                         onPressed: _addPost,
+                        tooltip: 'Create community item',
                         icon: const Icon(Icons.add_rounded),
-                        tooltip: 'Create community post',
                       )
                     : null,
               ),
               const SizedBox(height: 16),
               RcExpressiveSurface(
                 shape: RcSurfaceShape.hero,
-                tone: theme.colorScheme.primaryContainer.withValues(alpha: .34),
-                child: Column(
+                tone: theme.colorScheme.primaryContainer.withValues(alpha: .30),
+                child: Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Row(
-                      children: [
-                        Icon(
-                          Icons.groups_2_outlined,
-                          color: theme.colorScheme.primary,
-                        ),
-                        const SizedBox(width: 9),
-                        Text(
-                          'Building back safer — together',
-                          style: theme.textTheme.titleLarge,
-                        ),
-                      ],
+                    RcIconWell(
+                      icon: Icons.groups_2_rounded,
+                      color: theme.colorScheme.primary,
+                      size: 54,
                     ),
-                    const SizedBox(height: 8),
-                    Text(
-                      'Red Cross news • upcoming meetings • team events • safety recognition • efficient crew performance. Community Admin and limited roles can read and send suggestions for review.',
-                    ),
-                    if (!profile.canCreateCommunityEvent) ...[
-                      const SizedBox(height: 12),
-                      FilledButton.tonalIcon(
-                        onPressed: _suggest,
-                        icon: const Icon(Icons.lightbulb_outline),
-                        label: const Text('Send suggestion'),
+                    const SizedBox(width: 13),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Building back safer — together',
+                            style: theme.textTheme.titleLarge,
+                          ),
+                          const SizedBox(height: 5),
+                          const Text(
+                            'Upcoming events, live meetings, training, media, files, field recognition and operational updates in one place.',
+                          ),
+                          if (!profile.canCreateCommunityEvent) ...[
+                            const SizedBox(height: 12),
+                            FilledButton.tonalIcon(
+                              onPressed: _suggest,
+                              icon: const Icon(Icons.lightbulb_outline),
+                              label: const Text('Send suggestion'),
+                            ),
+                          ],
+                        ],
                       ),
-                    ],
+                    ),
                   ],
                 ),
               ),
+              const SizedBox(height: 18),
+              Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      'Upcoming Events',
+                      style: theme.textTheme.titleLarge,
+                    ),
+                  ),
+                  Text(
+                    'Swipe →',
+                    style: theme.textTheme.labelMedium?.copyWith(
+                      color: theme.colorScheme.onSurfaceVariant,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 9),
+              if (upcoming.isEmpty)
+                const RcExpressiveSurface(
+                  child: Text(
+                    'No upcoming events or meetings have been scheduled yet.',
+                  ),
+                )
+              else
+                SizedBox(
+                  height: 202,
+                  child: ListView.separated(
+                    scrollDirection: Axis.horizontal,
+                    itemCount: upcoming.length,
+                    separatorBuilder: (_, _) => const SizedBox(width: 10),
+                    itemBuilder: (_, index) => SizedBox(
+                      width: 280,
+                      child: _UpcomingEventCard(
+                        record: upcoming[index],
+                        onOpen: () => _openPost(upcoming[index]),
+                      ),
+                    ),
+                  ),
+                ),
               const SizedBox(height: 18),
               _RecognitionStrip(records: posts),
               const SizedBox(height: 18),
@@ -128,51 +494,14 @@ class _CommunityScreenState extends State<CommunityScreen> {
               if (posts.isEmpty &&
                   snap.connectionState != ConnectionState.waiting)
                 const RcExpressiveSurface(
-                  child: Text(
-                    'No published community updates yet. Authorized supervisors can create the first event or team update.',
-                  ),
+                  child: Text('No published community updates yet.'),
                 ),
               ...posts.map(
                 (post) => Padding(
                   padding: const EdgeInsets.only(bottom: 10),
-                  child: RcExpressiveSurface(
-                    shape: RcSurfaceShape.offset,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          children: [
-                            RcStatusPill(
-                              label: '${post.item['category'] ?? 'UPDATE'}'
-                                  .toUpperCase(),
-                              color: _categoryColor(
-                                '${post.item['category'] ?? ''}',
-                              ),
-                            ),
-                            const Spacer(),
-                            Text(
-                              _date(post.updatedAt),
-                              style: theme.textTheme.labelSmall,
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 10),
-                        Text(post.title, style: theme.textTheme.titleLarge),
-                        const SizedBox(height: 6),
-                        Text('${post.item['body'] ?? post.summary}'),
-                        if ('${post.item['mediaUrl'] ?? ''}'.isNotEmpty) ...[
-                          const SizedBox(height: 10),
-                          _CommunityMedia(url: '${post.item['mediaUrl']}'),
-                        ],
-                        const SizedBox(height: 8),
-                        Text(
-                          post.parish.isEmpty ? 'All Parishes' : post.parish,
-                          style: theme.textTheme.labelMedium?.copyWith(
-                            color: theme.colorScheme.onSurfaceVariant,
-                          ),
-                        ),
-                      ],
-                    ),
+                  child: _PostCard(
+                    post: post,
+                    onOpen: () => _openPost(post),
                   ),
                 ),
               ),
@@ -183,13 +512,52 @@ class _CommunityScreenState extends State<CommunityScreen> {
     );
   }
 
-  Color _categoryColor(String category) => switch (category.toLowerCase()) {
-    'event' => RcColors.purple,
-    'meeting' => RcColors.blue,
-    'recognition' => RcColors.success,
-    'urgent' => RcColors.warning,
-    _ => Theme.of(context).colorScheme.primary,
-  };
+  List<ProductionRecord> _upcoming(List<ProductionRecord> posts) {
+    final now = DateTime.now().subtract(const Duration(hours: 6));
+    final events = posts.where((post) {
+      final category = '${post.item['category'] ?? ''}'.toLowerCase();
+      final start = DateTime.tryParse('${post.item['eventStart'] ?? ''}');
+      final eventLike = {
+        'event',
+        'meeting',
+        'live stream',
+        'training',
+      }.contains(category);
+      return eventLike && (start == null || start.isAfter(now));
+    }).toList();
+    events.sort((a, b) {
+      final ad = DateTime.tryParse('${a.item['eventStart'] ?? ''}');
+      final bd = DateTime.tryParse('${b.item['eventStart'] ?? ''}');
+      if (ad == null && bd == null) return 0;
+      if (ad == null) return 1;
+      if (bd == null) return -1;
+      return ad.compareTo(bd);
+    });
+    return events;
+  }
+
+  Future<void> _addPost() async {
+    final saved = await showCommunityComposer(
+      context,
+      widget.state,
+      adminMode: widget.state.profile!.canViewAdmin,
+    );
+    if (saved == true) await refresh();
+  }
+
+  Future<void> _openPost(ProductionRecord post) async {
+    final mediaUrl = '${post.item['mediaUrl'] ?? ''}'.trim();
+    final ctaUrl = '${post.item['ctaUrl'] ?? ''}'.trim();
+    final url = mediaUrl.isNotEmpty ? mediaUrl : ctaUrl;
+    if (url.isEmpty) return;
+    await _openMedia(
+      context,
+      url: url,
+      title: post.title,
+      mediaType: '${post.item['mediaType'] ?? 'Website'}',
+      embed: post.item['embed'] != false,
+    );
+  }
 
   Future<void> _suggest() async {
     final controller = TextEditingController();
@@ -245,110 +613,319 @@ class _CommunityScreenState extends State<CommunityScreen> {
     } catch (_) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text(
-              'Suggestion could not be sent. Check connectivity and retry.',
-            ),
-          ),
+          const SnackBar(content: Text('Suggestion could not be sent.')),
         );
       }
     }
   }
+}
 
-  Future<void> _addPost() async {
-    final title = TextEditingController();
-    final body = TextEditingController();
-    String category = 'News';
-    final saved = await showModalBottomSheet<bool>(
-      context: context,
-      isScrollControlled: true,
-      showDragHandle: true,
-      builder: (context) => StatefulBuilder(
-        builder: (_, setSheetState) => Padding(
-          padding: EdgeInsets.fromLTRB(
-            18,
-            0,
-            18,
-            18 + MediaQuery.viewInsetsOf(context).bottom,
+class _UpcomingEventCard extends StatelessWidget {
+  const _UpcomingEventCard({required this.record, required this.onOpen});
+  final ProductionRecord record;
+  final VoidCallback onOpen;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final start = DateTime.tryParse('${record.item['eventStart'] ?? ''}');
+    final category = '${record.item['category'] ?? 'Event'}';
+    return RcExpressiveSurface(
+      shape: RcSurfaceShape.offset,
+      onTap: onOpen,
+      tone: theme.colorScheme.secondaryContainer.withValues(alpha: .24),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              RcStatusPill(
+                label: category.toUpperCase(),
+                icon: _categoryIcon(category),
+                color: _categoryColor(context, category),
+              ),
+              const Spacer(),
+              if (start != null)
+                Text(_compactDate(start), style: theme.textTheme.labelMedium),
+            ],
           ),
-          child: SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
+          const Spacer(),
+          Text(
+            record.title,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+            style: theme.textTheme.titleLarge,
+          ),
+          const SizedBox(height: 6),
+          Text(
+            '${record.item['location'] ?? record.parish}',
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+          const SizedBox(height: 10),
+          Row(
+            children: [
+              Icon(
+                _mediaIcon('${record.item['mediaType'] ?? ''}'),
+                color: theme.colorScheme.primary,
+              ),
+              const SizedBox(width: 6),
+              Expanded(
+                child: Text(
+                  _defaultAction(record.item),
+                  style: theme.textTheme.labelLarge,
+                ),
+              ),
+              const Icon(Icons.arrow_forward_rounded),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _PostCard extends StatelessWidget {
+  const _PostCard({required this.post, required this.onOpen});
+  final ProductionRecord post;
+  final VoidCallback onOpen;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final category = '${post.item['category'] ?? 'Update'}';
+    final featured = post.item['featured'] == true;
+    final mediaUrl = '${post.item['mediaUrl'] ?? ''}'.trim();
+    final ctaUrl = '${post.item['ctaUrl'] ?? ''}'.trim();
+    final actionable = mediaUrl.isNotEmpty || ctaUrl.isNotEmpty;
+    return RcExpressiveSurface(
+      shape: featured ? RcSurfaceShape.hero : RcSurfaceShape.offset,
+      tone: featured
+          ? theme.colorScheme.primaryContainer.withValues(alpha: .20)
+          : null,
+      onTap: actionable ? onOpen : null,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              RcStatusPill(
+                label: category.toUpperCase(),
+                icon: _categoryIcon(category),
+                color: _categoryColor(context, category),
+              ),
+              if (featured) ...[
+                const SizedBox(width: 6),
+                const RcStatusPill(
+                  label: 'FEATURED',
+                  icon: Icons.auto_awesome_rounded,
+                  color: RcColors.gold,
+                ),
+              ],
+              const Spacer(),
+              Text(_compactDate(post.updatedAt), style: theme.textTheme.labelSmall),
+            ],
+          ),
+          const SizedBox(height: 10),
+          Text(post.title, style: theme.textTheme.titleLarge),
+          const SizedBox(height: 6),
+          Text('${post.item['body'] ?? post.summary}'),
+          if (mediaUrl.isNotEmpty) ...[
+            const SizedBox(height: 12),
+            _CommunityMedia(post: post),
+          ],
+          if (mediaUrl.isEmpty && ctaUrl.isNotEmpty) ...[
+            const SizedBox(height: 10),
+            FilledButton.tonalIcon(
+              onPressed: onOpen,
+              icon: const Icon(Icons.open_in_new_rounded),
+              label: Text(_defaultAction(post.item)),
+            ),
+          ],
+          if ('${post.item['eventStart'] ?? ''}'.isNotEmpty ||
+              '${post.item['location'] ?? ''}'.isNotEmpty) ...[
+            const SizedBox(height: 10),
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
               children: [
-                Text(
-                  'Publish team update',
-                  style: Theme.of(context).textTheme.titleLarge,
+                if ('${post.item['eventStart'] ?? ''}'.isNotEmpty)
+                  RcStatusPill(
+                    label: _dateTimeLabel(
+                      DateTime.tryParse('${post.item['eventStart']}') ??
+                          post.updatedAt,
+                    ),
+                    icon: Icons.event_rounded,
+                    color: RcColors.blue,
+                  ),
+                if ('${post.item['location'] ?? ''}'.isNotEmpty)
+                  RcStatusPill(
+                    label: '${post.item['location']}',
+                    icon: Icons.location_on_outlined,
+                    color: RcColors.teal,
+                  ),
+              ],
+            ),
+          ],
+          const SizedBox(height: 9),
+          Text(
+            post.parish.isEmpty ? 'All Parishes' : post.parish,
+            style: theme.textTheme.labelMedium?.copyWith(
+              color: theme.colorScheme.onSurfaceVariant,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _CommunityMedia extends StatelessWidget {
+  const _CommunityMedia({required this.post});
+  final ProductionRecord post;
+
+  @override
+  Widget build(BuildContext context) {
+    final item = post.item;
+    final url = '${item['mediaUrl'] ?? ''}'.trim();
+    final type = '${item['mediaType'] ?? 'Website'}';
+    final thumbnail = '${item['thumbnailUrl'] ?? ''}'.trim();
+    final uri = Uri.tryParse(url);
+    if (uri == null || !uri.hasScheme) return const SizedBox.shrink();
+
+    final preview = thumbnail.isNotEmpty ? thumbnail : _youtubeThumbnail(url);
+    if (type.toLowerCase() == 'image') {
+      return ClipRRect(
+        borderRadius: BorderRadius.circular(RcRadius.md),
+        child: AspectRatio(
+          aspectRatio: 16 / 9,
+          child: Image.network(
+            url,
+            fit: BoxFit.cover,
+            errorBuilder: (_, _, _) => _MediaActionCard(
+              type: type,
+              url: url,
+              title: post.title,
+              embed: item['embed'] != false,
+            ),
+          ),
+        ),
+      );
+    }
+
+    if (preview != null) {
+      return InkWell(
+        borderRadius: BorderRadius.circular(RcRadius.md),
+        onTap: () => _openMedia(
+          context,
+          url: url,
+          title: post.title,
+          mediaType: type,
+          embed: item['embed'] != false,
+        ),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(RcRadius.md),
+          child: AspectRatio(
+            aspectRatio: 16 / 9,
+            child: Stack(
+              fit: StackFit.expand,
+              children: [
+                Image.network(
+                  preview,
+                  fit: BoxFit.cover,
+                  errorBuilder: (_, _, _) => Container(
+                    color: Theme.of(context).colorScheme.surfaceContainer,
+                  ),
                 ),
-                const SizedBox(height: 10),
-                DropdownButtonFormField<String>(
-                  initialValue: category,
-                  decoration: const InputDecoration(labelText: 'Category'),
-                  items:
-                      const [
-                            'News',
-                            'Event',
-                            'Meeting',
-                            'Recognition',
-                            'Urgent',
-                          ]
-                          .map(
-                            (x) => DropdownMenuItem(value: x, child: Text(x)),
-                          )
-                          .toList(),
-                  onChanged: (v) => setSheetState(() => category = v!),
+                DecoratedBox(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: [
+                        Colors.transparent,
+                        Colors.black.withValues(alpha: .52),
+                      ],
+                    ),
+                  ),
                 ),
-                const SizedBox(height: 10),
-                TextField(
-                  controller: title,
-                  decoration: const InputDecoration(labelText: 'Title'),
+                Center(
+                  child: RcIconWell(
+                    icon: _mediaIcon(type),
+                    color: Colors.white,
+                    size: 62,
+                  ),
                 ),
-                const SizedBox(height: 10),
-                TextField(
-                  controller: body,
-                  minLines: 4,
-                  maxLines: 8,
-                  decoration: const InputDecoration(labelText: 'Update'),
-                ),
-                const SizedBox(height: 14),
-                FilledButton(
-                  onPressed: () async {
-                    if (title.text.trim().isEmpty || body.text.trim().isEmpty) {
-                      return;
-                    }
-                    try {
-                      await widget.state.repository.submitCommunityPost(
-                        profile: widget.state.profile!,
-                        title: title.text.trim(),
-                        body: body.text.trim(),
-                        category: category,
-                      );
-                      if (context.mounted) Navigator.pop(context, true);
-                    } catch (_) {
-                      if (context.mounted) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text(
-                              'Community update could not be published.',
-                            ),
-                          ),
-                        );
-                      }
-                    }
-                  },
-                  child: const Text('Publish'),
+                Positioned(
+                  left: 12,
+                  right: 12,
+                  bottom: 10,
+                  child: Text(
+                    _defaultAction(item),
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w900,
+                    ),
+                  ),
                 ),
               ],
             ),
           ),
         ),
+      );
+    }
+
+    return _MediaActionCard(
+      type: type,
+      url: url,
+      title: post.title,
+      embed: item['embed'] != false,
+    );
+  }
+}
+
+class _MediaActionCard extends StatelessWidget {
+  const _MediaActionCard({
+    required this.type,
+    required this.url,
+    required this.title,
+    required this.embed,
+  });
+  final String type;
+  final String url;
+  final String title;
+  final bool embed;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return RcExpressiveSurface(
+      shape: RcSurfaceShape.pill,
+      tone: theme.colorScheme.secondaryContainer.withValues(alpha: .28),
+      onTap: () => _openMedia(
+        context,
+        url: url,
+        title: title,
+        mediaType: type,
+        embed: embed,
+      ),
+      padding: const EdgeInsets.all(10),
+      child: Row(
+        children: [
+          RcIconWell(
+            icon: _mediaIcon(type),
+            color: theme.colorScheme.secondary,
+            size: 46,
+          ),
+          const SizedBox(width: 10),
+          Expanded(child: Text(type, style: theme.textTheme.titleMedium)),
+          Text(embed ? 'Open in app' : 'Open', style: theme.textTheme.labelLarge),
+          const SizedBox(width: 5),
+          const Icon(Icons.chevron_right_rounded),
+        ],
       ),
     );
-    title.dispose();
-    body.dispose();
-    if (saved == true) await refresh();
   }
-
-  String _date(DateTime date) => '${date.day}/${date.month}/${date.year}';
 }
 
 class _RecognitionStrip extends StatelessWidget {
@@ -357,16 +934,24 @@ class _RecognitionStrip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    ProductionRecord? recognition;
+    for (final record in records) {
+      if ('${record.item['category']}'.toLowerCase() == 'recognition') {
+        recognition = record;
+        break;
+      }
+    }
     final theme = Theme.of(context);
-    final recognition = records
-        .where((r) => '${r.item['category']}'.toLowerCase() == 'recognition')
-        .firstOrNull;
     return RcExpressiveSurface(
       shape: RcSurfaceShape.pill,
-      tone: theme.colorScheme.tertiaryContainer.withValues(alpha: .35),
+      tone: theme.colorScheme.tertiaryContainer.withValues(alpha: .32),
       child: Row(
         children: [
-          const Icon(Icons.emoji_events_outlined, size: RcIconSize.lg),
+          const RcIconWell(
+            icon: Icons.emoji_events_rounded,
+            color: RcColors.gold,
+            size: 50,
+          ),
           const SizedBox(width: 12),
           Expanded(
             child: Column(
@@ -375,7 +960,7 @@ class _RecognitionStrip extends StatelessWidget {
                 Text('Team recognition', style: theme.textTheme.titleMedium),
                 Text(
                   recognition == null
-                      ? 'Recognition is calculated from verified production data; publish approved team awards here.'
+                      ? 'Celebrate verified safety, quality and production achievements.'
                       : recognition.title,
                 ),
               ],
@@ -387,55 +972,193 @@ class _RecognitionStrip extends StatelessWidget {
   }
 }
 
-class _CommunityMedia extends StatelessWidget {
-  const _CommunityMedia({required this.url});
+Future<void> _openMedia(
+  BuildContext context, {
+  required String url,
+  required String title,
+  required String mediaType,
+  required bool embed,
+}) async {
+  final uri = Uri.tryParse(url);
+  if (uri == null || !uri.hasScheme) return;
+  final embeddable = {
+    'youtube',
+    'live stream',
+    'microsoft teams',
+    'zoom',
+    'video',
+    'website',
+  }.contains(mediaType.toLowerCase());
 
+  if (embed && embeddable) {
+    final embeddedUrl = mediaType.toLowerCase() == 'youtube'
+        ? _youtubeEmbed(url) ?? url
+        : url;
+    await Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => _EmbeddedMediaScreen(
+          title: title,
+          url: embeddedUrl,
+          externalUrl: url,
+        ),
+      ),
+    );
+    return;
+  }
+  await launchUrl(uri, mode: LaunchMode.externalApplication);
+}
+
+class _EmbeddedMediaScreen extends StatefulWidget {
+  const _EmbeddedMediaScreen({
+    required this.title,
+    required this.url,
+    required this.externalUrl,
+  });
+  final String title;
   final String url;
+  final String externalUrl;
 
-  bool get _isImage {
-    final lower = url.toLowerCase();
-    return lower.endsWith('.jpg') ||
-        lower.endsWith('.jpeg') ||
-        lower.endsWith('.png') ||
-        lower.endsWith('.webp') ||
-        lower.endsWith('.gif');
+  @override
+  State<_EmbeddedMediaScreen> createState() => _EmbeddedMediaScreenState();
+}
+
+class _EmbeddedMediaScreenState extends State<_EmbeddedMediaScreen> {
+  late final WebViewController controller;
+  int progress = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    controller = WebViewController();
+    if (!kIsWeb) {
+      controller
+        ..setJavaScriptMode(JavaScriptMode.unrestricted)
+        ..setNavigationDelegate(
+          NavigationDelegate(
+            onProgress: (value) {
+              if (mounted) setState(() => progress = value);
+            },
+          ),
+        );
+    }
+    controller.loadRequest(Uri.parse(widget.url));
   }
 
   @override
   Widget build(BuildContext context) {
-    final uri = Uri.tryParse(url);
-    if (uri == null || !uri.hasScheme) return const SizedBox.shrink();
-    if (_isImage) {
-      return ClipRRect(
-        borderRadius: BorderRadius.circular(RcRadius.md),
-        child: AspectRatio(
-          aspectRatio: 16 / 9,
-          child: Image.network(
-            url,
-            fit: BoxFit.cover,
-            semanticLabel: 'Community post media',
-            errorBuilder: (_, _, _) => _MediaLink(uri: uri),
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(widget.title),
+        actions: [
+          IconButton(
+            tooltip: 'Open in external app/browser',
+            onPressed: () => launchUrl(
+              Uri.parse(widget.externalUrl),
+              mode: LaunchMode.externalApplication,
+            ),
+            icon: const Icon(Icons.open_in_new_rounded),
           ),
-        ),
-      );
-    }
-    return _MediaLink(uri: uri);
+        ],
+      ),
+      body: Column(
+        children: [
+          if (!kIsWeb && progress < 100)
+            LinearProgressIndicator(value: progress / 100),
+          Expanded(child: WebViewWidget(controller: controller)),
+        ],
+      ),
+    );
   }
 }
 
-class _MediaLink extends StatelessWidget {
-  const _MediaLink({required this.uri});
+IconData _mediaIcon(String type) => switch (type.toLowerCase()) {
+  'youtube' => Icons.play_circle_fill_rounded,
+  'live stream' => Icons.sensors_rounded,
+  'microsoft teams' => Icons.groups_rounded,
+  'zoom' => Icons.video_camera_front_rounded,
+  'video' => Icons.movie_rounded,
+  'document / file' => Icons.description_rounded,
+  'image' => Icons.image_rounded,
+  _ => Icons.language_rounded,
+};
 
-  final Uri uri;
+IconData _categoryIcon(String category) => switch (category.toLowerCase()) {
+  'event' => Icons.event_rounded,
+  'meeting' => Icons.groups_rounded,
+  'live stream' => Icons.sensors_rounded,
+  'training' => Icons.school_rounded,
+  'recognition' => Icons.emoji_events_rounded,
+  'safety' => Icons.health_and_safety_rounded,
+  'urgent' => Icons.warning_amber_rounded,
+  _ => Icons.campaign_rounded,
+};
 
-  @override
-  Widget build(BuildContext context) => OutlinedButton.icon(
-    onPressed: () => launchUrl(uri, mode: LaunchMode.externalApplication),
-    icon: const Icon(Icons.play_circle_outline, size: RcIconSize.sm),
-    label: const Text('Open attached media'),
-  );
+Color _categoryColor(BuildContext context, String category) =>
+    switch (category.toLowerCase()) {
+      'event' => RcColors.purple,
+      'meeting' => RcColors.blue,
+      'live stream' => RcColors.danger,
+      'training' => RcColors.teal,
+      'recognition' => RcColors.success,
+      'safety' => RcColors.gold,
+      'urgent' => RcColors.warning,
+      _ => Theme.of(context).colorScheme.primary,
+    };
+
+String _defaultAction(Map<String, dynamic> item) {
+  final label = '${item['ctaLabel'] ?? ''}'.trim();
+  if (label.isNotEmpty) return label;
+  return switch ('${item['mediaType'] ?? ''}'.toLowerCase()) {
+    'youtube' => 'Watch video',
+    'live stream' => 'Watch live',
+    'microsoft teams' => 'Join Teams meeting',
+    'zoom' => 'Join Zoom meeting',
+    'document / file' => 'Open file',
+    'video' => 'Play video',
+    _ => 'Open link',
+  };
 }
 
-extension _First<T> on Iterable<T> {
-  T? get firstOrNull => isEmpty ? null : first;
+String? _youtubeId(String url) {
+  final uri = Uri.tryParse(url);
+  if (uri == null) return null;
+  if (uri.host.contains('youtu.be')) {
+    return uri.pathSegments.isEmpty ? null : uri.pathSegments.first;
+  }
+  if (uri.host.contains('youtube.com')) {
+    if (uri.queryParameters['v']?.isNotEmpty == true) {
+      return uri.queryParameters['v'];
+    }
+    final segments = uri.pathSegments;
+    final embedIndex = segments.indexOf('embed');
+    if (embedIndex >= 0 && embedIndex + 1 < segments.length) {
+      return segments[embedIndex + 1];
+    }
+    final liveIndex = segments.indexOf('live');
+    if (liveIndex >= 0 && liveIndex + 1 < segments.length) {
+      return segments[liveIndex + 1];
+    }
+  }
+  return null;
 }
+
+String? _youtubeThumbnail(String url) {
+  final id = _youtubeId(url);
+  return id == null ? null : 'https://img.youtube.com/vi/$id/hqdefault.jpg';
+}
+
+String? _youtubeEmbed(String url) {
+  final id = _youtubeId(url);
+  return id == null
+      ? null
+      : 'https://www.youtube.com/embed/$id?playsinline=1&autoplay=0';
+}
+
+String _compactDate(DateTime value) =>
+    '${value.day.toString().padLeft(2, '0')}/'
+    '${value.month.toString().padLeft(2, '0')}/${value.year}';
+
+String _dateTimeLabel(DateTime value) =>
+    '${_compactDate(value)} • '
+    '${value.hour.toString().padLeft(2, '0')}:'
+    '${value.minute.toString().padLeft(2, '0')}';

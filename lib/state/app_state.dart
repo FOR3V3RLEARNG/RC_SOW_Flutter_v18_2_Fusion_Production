@@ -6,6 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../core/app_constants.dart';
+import '../core/ui_studio.dart';
 import '../models/app_models.dart';
 import '../services/rc_sow_repository.dart';
 
@@ -54,6 +55,56 @@ class AppState extends ChangeNotifier {
           .map((value) => '$value')
           .where((value) => value.isNotEmpty)
           .toList();
+
+  double get uiExpressiveness {
+    final raw = remoteUiConfig['uiExpressiveness'];
+    final value = raw is num ? raw.toDouble() : double.tryParse('$raw') ?? 78;
+    return (value / 100).clamp(.25, 1.0).toDouble();
+  }
+
+  double get uiDepth {
+    final raw = remoteUiConfig['uiDepth'];
+    final value = raw is num ? raw.toDouble() : double.tryParse('$raw') ?? 72;
+    return (value / 100).clamp(.20, 1.0).toDouble();
+  }
+
+  String get uiSurfaceFinish {
+    final value = '${remoteUiConfig['uiSurfaceFinish'] ?? 'suede'}';
+    return const {'suede', 'clean', 'soft'}.contains(value) ? value : 'suede';
+  }
+
+  String get uiIconPack {
+    final value = '${remoteUiConfig['uiIconPack'] ?? 'rounded'}';
+    return RcIconCatalog.packs.containsKey(value) ? value : 'rounded';
+  }
+
+  String get uiIconShape {
+    final value = '${remoteUiConfig['uiIconShape'] ?? 'squircle'}';
+    return const {'squircle', 'circle', 'pill', 'soft'}.contains(value)
+        ? value
+        : 'squircle';
+  }
+
+  String get uiAccentMood {
+    final value = '${remoteUiConfig['uiAccentMood'] ?? 'red'}';
+    return const {'red', 'ocean', 'forest', 'violet', 'gold', 'teal'}
+            .contains(value)
+        ? value
+        : 'red';
+  }
+
+  Map<String, String> get uiIconOverrides {
+    final raw = remoteUiConfig['uiIconOverrides'];
+    if (raw is! Map) return const {};
+    return raw.map((key, value) => MapEntry('$key', '$value'));
+  }
+
+  IconData uiIcon(String slot, IconData fallback) => RcIconCatalog.resolveSlot(
+    slot: slot,
+    pack: uiIconPack,
+    overrides: uiIconOverrides,
+    fallback: fallback,
+  );
 
   bool _authSyncInFlight = false;
   bool _authSyncQueued = false;

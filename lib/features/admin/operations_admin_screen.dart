@@ -5,6 +5,9 @@ import 'package:url_launcher/url_launcher.dart';
 import '../../core/app_constants.dart';
 import '../../core/design_tokens.dart';
 import '../../core/record_schemas.dart';
+import '../../core/ui_studio.dart';
+import '../../models/app_models.dart';
+import '../community/community_screen.dart';
 import '../../core/rc_components.dart';
 import '../../services/boq_import_service.dart';
 import '../../state/app_state.dart';
@@ -24,7 +27,7 @@ class _OperationsAdminScreenState extends State<OperationsAdminScreen>
   @override
   void initState() {
     super.initState();
-    tabs = TabController(length: 7, vsync: this);
+    tabs = TabController(length: 8, vsync: this);
   }
 
   @override
@@ -54,6 +57,10 @@ class _OperationsAdminScreenState extends State<OperationsAdminScreen>
               icon: Icon(Icons.dashboard_customize_outlined),
             ),
             Tab(
+              text: 'Community',
+              icon: Icon(Icons.live_tv_rounded),
+            ),
+            Tab(
               text: 'Notify',
               icon: Icon(Icons.notifications_active_outlined),
             ),
@@ -69,6 +76,7 @@ class _OperationsAdminScreenState extends State<OperationsAdminScreen>
           _BoqTemplates(state: widget.state),
           _AuthorizedAccounts(state: widget.state),
           _InterfaceConfig(state: widget.state),
+          _CommunityStudio(state: widget.state),
           _NotificationCentre(state: widget.state),
           _StaffDirectory(state: widget.state),
           _TrackerConfig(state: widget.state),
@@ -560,9 +568,17 @@ class _InterfaceConfigState extends State<_InterfaceConfig> {
   late final TextEditingController paymentLabel;
   late final TextEditingController needActionLabel;
   late final TextEditingController openLabel;
+
   int columns = 2;
   String defaultView = 'houses';
   List<String> moduleOrder = const [];
+  double expressiveness = 78;
+  double depth = 72;
+  String surfaceFinish = 'suede';
+  String iconPack = 'rounded';
+  String iconShape = 'squircle';
+  String accentMood = 'red';
+  Map<String, String> iconOverrides = {};
 
   @override
   void initState() {
@@ -573,7 +589,7 @@ class _InterfaceConfigState extends State<_InterfaceConfig> {
     }
 
     appTitle = TextEditingController(
-      text: text('appTitle', 'Red Cross Scope Of Work'),
+      text: text('appTitle', 'Red Cross Scope of Work'),
     );
     controlTitle = TextEditingController(
       text: text('controlTitle', 'Control Of Works'),
@@ -592,6 +608,7 @@ class _InterfaceConfigState extends State<_InterfaceConfig> {
       text: text('needActionLabel', 'Need Attention'),
     );
     openLabel = TextEditingController(text: text('openLabel', 'Open'));
+
     columns = widget.state.controlColumns.clamp(1, 3);
     defaultView = widget.state.controlDefaultView;
     final configured = widget.state.controlModuleOrder;
@@ -601,6 +618,14 @@ class _InterfaceConfigState extends State<_InterfaceConfig> {
               .map((schema) => schema.eventType)
               .toList()
         : List<String>.from(configured);
+
+    expressiveness = widget.state.uiExpressiveness * 100;
+    depth = widget.state.uiDepth * 100;
+    surfaceFinish = widget.state.uiSurfaceFinish;
+    iconPack = widget.state.uiIconPack;
+    iconShape = widget.state.uiIconShape;
+    accentMood = widget.state.uiAccentMood;
+    iconOverrides = Map<String, String>.from(widget.state.uiIconOverrides);
   }
 
   @override
@@ -678,15 +703,114 @@ class _InterfaceConfigState extends State<_InterfaceConfig> {
         ),
       ),
     );
-    if (result != null && mounted) {
-      setState(() => moduleOrder = result);
-    }
+    if (result != null && mounted) setState(() => moduleOrder = result);
+  }
+
+  Future<void> _editIcons() async {
+    final draft = Map<String, String>.from(iconOverrides);
+    final slots = <String, String>{
+      ...RcIconCatalog.coreSlots,
+      for (final schema in RcRecordSchemas.schemas)
+        'module.${schema.eventType}': schema.title,
+    };
+
+    final result = await showModalBottomSheet<Map<String, String>>(
+      context: context,
+      isScrollControlled: true,
+      showDragHandle: true,
+      builder: (context) => StatefulBuilder(
+        builder: (context, setSheetState) => FractionallySizedBox(
+          heightFactor: .92,
+          child: Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Icon Studio',
+                            style: Theme.of(context).textTheme.titleLarge,
+                          ),
+                          const Text(
+                            'Override navigation, header and Control module icons.',
+                          ),
+                        ],
+                      ),
+                    ),
+                    FilledButton(
+                      onPressed: () => Navigator.pop(context, draft),
+                      child: const Text('Apply'),
+                    ),
+                  ],
+                ),
+              ),
+              Expanded(
+                child: ListView(
+                  padding: const EdgeInsets.fromLTRB(12, 4, 12, 24),
+                  children: slots.entries.map((entry) {
+                    final selected = draft[entry.key] ?? '';
+                    return Card(
+                      child: ListTile(
+                        leading: RcIconWell(
+                          icon: RcIconCatalog.resolveName(
+                            selected.isEmpty ? null : selected,
+                            Icons.auto_awesome_rounded,
+                          ),
+                          size: 46,
+                        ),
+                        title: Text(entry.value),
+                        subtitle: Text(entry.key),
+                        trailing: SizedBox(
+                          width: 150,
+                          child: DropdownButtonFormField<String>(
+                            initialValue: selected,
+                            isExpanded: true,
+                            items: [
+                              const DropdownMenuItem(
+                                value: '',
+                                child: Text('Use pack'),
+                              ),
+                              ...RcIconCatalog.availableNames.map(
+                                (name) => DropdownMenuItem(
+                                  value: name,
+                                  child: Text(
+                                    name,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                              ),
+                            ],
+                            onChanged: (value) => setSheetState(() {
+                              if (value == null || value.isEmpty) {
+                                draft.remove(entry.key);
+                              } else {
+                                draft[entry.key] = value;
+                              }
+                            }),
+                          ),
+                        ),
+                      ),
+                    );
+                  }).toList(),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+    if (result != null && mounted) setState(() => iconOverrides = result);
   }
 
   Future<void> _save() async {
     await widget.state.repository.saveUiConfig(
       configKey: 'global',
       config: {
+        ...widget.state.remoteUiConfig,
         'appTitle': appTitle.text.trim(),
         'controlTitle': controlTitle.text.trim(),
         'controlSubtitle': controlSubtitle.text.trim(),
@@ -697,27 +821,148 @@ class _InterfaceConfigState extends State<_InterfaceConfig> {
         'controlColumns': columns,
         'controlDefaultView': defaultView,
         'controlModuleOrder': moduleOrder,
+        'uiExpressiveness': expressiveness.round(),
+        'uiDepth': depth.round(),
+        'uiSurfaceFinish': surfaceFinish,
+        'uiIconPack': iconPack,
+        'uiIconShape': iconShape,
+        'uiAccentMood': accentMood,
+        'uiIconOverrides': iconOverrides,
       },
     );
     await widget.state.refreshUiConfig();
     if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Interface configuration published.')),
+      const SnackBar(content: Text('Creative interface setup published.')),
     );
   }
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return ListView(
-      padding: const EdgeInsets.fromLTRB(16, 14, 16, 80),
+      padding: const EdgeInsets.fromLTRB(16, 14, 16, 90),
       children: [
         const RcPageHeading(
-          eyebrow: 'No-code interface controls',
-          title: 'Screen & Tile Setup',
+          eyebrow: 'Admin UI Studio',
+          title: 'Creative Interface Controls',
           subtitle:
-              'Adjust operational headings and Control of Works tile density without rebuilding the app.',
+              'Control tactile depth, suede finish, icon pack, individual icons, color mood, tile density, text and expressive intensity without rebuilding the app.',
         ),
         const SizedBox(height: 12),
+        RcExpressiveSurface(
+          shape: RcSurfaceShape.hero,
+          tone: theme.colorScheme.primaryContainer.withValues(alpha: .24),
+          child: Row(
+            children: [
+              const RcIconWell(icon: Icons.palette_rounded, size: 58),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('Live style preview', style: theme.textTheme.titleLarge),
+                    const SizedBox(height: 5),
+                    Text(
+                      '${surfaceFinish.toUpperCase()} • '
+                      '${expressiveness.round()}% expressive • '
+                      '${depth.round()}% depth • $iconPack icons',
+                    ),
+                  ],
+                ),
+              ),
+              FilledButton.tonalIcon(
+                onPressed: _save,
+                icon: const Icon(Icons.publish_rounded),
+                label: const Text('Publish'),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 14),
+        Text('Visual expression', style: theme.textTheme.titleLarge),
+        const SizedBox(height: 8),
+        Text('Expressiveness ${expressiveness.round()}%'),
+        Slider(
+          value: expressiveness,
+          min: 25,
+          max: 100,
+          divisions: 15,
+          label: '${expressiveness.round()}%',
+          onChanged: (value) => setState(() => expressiveness = value),
+        ),
+        Text('Depth & press relief ${depth.round()}%'),
+        Slider(
+          value: depth,
+          min: 20,
+          max: 100,
+          divisions: 16,
+          label: '${depth.round()}%',
+          onChanged: (value) => setState(() => depth = value),
+        ),
+        const SizedBox(height: 8),
+        RcResponsiveGrid(
+          minTileWidth: 230,
+          children: [
+            DropdownButtonFormField<String>(
+              initialValue: surfaceFinish,
+              decoration: const InputDecoration(labelText: 'Surface finish'),
+              items: const [
+                DropdownMenuItem(value: 'suede', child: Text('Soft Suede / Matte')),
+                DropdownMenuItem(value: 'clean', child: Text('Clean Minimal')),
+                DropdownMenuItem(value: 'soft', child: Text('Soft Cloud')),
+              ],
+              onChanged: (value) =>
+                  setState(() => surfaceFinish = value ?? 'suede'),
+            ),
+            DropdownButtonFormField<String>(
+              initialValue: accentMood,
+              decoration: const InputDecoration(labelText: 'Accent mood'),
+              items: const [
+                DropdownMenuItem(value: 'red', child: Text('Red Cross')),
+                DropdownMenuItem(value: 'ocean', child: Text('Ocean Blue')),
+                DropdownMenuItem(value: 'forest', child: Text('Field Green')),
+                DropdownMenuItem(value: 'violet', child: Text('Violet')),
+                DropdownMenuItem(value: 'gold', child: Text('Warm Gold')),
+                DropdownMenuItem(value: 'teal', child: Text('Teal')),
+              ],
+              onChanged: (value) =>
+                  setState(() => accentMood = value ?? 'red'),
+            ),
+            DropdownButtonFormField<String>(
+              initialValue: iconPack,
+              decoration: const InputDecoration(labelText: 'Icon pack'),
+              items: const [
+                DropdownMenuItem(value: 'rounded', child: Text('Expressive Rounded')),
+                DropdownMenuItem(value: 'builder', child: Text('Construction / Builder')),
+                DropdownMenuItem(value: 'bold', child: Text('Bold Creative')),
+              ],
+              onChanged: (value) => setState(() => iconPack = value ?? 'rounded'),
+            ),
+            DropdownButtonFormField<String>(
+              initialValue: iconShape,
+              decoration: const InputDecoration(labelText: 'Icon container'),
+              items: const [
+                DropdownMenuItem(value: 'squircle', child: Text('Squircle')),
+                DropdownMenuItem(value: 'circle', child: Text('Circle')),
+                DropdownMenuItem(value: 'pill', child: Text('Pill')),
+                DropdownMenuItem(value: 'soft', child: Text('Soft Square')),
+              ],
+              onChanged: (value) => setState(() => iconShape = value ?? 'squircle'),
+            ),
+          ],
+        ),
+        const SizedBox(height: 10),
+        OutlinedButton.icon(
+          onPressed: _editIcons,
+          icon: const Icon(Icons.auto_awesome_rounded),
+          label: Text(
+            'Customize Icons${iconOverrides.isEmpty ? '' : ' • ${iconOverrides.length} overrides'}',
+          ),
+        ),
+        const SizedBox(height: 20),
+        Text('Text & Control layout', style: theme.textTheme.titleLarge),
+        const SizedBox(height: 8),
         for (final entry in <(TextEditingController, String)>[
           (appTitle, 'App title'),
           (controlTitle, 'Control heading'),
@@ -737,9 +982,12 @@ class _InterfaceConfigState extends State<_InterfaceConfig> {
           initialValue: columns,
           decoration: const InputDecoration(labelText: 'Control tile columns'),
           items: const [1, 2, 3]
-              .map((v) => DropdownMenuItem(value: v, child: Text('$v columns')))
+              .map((value) => DropdownMenuItem(
+                    value: value,
+                    child: Text('$value columns'),
+                  ))
               .toList(),
-          onChanged: (v) => setState(() => columns = v!),
+          onChanged: (value) => setState(() => columns = value ?? 2),
         ),
         const SizedBox(height: 9),
         DropdownButtonFormField<String>(
@@ -747,12 +995,9 @@ class _InterfaceConfigState extends State<_InterfaceConfig> {
           decoration: const InputDecoration(labelText: 'Default Control view'),
           items: const [
             DropdownMenuItem(value: 'houses', child: Text('House Codes')),
-            DropdownMenuItem(
-              value: 'modules',
-              child: Text('Production Modules'),
-            ),
+            DropdownMenuItem(value: 'modules', child: Text('Production Modules')),
           ],
-          onChanged: (v) => setState(() => defaultView = v!),
+          onChanged: (value) => setState(() => defaultView = value ?? 'houses'),
         ),
         const SizedBox(height: 12),
         OutlinedButton.icon(
@@ -760,15 +1005,210 @@ class _InterfaceConfigState extends State<_InterfaceConfig> {
           icon: const Icon(Icons.reorder_rounded),
           label: const Text('Arrange Production Module Tiles'),
         ),
-        const SizedBox(height: 14),
+        const SizedBox(height: 16),
         FilledButton.icon(
           onPressed: _save,
           icon: const Icon(Icons.publish_outlined),
-          label: const Text('Publish Interface Setup'),
+          label: const Text('Publish Creative UI Setup'),
         ),
       ],
     );
   }
+}
+
+
+class _CommunityStudio extends StatefulWidget {
+  const _CommunityStudio({required this.state});
+  final AppState state;
+
+  @override
+  State<_CommunityStudio> createState() => _CommunityStudioState();
+}
+
+class _CommunityStudioState extends State<_CommunityStudio> {
+  late Future<List<ProductionRecord>> future;
+
+  @override
+  void initState() {
+    super.initState();
+    future = widget.state.repository.communityRecords(
+      widget.state.profile!,
+      limit: 200,
+    );
+  }
+
+  Future<void> _refresh() async {
+    setState(
+      () => future = widget.state.repository.communityRecords(
+        widget.state.profile!,
+        limit: 200,
+      ),
+    );
+    await future;
+  }
+
+  Future<void> _create() async {
+    final saved = await showCommunityComposer(
+      context,
+      widget.state,
+      adminMode: true,
+    );
+    if (saved == true) await _refresh();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return FutureBuilder<List<ProductionRecord>>(
+      future: future,
+      builder: (context, snap) {
+        final records = (snap.data ?? const <ProductionRecord>[])
+            .where((record) => record.eventType == 'communityPost')
+            .toList();
+        final live = records.where((record) {
+          final type = '${record.item['mediaType'] ?? ''}'.toLowerCase();
+          return type == 'live stream' ||
+              type == 'microsoft teams' ||
+              type == 'zoom';
+        }).length;
+        final upcoming = records.where((record) {
+          final start = DateTime.tryParse('${record.item['eventStart'] ?? ''}');
+          return start != null && start.isAfter(DateTime.now());
+        }).length;
+
+        return RefreshIndicator(
+          onRefresh: _refresh,
+          child: ListView(
+            padding: const EdgeInsets.fromLTRB(16, 14, 16, 90),
+            children: [
+              RcPageHeading(
+                eyebrow: 'Community control',
+                title: 'Events, Media & Live Studio',
+                subtitle:
+                    'Publish meetings, upcoming events, YouTube, Teams, Zoom, livestreams, images, files, links and featured community content.',
+                trailing: FilledButton.icon(
+                  onPressed: _create,
+                  icon: const Icon(Icons.add_rounded),
+                  label: const Text('Create'),
+                ),
+              ),
+              const SizedBox(height: 12),
+              RcResponsiveGrid(
+                minTileWidth: 160,
+                children: [
+                  _CommunityAdminMetric(
+                    'Published',
+                    '${records.length}',
+                    Icons.campaign_rounded,
+                    theme.colorScheme.primary,
+                  ),
+                  _CommunityAdminMetric(
+                    'Upcoming',
+                    '$upcoming',
+                    Icons.event_rounded,
+                    RcColors.blue,
+                  ),
+                  _CommunityAdminMetric(
+                    'Live / meeting',
+                    '$live',
+                    Icons.sensors_rounded,
+                    RcColors.danger,
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16),
+              if (records.isEmpty &&
+                  snap.connectionState != ConnectionState.waiting)
+                const RcExpressiveSurface(
+                  child: Text('No Community items are published yet.'),
+                ),
+              ...records.map(
+                (record) => Padding(
+                  padding: const EdgeInsets.only(bottom: 8),
+                  child: RcExpressiveSurface(
+                    shape: RcSurfaceShape.offset,
+                    child: Row(
+                      children: [
+                        RcIconWell(
+                          icon: record.item['featured'] == true
+                              ? Icons.auto_awesome_rounded
+                              : Icons.campaign_rounded,
+                          color: record.item['featured'] == true
+                              ? RcColors.gold
+                              : theme.colorScheme.primary,
+                        ),
+                        const SizedBox(width: 11),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                record.title,
+                                style: theme.textTheme.titleMedium,
+                              ),
+                              Text(
+                                '${record.item['category'] ?? 'Update'} • '
+                                '${record.item['mediaType'] ?? 'No media'} • '
+                                '${record.parish.isEmpty ? 'All Parishes' : record.parish}',
+                                style: theme.textTheme.bodySmall,
+                              ),
+                            ],
+                          ),
+                        ),
+                        PopupMenuButton<String>(
+                          onSelected: (action) async {
+                            if (action == 'delete') {
+                              await widget.state.repository
+                                  .deleteCommunityPost(record.id);
+                              await _refresh();
+                            }
+                          },
+                          itemBuilder: (_) => const [
+                            PopupMenuItem(
+                              value: 'delete',
+                              child: Text('Delete'),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+}
+
+class _CommunityAdminMetric extends StatelessWidget {
+  const _CommunityAdminMetric(this.label, this.value, this.icon, this.color);
+  final String label;
+  final String value;
+  final IconData icon;
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) => RcExpressiveSurface(
+    shape: RcSurfaceShape.offset,
+    tone: color.withValues(alpha: .07),
+    child: Row(
+      children: [
+        RcIconWell(icon: icon, color: color),
+        const SizedBox(width: 10),
+        Expanded(child: Text(label)),
+        Text(
+          value,
+          style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+            color: color,
+            fontWeight: FontWeight.w900,
+          ),
+        ),
+      ],
+    ),
+  );
 }
 
 class _NotificationCentre extends StatefulWidget {

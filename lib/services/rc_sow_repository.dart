@@ -1041,6 +1041,14 @@ class RcSowRepository {
     required String body,
     required String category,
     String? mediaUrl,
+    String mediaType = 'None',
+    String? thumbnailUrl,
+    String? location,
+    DateTime? eventStart,
+    String? ctaLabel,
+    String? ctaUrl,
+    bool embed = true,
+    bool featured = false,
     String? parish,
   }) async {
     final id = 'community-${DateTime.now().microsecondsSinceEpoch}';
@@ -1052,7 +1060,10 @@ class RcSowRepository {
       id: id,
       parish: targetParish,
       recipients: [
-        {'type': 'parish', 'value': targetParish},
+        if (targetParish == 'All Parishes')
+          {'type': 'all', 'value': 'all'}
+        else
+          {'type': 'parish', 'value': targetParish},
       ],
       item: {
         'id': id,
@@ -1060,7 +1071,26 @@ class RcSowRepository {
         'body': body,
         'category': category,
         'mediaUrl': mediaUrl,
+        'mediaType': mediaType,
+        'thumbnailUrl': thumbnailUrl,
+        'location': location,
+        'eventStart': eventStart?.toUtc().toIso8601String(),
+        'ctaLabel': ctaLabel,
+        'ctaUrl': ctaUrl,
+        'embed': embed,
+        'featured': featured,
         'status': 'Published',
+        'publishedBy': profile.email,
+      },
+    );
+  }
+
+  Future<void> deleteCommunityPost(String id) async {
+    await client.rpc(
+      'delete_app_event',
+      params: {
+        'p_event_type': 'communityPost',
+        'p_item_id': id,
       },
     );
   }
