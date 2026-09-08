@@ -413,8 +413,7 @@ class RcSowRepository {
       params: {
         'p_house_code': houseCode.trim().toUpperCase(),
         'p_parish': parish,
-        'p_user_id':
-            normalizedUserId == null || normalizedUserId.isEmpty
+        'p_user_id': normalizedUserId == null || normalizedUserId.isEmpty
             ? null
             : normalizedUserId,
         'p_email': email.trim().toLowerCase(),

@@ -44,10 +44,7 @@ class UserProfile {
   bool get canExportData => hasPrivilege('exportData');
   bool get canEditProduction => hasPrivilege('editControl');
   bool get canManageCrew =>
-      isAdmin ||
-      isSiteSupervisor ||
-      isManagement ||
-      hasPrivilege('manageCrew');
+      isAdmin || isSiteSupervisor || isManagement || hasPrivilege('manageCrew');
   bool get canCreateCommunityEvent =>
       isAdmin && hasPrivilege('manageCommunity');
   bool get canModerateCommunity => isAdmin && hasPrivilege('manageCommunity');

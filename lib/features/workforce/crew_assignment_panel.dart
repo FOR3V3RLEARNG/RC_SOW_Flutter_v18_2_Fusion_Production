@@ -351,8 +351,7 @@ class _CrewAssignmentPanelState extends State<CrewAssignmentPanel> {
                   if (profile.canManageUsers)
                     IconButton.filledTonal(
                       tooltip: 'Create crew member',
-                      onPressed:
-                          saving || selectedHouseRecord == null
+                      onPressed: saving || selectedHouseRecord == null
                           ? null
                           : () => _createAndAssign(data),
                       icon: const Icon(Icons.person_add_alt_1_outlined),
@@ -451,8 +450,8 @@ class _CrewAssignmentPanelState extends State<CrewAssignmentPanel> {
                       prefixIcon: Icon(Icons.engineering_outlined),
                     ),
                     items: crew.map((u) {
-                      final accountStatus =
-                          '${u['account_status'] ?? ''}'.trim();
+                      final accountStatus = '${u['account_status'] ?? ''}'
+                          .trim();
                       return DropdownMenuItem(
                         value: '${u['email'] ?? ''}',
                         child: Text(
@@ -472,8 +471,7 @@ class _CrewAssignmentPanelState extends State<CrewAssignmentPanel> {
                   children: [
                     if (profile.canManageUsers)
                       OutlinedButton.icon(
-                        onPressed:
-                            saving || selectedHouseRecord == null
+                        onPressed: saving || selectedHouseRecord == null
                             ? null
                             : () => _createAndAssign(data),
                         icon: const Icon(Icons.person_add_alt_1_outlined),
@@ -481,8 +479,7 @@ class _CrewAssignmentPanelState extends State<CrewAssignmentPanel> {
                       ),
                     const Spacer(),
                     FilledButton.tonalIcon(
-                      onPressed:
-                          saving || selectedEmail == null
+                      onPressed: saving || selectedEmail == null
                           ? null
                           : () => _assign(data),
                       icon: const Icon(Icons.link_outlined),
