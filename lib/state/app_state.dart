@@ -162,10 +162,7 @@ class AppState extends ChangeNotifier {
 
   void _ensurePresenceHeartbeat() {
     final current = profile;
-    if (!signedIn ||
-        current == null ||
-        !current.approved ||
-        !current.active) {
+    if (!signedIn || current == null || !current.approved || !current.active) {
       _presenceTimer?.cancel();
       _presenceTimer = null;
       return;

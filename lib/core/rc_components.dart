@@ -95,20 +95,13 @@ class _RcExpressiveSurfaceState extends State<RcExpressiveSurface> {
                   if (mounted) setState(() => pressed = value);
                 }
               : null,
-          child: Padding(
-            padding: widget.padding,
-            child: widget.child,
-          ),
+          child: Padding(padding: widget.padding, child: widget.child),
         ),
       ),
     );
 
     if (!interactive) return surface;
-    return Semantics(
-      button: true,
-      label: widget.semanticLabel,
-      child: surface,
-    );
+    return Semantics(button: true, label: widget.semanticLabel, child: surface);
   }
 }
 

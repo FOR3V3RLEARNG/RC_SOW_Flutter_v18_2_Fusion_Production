@@ -250,8 +250,7 @@ class _InteractiveHouseMapScreenState extends State<InteractiveHouseMapScreen> {
                           width: 88,
                           height: 78,
                           child: GestureDetector(
-                            onTap: () =>
-                                _showPointActions(row, data.source!),
+                            onTap: () => _showPointActions(row, data.source!),
                             child: Column(
                               mainAxisSize: MainAxisSize.min,
                               children: [
@@ -277,9 +276,7 @@ class _InteractiveHouseMapScreenState extends State<InteractiveHouseMapScreen> {
                                     vertical: 2,
                                   ),
                                   decoration: BoxDecoration(
-                                    color: Theme.of(context)
-                                        .colorScheme
-                                        .surface
+                                    color: Theme.of(context).colorScheme.surface
                                         .withValues(alpha: .96),
                                     borderRadius: BorderRadius.circular(8),
                                   ),
@@ -291,9 +288,9 @@ class _InteractiveHouseMapScreenState extends State<InteractiveHouseMapScreen> {
                                         .textTheme
                                         .labelSmall
                                         ?.copyWith(
-                                          color: Theme.of(context)
-                                              .colorScheme
-                                              .onSurface,
+                                          color: Theme.of(
+                                            context,
+                                          ).colorScheme.onSurface,
                                           fontWeight: FontWeight.w900,
                                         ),
                                   ),
@@ -441,10 +438,7 @@ class _InteractiveHouseMapScreenState extends State<InteractiveHouseMapScreen> {
 }
 
 class _ParishMapData {
-  const _ParishMapData({
-    this.source,
-    this.points = const [],
-  });
+  const _ParishMapData({this.source, this.points = const []});
 
   final Map<String, dynamic>? source;
   final List<Map<String, dynamic>> points;

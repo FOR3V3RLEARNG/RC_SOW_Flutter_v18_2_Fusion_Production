@@ -200,7 +200,6 @@ class RcSowRepository {
     await client.rpc('touch_presence');
   }
 
-
   Future<List<Map<String, dynamic>>> crewDirectory({String? parish}) async {
     final result = await client.rpc(
       'list_crew_directory',
@@ -442,8 +441,7 @@ class RcSowRepository {
     for (final raw in rawPoints) {
       final row = Map<String, dynamic>.from(raw);
       final code = '${row['house_code'] ?? ''}'.trim().toUpperCase();
-      if (crewCodes != null &&
-          (code.isEmpty || !crewCodes.contains(code))) {
+      if (crewCodes != null && (code.isEmpty || !crewCodes.contains(code))) {
         continue;
       }
       final beneficiary = beneficiaries[code];
@@ -453,7 +451,8 @@ class RcSowRepository {
       points.add({
         ...row,
         'house_code': code,
-        'beneficiary_name': beneficiary?['beneficiary_name'] ??
+        'beneficiary_name':
+            beneficiary?['beneficiary_name'] ??
             payload['beneficiaryName'] ??
             '',
         'cluster': beneficiary?['cluster'] ?? payload['cluster'] ?? '',

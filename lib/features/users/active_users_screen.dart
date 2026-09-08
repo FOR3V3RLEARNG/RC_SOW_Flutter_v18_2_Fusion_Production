@@ -226,8 +226,8 @@ class _ActiveUsersBodyState extends State<ActiveUsersBody> {
                   separatorBuilder: (_, _) => const SizedBox(height: 7),
                   itemBuilder: (_, index) {
                     final user = users[index];
-                    final status =
-                        '${user['presence_status'] ?? 'active'}'.toLowerCase();
+                    final status = '${user['presence_status'] ?? 'active'}'
+                        .toLowerCase();
                     final busy = status == 'busy';
                     final color = busy ? RcColors.warning : RcColors.success;
                     final name = '${user['full_name'] ?? ''}'.trim();
