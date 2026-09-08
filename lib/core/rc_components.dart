@@ -88,12 +88,7 @@ class _RcExpressiveSurfaceState extends State<RcExpressiveSurface> {
       curve: Curves.easeOutCubic,
       transformAlignment: Alignment.center,
       transform: Matrix4.identity()
-        ..translateByDouble(
-          0.0,
-          pressed ? 2.2 + ui.depth * 1.5 : 0.0,
-          0.0,
-          1.0,
-        )
+        ..translateByDouble(0.0, pressed ? 2.2 + ui.depth * 1.5 : 0.0, 0.0, 1.0)
         ..scaleByDouble(
           pressed ? .994 : 1.0,
           pressed ? .994 : 1.0,
