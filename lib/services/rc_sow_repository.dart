@@ -356,9 +356,7 @@ class RcSowRepository {
           .select()
           .eq('parish', parish)
           .order('tracker_house_code');
-      return rows
-          .map((row) => Map<String, dynamic>.from(row))
-          .toList();
+      return rows.map((row) => Map<String, dynamic>.from(row)).toList();
     } catch (_) {
       // Older deployments still render tracker data; house-code resolution
       // falls back to the accessible RC SOW house directory.

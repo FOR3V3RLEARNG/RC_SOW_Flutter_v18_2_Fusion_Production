@@ -53,10 +53,7 @@ class _LiveTrackerScreenState extends State<LiveTrackerScreen> {
     }
 
     final result = await Future.wait([
-      widget.state.repository.liveTrackerSnapshot(
-        profile,
-        parish: selected,
-      ),
+      widget.state.repository.liveTrackerSnapshot(profile, parish: selected),
       widget.state.repository.liveTrackerParishInventory(
         profile,
         parish: selected,
@@ -84,9 +81,7 @@ class _LiveTrackerScreenState extends State<LiveTrackerScreen> {
 
     final statusByTracker = <String, Map<String, dynamic>>{};
     for (final row in statusRows) {
-      final code = '${row['tracker_house_code'] ?? ''}'
-          .trim()
-          .toUpperCase();
+      final code = '${row['tracker_house_code'] ?? ''}'.trim().toUpperCase();
       if (code.isNotEmpty) statusByTracker[code] = row;
     }
 
@@ -106,9 +101,7 @@ class _LiveTrackerScreenState extends State<LiveTrackerScreen> {
       final rows = <Map<String, dynamic>>[];
       for (final raw in rawHouses) {
         final row = Map<String, dynamic>.from(raw);
-        final trackerCode = '${row['houseId'] ?? ''}'
-            .trim()
-            .toUpperCase();
+        final trackerCode = '${row['houseId'] ?? ''}'.trim().toUpperCase();
         final statusRow = statusByTracker[trackerCode];
 
         final resolved = _resolveHouseCode(
@@ -118,8 +111,7 @@ class _LiveTrackerScreenState extends State<LiveTrackerScreen> {
         );
 
         final rejected =
-            row['rejected'] == true ||
-            statusRow?['rejected'] == true;
+            row['rejected'] == true || statusRow?['rejected'] == true;
         final redFlag = statusRow?['red_house_code'] == true;
 
         if (profile.isCrew && resolved.isEmpty) continue;
@@ -132,11 +124,8 @@ class _LiveTrackerScreenState extends State<LiveTrackerScreen> {
           'rejected': rejected,
           'redHouseCode': redFlag,
           'mapExcluded':
-              statusRow?['excluded_from_map'] == true ||
-              rejected ||
-              redFlag,
-          'statusComments':
-              statusRow?['comments'] ?? row['comments'] ?? '',
+              statusRow?['excluded_from_map'] == true || rejected || redFlag,
+          'statusComments': statusRow?['comments'] ?? row['comments'] ?? '',
         });
       }
 
@@ -265,19 +254,18 @@ class _LiveTrackerScreenState extends State<LiveTrackerScreen> {
           }
 
           final allRows = data.clusters.expand((c) => c.houses).toList();
-          final finished =
-              allRows.where((row) => row['finished'] == true).length;
-          final started =
-              allRows.where((row) => row['started'] == true).length;
-          final rejected =
-              allRows.where((row) => row['rejected'] == true).length;
+          final finished = allRows
+              .where((row) => row['finished'] == true)
+              .length;
+          final started = allRows.where((row) => row['started'] == true).length;
+          final rejected = allRows
+              .where((row) => row['rejected'] == true)
+              .length;
           final verified = allRows
               .where((row) => row['houseVisitedVerified'] == true)
               .length;
-          final boqDone =
-              allRows.where((row) => row['boqDone'] == true).length;
-          final sowDone =
-              allRows.where((row) => row['sowDone'] == true).length;
+          final boqDone = allRows.where((row) => row['boqDone'] == true).length;
+          final sowDone = allRows.where((row) => row['sowDone'] == true).length;
 
           final sourceStatus =
               '${data.source?['last_sync_status'] ?? 'Never synced'}';
@@ -483,8 +471,7 @@ class _LiveTrackerScreenState extends State<LiveTrackerScreen> {
         ...data.clusters.map((cluster) {
           final rows = cluster.houses;
           final done = rows.where((row) => row['finished'] == true).length;
-          final rejected =
-              rows.where((row) => row['rejected'] == true).length;
+          final rejected = rows.where((row) => row['rejected'] == true).length;
           final ready = rows.where(_isReady).length;
           return Padding(
             padding: const EdgeInsets.only(bottom: 8),
@@ -499,18 +486,13 @@ class _LiveTrackerScreenState extends State<LiveTrackerScreen> {
               },
               child: Row(
                 children: [
-                  CircleAvatar(
-                    child: Text('${rows.length}'),
-                  ),
+                  CircleAvatar(child: Text('${rows.length}')),
                   const SizedBox(width: 11),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          cluster.name,
-                          style: theme.textTheme.titleMedium,
-                        ),
+                        Text(cluster.name, style: theme.textTheme.titleMedium),
                         const SizedBox(height: 5),
                         Wrap(
                           spacing: 6,
@@ -558,12 +540,11 @@ class _LiveTrackerScreenState extends State<LiveTrackerScreen> {
     final clusterNames = data.clusters.map((c) => c.name).toList();
 
     final filtered = allRows.where((row) {
-      final code =
-          '${row['trackerHouseCode'] ?? row['houseId'] ?? ''}'.toLowerCase();
-      final resolved =
-          '${row['resolvedHouseCode'] ?? ''}'.toLowerCase();
-      final comments =
-          '${row['statusComments'] ?? row['comments'] ?? ''}'.toLowerCase();
+      final code = '${row['trackerHouseCode'] ?? row['houseId'] ?? ''}'
+          .toLowerCase();
+      final resolved = '${row['resolvedHouseCode'] ?? ''}'.toLowerCase();
+      final comments = '${row['statusComments'] ?? row['comments'] ?? ''}'
+          .toLowerCase();
       final q = query.trim().toLowerCase();
       final queryOk =
           q.isEmpty ||
@@ -605,19 +586,20 @@ class _LiveTrackerScreenState extends State<LiveTrackerScreen> {
         SingleChildScrollView(
           scrollDirection: Axis.horizontal,
           child: Row(
-            children: ['All', 'Started', 'Ready', 'Finished', 'Rejected', 'Attention']
-                .map(
-                  (value) => Padding(
-                    padding: const EdgeInsets.only(right: 6),
-                    child: FilterChip(
-                      selected: statusFilter == value,
-                      label: Text(value),
-                      onSelected: (_) =>
-                          setState(() => statusFilter = value),
-                    ),
-                  ),
-                )
-                .toList(),
+            children:
+                ['All', 'Started', 'Ready', 'Finished', 'Rejected', 'Attention']
+                    .map(
+                      (value) => Padding(
+                        padding: const EdgeInsets.only(right: 6),
+                        child: FilterChip(
+                          selected: statusFilter == value,
+                          label: Text(value),
+                          onSelected: (_) =>
+                              setState(() => statusFilter = value),
+                        ),
+                      ),
+                    )
+                    .toList(),
           ),
         ),
         const SizedBox(height: 8),
@@ -631,8 +613,7 @@ class _LiveTrackerScreenState extends State<LiveTrackerScreen> {
                     child: ChoiceChip(
                       selected: clusterFilter == value,
                       label: Text(value),
-                      onSelected: (_) =>
-                          setState(() => clusterFilter = value),
+                      onSelected: (_) => setState(() => clusterFilter = value),
                     ),
                   ),
                 )
@@ -649,10 +630,7 @@ class _LiveTrackerScreenState extends State<LiveTrackerScreen> {
               ),
             ),
             if (clusterFilter != 'All')
-              Text(
-                clusterFilter,
-                style: theme.textTheme.labelLarge,
-              ),
+              Text(clusterFilter, style: theme.textTheme.labelLarge),
           ],
         ),
         const SizedBox(height: 8),
@@ -667,12 +645,10 @@ class _LiveTrackerScreenState extends State<LiveTrackerScreen> {
 
   Widget _houseCard(Map<String, dynamic> row) {
     final theme = Theme.of(context);
-    final trackerCode =
-        '${row['trackerHouseCode'] ?? row['houseId'] ?? ''}'
-            .trim()
-            .toUpperCase();
-    final resolved =
-        '${row['resolvedHouseCode'] ?? ''}'.trim().toUpperCase();
+    final trackerCode = '${row['trackerHouseCode'] ?? row['houseId'] ?? ''}'
+        .trim()
+        .toUpperCase();
+    final resolved = '${row['resolvedHouseCode'] ?? ''}'.trim().toUpperCase();
     final rejected = row['rejected'] == true;
     final redFlag = row['redHouseCode'] == true;
     final state = _houseState(row);
@@ -685,8 +661,7 @@ class _LiveTrackerScreenState extends State<LiveTrackerScreen> {
     };
 
     final date = '${row['projectEstimatedStartDate'] ?? ''}'.trim();
-    final comments =
-        '${row['statusComments'] ?? row['comments'] ?? ''}'.trim();
+    final comments = '${row['statusComments'] ?? row['comments'] ?? ''}'.trim();
     final link = '${row['link'] ?? ''}'.trim();
 
     return Padding(
@@ -725,10 +700,7 @@ class _LiveTrackerScreenState extends State<LiveTrackerScreen> {
                     ],
                   ),
                 ),
-                RcStatusPill(
-                  label: state.toUpperCase(),
-                  color: stateColor,
-                ),
+                RcStatusPill(label: state.toUpperCase(), color: stateColor),
               ],
             ),
             const SizedBox(height: 9),
@@ -742,20 +714,14 @@ class _LiveTrackerScreenState extends State<LiveTrackerScreen> {
                     color: RcColors.success,
                   ),
                 if (row['started'] == true)
-                  const RcStatusPill(
-                    label: 'STARTED',
-                    color: RcColors.blue,
-                  ),
+                  const RcStatusPill(label: 'STARTED', color: RcColors.blue),
                 if (row['materialsOnSiteNotStarted'] == true)
                   const RcStatusPill(
                     label: 'MATERIALS ON SITE',
                     color: RcColors.warning,
                   ),
                 if (row['boqSent'] == true)
-                  const RcStatusPill(
-                    label: 'BOQ SENT',
-                    color: RcColors.blue,
-                  ),
+                  const RcStatusPill(label: 'BOQ SENT', color: RcColors.blue),
                 if (row['boqDone'] == true)
                   const RcStatusPill(
                     label: 'BOQ DONE',
@@ -777,15 +743,9 @@ class _LiveTrackerScreenState extends State<LiveTrackerScreen> {
                     color: RcColors.success,
                   ),
                 if (rejected)
-                  const RcStatusPill(
-                    label: 'REJECTED',
-                    color: RcColors.danger,
-                  ),
+                  const RcStatusPill(label: 'REJECTED', color: RcColors.danger),
                 if (redFlag)
-                  const RcStatusPill(
-                    label: 'RED FLAG',
-                    color: RcColors.danger,
-                  ),
+                  const RcStatusPill(label: 'RED FLAG', color: RcColors.danger),
               ],
             ),
             if (date.isNotEmpty) ...[
@@ -858,10 +818,7 @@ class _LiveTrackerScreenState extends State<LiveTrackerScreen> {
         Row(
           children: [
             Expanded(
-              child: Text(
-                'Parish Storage',
-                style: theme.textTheme.titleLarge,
-              ),
+              child: Text('Parish Storage', style: theme.textTheme.titleLarge),
             ),
             Text(
               '${data.inventory.length} material lines',
@@ -882,11 +839,10 @@ class _LiveTrackerScreenState extends State<LiveTrackerScreen> {
           final size = '${payload['size'] ?? ''}'.trim();
           final length = '${payload['length'] ?? ''}'.trim();
           final unit = '${row['unit'] ?? ''}'.trim();
-          final transactions =
-              (payload['transactions'] as List? ?? const [])
-                  .whereType<Map>()
-                  .map((e) => Map<String, dynamic>.from(e))
-                  .toList();
+          final transactions = (payload['transactions'] as List? ?? const [])
+              .whereType<Map>()
+              .map((e) => Map<String, dynamic>.from(e))
+              .toList();
 
           return Padding(
             padding: const EdgeInsets.only(bottom: 8),
@@ -963,9 +919,7 @@ class _LiveTrackerScreenState extends State<LiveTrackerScreen> {
                                 ? Icons.south_west_rounded
                                 : Icons.north_east_rounded,
                           ),
-                          title: Text(
-                            '$direction ${_qty(tx['quantity'])}',
-                          ),
+                          title: Text('$direction ${_qty(tx['quantity'])}'),
                           subtitle: Text(
                             [
                               if ('${tx['date'] ?? ''}'.trim().isNotEmpty)
@@ -1016,13 +970,12 @@ class _LiveTrackerScreenState extends State<LiveTrackerScreen> {
   Future<void> _openUrl(String raw) async {
     final uri = Uri.tryParse(raw.trim());
     if (uri == null || !uri.hasScheme) return;
-    final opened = await launchUrl(
-      uri,
-      mode: LaunchMode.externalApplication,
-    );
+    final opened = await launchUrl(uri, mode: LaunchMode.externalApplication);
     if (!opened && mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('The linked document could not be opened.')),
+        const SnackBar(
+          content: Text('The linked document could not be opened.'),
+        ),
       );
     }
   }
@@ -1055,10 +1008,7 @@ class _Metric extends StatelessWidget {
           Icon(icon, color: color),
           const SizedBox(width: 9),
           Expanded(
-            child: Text(
-              label,
-              style: Theme.of(context).textTheme.labelLarge,
-            ),
+            child: Text(label, style: Theme.of(context).textTheme.labelLarge),
           ),
           Text(
             value,
@@ -1074,10 +1024,7 @@ class _Metric extends StatelessWidget {
 }
 
 class _TrackerCluster {
-  const _TrackerCluster({
-    required this.name,
-    this.houses = const [],
-  });
+  const _TrackerCluster({required this.name, this.houses = const []});
 
   final String name;
   final List<Map<String, dynamic>> houses;
