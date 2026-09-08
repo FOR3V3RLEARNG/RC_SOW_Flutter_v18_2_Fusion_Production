@@ -178,7 +178,7 @@ class _ActiveUsersBodyState extends State<ActiveUsersBody> {
 
                 if (snap.connectionState == ConnectionState.waiting &&
                     users.isEmpty) {
-                  return const ListView(
+                  return ListView(
                     children: [
                       Padding(
                         padding: EdgeInsets.all(32),
@@ -205,7 +205,7 @@ class _ActiveUsersBodyState extends State<ActiveUsersBody> {
                 }
 
                 if (users.isEmpty) {
-                  return const ListView(
+                  return ListView(
                     children: [
                       Padding(
                         padding: EdgeInsets.all(28),
