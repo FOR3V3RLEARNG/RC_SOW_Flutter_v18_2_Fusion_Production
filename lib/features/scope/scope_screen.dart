@@ -51,6 +51,36 @@ class RoofStroke {
   };
 }
 
+enum _CanvasDragMode { vertex, segment }
+
+class _CanvasEndpointHit {
+  const _CanvasEndpointHit({
+    required this.strokeIndex,
+    required this.pointIndex,
+    required this.point,
+  });
+
+  final int strokeIndex;
+  final int pointIndex;
+  final Offset point;
+}
+
+class _CanvasEndpointBinding {
+  const _CanvasEndpointBinding({
+    required this.strokeIndex,
+    required this.pointIndex,
+    required this.original,
+    required this.group,
+  });
+
+  final int strokeIndex;
+  final int pointIndex;
+  final Offset original;
+  final int group;
+
+  String get key => '$strokeIndex:$pointIndex';
+}
+
 class ScopeScreen extends StatefulWidget {
   const ScopeScreen({super.key, required this.state});
   final AppState state;
@@ -100,7 +130,18 @@ class _ScopeScreenState extends State<ScopeScreen>
   final strokes = <RoofStroke>[];
   final redo = <RoofStroke>[];
   List<Offset> current = [];
+  int? selectedStrokeIndex;
+  _CanvasDragMode? _dragMode;
+  Offset? _dragAnchor;
+  Offset? _dragSegmentStart;
+  Offset? _dragSegmentEnd;
+  List<_CanvasEndpointBinding> _dragBindings = [];
   final signatures = <String, Uint8List>{};
+
+  static const double _canvasSnapRadius = 16;
+  static const double _canvasHitRadius = 22;
+  static const double _canvasMinSegment = 8;
+  static const double _canvasGrid = 20;
   BeneficiaryRecord? selectedBeneficiary;
 
   UserProfile get profile => widget.state.profile!;
@@ -423,7 +464,12 @@ class _ScopeScreenState extends State<ScopeScreen>
                       .toList(),
                   selected: {drawTool},
                   showSelectedIcon: false,
-                  onSelectionChanged: (s) => setState(() => drawTool = s.first),
+                  onSelectionChanged: (s) => setState(() {
+                    drawTool = s.first;
+                    current = [];
+                    selectedStrokeIndex = null;
+                    _clearSelectionDrag();
+                  }),
                 ),
               ),
               const SizedBox(height: 10),
@@ -481,24 +527,33 @@ class _ScopeScreenState extends State<ScopeScreen>
                     behavior: HitTestBehavior.opaque,
                     onTapUp: drawTool == RoofDrawTool.freehand
                         ? null
+                        : drawTool == RoofDrawTool.select
+                        ? (details) => _selectAt(details.localPosition)
                         : (details) =>
                               _placeTechnicalPoint(details.localPosition),
                     onPanStart: drawTool == RoofDrawTool.freehand
                         ? (details) =>
                               setState(() => current = [details.localPosition])
+                        : drawTool == RoofDrawTool.select
+                        ? (details) => _beginSelectDrag(details.localPosition)
                         : null,
                     onPanUpdate: drawTool == RoofDrawTool.freehand
                         ? (details) =>
                               setState(() => current.add(details.localPosition))
+                        : drawTool == RoofDrawTool.select
+                        ? (details) => _updateSelectDrag(details.localPosition)
                         : null,
                     onPanEnd: drawTool == RoofDrawTool.freehand
                         ? (_) => _finishStroke()
+                        : drawTool == RoofDrawTool.select
+                        ? (_) => _endSelectDrag()
                         : null,
                     child: CustomPaint(
                       painter: RoofCanvasPainter(
                         strokes: strokes,
                         current: current,
                         currentTool: drawTool,
+                        selectedStrokeIndex: selectedStrokeIndex,
                         showGrid: widget.state.showGrid,
                       ),
                       child: const SizedBox.expand(),
@@ -508,7 +563,7 @@ class _ScopeScreenState extends State<ScopeScreen>
               ),
               const SizedBox(height: 8),
               Text(
-                'Stable mode: tap once for the start point and tap again for the end point of Wall/Ridge/Hip/Valley/Drain segments. Freehand still follows your finger. Tap a saved segment below to edit its measurement.',
+                'Connected drafting mode: endpoints snap to the grid and to existing vertices. Wall drawing continues from the last corner automatically. Use Select to drag a corner or a whole segment; every attached wall/ridge/hip/valley endpoint sharing that vertex moves with it, so joints stay closed.',
                 style: theme.textTheme.bodySmall?.copyWith(
                   color: theme.colorScheme.onSurfaceVariant,
                 ),
@@ -541,8 +596,12 @@ class _ScopeScreenState extends State<ScopeScreen>
                           : entry.value.measurement,
                     ),
                     trailing: IconButton(
-                      onPressed: () =>
-                          setState(() => strokes.removeAt(entry.key)),
+                      onPressed: () => setState(() {
+                        strokes.removeAt(entry.key);
+                        selectedStrokeIndex = null;
+                        current = [];
+                        _clearSelectionDrag();
+                      }),
                       icon: const Icon(Icons.delete_outline),
                     ),
                     onTap: () => _editMeasurement(entry.value),
@@ -890,20 +949,286 @@ class _ScopeScreenState extends State<ScopeScreen>
     if (drawTool == RoofDrawTool.select || drawTool == RoofDrawTool.freehand) {
       return;
     }
+
+    final snapped = _snapPoint(point);
+
     if (current.isEmpty) {
       setState(() {
-        current = [point];
+        current = [snapped];
+        selectedStrokeIndex = null;
         redo.clear();
       });
       return;
     }
-    final stroke = RoofStroke(tool: drawTool, points: [current.first, point]);
+
+    final start = current.first;
+    final end = _snapPoint(point);
+
+    if ((end - start).distance < _canvasMinSegment) {
+      return;
+    }
+
+    final stroke = RoofStroke(tool: drawTool, points: [start, end]);
+
     setState(() {
       strokes.add(stroke);
+      selectedStrokeIndex = strokes.length - 1;
+      redo.clear();
+      current = drawTool == RoofDrawTool.wall ? [end] : [];
+    });
+
+    if (drawTool != RoofDrawTool.drain) {
+      await _editMeasurement(stroke);
+    }
+  }
+
+  bool _isTechnicalSegment(RoofStroke stroke) =>
+      stroke.tool != RoofDrawTool.freehand &&
+      stroke.tool != RoofDrawTool.select &&
+      stroke.points.length >= 2;
+
+  Offset _gridSnap(Offset point) {
+    if (!widget.state.showGrid) return point;
+    return Offset(
+      (point.dx / _canvasGrid).round() * _canvasGrid,
+      (point.dy / _canvasGrid).round() * _canvasGrid,
+    );
+  }
+
+  Offset _snapPoint(
+    Offset point, {
+    Set<String> excludedEndpoints = const <String>{},
+  }) {
+    Offset? endpoint;
+    var bestDistance = _canvasSnapRadius;
+
+    for (var strokeIndex = 0; strokeIndex < strokes.length; strokeIndex++) {
+      final stroke = strokes[strokeIndex];
+      if (!_isTechnicalSegment(stroke)) continue;
+
+      final endpointIndices = <int>{0, stroke.points.length - 1};
+      for (final pointIndex in endpointIndices) {
+        final key = '$strokeIndex:$pointIndex';
+        if (excludedEndpoints.contains(key)) continue;
+
+        final candidate = stroke.points[pointIndex];
+        final distance = (candidate - point).distance;
+        if (distance <= bestDistance) {
+          endpoint = candidate;
+          bestDistance = distance;
+        }
+      }
+    }
+
+    return endpoint ?? _gridSnap(point);
+  }
+
+  _CanvasEndpointHit? _nearestEndpoint(Offset position) {
+    _CanvasEndpointHit? hit;
+    var bestDistance = _canvasHitRadius;
+
+    for (var strokeIndex = 0; strokeIndex < strokes.length; strokeIndex++) {
+      final stroke = strokes[strokeIndex];
+      if (!_isTechnicalSegment(stroke)) continue;
+
+      final endpointIndices = <int>{0, stroke.points.length - 1};
+      for (final pointIndex in endpointIndices) {
+        final candidate = stroke.points[pointIndex];
+        final distance = (candidate - position).distance;
+        if (distance <= bestDistance) {
+          bestDistance = distance;
+          hit = _CanvasEndpointHit(
+            strokeIndex: strokeIndex,
+            pointIndex: pointIndex,
+            point: candidate,
+          );
+        }
+      }
+    }
+
+    return hit;
+  }
+
+  int? _nearestSegment(Offset position) {
+    int? hit;
+    var bestDistance = _canvasHitRadius;
+
+    for (var i = 0; i < strokes.length; i++) {
+      final stroke = strokes[i];
+      if (!_isTechnicalSegment(stroke)) continue;
+
+      final distance = _distanceToSegment(
+        position,
+        stroke.points.first,
+        stroke.points.last,
+      );
+
+      if (distance <= bestDistance) {
+        bestDistance = distance;
+        hit = i;
+      }
+    }
+
+    return hit;
+  }
+
+  double _distanceToSegment(Offset p, Offset a, Offset b) {
+    final ab = b - a;
+    final ap = p - a;
+    final lengthSquared = ab.dx * ab.dx + ab.dy * ab.dy;
+    if (lengthSquared == 0) return ap.distance;
+
+    final t = ((ap.dx * ab.dx + ap.dy * ab.dy) / lengthSquared).clamp(
+      0.0,
+      1.0,
+    );
+    final projection = Offset(a.dx + ab.dx * t, a.dy + ab.dy * t);
+    return (p - projection).distance;
+  }
+
+  List<_CanvasEndpointBinding> _bindingsForVertex(
+    Offset vertex, {
+    required int group,
+  }) {
+    final bindings = <_CanvasEndpointBinding>[];
+
+    for (var strokeIndex = 0; strokeIndex < strokes.length; strokeIndex++) {
+      final stroke = strokes[strokeIndex];
+      if (!_isTechnicalSegment(stroke)) continue;
+
+      final endpointIndices = <int>{0, stroke.points.length - 1};
+      for (final pointIndex in endpointIndices) {
+        final candidate = stroke.points[pointIndex];
+        if ((candidate - vertex).distance <= _canvasSnapRadius) {
+          bindings.add(
+            _CanvasEndpointBinding(
+              strokeIndex: strokeIndex,
+              pointIndex: pointIndex,
+              original: candidate,
+              group: group,
+            ),
+          );
+        }
+      }
+    }
+
+    return bindings;
+  }
+
+  void _selectAt(Offset position) {
+    final endpoint = _nearestEndpoint(position);
+    final segment = endpoint?.strokeIndex ?? _nearestSegment(position);
+
+    setState(() {
+      selectedStrokeIndex = segment;
+      current = [];
+      _clearSelectionDrag();
+    });
+  }
+
+  void _beginSelectDrag(Offset position) {
+    final endpoint = _nearestEndpoint(position);
+
+    if (endpoint != null) {
+      final bindings = _bindingsForVertex(endpoint.point, group: 0);
+
+      setState(() {
+        selectedStrokeIndex = endpoint.strokeIndex;
+        current = [];
+        redo.clear();
+        _dragMode = _CanvasDragMode.vertex;
+        _dragAnchor = position;
+        _dragSegmentStart = endpoint.point;
+        _dragSegmentEnd = null;
+        _dragBindings = bindings;
+      });
+      return;
+    }
+
+    final segmentIndex = _nearestSegment(position);
+    if (segmentIndex == null) {
+      setState(() {
+        selectedStrokeIndex = null;
+        _clearSelectionDrag();
+      });
+      return;
+    }
+
+    final stroke = strokes[segmentIndex];
+    final start = stroke.points.first;
+    final end = stroke.points.last;
+
+    final bindings = <_CanvasEndpointBinding>[
+      ..._bindingsForVertex(start, group: 0),
+      ..._bindingsForVertex(end, group: 1),
+    ];
+
+    setState(() {
+      selectedStrokeIndex = segmentIndex;
       current = [];
       redo.clear();
+      _dragMode = _CanvasDragMode.segment;
+      _dragAnchor = position;
+      _dragSegmentStart = start;
+      _dragSegmentEnd = end;
+      _dragBindings = bindings;
     });
-    if (drawTool != RoofDrawTool.drain) await _editMeasurement(stroke);
+  }
+
+  void _updateSelectDrag(Offset position) {
+    final mode = _dragMode;
+    if (mode == null || _dragBindings.isEmpty) return;
+
+    if (mode == _CanvasDragMode.vertex) {
+      final excluded = _dragBindings.map((binding) => binding.key).toSet();
+      final target = _snapPoint(
+        position,
+        excludedEndpoints: excluded,
+      );
+
+      setState(() {
+        for (final binding in _dragBindings) {
+          if (binding.strokeIndex >= strokes.length) continue;
+          final stroke = strokes[binding.strokeIndex];
+          if (binding.pointIndex >= stroke.points.length) continue;
+          stroke.points[binding.pointIndex] = target;
+        }
+      });
+      return;
+    }
+
+    final anchor = _dragAnchor;
+    final originalStart = _dragSegmentStart;
+    final originalEnd = _dragSegmentEnd;
+    if (anchor == null || originalStart == null || originalEnd == null) return;
+
+    final rawDelta = position - anchor;
+    final snappedStart = _gridSnap(originalStart + rawDelta);
+    final delta = snappedStart - originalStart;
+    final movedStart = originalStart + delta;
+    final movedEnd = originalEnd + delta;
+
+    setState(() {
+      for (final binding in _dragBindings) {
+        if (binding.strokeIndex >= strokes.length) continue;
+        final stroke = strokes[binding.strokeIndex];
+        if (binding.pointIndex >= stroke.points.length) continue;
+        stroke.points[binding.pointIndex] =
+            binding.group == 0 ? movedStart : movedEnd;
+      }
+    });
+  }
+
+  void _endSelectDrag() {
+    setState(_clearSelectionDrag);
+  }
+
+  void _clearSelectionDrag() {
+    _dragMode = null;
+    _dragAnchor = null;
+    _dragSegmentStart = null;
+    _dragSegmentEnd = null;
+    _dragBindings = [];
   }
 
   Future<void> _finishStroke() async {
@@ -954,14 +1279,22 @@ class _ScopeScreenState extends State<ScopeScreen>
 
   void _undo() => setState(() {
     if (strokes.isNotEmpty) redo.add(strokes.removeLast());
+    current = [];
+    selectedStrokeIndex = null;
+    _clearSelectionDrag();
   });
   void _redo() => setState(() {
     if (redo.isNotEmpty) strokes.add(redo.removeLast());
+    current = [];
+    selectedStrokeIndex = null;
+    _clearSelectionDrag();
   });
   void _clearCanvas() => setState(() {
     redo.addAll(strokes.reversed);
     strokes.clear();
     current = [];
+    selectedStrokeIndex = null;
+    _clearSelectionDrag();
   });
 
   Map<String, dynamic> _scopeData(String status) => {
@@ -1190,11 +1523,13 @@ class RoofCanvasPainter extends CustomPainter {
     required this.strokes,
     required this.current,
     required this.currentTool,
+    required this.selectedStrokeIndex,
     required this.showGrid,
   });
   final List<RoofStroke> strokes;
   final List<Offset> current;
   final RoofDrawTool currentTool;
+  final int? selectedStrokeIndex;
   final bool showGrid;
 
   @override
@@ -1210,9 +1545,25 @@ class RoofCanvasPainter extends CustomPainter {
         canvas.drawLine(Offset(0, y), Offset(size.width, y), grid);
       }
     }
-    for (final stroke in strokes) {
-      _drawStroke(canvas, stroke, size);
+    for (var i = 0; i < strokes.length; i++) {
+      _drawStroke(
+        canvas,
+        strokes[i],
+        size,
+        selected: i == selectedStrokeIndex,
+      );
     }
+
+    if (current.length == 1) {
+      canvas.drawCircle(
+        current.first,
+        5,
+        Paint()
+          ..color = RcColors.blue
+          ..style = PaintingStyle.fill,
+      );
+    }
+
     if (current.length >= 2) {
       _drawStroke(
         canvas,
@@ -1228,6 +1579,7 @@ class RoofCanvasPainter extends CustomPainter {
     RoofStroke stroke,
     Size size, {
     bool preview = false,
+    bool selected = false,
   }) {
     final color = switch (stroke.tool) {
       RoofDrawTool.wall => RcColors.ink,
@@ -1240,7 +1592,9 @@ class RoofCanvasPainter extends CustomPainter {
     };
     final paint = Paint()
       ..color = preview ? color.withValues(alpha: .55) : color
-      ..strokeWidth = stroke.tool == RoofDrawTool.wall ? 3 : 2.3
+      ..strokeWidth = selected
+          ? (stroke.tool == RoofDrawTool.wall ? 4.8 : 4)
+          : (stroke.tool == RoofDrawTool.wall ? 3 : 2.3)
       ..strokeCap = StrokeCap.round
       ..strokeJoin = StrokeJoin.round
       ..style = PaintingStyle.stroke;
@@ -1255,7 +1609,28 @@ class RoofCanvasPainter extends CustomPainter {
     } else {
       final start = stroke.points.first;
       final end = stroke.points.last;
+
+      if (selected && !preview) {
+        canvas.drawLine(
+          start,
+          end,
+          Paint()
+            ..color = RcColors.blue.withValues(alpha: .16)
+            ..strokeWidth = paint.strokeWidth + 8
+            ..strokeCap = StrokeCap.round
+            ..style = PaintingStyle.stroke,
+        );
+      }
+
       canvas.drawLine(start, end, paint);
+
+      if (!preview) {
+        final startConnected = _connectionCount(start) > 1;
+        final endConnected = _connectionCount(end) > 1;
+        _drawNode(canvas, start, color, selected, startConnected);
+        _drawNode(canvas, end, color, selected, endConnected);
+      }
+
       if (stroke.tool == RoofDrawTool.drain) _arrow(canvas, start, end, paint);
       if (stroke.measurement.isNotEmpty) {
         final tp = TextPainter(
@@ -1279,6 +1654,44 @@ class RoofCanvasPainter extends CustomPainter {
         );
       }
     }
+  }
+
+  int _connectionCount(Offset point) {
+    var count = 0;
+    for (final stroke in strokes) {
+      if (stroke.tool == RoofDrawTool.freehand || stroke.points.length < 2) {
+        continue;
+      }
+      if ((stroke.points.first - point).distance <= 1.5) count++;
+      if ((stroke.points.last - point).distance <= 1.5) count++;
+    }
+    return count;
+  }
+
+  void _drawNode(
+    Canvas canvas,
+    Offset point,
+    Color baseColor,
+    bool selected,
+    bool connected,
+  ) {
+    final nodeColor = connected ? RcColors.success : baseColor;
+
+    canvas.drawCircle(
+      point,
+      selected ? 5.5 : connected ? 4.2 : 3.2,
+      Paint()
+        ..color = nodeColor
+        ..style = PaintingStyle.fill,
+    );
+
+    canvas.drawCircle(
+      point,
+      selected ? 9 : connected ? 7 : 5.5,
+      Paint()
+        ..color = nodeColor.withValues(alpha: .14)
+        ..style = PaintingStyle.fill,
+    );
   }
 
   void _arrow(Canvas canvas, Offset start, Offset end, Paint paint) {
