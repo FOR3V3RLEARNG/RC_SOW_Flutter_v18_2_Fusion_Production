@@ -2121,7 +2121,11 @@ class BeneficiaryAgreementRoofPainter extends CustomPainter {
 
     _label(canvas, 'RIDGE LINE', Offset(size.width * .48, size.height * .20));
     _label(canvas, 'RAFTERS', Offset(size.width * .67, size.height * .42));
-    _label(canvas, 'FASCIA / EAVE', Offset(size.width * .14, size.height * .79));
+    _label(
+      canvas,
+      'FASCIA / EAVE',
+      Offset(size.width * .14, size.height * .79),
+    );
   }
 
   void _hip(
@@ -2166,7 +2170,11 @@ class BeneficiaryAgreementRoofPainter extends CustomPainter {
 
     _label(canvas, 'RIDGE', Offset(size.width * .48, size.height * .23));
     _label(canvas, 'HIP RAFTERS', Offset(size.width * .69, size.height * .36));
-    _label(canvas, 'FASCIA / EAVES', Offset(size.width * .14, size.height * .80));
+    _label(
+      canvas,
+      'FASCIA / EAVES',
+      Offset(size.width * .14, size.height * .80),
+    );
   }
 
   void _shed(
@@ -2203,8 +2211,16 @@ class BeneficiaryAgreementRoofPainter extends CustomPainter {
     }
 
     _label(canvas, 'HIGH EAVE', Offset(size.width * .61, size.height * .29));
-    _label(canvas, 'RAFTERS / FALL', Offset(size.width * .46, size.height * .52));
-    _label(canvas, 'LOW EAVE / FASCIA', Offset(size.width * .14, size.height * .80));
+    _label(
+      canvas,
+      'RAFTERS / FALL',
+      Offset(size.width * .46, size.height * .52),
+    );
+    _label(
+      canvas,
+      'LOW EAVE / FASCIA',
+      Offset(size.width * .14, size.height * .80),
+    );
   }
 
   void _intersecting(
@@ -2237,8 +2253,16 @@ class BeneficiaryAgreementRoofPainter extends CustomPainter {
     final cross2 = Offset(size.width * .75, size.height * .41);
     canvas.drawLine(main1, main2, ridge);
     canvas.drawLine(cross1, cross2, ridge);
-    canvas.drawLine(cross1, Offset(size.width * .38, size.height * .46), valley);
-    canvas.drawLine(cross1, Offset(size.width * .57, size.height * .42), valley);
+    canvas.drawLine(
+      cross1,
+      Offset(size.width * .38, size.height * .46),
+      valley,
+    );
+    canvas.drawLine(
+      cross1,
+      Offset(size.width * .57, size.height * .42),
+      valley,
+    );
     canvas.drawLine(a, b, eave);
     canvas.drawLine(b, c, eave);
     canvas.drawLine(c, d, eave);
@@ -2283,7 +2307,11 @@ class BeneficiaryAgreementRoofPainter extends CustomPainter {
       Offset(size.width * .57, size.height * .53),
       valley,
     );
-    _label(canvas, 'CUSTOM / COMPLEX ROOF', Offset(size.width * .34, size.height * .21));
+    _label(
+      canvas,
+      'CUSTOM / COMPLEX ROOF',
+      Offset(size.width * .34, size.height * .21),
+    );
     _label(
       canvas,
       'Final geometry follows approved Scope',
