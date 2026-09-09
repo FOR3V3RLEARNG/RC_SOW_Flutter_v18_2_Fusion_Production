@@ -203,10 +203,7 @@ class _ScopeScreenState extends State<ScopeScreen>
         ),
         Padding(
           padding: const EdgeInsets.fromLTRB(16, 2, 16, 8),
-          child: _ScopeProgress(
-            index: tabs.index,
-            onSelect: tabs.animateTo,
-          ),
+          child: _ScopeProgress(index: tabs.index, onSelect: tabs.animateTo),
         ),
         TabBar(
           controller: tabs,
@@ -1687,10 +1684,7 @@ class _ScopeScreenState extends State<ScopeScreen>
 }
 
 class _ScopeProgress extends StatelessWidget {
-  const _ScopeProgress({
-    required this.index,
-    required this.onSelect,
-  });
+  const _ScopeProgress({required this.index, required this.onSelect});
 
   final int index;
   final ValueChanged<int> onSelect;
@@ -1718,9 +1712,7 @@ class _ScopeProgress extends StatelessWidget {
                       color: i <= index
                           ? theme.colorScheme.primaryContainer
                           : theme.colorScheme.surfaceContainerLow,
-                      borderRadius: BorderRadius.circular(
-                        i == index ? 18 : 12,
-                      ),
+                      borderRadius: BorderRadius.circular(i == index ? 18 : 12),
                       border: Border.all(
                         color: i == index
                             ? theme.colorScheme.primary.withValues(alpha: .30)
