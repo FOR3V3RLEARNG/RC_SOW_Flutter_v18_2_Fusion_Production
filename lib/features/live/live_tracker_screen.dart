@@ -216,9 +216,9 @@ class _LiveTrackerScreenState extends State<LiveTrackerScreen> {
       return;
     }
 
-    final schemas = RcProductRegistry.visibleSchemas(profile)
-        .where((schema) => schema.eventType != 'crewAttendance')
-        .toList();
+    final schemas = RcProductRegistry.visibleSchemas(
+      profile,
+    ).where((schema) => schema.eventType != 'crewAttendance').toList();
 
     final selected = await showModalBottomSheet<String>(
       context: context,
@@ -249,8 +249,7 @@ class _LiveTrackerScreenState extends State<LiveTrackerScreen> {
                     color.withValues(alpha: .16),
                     Theme.of(sheetContext).colorScheme.surface,
                   ),
-                  onTap: () =>
-                      Navigator.pop(sheetContext, schema.eventType),
+                  onTap: () => Navigator.pop(sheetContext, schema.eventType),
                   child: Row(
                     children: [
                       RcIconWell(
@@ -267,9 +266,7 @@ class _LiveTrackerScreenState extends State<LiveTrackerScreen> {
                           schema.title,
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
-                          style: Theme.of(sheetContext)
-                              .textTheme
-                              .titleMedium,
+                          style: Theme.of(sheetContext).textTheme.titleMedium,
                         ),
                       ),
                       const Icon(Icons.chevron_right_rounded),
@@ -882,9 +879,7 @@ class _LiveTrackerScreenState extends State<LiveTrackerScreen> {
                         ? null
                         : () => _openHouse(resolved),
                     icon: const Icon(Icons.home_repair_service_outlined),
-                    label: Text(
-                      resolved.isEmpty ? 'Not linked' : 'House',
-                    ),
+                    label: Text(resolved.isEmpty ? 'Not linked' : 'House'),
                   ),
                 ),
                 const SizedBox(width: 8),

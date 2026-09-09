@@ -279,9 +279,7 @@ class _SlidingNavigationIsland extends StatelessWidget {
             return SingleChildScrollView(
               scrollDirection: Axis.horizontal,
               child: ConstrainedBox(
-                constraints: BoxConstraints(
-                  minWidth: constraints.maxWidth,
-                ),
+                constraints: BoxConstraints(minWidth: constraints.maxWidth),
                 child: Row(
                   mainAxisAlignment: canSpread
                       ? MainAxisAlignment.spaceEvenly
@@ -292,8 +290,10 @@ class _SlidingNavigationIsland extends StatelessWidget {
                         width: buttonWidth,
                         label: d.label,
                         icon: state.uiIcon('nav.${d.name}', d.icon),
-                        selectedIcon:
-                            state.uiIcon('nav.${d.name}', d.selectedIcon),
+                        selectedIcon: state.uiIcon(
+                          'nav.${d.name}',
+                          d.selectedIcon,
+                        ),
                         selected: state.selectedTab == d.index,
                         onTap: () => state.selectTab(d.index),
                       ),
@@ -304,8 +304,7 @@ class _SlidingNavigationIsland extends StatelessWidget {
                       icon: state.uiIcon('nav.map', Icons.map_outlined),
                       selected: false,
                       onTap: () async {
-                        final result =
-                            await Navigator.of(context).push<String>(
+                        final result = await Navigator.of(context).push<String>(
                           MaterialPageRoute(
                             builder: (_) =>
                                 InteractiveHouseMapScreen(state: state),

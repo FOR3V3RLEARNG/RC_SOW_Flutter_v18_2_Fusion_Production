@@ -689,8 +689,7 @@ class _CommunityCommandBoard extends StatelessWidget {
                   itemCount: ticker.length,
                   itemBuilder: (_, index) {
                     final post = ticker[index];
-                    final category =
-                        '${post.item['category'] ?? 'Update'}';
+                    final category = '${post.item['category'] ?? 'Update'}';
                     return InkWell(
                       borderRadius: BorderRadius.circular(16),
                       onTap: () => onOpen(post),
@@ -705,8 +704,7 @@ class _CommunityCommandBoard extends StatelessWidget {
                           Expanded(
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.center,
-                              crossAxisAlignment:
-                                  CrossAxisAlignment.start,
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
                                   post.title,
@@ -751,21 +749,12 @@ class _CommunityCommandBoard extends StatelessWidget {
           children: [
             Row(
               children: [
-                const Icon(
-                  Icons.event_upcoming_rounded,
-                  color: RcColors.blue,
-                ),
+                const Icon(Icons.event_upcoming_rounded, color: RcColors.blue),
                 const SizedBox(width: 7),
                 Expanded(
-                  child: Text(
-                    'Upcoming',
-                    style: theme.textTheme.titleMedium,
-                  ),
+                  child: Text('Upcoming', style: theme.textTheme.titleMedium),
                 ),
-                Text(
-                  '${upcoming.length}',
-                  style: theme.textTheme.labelLarge,
-                ),
+                Text('${upcoming.length}', style: theme.textTheme.labelLarge),
               ],
             ),
             const SizedBox(height: 5),
@@ -782,8 +771,7 @@ class _CommunityCommandBoard extends StatelessWidget {
                         return InkWell(
                           onTap: () => onOpen(event),
                           child: Padding(
-                            padding:
-                                const EdgeInsets.symmetric(vertical: 3),
+                            padding: const EdgeInsets.symmetric(vertical: 3),
                             child: Row(
                               children: [
                                 SizedBox(
@@ -792,8 +780,7 @@ class _CommunityCommandBoard extends StatelessWidget {
                                     start == null
                                         ? 'SOON'
                                         : _compactDate(start),
-                                    style:
-                                        theme.textTheme.labelSmall?.copyWith(
+                                    style: theme.textTheme.labelSmall?.copyWith(
                                       fontWeight: FontWeight.w900,
                                       color: RcColors.blue,
                                     ),

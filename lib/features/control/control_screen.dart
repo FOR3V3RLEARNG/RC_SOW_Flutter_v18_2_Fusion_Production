@@ -824,8 +824,8 @@ class _ModuleTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final color =
-        RcColors.expressivePalette[
-            schema.icon.codePoint % RcColors.expressivePalette.length];
+        RcColors.expressivePalette[schema.icon.codePoint %
+            RcColors.expressivePalette.length];
     return RcExpressiveSurface(
       shape: RcSurfaceShape.offset,
       tone: Color.alphaBlend(

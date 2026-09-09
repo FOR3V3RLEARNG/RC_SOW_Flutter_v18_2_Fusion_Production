@@ -1690,9 +1690,8 @@ class _ActionTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final color =
-        RcColors.expressivePalette[
-            icon.codePoint % RcColors.expressivePalette.length];
+    final color = RcColors
+        .expressivePalette[icon.codePoint % RcColors.expressivePalette.length];
     return RcExpressiveSurface(
       shape: RcSurfaceShape.offset,
       tone: Color.alphaBlend(
@@ -1702,11 +1701,7 @@ class _ActionTile extends StatelessWidget {
       onTap: onTap,
       child: Row(
         children: [
-          RcIconWell(
-            icon: icon,
-            color: color,
-            size: 46,
-          ),
+          RcIconWell(icon: icon, color: color, size: 46),
           const SizedBox(width: 10),
           Expanded(
             child: Column(
