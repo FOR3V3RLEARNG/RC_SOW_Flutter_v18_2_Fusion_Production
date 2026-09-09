@@ -205,7 +205,8 @@ class _LiveTrackerScreenState extends State<LiveTrackerScreen> {
         )
         .firstOrNull;
 
-    if (!mounted || house == null) {
+    if (!mounted) return;
+    if (house == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text(

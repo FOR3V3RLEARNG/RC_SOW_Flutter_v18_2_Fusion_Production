@@ -749,7 +749,7 @@ class _CommunityCommandBoard extends StatelessWidget {
           children: [
             Row(
               children: [
-                const Icon(Icons.event_upcoming_rounded, color: RcColors.blue),
+                const Icon(Icons.event_rounded, color: RcColors.blue),
                 const SizedBox(width: 7),
                 Expanded(
                   child: Text('Upcoming', style: theme.textTheme.titleMedium),
