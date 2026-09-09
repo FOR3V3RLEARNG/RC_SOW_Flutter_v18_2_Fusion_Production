@@ -502,8 +502,8 @@ class RcHeader extends StatelessWidget {
                 icon: Badge(
                   child: Icon(
                     state.uiIcon(
-                      'header.messages',
-                      Icons.notifications_active_outlined,
+                      'header.notifications',
+                      Icons.notifications_active_rounded,
                     ),
                     size: RcIconSize.md,
                   ),

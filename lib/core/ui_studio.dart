@@ -75,6 +75,7 @@ abstract final class RcIconCatalog {
     'map': Icons.map_rounded,
     'tracker': Icons.radar_rounded,
     'messages': Icons.forum_rounded,
+    'notifications': Icons.notifications_active_rounded,
     'settings': Icons.tune_rounded,
     'site_visit': Icons.location_on_rounded,
     'daily_log': Icons.menu_book_rounded,
@@ -117,7 +118,8 @@ abstract final class RcIconCatalog {
     'nav.community': 'Community',
     'nav.map': 'Map',
     'nav.tracker': 'Live Tracker',
-    'header.messages': 'Notifications',
+    'header.notifications': 'Notifications',
+    'header.messages': 'Messages',
     'header.settings': 'Settings',
   };
 
@@ -130,6 +132,9 @@ abstract final class RcIconCatalog {
       'nav.community': 'community',
       'nav.map': 'map',
       'nav.tracker': 'tracker',
+      'header.notifications': 'notifications',
+      'header.notifications': 'notifications',
+      'header.notifications': 'notifications',
       'header.messages': 'messages',
       'header.settings': 'settings',
       'module.siteVisit': 'site_visit',
