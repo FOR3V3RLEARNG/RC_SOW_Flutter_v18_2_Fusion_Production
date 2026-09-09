@@ -87,10 +87,10 @@ class _LiveTrackerScreenState extends State<LiveTrackerScreen> {
       if (code.isNotEmpty) statusByTracker[code] = row;
     }
 
-    final accessibleCodes = houses
-        .map((house) => house.code.trim().toUpperCase())
-        .where((code) => code.isNotEmpty)
-        .toSet();
+    final houseByCode = <String, HouseRecord>{
+      for (final house in houses) house.code.trim().toUpperCase(): house,
+    };
+    final accessibleCodes = houseByCode.keys.toSet();
 
     final clusters = <_TrackerCluster>[];
     for (final cluster in rawClusters) {
@@ -118,11 +118,14 @@ class _LiveTrackerScreenState extends State<LiveTrackerScreen> {
 
         if (profile.isCrew && resolved.isEmpty) continue;
 
+        final appHouse = resolved.isEmpty ? null : houseByCode[resolved];
         rows.add({
           ...row,
           'clusterName': name,
           'trackerHouseCode': trackerCode,
           'resolvedHouseCode': resolved,
+          'appHouseStage': appHouse?.stage ?? '',
+          'appHouseProgress': appHouse?.progress ?? 0,
           'rejected': rejected,
           'redHouseCode': redFlag,
           'mapExcluded':
@@ -177,7 +180,7 @@ class _LiveTrackerScreenState extends State<LiveTrackerScreen> {
     }).toList();
 
     if (matches.length == 1) return matches.first;
-    return backend;
+    return '';
   }
 
   Future<void> _refresh() async {
@@ -499,6 +502,15 @@ class _LiveTrackerScreenState extends State<LiveTrackerScreen> {
     );
   }
 
+  void _openOverviewFilter(String filter) {
+    setState(() {
+      query = '';
+      clusterFilter = 'All';
+      statusFilter = filter;
+      section = 1;
+    });
+  }
+
   Widget _overview(
     _TrackerData data, {
     required int total,
@@ -522,48 +534,56 @@ class _LiveTrackerScreenState extends State<LiveTrackerScreen> {
               '$total',
               Icons.home_work_outlined,
               theme.colorScheme.primary,
+              onTap: () => _openOverviewFilter('All'),
             ),
             _Metric(
               'Started',
               '$started',
               Icons.construction_outlined,
               RcColors.blue,
+              onTap: () => _openOverviewFilter('Started'),
             ),
             _Metric(
               'Finished',
               '$finished',
               Icons.verified_outlined,
               RcColors.success,
+              onTap: () => _openOverviewFilter('Finished'),
             ),
             _Metric(
               'Verified',
               '$verified',
               Icons.fact_check_outlined,
               RcColors.purple,
+              onTap: () => _openOverviewFilter('Verified'),
             ),
             _Metric(
               'BOQ Done',
               '$boqDone',
               Icons.receipt_long_outlined,
               RcColors.blue,
+              onTap: () => _openOverviewFilter('BOQ Done'),
             ),
             _Metric(
               'SOW Done',
               '$sowDone',
               Icons.description_outlined,
               RcColors.success,
+              onTap: () => _openOverviewFilter('SOW Done'),
             ),
             _Metric(
               'Rejected',
               '$rejected',
               Icons.block_outlined,
               RcColors.danger,
+              onTap: () => _openOverviewFilter('Rejected'),
             ),
             _Metric(
               'Storage',
               '${data.inventory.length}',
               Icons.inventory_2_outlined,
               RcColors.warning,
+              onTap: () => setState(() => section = 2),
             ),
           ],
         ),
@@ -660,8 +680,13 @@ class _LiveTrackerScreenState extends State<LiveTrackerScreen> {
 
       final statusOk = switch (statusFilter) {
         'Finished' => row['finished'] == true,
-        'Started' => row['started'] == true,
+        'Started' =>
+          row['started'] == true && row['appHouseStage'] != 'Revoked',
         'Ready' => _isReady(row),
+        'Verified' => row['houseVisitedVerified'] == true,
+        'BOQ Done' => row['boqDone'] == true,
+        'SOW Done' => row['sowDone'] == true,
+        'Revoked' => row['appHouseStage'] == 'Revoked',
         'Rejected' => row['rejected'] == true,
         'Attention' =>
           row['rejected'] != true &&
@@ -689,7 +714,18 @@ class _LiveTrackerScreenState extends State<LiveTrackerScreen> {
           scrollDirection: Axis.horizontal,
           child: Row(
             children:
-                ['All', 'Started', 'Ready', 'Finished', 'Rejected', 'Attention']
+                [
+                  'All',
+                  'Started',
+                  'Ready',
+                  'Finished',
+                  'Verified',
+                  'BOQ Done',
+                  'SOW Done',
+                  'Revoked',
+                  'Rejected',
+                  'Attention',
+                ]
                     .map(
                       (value) => Padding(
                         padding: const EdgeInsets.only(right: 6),
@@ -745,6 +781,106 @@ class _LiveTrackerScreenState extends State<LiveTrackerScreen> {
     );
   }
 
+  bool get _canStartHouse =>
+      profile.isAdmin || profile.isSiteSupervisor || profile.canEditProduction;
+
+  Future<void> _startHouse(Map<String, dynamic> row) async {
+    if (!_canStartHouse) return;
+    final trackerCode =
+        '${row['trackerHouseCode'] ?? row['houseId'] ?? ''}'
+            .trim()
+            .toUpperCase();
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: Text('Start $trackerCode in RC SOW?'),
+        content: const Text(
+          'This creates the RC SOW house workspace from Tracker/Shelter data. '
+          'It does not edit the source Excel workbook.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext, false),
+            child: const Text('Cancel'),
+          ),
+          FilledButton.icon(
+            onPressed: () => Navigator.pop(dialogContext, true),
+            icon: const Icon(Icons.play_arrow_rounded),
+            label: const Text('Start House'),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true || !mounted) return;
+
+    try {
+      final code = await widget.state.repository.startHouseFromTracker(
+        profile: profile,
+        trackerHouseCode: trackerCode,
+        parish: parish ?? profile.parish,
+        cluster: '${row['clusterName'] ?? ''}',
+      );
+      await _refresh();
+      if (mounted) await _openHouse(code);
+    } catch (error) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('House could not be started: $error')),
+      );
+    }
+  }
+
+  Future<void> _adminHouseAction(
+    Map<String, dynamic> row,
+    String action,
+  ) async {
+    if (!profile.isAdmin) return;
+    final code = '${row['resolvedHouseCode'] ?? ''}'.trim().toUpperCase();
+    if (code.isEmpty) return;
+
+    try {
+      if (action == 'delete') {
+        final confirmed = await showDialog<bool>(
+          context: context,
+          builder: (dialogContext) => AlertDialog(
+            title: Text('Delete $code start record?'),
+            content: const Text(
+              'This removes only the RC SOW house activation/start record. '
+              'Existing SOW, BOQ, photos and Control records are preserved.',
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(dialogContext, false),
+                child: const Text('Cancel'),
+              ),
+              FilledButton(
+                onPressed: () => Navigator.pop(dialogContext, true),
+                child: const Text('Delete Start Record'),
+              ),
+            ],
+          ),
+        );
+        if (confirmed != true || !mounted) return;
+        await widget.state.repository.deleteHouseStartRecord(
+          profile: profile,
+          houseCode: code,
+        );
+      } else {
+        await widget.state.repository.setHouseLifecycle(
+          profile: profile,
+          houseCode: code,
+          action: action,
+        );
+      }
+      await _refresh();
+    } catch (error) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('House lifecycle action failed: $error')),
+      );
+    }
+  }
+
   Widget _houseCard(Map<String, dynamic> row) {
     final theme = Theme.of(context);
     final trackerCode = '${row['trackerHouseCode'] ?? row['houseId'] ?? ''}'
@@ -753,9 +889,11 @@ class _LiveTrackerScreenState extends State<LiveTrackerScreen> {
     final resolved = '${row['resolvedHouseCode'] ?? ''}'.trim().toUpperCase();
     final rejected = row['rejected'] == true;
     final redFlag = row['redHouseCode'] == true;
+    final revoked = row['appHouseStage'] == 'Revoked';
     final state = _houseState(row);
     final stateColor = switch (state) {
       'Rejected' => RcColors.danger,
+      'Revoked' => RcColors.danger,
       'Finished' => RcColors.success,
       'In Progress' => RcColors.blue,
       'Ready' => RcColors.purple,
@@ -773,7 +911,9 @@ class _LiveTrackerScreenState extends State<LiveTrackerScreen> {
         tone: rejected || redFlag
             ? theme.colorScheme.errorContainer.withValues(alpha: .34)
             : null,
-        onTap: resolved.isEmpty ? null : () => _openHouse(resolved),
+        onTap: resolved.isEmpty || (revoked && !profile.isAdmin)
+            ? null
+            : () => _openHouse(resolved),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
@@ -803,6 +943,28 @@ class _LiveTrackerScreenState extends State<LiveTrackerScreen> {
                   ),
                 ),
                 RcStatusPill(label: state.toUpperCase(), color: stateColor),
+                if (profile.isAdmin && resolved.isNotEmpty)
+                  PopupMenuButton<String>(
+                    tooltip: 'Admin house lifecycle',
+                    onSelected: (action) => _adminHouseAction(row, action),
+                    itemBuilder: (_) => [
+                      if (revoked)
+                        const PopupMenuItem(
+                          value: 'resume',
+                          child: Text('Resume house'),
+                        )
+                      else
+                        const PopupMenuItem(
+                          value: 'revoke',
+                          child: Text('Revoke house start'),
+                        ),
+                      const PopupMenuDivider(),
+                      const PopupMenuItem(
+                        value: 'delete',
+                        child: Text('Delete start record'),
+                      ),
+                    ],
+                  ),
               ],
             ),
             const SizedBox(height: 9),
@@ -877,16 +1039,28 @@ class _LiveTrackerScreenState extends State<LiveTrackerScreen> {
                 Expanded(
                   child: FilledButton.icon(
                     onPressed: resolved.isEmpty
-                        ? null
-                        : () => _openHouse(resolved),
-                    icon: const Icon(Icons.home_repair_service_outlined),
-                    label: Text(resolved.isEmpty ? 'Not linked' : 'House'),
+                        ? ((rejected || redFlag || !_canStartHouse)
+                              ? null
+                              : () => _startHouse(row))
+                        : ((revoked && !profile.isAdmin)
+                              ? null
+                              : () => _openHouse(resolved)),
+                    icon: Icon(
+                      resolved.isEmpty
+                          ? Icons.play_arrow_rounded
+                          : Icons.home_repair_service_outlined,
+                    ),
+                    label: Text(
+                      resolved.isEmpty
+                          ? (rejected || redFlag ? 'Rejected' : 'Start House')
+                          : (revoked ? 'View Revoked' : 'House'),
+                    ),
                   ),
                 ),
                 const SizedBox(width: 8),
                 Expanded(
                   child: FilledButton.tonalIcon(
-                    onPressed: resolved.isEmpty
+                    onPressed: resolved.isEmpty || revoked
                         ? null
                         : () => _openHouseModules(resolved),
                     icon: const Icon(Icons.dashboard_customize_outlined),
@@ -1057,6 +1231,7 @@ class _LiveTrackerScreenState extends State<LiveTrackerScreen> {
 
   String _houseState(Map<String, dynamic> row) {
     if (row['rejected'] == true) return 'Rejected';
+    if (row['appHouseStage'] == 'Revoked') return 'Revoked';
     if (row['finished'] == true) return 'Finished';
     if (row['started'] == true) return 'In Progress';
     if (_isReady(row)) return 'Ready';
@@ -1099,18 +1274,27 @@ class _LiveTrackerScreenState extends State<LiveTrackerScreen> {
 }
 
 class _Metric extends StatelessWidget {
-  const _Metric(this.label, this.value, this.icon, this.color);
+  const _Metric(
+    this.label,
+    this.value,
+    this.icon,
+    this.color, {
+    required this.onTap,
+  });
 
   final String label;
   final String value;
   final IconData icon;
   final Color color;
+  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
     return RcExpressiveSurface(
       shape: RcSurfaceShape.offset,
-      tone: color.withValues(alpha: .075),
+      tone: color.withValues(alpha: .12),
+      onTap: onTap,
+      semanticLabel: '$label: $value. Open matching houses.',
       child: Row(
         children: [
           Icon(icon, color: color),

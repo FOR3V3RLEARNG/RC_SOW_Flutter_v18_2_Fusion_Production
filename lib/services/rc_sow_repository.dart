@@ -1394,6 +1394,230 @@ class RcSowRepository {
         .toList();
   }
 
+  Future<Map<String, dynamic>?> houseEvent(String houseCode) async {
+    final rows = await client
+        .from('app_events')
+        .select()
+        .eq('event_type', 'house')
+        .eq('house_code', houseCode.trim().toUpperCase())
+        .order('updated_at', ascending: false)
+        .limit(1);
+    if (rows.isEmpty) return null;
+    return Map<String, dynamic>.from(rows.first);
+  }
+
+  Future<String> startHouseFromTracker({
+    required UserProfile profile,
+    required String trackerHouseCode,
+    required String parish,
+    required String cluster,
+  }) async {
+    final tracker = trackerHouseCode.trim().replaceAll(' ', '').toUpperCase();
+    if (tracker.isEmpty) throw ArgumentError('Tracker house code is required.');
+
+    Map<String, dynamic>? beneficiary;
+    final exact = await client
+        .from('beneficiary_directory')
+        .select('house_code,beneficiary_name,parish,cluster')
+        .eq('parish', parish)
+        .eq('house_code', tracker)
+        .limit(1);
+
+    if (exact.isNotEmpty) {
+      beneficiary = Map<String, dynamic>.from(exact.first);
+    } else {
+      final rows = await client
+          .from('beneficiary_directory')
+          .select('house_code,beneficiary_name,parish,cluster')
+          .eq('parish', parish)
+          .limit(5000);
+
+      int? numOf(String code) {
+        final m = RegExp(r'\d+').firstMatch(code);
+        return m == null ? null : int.tryParse(m.group(0)!);
+      }
+
+      final target = numOf(tracker);
+      if (target != null) {
+        final matches = rows
+            .map((r) => Map<String, dynamic>.from(r))
+            .where((r) => numOf('${r['house_code'] ?? ''}') == target)
+            .toList();
+        if (matches.length == 1) {
+          beneficiary = matches.first;
+        } else {
+          final ha = matches
+              .where((r) => '${r['house_code'] ?? ''}'.trim().toUpperCase().startsWith('HA'))
+              .toList();
+          if (ha.length == 1) beneficiary = ha.first;
+        }
+      }
+    }
+
+    final code = '${beneficiary?['house_code'] ?? tracker}'.trim().toUpperCase();
+    final existing = await houseEvent(code);
+    if (existing != null) return code;
+
+    final beneficiaryName =
+        '${beneficiary?['beneficiary_name'] ?? 'Tracker $tracker'}'.trim();
+    final effectiveParish =
+        '${beneficiary?['parish'] ?? parish}'.trim().isEmpty
+        ? parish
+        : '${beneficiary?['parish'] ?? parish}'.trim();
+    final effectiveCluster =
+        '${beneficiary?['cluster'] ?? cluster}'.trim().isEmpty
+        ? cluster
+        : '${beneficiary?['cluster'] ?? cluster}'.trim();
+    final id = 'house-${_safePath(code)}';
+    final now = DateTime.now().toUtc().toIso8601String();
+
+    await _upsertEvent(
+      type: 'house',
+      id: id,
+      parish: effectiveParish,
+      houseCode: code,
+      item: {
+        'id': id,
+        'houseCode': code,
+        'code': code,
+        'beneficiary': beneficiaryName,
+        'beneficiaryName': beneficiaryName,
+        'parish': effectiveParish,
+        'cluster': effectiveCluster,
+        'stage': 'Not Started',
+        'status': 'Active',
+        'progress': 0,
+        'lifecycleState': 'active',
+        'source': 'liveTracker',
+        'trackerHouseCode': tracker,
+        'startedAt': now,
+        'startedBy': profile.email,
+      },
+    );
+
+    await submitControlEvent(
+      profile: profile,
+      eventType: 'controlData',
+      houseCode: code,
+      parish: effectiveParish,
+      item: {
+        'title': 'House lifecycle',
+        'recordKind': 'houseLifecycle',
+        'status': 'Active',
+        'action': 'start',
+        'summary': 'House activated from Live Tracker.',
+        'performedAt': now,
+        'performedBy': profile.email,
+      },
+    );
+    return code;
+  }
+
+  Future<void> setHouseLifecycle({
+    required UserProfile profile,
+    required String houseCode,
+    required String action,
+  }) async {
+    if (!profile.isAdmin) {
+      throw StateError('Only Admin can revoke or resume a house.');
+    }
+    final code = houseCode.trim().toUpperCase();
+    final row = await houseEvent(code);
+    if (row == null) throw StateError('$code has not been started.');
+
+    final item = Map<String, dynamic>.from(row['item'] as Map? ?? const {});
+    final id = '${row['item_id'] ?? item['id'] ?? 'house-${_safePath(code)}'}';
+    final parish = '${row['parish'] ?? item['parish'] ?? profile.parish}';
+    final now = DateTime.now().toUtc().toIso8601String();
+
+    if (action == 'revoke') {
+      final currentStage = '${item['stage'] ?? 'Not Started'}';
+      if (currentStage != 'Revoked') item['previousStage'] = currentStage;
+      item['stage'] = 'Revoked';
+      item['status'] = 'Revoked';
+      item['lifecycleState'] = 'revoked';
+      item['revokedAt'] = now;
+      item['revokedBy'] = profile.email;
+    } else if (action == 'resume') {
+      final previous = '${item['previousStage'] ?? 'Not Started'}'.trim();
+      item['stage'] = previous.isEmpty || previous == 'Revoked'
+          ? 'Not Started'
+          : previous;
+      item['status'] = 'Active';
+      item['lifecycleState'] = 'active';
+      item['resumedAt'] = now;
+      item['resumedBy'] = profile.email;
+    } else {
+      throw ArgumentError('Unsupported lifecycle action: $action');
+    }
+
+    await _upsertEvent(
+      type: 'house',
+      id: id,
+      parish: parish,
+      houseCode: code,
+      item: item,
+    );
+
+    await submitControlEvent(
+      profile: profile,
+      eventType: 'controlData',
+      houseCode: code,
+      parish: parish,
+      item: {
+        'title': 'House lifecycle',
+        'recordKind': 'houseLifecycle',
+        'status': action == 'revoke' ? 'Revoked' : 'Active',
+        'action': action,
+        'summary': action == 'revoke'
+            ? 'House start revoked by Admin.'
+            : 'House resumed by Admin.',
+        'performedAt': now,
+        'performedBy': profile.email,
+      },
+    );
+  }
+
+  Future<void> deleteHouseStartRecord({
+    required UserProfile profile,
+    required String houseCode,
+  }) async {
+    if (!profile.isAdmin) {
+      throw StateError('Only Admin can delete a house start record.');
+    }
+
+    final code = houseCode.trim().toUpperCase();
+    final row = await houseEvent(code);
+    if (row == null) return;
+    final item = Map<String, dynamic>.from(row['item'] as Map? ?? const {});
+    final id = '${row['item_id'] ?? item['id'] ?? ''}';
+    if (id.isEmpty) throw StateError('House start record has no item ID.');
+    final parish = '${row['parish'] ?? item['parish'] ?? profile.parish}';
+    final now = DateTime.now().toUtc().toIso8601String();
+
+    await submitControlEvent(
+      profile: profile,
+      eventType: 'controlData',
+      houseCode: code,
+      parish: parish,
+      item: {
+        'title': 'House lifecycle',
+        'recordKind': 'houseLifecycle',
+        'status': 'Start Deleted',
+        'action': 'deleteStart',
+        'summary':
+            'Admin deleted the RC SOW start record. Existing SOW, BOQ and Control records were preserved.',
+        'performedAt': now,
+        'performedBy': profile.email,
+      },
+    );
+
+    await client.rpc(
+      'delete_app_event',
+      params: {'p_event_type': 'house', 'p_item_id': id},
+    );
+  }
+
   Future<Map<String, dynamic>> setHouseConstructionStage({
     required String houseCode,
     required String stage,
