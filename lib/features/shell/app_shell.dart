@@ -268,49 +268,76 @@ class _SlidingNavigationIsland extends StatelessWidget {
             ),
           ],
         ),
-        child: SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          padding: const EdgeInsets.symmetric(horizontal: 5),
-          child: Row(
-            children: [
-              ...RcDestination.values.map(
-                (d) => _NavButton(
-                  label: d.label,
-                  icon: state.uiIcon('nav.${d.name}', d.icon),
-                  selectedIcon: state.uiIcon('nav.${d.name}', d.selectedIcon),
-                  selected: state.selectedTab == d.index,
-                  onTap: () => state.selectTab(d.index),
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            final itemCount = RcDestination.values.length + 3;
+            final canSpread = constraints.maxWidth >= itemCount * 62;
+            final buttonWidth = canSpread
+                ? (constraints.maxWidth - 10) / itemCount
+                : 70.0;
+
+            return SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: ConstrainedBox(
+                constraints: BoxConstraints(
+                  minWidth: constraints.maxWidth,
+                ),
+                child: Row(
+                  mainAxisAlignment: canSpread
+                      ? MainAxisAlignment.spaceEvenly
+                      : MainAxisAlignment.start,
+                  children: [
+                    ...RcDestination.values.map(
+                      (d) => _NavButton(
+                        width: buttonWidth,
+                        label: d.label,
+                        icon: state.uiIcon('nav.${d.name}', d.icon),
+                        selectedIcon:
+                            state.uiIcon('nav.${d.name}', d.selectedIcon),
+                        selected: state.selectedTab == d.index,
+                        onTap: () => state.selectTab(d.index),
+                      ),
+                    ),
+                    _NavButton(
+                      width: buttonWidth,
+                      label: 'Map',
+                      icon: state.uiIcon('nav.map', Icons.map_outlined),
+                      selected: false,
+                      onTap: () async {
+                        final result =
+                            await Navigator.of(context).push<String>(
+                          MaterialPageRoute(
+                            builder: (_) =>
+                                InteractiveHouseMapScreen(state: state),
+                          ),
+                        );
+                        if (result == 'tracker' && context.mounted) {
+                          RcNavigator.liveTracker(context, state);
+                        }
+                      },
+                    ),
+                    _NavButton(
+                      width: buttonWidth,
+                      label: 'Tracker',
+                      icon: state.uiIcon(
+                        'nav.tracker',
+                        Icons.location_searching,
+                      ),
+                      selected: false,
+                      onTap: () => RcNavigator.liveTracker(context, state),
+                    ),
+                    _NavButton(
+                      width: buttonWidth,
+                      label: 'More',
+                      icon: Icons.more_horiz,
+                      selected: false,
+                      onTap: () => showRcMoreMenu(context, state),
+                    ),
+                  ],
                 ),
               ),
-              _NavButton(
-                label: 'Map',
-                icon: state.uiIcon('nav.map', Icons.map_outlined),
-                selected: false,
-                onTap: () async {
-                  final result = await Navigator.of(context).push<String>(
-                    MaterialPageRoute(
-                      builder: (_) => InteractiveHouseMapScreen(state: state),
-                    ),
-                  );
-                  if (result == 'tracker' && context.mounted) {
-                    RcNavigator.liveTracker(context, state);
-                  }
-                },
-              ),
-              _NavButton(
-                label: 'Tracker',
-                icon: state.uiIcon('nav.tracker', Icons.location_searching),
-                selected: false,
-                onTap: () => RcNavigator.liveTracker(context, state),
-              ),
-              _NavButton(
-                label: 'More',
-                icon: Icons.more_horiz,
-                selected: false,
-                onTap: () => showRcMoreMenu(context, state),
-              ),
-            ],
-          ),
+            );
+          },
         ),
       ),
     );
@@ -322,6 +349,7 @@ class _NavButton extends StatelessWidget {
     this.label,
     this.icon,
     this.selectedIcon,
+    this.width = 76,
     required this.selected,
     required this.onTap,
   }) : destination = null;
@@ -329,6 +357,7 @@ class _NavButton extends StatelessWidget {
   final String? label;
   final IconData? icon;
   final IconData? selectedIcon;
+  final double width;
   final bool selected;
   final VoidCallback onTap;
 
@@ -341,7 +370,7 @@ class _NavButton extends StatelessWidget {
       onTap: onTap,
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 180),
-        width: 76,
+        width: width,
         margin: const EdgeInsets.symmetric(horizontal: 1, vertical: 6),
         decoration: BoxDecoration(
           color: selected

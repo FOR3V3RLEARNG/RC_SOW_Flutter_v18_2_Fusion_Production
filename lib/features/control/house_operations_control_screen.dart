@@ -1644,19 +1644,33 @@ class _PulseTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final onColor =
+        ThemeData.estimateBrightnessForColor(color) == Brightness.dark
+        ? Colors.white
+        : Colors.black87;
     return RcExpressiveSurface(
       shape: RcSurfaceShape.offset,
-      tone: color.withValues(alpha: .075),
+      tone: color,
       onTap: onTap,
       child: Row(
         children: [
-          Icon(icon, color: color),
+          Icon(icon, color: onColor),
           const SizedBox(width: 10),
-          Expanded(child: Text(label)),
+          Expanded(
+            child: Text(
+              label,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                color: onColor,
+                fontWeight: FontWeight.w900,
+              ),
+            ),
+          ),
           Text(
             value,
             style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-              color: color,
+              color: onColor,
               fontWeight: FontWeight.w900,
             ),
           ),
@@ -1675,16 +1689,22 @@ class _ActionTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final color =
+        RcColors.expressivePalette[
+            icon.codePoint % RcColors.expressivePalette.length];
     return RcExpressiveSurface(
       shape: RcSurfaceShape.offset,
+      tone: Color.alphaBlend(
+        color.withValues(alpha: .15),
+        theme.colorScheme.surface,
+      ),
       onTap: onTap,
       child: Row(
         children: [
           RcIconWell(
             icon: icon,
-            color:
-                RcColors.expressivePalette[icon.codePoint %
-                    RcColors.expressivePalette.length],
+            color: color,
             size: 46,
           ),
           const SizedBox(width: 10),

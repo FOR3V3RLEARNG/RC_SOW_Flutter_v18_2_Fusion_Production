@@ -330,9 +330,11 @@ class ProductionModuleScreen extends StatefulWidget {
     super.key,
     required this.state,
     required this.schema,
+    this.initialHouse,
   });
   final AppState state;
   final RcRecordSchema schema;
+  final HouseRecord? initialHouse;
 
   @override
   State<ProductionModuleScreen> createState() => _ProductionModuleScreenState();
@@ -365,6 +367,7 @@ class _ProductionModuleScreenState extends State<ProductionModuleScreen> {
       widget.state.repository.productionRecords(
         widget.state.profile!,
         eventType: widget.schema.eventType,
+        houseCode: widget.initialHouse?.code,
       );
   Future<void> refresh() async {
     setState(() => future = _load());
@@ -375,7 +378,13 @@ class _ProductionModuleScreenState extends State<ProductionModuleScreen> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return Scaffold(
-      appBar: AppBar(title: Text(widget.schema.title)),
+      appBar: AppBar(
+        title: Text(
+          widget.initialHouse == null
+              ? widget.schema.title
+              : '${widget.initialHouse!.code} • ${widget.schema.title}',
+        ),
+      ),
       floatingActionButton: canAdd
           ? FloatingActionButton.extended(
               onPressed: _add,
@@ -537,8 +546,11 @@ class _ProductionModuleScreenState extends State<ProductionModuleScreen> {
   Future<void> _add() async {
     final saved = await Navigator.of(context).push<bool>(
       MaterialPageRoute(
-        builder: (_) =>
-            RecordFormScreen(state: widget.state, schema: widget.schema),
+        builder: (_) => RecordFormScreen(
+          state: widget.state,
+          schema: widget.schema,
+          initialHouse: widget.initialHouse,
+        ),
       ),
     );
     if (saved == true) await refresh();
@@ -811,17 +823,22 @@ class _ModuleTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final color =
+        RcColors.expressivePalette[
+            schema.icon.codePoint % RcColors.expressivePalette.length];
     return RcExpressiveSurface(
       shape: RcSurfaceShape.offset,
+      tone: Color.alphaBlend(
+        color.withValues(alpha: .16),
+        theme.colorScheme.surface,
+      ),
       onTap: onTap,
       semanticLabel: schema.title,
       child: Row(
         children: [
           RcIconWell(
             icon: state.uiIcon('module.${schema.eventType}', schema.icon),
-            color:
-                RcColors.expressivePalette[schema.icon.codePoint %
-                    RcColors.expressivePalette.length],
+            color: color,
             size: 48,
             iconSize: RcIconSize.lg,
           ),
@@ -858,20 +875,32 @@ class _Pulse extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final onColor =
+        ThemeData.estimateBrightnessForColor(color) == Brightness.dark
+        ? Colors.white
+        : Colors.black87;
     return RcExpressiveSurface(
       shape: RcSurfaceShape.offset,
+      tone: color,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(icon, size: RcIconSize.sm, color: color),
+          Icon(icon, size: RcIconSize.sm, color: onColor),
           const Spacer(),
           Text(
             value,
-            style: Theme.of(
-              context,
-            ).textTheme.headlineMedium?.copyWith(color: color),
+            style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+              color: onColor,
+              fontWeight: FontWeight.w900,
+            ),
           ),
-          Text(label),
+          Text(
+            label,
+            style: Theme.of(context).textTheme.labelLarge?.copyWith(
+              color: onColor,
+              fontWeight: FontWeight.w900,
+            ),
+          ),
         ],
       ),
     );

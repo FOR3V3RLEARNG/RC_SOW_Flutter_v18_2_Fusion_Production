@@ -3,8 +3,10 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../../core/design_tokens.dart';
 import '../../core/rc_components.dart';
+import '../../core/product_registry.dart';
 import '../../models/app_models.dart';
 import '../../state/app_state.dart';
+import '../control/control_screen.dart';
 import '../control/house_operations_control_screen.dart';
 
 class LiveTrackerScreen extends StatefulWidget {
@@ -191,6 +193,108 @@ class _LiveTrackerScreenState extends State<LiveTrackerScreen> {
       statusFilter = 'All';
       future = _load();
     });
+  }
+
+  Future<void> _openHouseModules(String houseCode) async {
+    final houses = await widget.state.repository.houses(profile);
+    final house = houses
+        .where(
+          (candidate) =>
+              candidate.code.trim().toUpperCase() ==
+              houseCode.trim().toUpperCase(),
+        )
+        .firstOrNull;
+
+    if (!mounted || house == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            'This tracker row is not linked to an accessible house record.',
+          ),
+        ),
+      );
+      return;
+    }
+
+    final schemas = RcProductRegistry.visibleSchemas(profile)
+        .where((schema) => schema.eventType != 'crewAttendance')
+        .toList();
+
+    final selected = await showModalBottomSheet<String>(
+      context: context,
+      isScrollControlled: true,
+      showDragHandle: true,
+      builder: (sheetContext) => FractionallySizedBox(
+        heightFactor: .82,
+        child: ListView(
+          padding: const EdgeInsets.fromLTRB(14, 0, 14, 24),
+          children: [
+            RcPageHeading(
+              eyebrow: '${house.parish} • ${house.cluster}',
+              title: '${house.code} Quick Modules',
+              subtitle:
+                  'Open the selected house directly in a Control of Works module.',
+            ),
+            const SizedBox(height: 10),
+            RcResponsiveGrid(
+              minTileWidth: 165,
+              childAspectRatio: 1.48,
+              children: schemas.map((schema) {
+                final color =
+                    RcColors.expressivePalette[schema.icon.codePoint %
+                        RcColors.expressivePalette.length];
+                return RcExpressiveSurface(
+                  shape: RcSurfaceShape.offset,
+                  tone: Color.alphaBlend(
+                    color.withValues(alpha: .16),
+                    Theme.of(sheetContext).colorScheme.surface,
+                  ),
+                  onTap: () =>
+                      Navigator.pop(sheetContext, schema.eventType),
+                  child: Row(
+                    children: [
+                      RcIconWell(
+                        icon: widget.state.uiIcon(
+                          'module.${schema.eventType}',
+                          schema.icon,
+                        ),
+                        color: color,
+                        size: 44,
+                      ),
+                      const SizedBox(width: 9),
+                      Expanded(
+                        child: Text(
+                          schema.title,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: Theme.of(sheetContext)
+                              .textTheme
+                              .titleMedium,
+                        ),
+                      ),
+                      const Icon(Icons.chevron_right_rounded),
+                    ],
+                  ),
+                );
+              }).toList(),
+            ),
+          ],
+        ),
+      ),
+    );
+
+    if (!mounted || selected == null) return;
+    final schema = RcProductRegistry.resolveSchema(selected);
+    await Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => ProductionModuleScreen(
+          state: widget.state,
+          schema: schema,
+          initialHouse: house,
+        ),
+      ),
+    );
+    await _refresh();
   }
 
   @override
@@ -773,16 +877,24 @@ class _LiveTrackerScreenState extends State<LiveTrackerScreen> {
             Row(
               children: [
                 Expanded(
-                  child: FilledButton.tonalIcon(
+                  child: FilledButton.icon(
                     onPressed: resolved.isEmpty
                         ? null
                         : () => _openHouse(resolved),
                     icon: const Icon(Icons.home_repair_service_outlined),
                     label: Text(
-                      resolved.isEmpty
-                          ? 'House not linked'
-                          : 'Open House Workspace',
+                      resolved.isEmpty ? 'Not linked' : 'House',
                     ),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: FilledButton.tonalIcon(
+                    onPressed: resolved.isEmpty
+                        ? null
+                        : () => _openHouseModules(resolved),
+                    icon: const Icon(Icons.dashboard_customize_outlined),
+                    label: const Text('Modules'),
                   ),
                 ),
                 if (link.isNotEmpty) ...[

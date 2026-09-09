@@ -19,11 +19,13 @@ class RecordFormScreen extends StatefulWidget {
     required this.state,
     required this.schema,
     this.record,
+    this.initialHouse,
   });
 
   final AppState state;
   final RcRecordSchema schema;
   final ProductionRecord? record;
+  final HouseRecord? initialHouse;
 
   @override
   State<RecordFormScreen> createState() => _RecordFormScreenState();
@@ -47,6 +49,14 @@ class _RecordFormScreenState extends State<RecordFormScreen> {
   void initState() {
     super.initState();
     values.addAll(widget.record?.item ?? const {});
+    final initialHouse = widget.initialHouse;
+    if (widget.record == null && initialHouse != null) {
+      values.putIfAbsent('houseCode', () => initialHouse.code);
+      values.putIfAbsent('beneficiaryName', () => initialHouse.beneficiary);
+      values.putIfAbsent('beneficiary', () => initialHouse.beneficiary);
+      values.putIfAbsent('parish', () => initialHouse.parish);
+      values.putIfAbsent('cluster', () => initialHouse.cluster);
+    }
     _loadStaffDirectory();
     for (final field in widget.schema.fields) {
       if (_usesController(field.kind)) {

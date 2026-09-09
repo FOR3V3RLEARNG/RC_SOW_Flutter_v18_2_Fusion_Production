@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -332,11 +334,40 @@ class CommunityScreen extends StatefulWidget {
 
 class _CommunityScreenState extends State<CommunityScreen> {
   late Future<List<ProductionRecord>> future;
+  late final PageController tickerController;
+  Timer? tickerTimer;
+  int tickerIndex = 0;
+  int tickerItemCount = 0;
+  bool tickerVisible = true;
 
   @override
   void initState() {
     super.initState();
+    tickerController = PageController();
+    tickerVisible =
+        widget.state.remoteUiConfig['communityTickerEnabled'] != false;
     future = widget.state.repository.communityRecords(widget.state.profile!);
+    tickerTimer = Timer.periodic(const Duration(seconds: 5), (_) {
+      if (!mounted ||
+          !tickerVisible ||
+          tickerItemCount < 2 ||
+          !tickerController.hasClients) {
+        return;
+      }
+      tickerIndex = (tickerIndex + 1) % tickerItemCount;
+      tickerController.animateToPage(
+        tickerIndex,
+        duration: const Duration(milliseconds: 520),
+        curve: Curves.easeOutCubic,
+      );
+    });
+  }
+
+  @override
+  void dispose() {
+    tickerTimer?.cancel();
+    tickerController.dispose();
+    super.dispose();
   }
 
   Future<void> refresh() async {
@@ -363,6 +394,7 @@ class _CommunityScreenState extends State<CommunityScreen> {
               .where((record) => record.eventType == 'communityPost')
               .toList();
           final upcoming = _upcoming(posts);
+          tickerItemCount = posts.take(8).length;
 
           if (snap.hasError) {
             return ListView(
@@ -444,46 +476,16 @@ class _CommunityScreenState extends State<CommunityScreen> {
                   ],
                 ),
               ),
-              const SizedBox(height: 18),
-              Row(
-                children: [
-                  Expanded(
-                    child: Text(
-                      'Upcoming Events',
-                      style: theme.textTheme.titleLarge,
-                    ),
-                  ),
-                  Text(
-                    'Swipe →',
-                    style: theme.textTheme.labelMedium?.copyWith(
-                      color: theme.colorScheme.onSurfaceVariant,
-                    ),
-                  ),
-                ],
+              const SizedBox(height: 14),
+              _CommunityCommandBoard(
+                posts: posts,
+                upcoming: upcoming,
+                tickerController: tickerController,
+                tickerVisible: tickerVisible,
+                onToggleTicker: () =>
+                    setState(() => tickerVisible = !tickerVisible),
+                onOpen: _openPost,
               ),
-              const SizedBox(height: 9),
-              if (upcoming.isEmpty)
-                const RcExpressiveSurface(
-                  child: Text(
-                    'No upcoming events or meetings have been scheduled yet.',
-                  ),
-                )
-              else
-                SizedBox(
-                  height: 202,
-                  child: ListView.separated(
-                    scrollDirection: Axis.horizontal,
-                    itemCount: upcoming.length,
-                    separatorBuilder: (_, _) => const SizedBox(width: 10),
-                    itemBuilder: (_, index) => SizedBox(
-                      width: 280,
-                      child: _UpcomingEventCard(
-                        record: upcoming[index],
-                        onOpen: () => _openPost(upcoming[index]),
-                      ),
-                    ),
-                  ),
-                ),
               const SizedBox(height: 18),
               _RecognitionStrip(records: posts),
               const SizedBox(height: 18),
@@ -612,6 +614,272 @@ class _CommunityScreenState extends State<CommunityScreen> {
         );
       }
     }
+  }
+}
+
+class _CommunityCommandBoard extends StatelessWidget {
+  const _CommunityCommandBoard({
+    required this.posts,
+    required this.upcoming,
+    required this.tickerController,
+    required this.tickerVisible,
+    required this.onToggleTicker,
+    required this.onOpen,
+  });
+
+  final List<ProductionRecord> posts;
+  final List<ProductionRecord> upcoming;
+  final PageController tickerController;
+  final bool tickerVisible;
+  final VoidCallback onToggleTicker;
+  final ValueChanged<ProductionRecord> onOpen;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final ticker = posts.take(8).toList();
+
+    Widget tickerPanel() => RcExpressiveSurface(
+      shape: RcSurfaceShape.offset,
+      tone: Color.alphaBlend(
+        RcColors.brand.withValues(alpha: .09),
+        theme.colorScheme.surface,
+      ),
+      child: SizedBox(
+        height: 118,
+        child: Column(
+          children: [
+            Row(
+              children: [
+                const RcStatusPill(
+                  label: 'LIVE TICKER',
+                  icon: Icons.campaign_rounded,
+                  color: RcColors.brand,
+                ),
+                const Spacer(),
+                IconButton(
+                  tooltip: tickerVisible ? 'Hide ticker' : 'Show ticker',
+                  onPressed: onToggleTicker,
+                  icon: Icon(
+                    tickerVisible
+                        ? Icons.visibility_outlined
+                        : Icons.visibility_off_outlined,
+                  ),
+                ),
+              ],
+            ),
+            if (!tickerVisible)
+              const Expanded(
+                child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text('Ticker hidden — tap the eye to show it.'),
+                ),
+              )
+            else if (ticker.isEmpty)
+              const Expanded(
+                child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text('No community ticker items yet.'),
+                ),
+              )
+            else
+              Expanded(
+                child: PageView.builder(
+                  controller: tickerController,
+                  itemCount: ticker.length,
+                  itemBuilder: (_, index) {
+                    final post = ticker[index];
+                    final category =
+                        '${post.item['category'] ?? 'Update'}';
+                    return InkWell(
+                      borderRadius: BorderRadius.circular(16),
+                      onTap: () => onOpen(post),
+                      child: Row(
+                        children: [
+                          RcIconWell(
+                            icon: _categoryIcon(category),
+                            color: _categoryColor(context, category),
+                            size: 42,
+                          ),
+                          const SizedBox(width: 9),
+                          Expanded(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment:
+                                  CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  post.title,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: theme.textTheme.titleMedium,
+                                ),
+                                const SizedBox(height: 2),
+                                Text(
+                                  post.summary.isEmpty
+                                      ? '${post.item['body'] ?? ''}'
+                                      : post.summary,
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: theme.textTheme.bodySmall,
+                                ),
+                              ],
+                            ),
+                          ),
+                          const Icon(Icons.chevron_right_rounded),
+                        ],
+                      ),
+                    );
+                  },
+                ),
+              ),
+          ],
+        ),
+      ),
+    );
+
+    Widget compactSidebar() => RcExpressiveSurface(
+      shape: RcSurfaceShape.offset,
+      tone: Color.alphaBlend(
+        RcColors.blue.withValues(alpha: .09),
+        theme.colorScheme.surface,
+      ),
+      child: SizedBox(
+        height: 118,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                const Icon(
+                  Icons.event_upcoming_rounded,
+                  color: RcColors.blue,
+                ),
+                const SizedBox(width: 7),
+                Expanded(
+                  child: Text(
+                    'Upcoming',
+                    style: theme.textTheme.titleMedium,
+                  ),
+                ),
+                Text(
+                  '${upcoming.length}',
+                  style: theme.textTheme.labelLarge,
+                ),
+              ],
+            ),
+            const SizedBox(height: 5),
+            Expanded(
+              child: upcoming.isEmpty
+                  ? const Center(child: Text('No upcoming events.'))
+                  : ListView.builder(
+                      itemCount: upcoming.take(3).length,
+                      itemBuilder: (_, index) {
+                        final event = upcoming[index];
+                        final start = DateTime.tryParse(
+                          '${event.item['eventStart'] ?? ''}',
+                        );
+                        return InkWell(
+                          onTap: () => onOpen(event),
+                          child: Padding(
+                            padding:
+                                const EdgeInsets.symmetric(vertical: 3),
+                            child: Row(
+                              children: [
+                                SizedBox(
+                                  width: 54,
+                                  child: Text(
+                                    start == null
+                                        ? 'SOON'
+                                        : _compactDate(start),
+                                    style:
+                                        theme.textTheme.labelSmall?.copyWith(
+                                      fontWeight: FontWeight.w900,
+                                      color: RcColors.blue,
+                                    ),
+                                  ),
+                                ),
+                                Expanded(
+                                  child: Text(
+                                    event.title,
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: theme.textTheme.labelLarge,
+                                  ),
+                                ),
+                                const Icon(
+                                  Icons.chevron_right_rounded,
+                                  size: 18,
+                                ),
+                              ],
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+            ),
+          ],
+        ),
+      ),
+    );
+
+    Widget mobileEventRail() {
+      if (upcoming.isEmpty) {
+        return const RcExpressiveSurface(
+          child: Text('No upcoming events or meetings yet.'),
+        );
+      }
+      return SizedBox(
+        height: 150,
+        child: ListView.separated(
+          scrollDirection: Axis.horizontal,
+          itemCount: upcoming.take(6).length,
+          separatorBuilder: (_, _) => const SizedBox(width: 8),
+          itemBuilder: (_, index) => SizedBox(
+            width: 238,
+            child: _UpcomingEventCard(
+              record: upcoming[index],
+              onOpen: () => onOpen(upcoming[index]),
+            ),
+          ),
+        ),
+      );
+    }
+
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        if (constraints.maxWidth >= 760) {
+          return Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(child: tickerPanel()),
+              const SizedBox(width: 10),
+              SizedBox(width: 330, child: compactSidebar()),
+            ],
+          );
+        }
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            tickerPanel(),
+            const SizedBox(height: 10),
+            Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    'Upcoming Events',
+                    style: theme.textTheme.titleMedium,
+                  ),
+                ),
+                Text('Swipe →', style: theme.textTheme.labelSmall),
+              ],
+            ),
+            const SizedBox(height: 6),
+            mobileEventRail(),
+          ],
+        );
+      },
+    );
   }
 }
 
