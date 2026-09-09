@@ -647,7 +647,11 @@ class _ScopeScreenState extends State<ScopeScreen>
   String get _agreementRoofStyle {
     final value = roofType.toLowerCase();
     if (value.contains('hip')) return 'Hip';
-    if (value.contains('shed') || value.contains('pitch')) return 'Pitched';
+    if (value.contains('shed') || value.contains('mono')) return 'Shed';
+    if (value.contains('intersect')) return 'Intersecting';
+    if (value.contains('custom')) return 'Custom';
+    if (value.contains('gable')) return 'Gable';
+    if (value.contains('pitch')) return 'Pitched';
     return 'Gable';
   }
 
@@ -1625,6 +1629,52 @@ class _ScopeScreenState extends State<ScopeScreen>
 </svg>''';
     }
 
+    if (normalized == 'shed') {
+      return '''<svg xmlns="http://www.w3.org/2000/svg" width="680" height="245" viewBox="0 0 680 245">
+<rect width="680" height="245" fill="#F7FAFF"/>
+<text x="30" y="27" font-size="15" font-weight="700" fill="#175CD3">SHED / MONO-PITCH ROOF - REPRESENTATIVE CONCEPT</text>
+<polygon points="110,168 290,196 570,118 390,92" fill="#EEF4FF" stroke="#101828" stroke-width="3"/>
+<line x1="390" y1="92" x2="570" y2="118" stroke="#C91F2C" stroke-width="5"/>
+<line x1="110" y1="168" x2="290" y2="196" stroke="#12805C" stroke-width="4"/>
+<line x1="150" y1="174" x2="430" y2="98" stroke="#667085" stroke-width="2"/>
+<line x1="195" y1="181" x2="475" y2="105" stroke="#667085" stroke-width="2"/>
+<line x1="240" y1="188" x2="520" y2="111" stroke="#667085" stroke-width="2"/>
+<text x="440" y="82" font-size="10" font-weight="700" fill="#C91F2C">HIGH EAVE</text>
+<text x="120" y="215" font-size="10" font-weight="700" fill="#12805C">LOW EAVE / FASCIA</text>
+<text x="300" y="144" font-size="10" font-weight="700" fill="#667085">RAFTERS / FALL</text>
+</svg>''';
+    }
+
+    if (normalized == 'intersecting') {
+      return '''<svg xmlns="http://www.w3.org/2000/svg" width="680" height="245" viewBox="0 0 680 245">
+<rect width="680" height="245" fill="#F7FAFF"/>
+<text x="30" y="27" font-size="15" font-weight="700" fill="#175CD3">INTERSECTING ROOF - REPRESENTATIVE CONCEPT</text>
+<polygon points="90,170 290,202 590,140 390,110" fill="#EEF4FF" stroke="#101828" stroke-width="3"/>
+<line x1="190" y1="118" x2="450" y2="70" stroke="#C91F2C" stroke-width="5"/>
+<line x1="325" y1="150" x2="495" y2="118" stroke="#C91F2C" stroke-width="5"/>
+<line x1="325" y1="150" x2="245" y2="132" stroke="#175CD3" stroke-width="4"/>
+<line x1="325" y1="150" x2="395" y2="108" stroke="#175CD3" stroke-width="4"/>
+<line x1="90" y1="170" x2="290" y2="202" stroke="#12805C" stroke-width="4"/>
+<line x1="290" y1="202" x2="590" y2="140" stroke="#12805C" stroke-width="4"/>
+<text x="260" y="80" font-size="10" font-weight="700" fill="#C91F2C">MAIN RIDGE</text>
+<text x="455" y="107" font-size="10" font-weight="700" fill="#C91F2C">CROSS RIDGE</text>
+<text x="290" y="170" font-size="10" font-weight="700" fill="#175CD3">VALLEYS</text>
+</svg>''';
+    }
+
+    if (normalized == 'custom') {
+      return '''<svg xmlns="http://www.w3.org/2000/svg" width="680" height="245" viewBox="0 0 680 245">
+<rect width="680" height="245" fill="#F7FAFF"/>
+<text x="30" y="27" font-size="15" font-weight="700" fill="#175CD3">CUSTOM / COMPLEX ROOF - REPRESENTATIVE CONCEPT</text>
+<polygon points="105,170 250,198 335,176 455,194 575,145 485,116 398,132 285,104" fill="#EEF4FF" stroke="#101828" stroke-width="3"/>
+<line x1="210" y1="124" x2="410" y2="86" stroke="#C91F2C" stroke-width="5"/>
+<line x1="335" y1="176" x2="398" y2="132" stroke="#175CD3" stroke-width="4"/>
+<text x="205" y="74" font-size="10" font-weight="700" fill="#C91F2C">REPRESENTATIVE RIDGE</text>
+<text x="350" y="162" font-size="10" font-weight="700" fill="#175CD3">JUNCTION / VALLEY</text>
+<text x="185" y="225" font-size="10" fill="#344054">Final geometry follows the approved technical Scope drawing.</text>
+</svg>''';
+    }
+
     if (normalized == 'pitched') {
       return '''<svg xmlns="http://www.w3.org/2000/svg" width="680" height="245" viewBox="0 0 680 245">
 <rect width="680" height="245" fill="#F7FAFF"/>
@@ -1970,126 +2020,276 @@ class BeneficiaryAgreementRoofPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    final ink = Paint()
+    final outline = Paint()
       ..color = RcColors.ink
       ..strokeWidth = 2.4
       ..strokeCap = StrokeCap.round
       ..strokeJoin = StrokeJoin.round
       ..style = PaintingStyle.stroke;
-    final primary = Paint()
+    final ridgePaint = Paint()
       ..color = RcColors.brand
-      ..strokeWidth = 4
+      ..strokeWidth = 4.5
       ..strokeCap = StrokeCap.round
       ..style = PaintingStyle.stroke;
-    final support = Paint()
+    final eavePaint = Paint()
       ..color = RcColors.success
-      ..strokeWidth = 2.4
+      ..strokeWidth = 3
       ..strokeCap = StrokeCap.round
       ..style = PaintingStyle.stroke;
-    final framing = Paint()
+    final framePaint = Paint()
       ..color = RcColors.muted
-      ..strokeWidth = 1.2
+      ..strokeWidth = 1.25
       ..strokeCap = StrokeCap.round
       ..style = PaintingStyle.stroke;
+    final valleyPaint = Paint()
+      ..color = RcColors.blue
+      ..strokeWidth = 3.2
+      ..strokeCap = StrokeCap.round
+      ..style = PaintingStyle.stroke;
+    final fill = Paint()
+      ..color = RcColors.blue.withValues(alpha: .06)
+      ..style = PaintingStyle.fill;
 
     final normalized = roofStyle.toLowerCase();
-
     if (normalized == 'hip') {
-      final a = Offset(size.width * .14, size.height * .66);
-      final b = Offset(size.width * .38, size.height * .27);
-      final c = Offset(size.width * .66, size.height * .36);
-      final d = Offset(size.width * .86, size.height * .72);
-      final e = Offset(size.width * .44, size.height * .83);
-      final shell = Path()
-        ..moveTo(a.dx, a.dy)
-        ..lineTo(b.dx, b.dy)
-        ..lineTo(c.dx, c.dy)
-        ..lineTo(d.dx, d.dy)
-        ..lineTo(e.dx, e.dy)
-        ..close();
-      canvas.drawPath(shell, ink);
-      canvas.drawLine(b, c, primary);
-      canvas.drawLine(b, a, support);
-      canvas.drawLine(b, e, support);
-      canvas.drawLine(c, d, support);
-      for (var i = 1; i <= 4; i++) {
-        final t = i / 5;
-        canvas.drawLine(Offset.lerp(a, b, t)!, Offset.lerp(e, c, t)!, framing);
-      }
-      _label(canvas, 'RIDGE', Offset(size.width * .48, size.height * .20));
-      _label(
+      _hip(canvas, size, outline, ridgePaint, eavePaint, framePaint, fill);
+    } else if (normalized == 'shed') {
+      _shed(canvas, size, outline, ridgePaint, eavePaint, framePaint, fill);
+    } else if (normalized == 'intersecting') {
+      _intersecting(
         canvas,
-        'HIP RAFTERS',
-        Offset(size.width * .68, size.height * .31),
+        size,
+        outline,
+        ridgePaint,
+        eavePaint,
+        framePaint,
+        valleyPaint,
+        fill,
       );
-      _label(
-        canvas,
-        'FASCIA / EAVE',
-        Offset(size.width * .14, size.height * .78),
-      );
-    } else if (normalized == 'pitched') {
-      final left = size.width * .18;
-      final right = size.width * .82;
-      final wallTop = size.height * .54;
-      final bottom = size.height * .82;
-      canvas.drawRect(Rect.fromLTRB(left, wallTop, right, bottom), ink);
-      canvas.drawLine(
-        Offset(left - 18, wallTop + 4),
-        Offset(right + 18, size.height * .24),
-        primary,
-      );
-      canvas.drawLine(
-        Offset(left, wallTop + 10),
-        Offset(right, size.height * .28),
-        support,
-      );
-      for (var i = 0; i < 6; i++) {
-        final x = left + (right - left) * i / 5;
-        final y = wallTop + 10 - (wallTop + 10 - size.height * .28) * i / 5;
-        canvas.drawLine(Offset(x, y), Offset(x, bottom), framing);
-      }
-      _label(
-        canvas,
-        'HIGH EDGE / ROOF COVERING',
-        Offset(size.width * .53, size.height * .16),
-      );
-      _label(
-        canvas,
-        'LOW EAVE / FASCIA',
-        Offset(size.width * .13, size.height * .47),
-      );
+    } else if (normalized == 'custom') {
+      _custom(canvas, size, outline, ridgePaint, valleyPaint, fill);
     } else {
-      final left = size.width * .16;
-      final right = size.width * .84;
-      final wallTop = size.height * .58;
-      final bottom = size.height * .83;
-      final ridge = Offset(size.width * .5, size.height * .22);
-      canvas.drawRect(Rect.fromLTRB(left, wallTop, right, bottom), ink);
-      canvas.drawLine(Offset(left - 14, wallTop), ridge, primary);
-      canvas.drawLine(ridge, Offset(right + 14, wallTop), primary);
-      canvas.drawLine(
-        Offset(left, wallTop + 8),
-        Offset(right, wallTop + 8),
-        support,
-      );
-      for (double x = left + 18; x < right - 10; x += 30) {
-        canvas.drawLine(
-          Offset(x, wallTop + 8),
-          Offset(size.width * .5 + (x - size.width * .5) * .45, ridge.dy + 10),
-          framing,
-        );
-      }
-      _label(canvas, 'RIDGE', Offset(size.width * .44, size.height * .13));
-      _label(canvas, 'RAFTERS', Offset(size.width * .69, size.height * .37));
-      _label(canvas, 'WALL PLATE', Offset(size.width * .18, size.height * .62));
+      _gable(canvas, size, outline, ridgePaint, eavePaint, framePaint, fill);
     }
 
     _label(
       canvas,
-      '$roofStyle • RED CROSS ROOF CONCEPT',
-      Offset(size.width * .28, size.height * .91),
+      '$roofStyle • BENEFICIARY ROOF CONCEPT',
+      Offset(size.width * .26, size.height * .91),
       color: RcColors.blue,
-      fontSize: 10.5,
+      fontSize: 10,
+    );
+  }
+
+  void _gable(
+    Canvas canvas,
+    Size size,
+    Paint outline,
+    Paint ridge,
+    Paint eave,
+    Paint frame,
+    Paint fill,
+  ) {
+    final fl = Offset(size.width * .14, size.height * .67);
+    final fr = Offset(size.width * .42, size.height * .76);
+    final bl = Offset(size.width * .57, size.height * .50);
+    final br = Offset(size.width * .86, size.height * .58);
+    final rf = Offset(size.width * .31, size.height * .40);
+    final rb = Offset(size.width * .67, size.height * .25);
+
+    final roof = Path()
+      ..moveTo(fl.dx, fl.dy)
+      ..lineTo(fr.dx, fr.dy)
+      ..lineTo(br.dx, br.dy)
+      ..lineTo(bl.dx, bl.dy)
+      ..close();
+    canvas.drawPath(roof, fill);
+    canvas.drawPath(roof, outline);
+    canvas.drawLine(fl, rf, outline);
+    canvas.drawLine(fr, rf, outline);
+    canvas.drawLine(bl, rb, outline);
+    canvas.drawLine(br, rb, outline);
+    canvas.drawLine(rf, rb, ridge);
+    canvas.drawLine(fl, fr, eave);
+    canvas.drawLine(bl, br, eave);
+
+    for (final t in const [.25, .50, .75]) {
+      final rp = Offset.lerp(rf, rb, t)!;
+      canvas.drawLine(Offset.lerp(fl, bl, t)!, rp, frame);
+      canvas.drawLine(Offset.lerp(fr, br, t)!, rp, frame);
+    }
+
+    _label(canvas, 'RIDGE LINE', Offset(size.width * .48, size.height * .20));
+    _label(canvas, 'RAFTERS', Offset(size.width * .67, size.height * .42));
+    _label(canvas, 'FASCIA / EAVE', Offset(size.width * .14, size.height * .79));
+  }
+
+  void _hip(
+    Canvas canvas,
+    Size size,
+    Paint outline,
+    Paint ridge,
+    Paint eave,
+    Paint frame,
+    Paint fill,
+  ) {
+    final fl = Offset(size.width * .13, size.height * .67);
+    final fr = Offset(size.width * .42, size.height * .77);
+    final br = Offset(size.width * .86, size.height * .58);
+    final bl = Offset(size.width * .57, size.height * .49);
+    final r1 = Offset(size.width * .38, size.height * .39);
+    final r2 = Offset(size.width * .65, size.height * .29);
+
+    final roof = Path()
+      ..moveTo(fl.dx, fl.dy)
+      ..lineTo(fr.dx, fr.dy)
+      ..lineTo(br.dx, br.dy)
+      ..lineTo(bl.dx, bl.dy)
+      ..close();
+    canvas.drawPath(roof, fill);
+    canvas.drawPath(roof, outline);
+    canvas.drawLine(r1, r2, ridge);
+    canvas.drawLine(r1, fl, outline);
+    canvas.drawLine(r1, fr, outline);
+    canvas.drawLine(r2, bl, outline);
+    canvas.drawLine(r2, br, outline);
+    canvas.drawLine(fl, fr, eave);
+    canvas.drawLine(fr, br, eave);
+    canvas.drawLine(br, bl, eave);
+    canvas.drawLine(bl, fl, eave);
+
+    for (final t in const [.32, .66]) {
+      final rp = Offset.lerp(r1, r2, t)!;
+      canvas.drawLine(Offset.lerp(fl, bl, t)!, rp, frame);
+      canvas.drawLine(Offset.lerp(fr, br, t)!, rp, frame);
+    }
+
+    _label(canvas, 'RIDGE', Offset(size.width * .48, size.height * .23));
+    _label(canvas, 'HIP RAFTERS', Offset(size.width * .69, size.height * .36));
+    _label(canvas, 'FASCIA / EAVES', Offset(size.width * .14, size.height * .80));
+  }
+
+  void _shed(
+    Canvas canvas,
+    Size size,
+    Paint outline,
+    Paint ridge,
+    Paint eave,
+    Paint frame,
+    Paint fill,
+  ) {
+    final low1 = Offset(size.width * .14, size.height * .67);
+    final low2 = Offset(size.width * .42, size.height * .76);
+    final high1 = Offset(size.width * .57, size.height * .37);
+    final high2 = Offset(size.width * .86, size.height * .45);
+
+    final roof = Path()
+      ..moveTo(low1.dx, low1.dy)
+      ..lineTo(low2.dx, low2.dy)
+      ..lineTo(high2.dx, high2.dy)
+      ..lineTo(high1.dx, high1.dy)
+      ..close();
+    canvas.drawPath(roof, fill);
+    canvas.drawPath(roof, outline);
+    canvas.drawLine(high1, high2, ridge);
+    canvas.drawLine(low1, low2, eave);
+
+    for (final t in const [.18, .38, .58, .78]) {
+      canvas.drawLine(
+        Offset.lerp(low1, low2, t)!,
+        Offset.lerp(high1, high2, t)!,
+        frame,
+      );
+    }
+
+    _label(canvas, 'HIGH EAVE', Offset(size.width * .61, size.height * .29));
+    _label(canvas, 'RAFTERS / FALL', Offset(size.width * .46, size.height * .52));
+    _label(canvas, 'LOW EAVE / FASCIA', Offset(size.width * .14, size.height * .80));
+  }
+
+  void _intersecting(
+    Canvas canvas,
+    Size size,
+    Paint outline,
+    Paint ridge,
+    Paint eave,
+    Paint frame,
+    Paint valley,
+    Paint fill,
+  ) {
+    final a = Offset(size.width * .12, size.height * .67);
+    final b = Offset(size.width * .40, size.height * .77);
+    final c = Offset(size.width * .87, size.height * .58);
+    final d = Offset(size.width * .58, size.height * .49);
+
+    final roof = Path()
+      ..moveTo(a.dx, a.dy)
+      ..lineTo(b.dx, b.dy)
+      ..lineTo(c.dx, c.dy)
+      ..lineTo(d.dx, d.dy)
+      ..close();
+    canvas.drawPath(roof, fill);
+    canvas.drawPath(roof, outline);
+
+    final main1 = Offset(size.width * .29, size.height * .39);
+    final main2 = Offset(size.width * .67, size.height * .25);
+    final cross1 = Offset(size.width * .47, size.height * .52);
+    final cross2 = Offset(size.width * .75, size.height * .41);
+    canvas.drawLine(main1, main2, ridge);
+    canvas.drawLine(cross1, cross2, ridge);
+    canvas.drawLine(cross1, Offset(size.width * .38, size.height * .46), valley);
+    canvas.drawLine(cross1, Offset(size.width * .57, size.height * .42), valley);
+    canvas.drawLine(a, b, eave);
+    canvas.drawLine(b, c, eave);
+    canvas.drawLine(c, d, eave);
+    canvas.drawLine(d, a, eave);
+    canvas.drawLine(a, main1, frame);
+    canvas.drawLine(b, main1, frame);
+    canvas.drawLine(c, cross2, frame);
+    canvas.drawLine(d, main2, frame);
+
+    _label(canvas, 'MAIN RIDGE', Offset(size.width * .42, size.height * .19));
+    _label(canvas, 'CROSS RIDGE', Offset(size.width * .68, size.height * .34));
+    _label(canvas, 'VALLEYS', Offset(size.width * .42, size.height * .55));
+  }
+
+  void _custom(
+    Canvas canvas,
+    Size size,
+    Paint outline,
+    Paint ridge,
+    Paint valley,
+    Paint fill,
+  ) {
+    final path = Path()
+      ..moveTo(size.width * .14, size.height * .67)
+      ..lineTo(size.width * .35, size.height * .77)
+      ..lineTo(size.width * .48, size.height * .69)
+      ..lineTo(size.width * .66, size.height * .76)
+      ..lineTo(size.width * .86, size.height * .56)
+      ..lineTo(size.width * .70, size.height * .47)
+      ..lineTo(size.width * .57, size.height * .53)
+      ..lineTo(size.width * .40, size.height * .42)
+      ..close();
+    canvas.drawPath(path, fill);
+    canvas.drawPath(path, outline);
+    canvas.drawLine(
+      Offset(size.width * .30, size.height * .48),
+      Offset(size.width * .64, size.height * .31),
+      ridge,
+    );
+    canvas.drawLine(
+      Offset(size.width * .48, size.height * .69),
+      Offset(size.width * .57, size.height * .53),
+      valley,
+    );
+    _label(canvas, 'CUSTOM / COMPLEX ROOF', Offset(size.width * .34, size.height * .21));
+    _label(
+      canvas,
+      'Final geometry follows approved Scope',
+      Offset(size.width * .27, size.height * .82),
+      color: RcColors.muted,
+      fontSize: 9,
     );
   }
 
@@ -2110,7 +2310,7 @@ class BeneficiaryAgreementRoofPainter extends CustomPainter {
         ),
       ),
       textDirection: TextDirection.ltr,
-    )..layout(maxWidth: 230);
+    )..layout(maxWidth: 240);
     tp.paint(canvas, position);
   }
 
