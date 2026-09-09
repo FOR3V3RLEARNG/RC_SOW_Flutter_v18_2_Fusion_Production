@@ -715,17 +715,17 @@ class _LiveTrackerScreenState extends State<LiveTrackerScreen> {
           child: Row(
             children:
                 [
-                  'All',
-                  'Started',
-                  'Ready',
-                  'Finished',
-                  'Verified',
-                  'BOQ Done',
-                  'SOW Done',
-                  'Revoked',
-                  'Rejected',
-                  'Attention',
-                ]
+                      'All',
+                      'Started',
+                      'Ready',
+                      'Finished',
+                      'Verified',
+                      'BOQ Done',
+                      'SOW Done',
+                      'Revoked',
+                      'Rejected',
+                      'Attention',
+                    ]
                     .map(
                       (value) => Padding(
                         padding: const EdgeInsets.only(right: 6),
@@ -786,10 +786,9 @@ class _LiveTrackerScreenState extends State<LiveTrackerScreen> {
 
   Future<void> _startHouse(Map<String, dynamic> row) async {
     if (!_canStartHouse) return;
-    final trackerCode =
-        '${row['trackerHouseCode'] ?? row['houseId'] ?? ''}'
-            .trim()
-            .toUpperCase();
+    final trackerCode = '${row['trackerHouseCode'] ?? row['houseId'] ?? ''}'
+        .trim()
+        .toUpperCase();
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (dialogContext) => AlertDialog(

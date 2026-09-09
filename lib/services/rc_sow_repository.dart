@@ -1447,21 +1447,27 @@ class RcSowRepository {
           beneficiary = matches.first;
         } else {
           final ha = matches
-              .where((r) => '${r['house_code'] ?? ''}'.trim().toUpperCase().startsWith('HA'))
+              .where(
+                (r) => '${r['house_code'] ?? ''}'
+                    .trim()
+                    .toUpperCase()
+                    .startsWith('HA'),
+              )
               .toList();
           if (ha.length == 1) beneficiary = ha.first;
         }
       }
     }
 
-    final code = '${beneficiary?['house_code'] ?? tracker}'.trim().toUpperCase();
+    final code = '${beneficiary?['house_code'] ?? tracker}'
+        .trim()
+        .toUpperCase();
     final existing = await houseEvent(code);
     if (existing != null) return code;
 
     final beneficiaryName =
         '${beneficiary?['beneficiary_name'] ?? 'Tracker $tracker'}'.trim();
-    final effectiveParish =
-        '${beneficiary?['parish'] ?? parish}'.trim().isEmpty
+    final effectiveParish = '${beneficiary?['parish'] ?? parish}'.trim().isEmpty
         ? parish
         : '${beneficiary?['parish'] ?? parish}'.trim();
     final effectiveCluster =
