@@ -203,7 +203,10 @@ class _ScopeScreenState extends State<ScopeScreen>
         ),
         Padding(
           padding: const EdgeInsets.fromLTRB(16, 2, 16, 8),
-          child: _ScopeProgress(index: tabs.index),
+          child: _ScopeProgress(
+            index: tabs.index,
+            onSelect: tabs.animateTo,
+          ),
         ),
         TabBar(
           controller: tabs,
@@ -356,36 +359,6 @@ class _ScopeScreenState extends State<ScopeScreen>
                 value: t111Ceiling,
                 onChanged: (v) => setState(() => t111Ceiling = v),
               ),
-              DropdownButtonFormField<String>(
-                initialValue: repairPreset,
-                decoration: const InputDecoration(
-                  labelText: 'Quick Repair Selection',
-                ),
-                items: repairPresets
-                    .map(
-                      (repair) =>
-                          DropdownMenuItem(value: repair, child: Text(repair)),
-                    )
-                    .toList(),
-                onChanged: (value) => setState(() => repairPreset = value!),
-              ),
-              const SizedBox(height: 8),
-              Align(
-                alignment: Alignment.centerLeft,
-                child: OutlinedButton.icon(
-                  onPressed: () {
-                    final existing = repairNotes.text.trim();
-                    setState(
-                      () => repairNotes.text = existing.isEmpty
-                          ? '• $repairPreset'
-                          : '$existing\n• $repairPreset',
-                    );
-                  },
-                  icon: const Icon(Icons.add),
-                  label: const Text('Add Repair'),
-                ),
-              ),
-              const SizedBox(height: 8),
               TextField(
                 controller: repairNotes,
                 minLines: 4,
@@ -393,7 +366,7 @@ class _ScopeScreenState extends State<ScopeScreen>
                 decoration: const InputDecoration(
                   labelText: 'Repairs To Be Done / Technical Notes',
                   helperText:
-                      'Add quick repairs, then customize the wording as required.',
+                      'Enter technical repair notes and Scope details as required.',
                 ),
               ),
             ],
@@ -739,6 +712,76 @@ class _ScopeScreenState extends State<ScopeScreen>
               _line('Parish', parish),
               _line('Community', cluster.text),
               _line('Roof Concept', style),
+              const SizedBox(height: 16),
+              RcExpressiveSurface(
+                shape: RcSurfaceShape.offset,
+                tone: Color.alphaBlend(
+                  RcColors.success.withValues(alpha: .10),
+                  theme.colorScheme.surface,
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Row(
+                      children: [
+                        RcIconWell(
+                          icon: Icons.home_repair_service_rounded,
+                          color: RcColors.success,
+                        ),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: Text(
+                            'Quick Repair Selection',
+                            style: theme.textTheme.titleLarge,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 10),
+                    const Text(
+                      'Select beneficiary-facing repair items here. They will appear in the Beneficiary Repair Agreement and printed PDF.',
+                    ),
+                    const SizedBox(height: 12),
+                    DropdownButtonFormField<String>(
+                      initialValue: repairPreset,
+                      decoration: const InputDecoration(
+                        labelText: 'Repair item',
+                      ),
+                      items: repairPresets
+                          .map(
+                            (repair) => DropdownMenuItem(
+                              value: repair,
+                              child: Text(repair),
+                            ),
+                          )
+                          .toList(),
+                      onChanged: (value) =>
+                          setState(() => repairPreset = value!),
+                    ),
+                    const SizedBox(height: 9),
+                    FilledButton.tonalIcon(
+                      onPressed: () {
+                        final existing = repairNotes.text.trim();
+                        final bullet = '• $repairPreset';
+                        if (existing
+                            .split('\n')
+                            .map((line) => line.trim())
+                            .contains(bullet)) {
+                          _snack('That repair is already listed.');
+                          return;
+                        }
+                        setState(
+                          () => repairNotes.text = existing.isEmpty
+                              ? bullet
+                              : '$existing\n$bullet',
+                        );
+                      },
+                      icon: const Icon(Icons.add_rounded),
+                      label: const Text('Add to Beneficiary Agreement'),
+                    ),
+                  ],
+                ),
+              ),
               const SizedBox(height: 16),
               Text('Repairs To Be Done', style: theme.textTheme.titleLarge),
               const SizedBox(height: 7),
@@ -1644,8 +1687,13 @@ class _ScopeScreenState extends State<ScopeScreen>
 }
 
 class _ScopeProgress extends StatelessWidget {
-  const _ScopeProgress({required this.index});
+  const _ScopeProgress({
+    required this.index,
+    required this.onSelect,
+  });
+
   final int index;
+  final ValueChanged<int> onSelect;
   @override
   Widget build(BuildContext context) {
     const labels = ['House', 'Canvas', 'Print', 'Files'];
@@ -1656,24 +1704,56 @@ class _ScopeProgress extends StatelessWidget {
         children: [
           for (var i = 0; i < labels.length; i++) ...[
             Expanded(
-              child: AnimatedContainer(
-                duration: const Duration(milliseconds: 220),
-                height: 38,
-                decoration: BoxDecoration(
-                  color: i <= index
-                      ? theme.colorScheme.primaryContainer
-                      : theme.colorScheme.surfaceContainerLow,
+              child: Semantics(
+                button: true,
+                selected: i == index,
+                label: 'Open ${labels[i]} tab',
+                child: InkWell(
                   borderRadius: BorderRadius.circular(i == index ? 18 : 12),
-                ),
-                child: Center(
-                  child: Text(
-                    labels[i],
-                    style: TextStyle(
-                      fontSize: 11,
-                      fontWeight: FontWeight.w900,
+                  onTap: () => onSelect(i),
+                  child: AnimatedContainer(
+                    duration: const Duration(milliseconds: 220),
+                    height: 38,
+                    decoration: BoxDecoration(
                       color: i <= index
-                          ? theme.colorScheme.onPrimaryContainer
-                          : theme.colorScheme.onSurfaceVariant,
+                          ? theme.colorScheme.primaryContainer
+                          : theme.colorScheme.surfaceContainerLow,
+                      borderRadius: BorderRadius.circular(
+                        i == index ? 18 : 12,
+                      ),
+                      border: Border.all(
+                        color: i == index
+                            ? theme.colorScheme.primary.withValues(alpha: .30)
+                            : theme.colorScheme.outlineVariant.withValues(
+                                alpha: .42,
+                              ),
+                      ),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        if (i == index) ...[
+                          Icon(
+                            Icons.touch_app_rounded,
+                            size: 13,
+                            color: theme.colorScheme.onPrimaryContainer,
+                          ),
+                          const SizedBox(width: 4),
+                        ],
+                        Flexible(
+                          child: Text(
+                            labels[i],
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                              fontSize: 11,
+                              fontWeight: FontWeight.w900,
+                              color: i <= index
+                                  ? theme.colorScheme.onPrimaryContainer
+                                  : theme.colorScheme.onSurfaceVariant,
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ),
