@@ -8,13 +8,14 @@ import '../features/users/active_users_screen.dart';
 import '../state/app_state.dart';
 import 'design_tokens.dart';
 
-enum RcDestination { dashboard, scope, control, houses, community }
+enum RcDestination { dashboard, scope, tracker, control, houses, community }
 
 extension RcDestinationX on RcDestination {
   int get index => RcDestination.values.indexOf(this);
   String get label => switch (this) {
     RcDestination.dashboard => 'Home',
     RcDestination.scope => 'Scope',
+    RcDestination.tracker => 'Tracker',
     RcDestination.control => 'Control',
     RcDestination.houses => 'Houses',
     RcDestination.community => 'Community',
@@ -22,6 +23,7 @@ extension RcDestinationX on RcDestination {
   IconData get icon => switch (this) {
     RcDestination.dashboard => Icons.dashboard_outlined,
     RcDestination.scope => Icons.assignment_outlined,
+    RcDestination.tracker => Icons.location_searching,
     RcDestination.control => Icons.construction_outlined,
     RcDestination.houses => Icons.home_work_outlined,
     RcDestination.community => Icons.groups_2_outlined,
@@ -29,6 +31,7 @@ extension RcDestinationX on RcDestination {
   IconData get selectedIcon => switch (this) {
     RcDestination.dashboard => Icons.dashboard_rounded,
     RcDestination.scope => Icons.assignment_rounded,
+    RcDestination.tracker => Icons.location_searching,
     RcDestination.control => Icons.construction_rounded,
     RcDestination.houses => Icons.home_work_rounded,
     RcDestination.community => Icons.groups_2_rounded,

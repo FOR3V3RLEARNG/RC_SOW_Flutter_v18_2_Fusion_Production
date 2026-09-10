@@ -243,7 +243,7 @@ class AppState extends ChangeNotifier {
   }
 
   void selectTab(int value) {
-    if (value < 0 || value > 4 || selectedTab == value) return;
+    if (value < 0 || value > 5 || selectedTab == value) return;
     selectedTab = value;
     feedback();
     notifyListeners();

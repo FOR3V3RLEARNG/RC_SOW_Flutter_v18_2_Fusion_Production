@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 
 import '../../core/design_tokens.dart';
-import '../../core/navigation.dart';
 import '../../core/record_schemas.dart';
 import '../../core/product_registry.dart';
 import '../../core/rc_components.dart';
@@ -124,7 +123,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 profile: profile,
                 experience: experience,
                 data: data,
-                onControl: () => widget.state.selectTab(2),
+                onControl: () => widget.state.selectTab(3),
               ),
               const SizedBox(height: 14),
               _ProductionChainNav(onOpenPhase: _openPhase),
@@ -157,8 +156,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         BeneficiarySearchScreen(state: widget.state),
                   ),
                 ),
-                onLiveTracker: () =>
-                    RcNavigator.liveTracker(context, widget.state),
+                onLiveTracker: () => widget.state.selectTab(2),
                 onAdmin: () => Navigator.of(context).push(
                   MaterialPageRoute(
                     builder: (_) => AdminScreen(state: widget.state),
@@ -169,8 +167,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     builder: (_) => OperationsAdminScreen(state: widget.state),
                   ),
                 ),
-                onControl: () => widget.state.selectTab(2),
-                onHouses: () => widget.state.selectTab(3),
+                onControl: () => widget.state.selectTab(3),
+                onHouses: () => widget.state.selectTab(4),
                 canManageCrew: profile.hasPrivilege('manageCrew'),
               ),
               if (recentHouse != null) ...[

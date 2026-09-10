@@ -16,6 +16,7 @@ import '../community/community_screen.dart';
 import '../control/control_screen.dart';
 import '../control/house_operations_control_screen.dart';
 import '../live/interactive_house_map_screen.dart';
+import '../live/live_tracker_screen.dart';
 import '../dashboard/dashboard_screen.dart';
 import '../houses/houses_screen.dart';
 import '../messages/messages_screen.dart';
@@ -37,6 +38,7 @@ class AppShell extends StatelessWidget {
     final pages = <Widget>[
       DashboardScreen(state: state),
       ScopeScreen(state: state),
+      LiveTrackerScreen(state: state),
       HouseOperationsControlScreen(state: state),
       HousesScreen(state: state),
       CommunityScreen(state: state),
@@ -269,7 +271,7 @@ class _SlidingNavigationIsland extends StatelessWidget {
         ),
         child: LayoutBuilder(
           builder: (context, constraints) {
-            final itemCount = RcDestination.values.length + 3;
+            final itemCount = RcDestination.values.length + 2;
             final canSpread = constraints.maxWidth >= itemCount * 62;
             final buttonWidth = canSpread
                 ? (constraints.maxWidth - 10) / itemCount
@@ -313,16 +315,6 @@ class _SlidingNavigationIsland extends StatelessWidget {
                           RcNavigator.liveTracker(context, state);
                         }
                       },
-                    ),
-                    _NavButton(
-                      width: buttonWidth,
-                      label: 'Tracker',
-                      icon: state.uiIcon(
-                        'nav.tracker',
-                        Icons.location_searching,
-                      ),
-                      selected: false,
-                      onTap: () => RcNavigator.liveTracker(context, state),
                     ),
                     _NavButton(
                       width: buttonWidth,

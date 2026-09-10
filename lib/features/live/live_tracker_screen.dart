@@ -1,3 +1,4 @@
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -5,6 +6,7 @@ import '../../core/design_tokens.dart';
 import '../../core/rc_components.dart';
 import '../../core/product_registry.dart';
 import '../../models/app_models.dart';
+import '../../services/live_tracker_operations_service.dart';
 import '../../state/app_state.dart';
 import '../control/control_screen.dart';
 import '../control/house_operations_control_screen.dart';
@@ -32,6 +34,9 @@ class _LiveTrackerScreenState extends State<LiveTrackerScreen> {
   int section = 0;
 
   UserProfile get profile => widget.state.profile!;
+
+  LiveTrackerOperationsService get _trackerOps =>
+      LiveTrackerOperationsService(widget.state.repository.client);
 
   @override
   void initState() {
@@ -65,12 +70,28 @@ class _LiveTrackerScreenState extends State<LiveTrackerScreen> {
         parish: selected,
       ),
       widget.state.repository.houses(profile),
+      _trackerOps.overrides(profile, parish: selected),
     ]);
 
     final snapshot = result[0] as Map<String, dynamic>?;
     final inventory = result[1] as List<Map<String, dynamic>>;
     final statusRows = result[2] as List<Map<String, dynamic>>;
     final houses = result[3] as List<HouseRecord>;
+    final overrideRows = result[4] as List<Map<String, dynamic>>;
+
+    final overrideByTracker = <String, Map<String, dynamic>>{};
+    for (final overrideRow in overrideRows) {
+      final overrideItem = Map<String, dynamic>.from(
+        overrideRow['item'] as Map? ?? const {},
+      );
+      final trackerCode =
+          '${overrideItem['trackerHouseCode'] ?? overrideRow['house_code'] ?? ''}'
+              .trim()
+              .toUpperCase();
+      if (trackerCode.isNotEmpty) {
+        overrideByTracker[trackerCode] = overrideRow;
+      }
+    }
 
     final item = Map<String, dynamic>.from(
       snapshot?['item'] as Map? ?? const {},
@@ -112,8 +133,18 @@ class _LiveTrackerScreenState extends State<LiveTrackerScreen> {
           accessibleCodes,
         );
 
-        final rejected =
+        final sourceRejected =
             row['rejected'] == true || statusRow?['rejected'] == true;
+        final overrideRow = overrideByTracker[trackerCode];
+        final overrideItem = Map<String, dynamic>.from(
+          overrideRow?['item'] as Map? ?? const {},
+        );
+        final rejected = overrideItem.containsKey('rejected')
+            ? overrideItem['rejected'] == true
+            : sourceRejected;
+        final milestoneOverrides = Map<String, dynamic>.from(
+          overrideItem['milestones'] as Map? ?? const {},
+        );
         final redFlag = statusRow?['red_house_code'] == true;
 
         if (profile.isCrew && resolved.isEmpty) continue;
@@ -127,6 +158,11 @@ class _LiveTrackerScreenState extends State<LiveTrackerScreen> {
           'appHouseStage': appHouse?.stage ?? '',
           'appHouseProgress': appHouse?.progress ?? 0,
           'rejected': rejected,
+          'sourceRejected': sourceRejected,
+          'trackerOverride': overrideItem,
+          'milestoneOverrides': milestoneOverrides,
+          'workbookSyncState': overrideItem['workbookSyncState'] ?? '',
+          'workbookSyncMessage': overrideItem['workbookSyncMessage'] ?? '',
           'redHouseCode': redFlag,
           'mapExcluded':
               statusRow?['excluded_from_map'] == true || rejected || redFlag,
@@ -976,47 +1012,25 @@ class _LiveTrackerScreenState extends State<LiveTrackerScreen> {
             ),
             const SizedBox(height: 9),
             Wrap(
-              spacing: 5,
-              runSpacing: 5,
+              spacing: 6,
+              runSpacing: 6,
               children: [
-                if (row['finished'] == true)
-                  const RcStatusPill(
-                    label: 'FINISHED',
-                    color: RcColors.success,
+                for (final milestone in _trackerMilestones)
+                  _TrackerMilestoneChip(
+                    label: milestone.label,
+                    icon: milestone.icon,
+                    done: _milestoneDone(row, milestone),
+                    hasDocument: _milestoneHasDocument(row, milestone),
+                    pendingSync:
+                        '${row['workbookSyncState'] ?? ''}' == 'pending',
+                    color: milestone.color,
+                    onTap: () => _openMilestoneActions(row, milestone),
                   ),
-                if (row['started'] == true)
-                  const RcStatusPill(label: 'STARTED', color: RcColors.blue),
-                if (row['materialsOnSiteNotStarted'] == true)
-                  const RcStatusPill(
-                    label: 'MATERIALS ON SITE',
-                    color: RcColors.warning,
-                  ),
-                if (row['boqSent'] == true)
-                  const RcStatusPill(label: 'BOQ SENT', color: RcColors.blue),
-                if (row['boqDone'] == true)
-                  const RcStatusPill(
-                    label: 'BOQ DONE',
-                    color: RcColors.success,
-                  ),
-                if (row['sowDone'] == true)
-                  const RcStatusPill(
-                    label: 'SOW DONE',
-                    color: RcColors.success,
-                  ),
-                if (row['contractSigned'] == true)
-                  const RcStatusPill(
-                    label: 'CONTRACT SIGNED',
-                    color: RcColors.purple,
-                  ),
-                if (row['houseVisitedVerified'] == true)
-                  const RcStatusPill(
-                    label: 'SITE VERIFIED',
-                    color: RcColors.success,
-                  ),
-                if (rejected)
-                  const RcStatusPill(label: 'REJECTED', color: RcColors.danger),
                 if (redFlag)
-                  const RcStatusPill(label: 'RED FLAG', color: RcColors.danger),
+                  const RcStatusPill(
+                    label: 'RED FLAG',
+                    color: RcColors.danger,
+                  ),
               ],
             ),
             if (date.isNotEmpty) ...[
@@ -1038,6 +1052,23 @@ class _LiveTrackerScreenState extends State<LiveTrackerScreen> {
                       ? FontWeight.w700
                       : FontWeight.normal,
                 ),
+              ),
+            ],
+            if (_canRejectHouse) ...[
+              const SizedBox(height: 10),
+              Align(
+                alignment: Alignment.centerLeft,
+                child: rejected
+                    ? FilledButton.tonalIcon(
+                        onPressed: () => _setTrackerRejected(row, false),
+                        icon: const Icon(Icons.undo_rounded),
+                        label: const Text('Undo rejection'),
+                      )
+                    : OutlinedButton.icon(
+                        onPressed: () => _setTrackerRejected(row, true),
+                        icon: const Icon(Icons.block_outlined),
+                        label: const Text('Reject house'),
+                      ),
               ),
             ],
             const SizedBox(height: 10),
@@ -1111,6 +1142,525 @@ class _LiveTrackerScreenState extends State<LiveTrackerScreen> {
           ],
         ),
       ),
+    );
+  }
+
+  bool get _canEditTracker =>
+      profile.isAdmin ||
+      profile.isManagement ||
+      profile.isSiteSupervisor ||
+      profile.canEditProduction;
+
+  bool get _canRejectHouse => _canEditTracker;
+
+  String _trackerCode(Map<String, dynamic> row) =>
+      '${row['trackerHouseCode'] ?? row['houseId'] ?? ''}'
+          .trim()
+          .toUpperCase();
+
+  String _resolvedCode(Map<String, dynamic> row) =>
+      '${row['resolvedHouseCode'] ?? ''}'.trim().toUpperCase();
+
+  Map<String, dynamic> _milestoneOverride(
+    Map<String, dynamic> row,
+    String key,
+  ) {
+    final raw = row['milestoneOverrides'];
+    if (raw is! Map) return const {};
+    final value = raw[key];
+    return value is Map ? Map<String, dynamic>.from(value) : const {};
+  }
+
+  bool _milestoneDone(
+    Map<String, dynamic> row,
+    _TrackerMilestone milestone,
+  ) {
+    final override = _milestoneOverride(row, milestone.key);
+    if (override.containsKey('done')) return override['done'] == true;
+    return row[milestone.sourceKey] == true;
+  }
+
+  bool _milestoneHasDocument(
+    Map<String, dynamic> row,
+    _TrackerMilestone milestone,
+  ) {
+    final override = _milestoneOverride(row, milestone.key);
+    return '${override['externalUrl'] ?? ''}'.trim().isNotEmpty ||
+        '${override['storagePath'] ?? ''}'.trim().isNotEmpty;
+  }
+
+  Future<void> _openMilestoneActions(
+    Map<String, dynamic> row,
+    _TrackerMilestone milestone,
+  ) async {
+    final trackerCode = _trackerCode(row);
+    final resolved = _resolvedCode(row);
+    final override = _milestoneOverride(row, milestone.key);
+    final done = _milestoneDone(row, milestone);
+    final hasDocument = _milestoneHasDocument(row, milestone);
+
+    final action = await showModalBottomSheet<String>(
+      context: context,
+      isScrollControlled: true,
+      showDragHandle: true,
+      builder: (sheetContext) => SafeArea(
+        child: ListView(
+          shrinkWrap: true,
+          padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
+          children: [
+            RcPageHeading(
+              eyebrow: '$trackerCode • Connected milestone',
+              title: milestone.label,
+              subtitle:
+                  'Create/open the RC SOW record, attach a project document, '
+                  'add an external link, or synchronize this milestone with the tracker workbook.',
+            ),
+            const SizedBox(height: 8),
+            ListTile(
+              enabled: resolved.isNotEmpty,
+              leading: const Icon(Icons.dashboard_customize_outlined),
+              title: Text(
+                milestone.eventType == null
+                    ? 'Open house ${milestone.label} workspace'
+                    : 'Create / open ${milestone.label} module',
+              ),
+              subtitle: Text(
+                resolved.isEmpty
+                    ? 'Start or link this tracker house to RC SOW first.'
+                    : 'Connected to RC SOW house $resolved',
+              ),
+              trailing: const Icon(Icons.chevron_right_rounded),
+              onTap: resolved.isEmpty
+                  ? null
+                  : () => Navigator.pop(sheetContext, 'module'),
+            ),
+            ListTile(
+              enabled: _canEditTracker,
+              leading: const Icon(Icons.add_link_rounded),
+              title: Text(
+                '${override['externalUrl'] ?? ''}'.trim().isEmpty
+                    ? 'Add document / folder link'
+                    : 'Edit document / folder link',
+              ),
+              subtitle: const Text(
+                'Paste a Google Drive, OneDrive, SharePoint, Excel or project URL.',
+              ),
+              onTap: _canEditTracker
+                  ? () => Navigator.pop(sheetContext, 'link')
+                  : null,
+            ),
+            ListTile(
+              enabled: _canEditTracker,
+              leading: const Icon(Icons.upload_file_rounded),
+              title: const Text('Upload project document'),
+              subtitle: const Text(
+                'PDF, Word, Excel, CSV or image in private RC SOW storage.',
+              ),
+              onTap: _canEditTracker
+                  ? () => Navigator.pop(sheetContext, 'upload')
+                  : null,
+            ),
+            if (hasDocument)
+              ListTile(
+                leading: const Icon(Icons.open_in_new_rounded),
+                title: const Text('Open linked document'),
+                subtitle: Text(
+                  '${override['fileName'] ?? override['linkLabel'] ?? 'Project document'}',
+                ),
+                onTap: () => Navigator.pop(sheetContext, 'open'),
+              ),
+            if (_canEditTracker)
+              ListTile(
+                leading: Icon(
+                  done ? Icons.undo_rounded : Icons.task_alt_rounded,
+                ),
+                title: Text(
+                  done
+                      ? 'Mark ${milestone.label} incomplete'
+                      : 'Mark ${milestone.label} complete',
+                ),
+                onTap: () => Navigator.pop(sheetContext, 'toggle'),
+              ),
+            if (_canEditTracker)
+              ListTile(
+                leading: const Icon(Icons.sync_alt_rounded),
+                title: const Text('Sync this milestone to Excel'),
+                subtitle: Text(
+                  '${row['workbookSyncState'] ?? ''}' == 'pending'
+                      ? 'Workbook write-back is queued/pending.'
+                      : 'Request write-back through the configured tracker provider.',
+                ),
+                onTap: () => Navigator.pop(sheetContext, 'sync'),
+              ),
+          ],
+        ),
+      ),
+    );
+
+    if (!mounted || action == null) return;
+    switch (action) {
+      case 'module':
+        await _openMilestoneModule(row, milestone);
+        break;
+      case 'link':
+        await _editMilestoneLink(row, milestone);
+        break;
+      case 'upload':
+        await _uploadMilestoneDocument(row, milestone);
+        break;
+      case 'open':
+        await _openMilestoneDocument(row, milestone);
+        break;
+      case 'toggle':
+        await _toggleMilestone(row, milestone, !done);
+        break;
+      case 'sync':
+        await _syncMilestoneToWorkbook(row, milestone);
+        break;
+    }
+  }
+
+  Future<void> _openMilestoneModule(
+    Map<String, dynamic> row,
+    _TrackerMilestone milestone,
+  ) async {
+    final resolved = _resolvedCode(row);
+    if (resolved.isEmpty) return;
+
+    if (milestone.eventType == null) {
+      await _openHouse(resolved);
+      return;
+    }
+
+    final houses = await widget.state.repository.houses(profile);
+    final house = houses
+        .where(
+          (candidate) =>
+              candidate.code.trim().toUpperCase() == resolved,
+        )
+        .firstOrNull;
+    if (!mounted || house == null) return;
+
+    final visible = RcProductRegistry.visibleSchemas(profile)
+        .where((schema) => schema.eventType == milestone.eventType)
+        .firstOrNull;
+
+    if (visible == null) {
+      await _openHouse(resolved);
+      return;
+    }
+
+    await Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => ProductionModuleScreen(
+          state: widget.state,
+          schema: visible,
+          initialHouse: house,
+        ),
+      ),
+    );
+    await _refresh();
+  }
+
+  Future<void> _editMilestoneLink(
+    Map<String, dynamic> row,
+    _TrackerMilestone milestone,
+  ) async {
+    final override = _milestoneOverride(row, milestone.key);
+    final controller = TextEditingController(
+      text: '${override['externalUrl'] ?? ''}',
+    );
+
+    final value = await showDialog<String>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: Text('${milestone.label} document link'),
+        content: TextField(
+          controller: controller,
+          keyboardType: TextInputType.url,
+          autofocus: true,
+          decoration: const InputDecoration(
+            labelText: 'Document / folder URL',
+            hintText: 'https://...',
+            prefixIcon: Icon(Icons.link_rounded),
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext),
+            child: const Text('Cancel'),
+          ),
+          FilledButton.icon(
+            onPressed: () =>
+                Navigator.pop(dialogContext, controller.text.trim()),
+            icon: const Icon(Icons.save_outlined),
+            label: const Text('Save link'),
+          ),
+        ],
+      ),
+    );
+    controller.dispose();
+
+    if (!mounted || value == null) return;
+    final uri = Uri.tryParse(value);
+    if (value.isNotEmpty &&
+        (uri == null ||
+            !uri.hasScheme ||
+            !const {'http', 'https'}.contains(uri.scheme.toLowerCase()))) {
+      _trackerSnack('Enter a valid http:// or https:// document link.');
+      return;
+    }
+
+    await _trackerOps.setMilestoneExternalLink(
+      profile: profile,
+      parish: parish ?? profile.parish,
+      trackerHouseCode: _trackerCode(row),
+      resolvedHouseCode: _resolvedCode(row),
+      milestoneKey: milestone.key,
+      url: value,
+      label: milestone.label,
+    );
+    await _refresh();
+    _trackerSnack('${milestone.label} link saved in RC SOW.');
+  }
+
+  Future<void> _uploadMilestoneDocument(
+    Map<String, dynamic> row,
+    _TrackerMilestone milestone,
+  ) async {
+    final picked = await FilePicker.platform.pickFiles(
+      allowMultiple: false,
+      withData: true,
+      type: FileType.custom,
+      allowedExtensions: const [
+        'pdf',
+        'doc',
+        'docx',
+        'xls',
+        'xlsx',
+        'csv',
+        'jpg',
+        'jpeg',
+        'png',
+        'webp',
+      ],
+    );
+    if (picked == null || picked.files.isEmpty) return;
+
+    final file = picked.files.single;
+    final bytes = file.bytes;
+    if (bytes == null || bytes.isEmpty) {
+      _trackerSnack('The selected document could not be read.');
+      return;
+    }
+
+    try {
+      final trackerCode = _trackerCode(row);
+      final storagePath = await _trackerOps.uploadDocument(
+        parish: parish ?? profile.parish,
+        houseCode: _resolvedCode(row).isEmpty
+            ? trackerCode
+            : _resolvedCode(row),
+        milestoneKey: milestone.key,
+        fileName: file.name,
+        bytes: bytes,
+      );
+      await _trackerOps.setMilestoneUploadedDocument(
+        profile: profile,
+        parish: parish ?? profile.parish,
+        trackerHouseCode: trackerCode,
+        resolvedHouseCode: _resolvedCode(row),
+        milestoneKey: milestone.key,
+        storagePath: storagePath,
+        fileName: file.name,
+      );
+      await _refresh();
+      _trackerSnack('${file.name} attached to ${milestone.label}.');
+    } catch (error) {
+      _trackerSnack('Document upload failed: $error');
+    }
+  }
+
+  Future<void> _openMilestoneDocument(
+    Map<String, dynamic> row,
+    _TrackerMilestone milestone,
+  ) async {
+    final override = _milestoneOverride(row, milestone.key);
+    final external = '${override['externalUrl'] ?? ''}'.trim();
+    if (external.isNotEmpty) {
+      await _openUrl(external);
+      return;
+    }
+
+    final storagePath = '${override['storagePath'] ?? ''}'.trim();
+    if (storagePath.isEmpty) return;
+
+    try {
+      final signed = await _trackerOps.signedDocumentUrl(storagePath);
+      await _openUrl(signed);
+    } catch (error) {
+      _trackerSnack('Document could not be opened: $error');
+    }
+  }
+
+  Future<void> _toggleMilestone(
+    Map<String, dynamic> row,
+    _TrackerMilestone milestone,
+    bool done,
+  ) async {
+    await _trackerOps.setMilestoneDone(
+      profile: profile,
+      parish: parish ?? profile.parish,
+      trackerHouseCode: _trackerCode(row),
+      resolvedHouseCode: _resolvedCode(row),
+      milestoneKey: milestone.key,
+      done: done,
+    );
+    await _refresh();
+    _trackerSnack(
+      '${milestone.label} marked ${done ? 'complete' : 'incomplete'} in RC SOW.',
+    );
+  }
+
+  Future<void> _syncMilestoneToWorkbook(
+    Map<String, dynamic> row,
+    _TrackerMilestone milestone,
+  ) async {
+    final override = _milestoneOverride(row, milestone.key);
+    final synced = await _trackerOps.syncToWorkbook(
+      profile: profile,
+      parish: parish ?? profile.parish,
+      trackerHouseCode: _trackerCode(row),
+      resolvedHouseCode: _resolvedCode(row),
+      patch: {
+        'kind': 'milestone',
+        'milestoneKey': milestone.key,
+        'label': milestone.label,
+        'done': _milestoneDone(row, milestone),
+        'externalUrl': override['externalUrl'],
+        'storagePath': override['storagePath'],
+        'fileName': override['fileName'],
+      },
+    );
+    await _refresh();
+    _trackerSnack(
+      synced
+          ? '${milestone.label} synchronized with the workbook.'
+          : '${milestone.label} saved in the app; Excel write-back is queued until the provider confirms write access.',
+    );
+  }
+
+  Future<void> _setTrackerRejected(
+    Map<String, dynamic> row,
+    bool rejected,
+  ) async {
+    if (!_canRejectHouse) return;
+
+    final reason = TextEditingController();
+    var syncExcel = true;
+
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => StatefulBuilder(
+        builder: (context, setDialogState) => AlertDialog(
+          title: Text(
+            rejected
+                ? 'Reject ${_trackerCode(row)}?'
+                : 'Undo rejection for ${_trackerCode(row)}?',
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                rejected
+                    ? 'The house stays in the audit trail but leaves active field workflow. This can be undone.'
+                    : 'The house returns to active tracker workflow. Prior rejection history remains.',
+              ),
+              if (rejected) ...[
+                const SizedBox(height: 12),
+                TextField(
+                  controller: reason,
+                  minLines: 2,
+                  maxLines: 4,
+                  decoration: const InputDecoration(
+                    labelText: 'Rejection reason',
+                  ),
+                ),
+              ],
+              const SizedBox(height: 8),
+              SwitchListTile.adaptive(
+                contentPadding: EdgeInsets.zero,
+                value: syncExcel,
+                title: const Text('Also sync to Excel'),
+                subtitle: const Text(
+                  'If direct write-back is unavailable, the change remains queued in RC SOW.',
+                ),
+                onChanged: (value) =>
+                    setDialogState(() => syncExcel = value),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(dialogContext, false),
+              child: const Text('Cancel'),
+            ),
+            FilledButton.icon(
+              onPressed: () {
+                if (rejected && reason.text.trim().isEmpty) return;
+                Navigator.pop(dialogContext, true);
+              },
+              icon: Icon(
+                rejected ? Icons.block_outlined : Icons.undo_rounded,
+              ),
+              label: Text(rejected ? 'Reject house' : 'Reinstate house'),
+            ),
+          ],
+        ),
+      ),
+    );
+
+    final rejectionReason = reason.text.trim();
+    reason.dispose();
+    if (confirmed != true || !mounted) return;
+
+    await _trackerOps.setRejected(
+      profile: profile,
+      parish: parish ?? profile.parish,
+      trackerHouseCode: _trackerCode(row),
+      resolvedHouseCode: _resolvedCode(row),
+      rejected: rejected,
+      reason: rejectionReason,
+      sourceRejected: row['sourceRejected'] == true,
+    );
+
+    var workbookSynced = false;
+    if (syncExcel) {
+      workbookSynced = await _trackerOps.syncToWorkbook(
+        profile: profile,
+        parish: parish ?? profile.parish,
+        trackerHouseCode: _trackerCode(row),
+        resolvedHouseCode: _resolvedCode(row),
+        patch: {
+          'kind': 'houseRejection',
+          'rejected': rejected,
+          'rejectionReason': rejectionReason,
+        },
+      );
+    }
+
+    await _refresh();
+    _trackerSnack(
+      rejected
+          ? 'House rejected in RC SOW${syncExcel ? (workbookSynced ? ' and synchronized to Excel.' : '; Excel write-back queued.') : '.'}'
+          : 'House reinstated${syncExcel ? (workbookSynced ? ' and synchronized to Excel.' : '; Excel write-back queued.') : '.'}',
+    );
+  }
+
+  void _trackerSnack(String message) {
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message)),
     );
   }
 
@@ -1301,6 +1851,148 @@ class _LiveTrackerScreenState extends State<LiveTrackerScreen> {
     return value == value.roundToDouble()
         ? '${value.toInt()}'
         : value.toStringAsFixed(2);
+  }
+}
+
+class _TrackerMilestone {
+  const _TrackerMilestone({
+    required this.key,
+    required this.label,
+    required this.sourceKey,
+    required this.icon,
+    required this.color,
+    this.eventType,
+  });
+
+  final String key;
+  final String label;
+  final String sourceKey;
+  final IconData icon;
+  final Color color;
+  final String? eventType;
+}
+
+const _trackerMilestones = <_TrackerMilestone>[
+  _TrackerMilestone(
+    key: 'verified',
+    label: 'Site verified',
+    sourceKey: 'houseVisitedVerified',
+    icon: Icons.fact_check_outlined,
+    color: RcColors.purple,
+    eventType: 'siteVisit',
+  ),
+  _TrackerMilestone(
+    key: 'sow',
+    label: 'SOW',
+    sourceKey: 'sowDone',
+    icon: Icons.description_outlined,
+    color: RcColors.success,
+  ),
+  _TrackerMilestone(
+    key: 'boqSent',
+    label: 'BOQ sent',
+    sourceKey: 'boqSent',
+    icon: Icons.send_outlined,
+    color: RcColors.blue,
+  ),
+  _TrackerMilestone(
+    key: 'boq',
+    label: 'BOQ',
+    sourceKey: 'boqDone',
+    icon: Icons.receipt_long_outlined,
+    color: RcColors.blue,
+  ),
+  _TrackerMilestone(
+    key: 'contract',
+    label: 'Contract',
+    sourceKey: 'contractSigned',
+    icon: Icons.assignment_turned_in_outlined,
+    color: RcColors.purple,
+    eventType: 'documentChecklist',
+  ),
+  _TrackerMilestone(
+    key: 'materials',
+    label: 'Materials',
+    sourceKey: 'materialsOnSiteNotStarted',
+    icon: Icons.inventory_2_outlined,
+    color: RcColors.warning,
+    eventType: 'materialRequest',
+  ),
+  _TrackerMilestone(
+    key: 'started',
+    label: 'Started',
+    sourceKey: 'started',
+    icon: Icons.play_circle_outline_rounded,
+    color: RcColors.blue,
+    eventType: 'workPlan',
+  ),
+  _TrackerMilestone(
+    key: 'finished',
+    label: 'Finished',
+    sourceKey: 'finished',
+    icon: Icons.verified_outlined,
+    color: RcColors.success,
+    eventType: 'notice',
+  ),
+  _TrackerMilestone(
+    key: 'payment',
+    label: 'Payment',
+    sourceKey: 'paymentDone',
+    icon: Icons.payments_outlined,
+    color: RcColors.purple,
+    eventType: 'payment',
+  ),
+];
+
+class _TrackerMilestoneChip extends StatelessWidget {
+  const _TrackerMilestoneChip({
+    required this.label,
+    required this.icon,
+    required this.done,
+    required this.hasDocument,
+    required this.pendingSync,
+    required this.color,
+    required this.onTap,
+  });
+
+  final String label;
+  final IconData icon;
+  final bool done;
+  final bool hasDocument;
+  final bool pendingSync;
+  final Color color;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final suffix = [
+      if (hasDocument) 'DOC',
+      if (pendingSync) 'SYNC',
+    ];
+
+    return ActionChip(
+      avatar: Icon(
+        done ? Icons.check_circle_rounded : icon,
+        size: 18,
+        color: done ? color : theme.colorScheme.onSurfaceVariant,
+      ),
+      label: Text(
+        suffix.isEmpty
+            ? label.toUpperCase()
+            : '${label.toUpperCase()} • ${suffix.join(' • ')}',
+      ),
+      tooltip: 'Open $label actions',
+      onPressed: onTap,
+      backgroundColor: done
+          ? color.withValues(alpha: .12)
+          : theme.colorScheme.surfaceContainerLow,
+      side: BorderSide(
+        color: done
+            ? color.withValues(alpha: .45)
+            : theme.colorScheme.outlineVariant,
+      ),
+    );
   }
 }
 
