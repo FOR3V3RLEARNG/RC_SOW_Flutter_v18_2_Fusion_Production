@@ -95,9 +95,7 @@ class _ControlScreenState extends State<ControlScreen> {
             return ListView(
               padding: const EdgeInsets.fromLTRB(24, 22, 24, 124),
               children: [
-                _ControlWorksHeader(
-                  onNew: () => _showNewMenu(records),
-                ),
+                _ControlWorksHeader(onNew: () => _showNewMenu(records)),
                 const SizedBox(height: 24),
                 _ProductionChain(
                   records: records,
@@ -238,7 +236,8 @@ class _ControlScreenState extends State<ControlScreen> {
               children: [
                 Text(
                   'Create production record',
-                  style: Theme.of(sheetContext).textTheme.headlineSmall?.copyWith(
+                  style: Theme.of(sheetContext).textTheme.headlineSmall
+                      ?.copyWith(
                         fontWeight: FontWeight.w900,
                         color: _ControlWorksPalette.textPrimary,
                       ),
@@ -247,8 +246,8 @@ class _ControlScreenState extends State<ControlScreen> {
                 Text(
                   'Choose the Control of Works module for the new record.',
                   style: Theme.of(sheetContext).textTheme.bodyMedium?.copyWith(
-                        color: _ControlWorksPalette.textSecondary,
-                      ),
+                    color: _ControlWorksPalette.textSecondary,
+                  ),
                 ),
                 const SizedBox(height: 14),
                 ...schemas.map(
@@ -831,10 +830,7 @@ class _ProductionChain extends StatelessWidget {
                   icon: const Icon(Icons.verified_outlined, size: 22),
                   label: const Text(
                     'Completion',
-                    style: TextStyle(
-                      fontWeight: FontWeight.w900,
-                      fontSize: 16,
-                    ),
+                    style: TextStyle(fontWeight: FontWeight.w900, fontSize: 16),
                   ),
                 ),
               ),
@@ -856,10 +852,7 @@ class _ProductionChain extends StatelessWidget {
                   icon: const Icon(Icons.payments_outlined, size: 22),
                   label: const Text(
                     'Payment',
-                    style: TextStyle(
-                      fontWeight: FontWeight.w900,
-                      fontSize: 16,
-                    ),
+                    style: TextStyle(fontWeight: FontWeight.w900, fontSize: 16),
                   ),
                 ),
               ),
@@ -1025,9 +1018,11 @@ class _PhaseRail extends StatelessWidget {
                 borderRadius: BorderRadius.circular(28),
                 child: Row(
                   children: [
-                    for (var i = 0;
-                        i < _ControlScreenState.phases.length;
-                        i++) ...[
+                    for (
+                      var i = 0;
+                      i < _ControlScreenState.phases.length;
+                      i++
+                    ) ...[
                       Expanded(
                         child: _PhaseTab(
                           label: _ControlScreenState.phases[i],
@@ -1201,10 +1196,7 @@ class _ModuleTile extends StatelessWidget {
 }
 
 class _ReferenceRecordTile extends StatelessWidget {
-  const _ReferenceRecordTile({
-    required this.record,
-    required this.onTap,
-  });
+  const _ReferenceRecordTile({required this.record, required this.onTap});
 
   final ProductionRecord record;
   final VoidCallback onTap;
@@ -1313,16 +1305,16 @@ class _Pulse extends StatelessWidget {
           Text(
             value,
             style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                  color: onColor,
-                  fontWeight: FontWeight.w900,
-                ),
+              color: onColor,
+              fontWeight: FontWeight.w900,
+            ),
           ),
           Text(
             label,
             style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                  color: onColor,
-                  fontWeight: FontWeight.w900,
-                ),
+              color: onColor,
+              fontWeight: FontWeight.w900,
+            ),
           ),
         ],
       ),
@@ -1350,4 +1342,3 @@ abstract final class _ControlWorksPalette {
   static const success = Color(0xFF2E7A60);
   static const paymentBorder = Color(0xFFE7C7CA);
 }
-
