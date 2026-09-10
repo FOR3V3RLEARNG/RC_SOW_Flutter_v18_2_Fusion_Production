@@ -186,16 +186,13 @@ class HouseRepairGame extends FlameGame {
     final sunRadius = math.min(w, h) * .075;
 
     final sunGlow = Paint()
-      ..shader = const RadialGradient(
-        stops: [0.0, .34, 1.0],
-        colors: [
-          Color(0xFFFFF8C7),
-          Color(0xAAFFD86B),
-          Color(0x00FFD86B),
-        ],
-      ).createShader(
-        Rect.fromCircle(center: sunCenter, radius: sunRadius * 3.2),
-      );
+      ..shader =
+          const RadialGradient(
+            stops: [0.0, .34, 1.0],
+            colors: [Color(0xFFFFF8C7), Color(0xAAFFD86B), Color(0x00FFD86B)],
+          ).createShader(
+            Rect.fromCircle(center: sunCenter, radius: sunRadius * 3.2),
+          );
     canvas.drawCircle(sunCenter, sunRadius * 3.2, sunGlow);
 
     final rayPaint = Paint()
