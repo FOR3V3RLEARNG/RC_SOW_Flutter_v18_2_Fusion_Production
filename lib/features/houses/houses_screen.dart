@@ -167,10 +167,7 @@ class _HousesScreenState extends State<HousesScreen> {
     );
   }
 
-  Future<void> _openHouse(
-    BuildContext context,
-    HouseRecord house,
-  ) async {
+  Future<void> _openHouse(BuildContext context, HouseRecord house) async {
     final deleted = await Navigator.of(context).push<bool>(
       PageRouteBuilder<bool>(
         settings: RouteSettings(name: '/houses/${house.code}'),
@@ -327,9 +324,7 @@ class HouseCommandScreen extends StatelessWidget {
     );
   }
 
-  Future<void> _confirmDeleteHouse(
-    BuildContext context,
-  ) async {
+  Future<void> _confirmDeleteHouse(BuildContext context) async {
     if (!state.profile!.isAdmin) return;
 
     final typedController = TextEditingController();
@@ -376,9 +371,7 @@ class HouseCommandScreen extends StatelessWidget {
               final typed = typedController.text.trim().toUpperCase();
               if (typed != house.code.trim().toUpperCase()) {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('House code does not match.'),
-                  ),
+                  const SnackBar(content: Text('House code does not match.')),
                 );
                 return;
               }
@@ -682,9 +675,7 @@ class _HouseLocationHero extends StatelessWidget {
     final theme = Theme.of(context);
     final item = beneficiary;
     final hasLocation = item?.hasCoordinates == true;
-    final point = hasLocation
-        ? LatLng(item!.latitude!, item.longitude!)
-        : null;
+    final point = hasLocation ? LatLng(item!.latitude!, item.longitude!) : null;
 
     final info = Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -737,15 +728,10 @@ class _HouseLocationHero extends StatelessWidget {
               label: house.stage.toUpperCase(),
               icon: Icons.flag_outlined,
             ),
-            RcStatusPill(
-              label: '$openRecords OPEN',
-              color: RcColors.blue,
-            ),
+            RcStatusPill(label: '$openRecords OPEN', color: RcColors.blue),
             RcStatusPill(
               label: '$attentionRecords ATTENTION',
-              color: attentionRecords > 0
-                  ? RcColors.warning
-                  : RcColors.success,
+              color: attentionRecords > 0 ? RcColors.warning : RcColors.success,
             ),
             RcStatusPill(
               label: hasLocation ? 'GPS CONNECTED' : 'NO GPS',
@@ -878,10 +864,7 @@ class _HouseLocationHero extends StatelessWidget {
                   ),
                 ),
               ),
-              Padding(
-                padding: const EdgeInsets.all(18),
-                child: info,
-              ),
+              Padding(padding: const EdgeInsets.all(18), child: info),
             ],
           ),
         ),

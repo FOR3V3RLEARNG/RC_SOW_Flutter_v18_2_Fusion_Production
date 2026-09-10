@@ -242,23 +242,24 @@ class _BeneficiarySearchScreenState extends State<BeneficiarySearchScreen> {
                             runSpacing: 8,
                             children: [
                               FilledButton.tonalIcon(
-                                onPressed: () => Navigator.of(context).pop(item),
+                                onPressed: () =>
+                                    Navigator.of(context).pop(item),
                                 icon: const Icon(Icons.check_circle_outline),
                                 label: const Text('Use this house'),
                               ),
                               if (item.hasCoordinates)
                                 OutlinedButton.icon(
-                              onPressed: () async {
-                                final uri = Uri.parse(
-                                  item.mapsUrl ??
-                                      'https://www.google.com/maps/search/?api=1&query=${item.latitude},${item.longitude}',
-                                );
-                                await launchUrl(
-                                  uri,
-                                  mode: LaunchMode.externalApplication,
-                                );
-                              },
-                              icon: const Icon(Icons.map_outlined),
+                                  onPressed: () async {
+                                    final uri = Uri.parse(
+                                      item.mapsUrl ??
+                                          'https://www.google.com/maps/search/?api=1&query=${item.latitude},${item.longitude}',
+                                    );
+                                    await launchUrl(
+                                      uri,
+                                      mode: LaunchMode.externalApplication,
+                                    );
+                                  },
+                                  icon: const Icon(Icons.map_outlined),
                                   label: const Text('Open mapped house'),
                                 ),
                             ],

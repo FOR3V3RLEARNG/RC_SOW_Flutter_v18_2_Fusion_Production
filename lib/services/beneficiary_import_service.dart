@@ -21,7 +21,9 @@ abstract final class BeneficiaryImportService {
     required String fallbackParish,
   }) {
     if (bytes.isEmpty) {
-      throw const FormatException('The selected beneficiary workbook is empty.');
+      throw const FormatException(
+        'The selected beneficiary workbook is empty.',
+      );
     }
 
     Excel workbook;
@@ -305,9 +307,9 @@ abstract final class BeneficiaryImportService {
 
   static double? _number(String value) {
     if (value.trim().isEmpty) return null;
-    final match = RegExp(r'-?\d+(?:\.\d+)?').firstMatch(
-      value.replaceAll(',', ''),
-    );
+    final match = RegExp(
+      r'-?\d+(?:\.\d+)?',
+    ).firstMatch(value.replaceAll(',', ''));
     return double.tryParse(match?.group(0) ?? '');
   }
 

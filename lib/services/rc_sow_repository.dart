@@ -1434,10 +1434,7 @@ class RcSowRepository {
         .toList();
   }
 
-  Future<String> evidenceSignedUrl(
-    String path, {
-    int expiresIn = 3600,
-  }) =>
+  Future<String> evidenceSignedUrl(String path, {int expiresIn = 3600}) =>
       client.storage.from('evidence').createSignedUrl(path, expiresIn);
 
   Future<bool> setHouseDisplayPhoto({
@@ -1453,8 +1450,8 @@ class RcSowRepository {
 
     final item = Map<String, dynamic>.from(row['item'] as Map? ?? const {});
     final id = '${row['item_id'] ?? item['id'] ?? 'house-${_safePath(code)}'}';
-    final effectiveParish =
-        '${row['parish'] ?? item['parish'] ?? parish}'.trim();
+    final effectiveParish = '${row['parish'] ?? item['parish'] ?? parish}'
+        .trim();
 
     item['housePhotoPaths'] = photoPaths;
     if (displayPhotoPath == null || displayPhotoPath.trim().isEmpty) {
@@ -1492,7 +1489,9 @@ class RcSowRepository {
         query = query.eq('parish', profile.parish);
       }
 
-      final rows = await query.order('updated_at', ascending: false).limit(1000);
+      final rows = await query
+          .order('updated_at', ascending: false)
+          .limit(1000);
       final coverByCode = <String, String>{};
 
       for (final raw in rows) {
