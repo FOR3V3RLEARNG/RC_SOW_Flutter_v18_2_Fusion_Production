@@ -803,6 +803,10 @@ class _LiveTrackerScreenState extends State<LiveTrackerScreen> {
             child: const Text('Cancel'),
           ),
           FilledButton.icon(
+            style: FilledButton.styleFrom(
+              backgroundColor: Theme.of(dialogContext).colorScheme.primary,
+              foregroundColor: Theme.of(dialogContext).colorScheme.onPrimary,
+            ),
             onPressed: () => Navigator.pop(dialogContext, true),
             icon: const Icon(Icons.play_arrow_rounded),
             label: const Text('Start House'),
@@ -853,6 +857,10 @@ class _LiveTrackerScreenState extends State<LiveTrackerScreen> {
                 child: const Text('Cancel'),
               ),
               FilledButton(
+                style: FilledButton.styleFrom(
+                  backgroundColor: Theme.of(dialogContext).colorScheme.error,
+                  foregroundColor: Theme.of(dialogContext).colorScheme.onError,
+                ),
                 onPressed: () => Navigator.pop(dialogContext, true),
                 child: const Text('Delete Start Record'),
               ),
@@ -1037,6 +1045,14 @@ class _LiveTrackerScreenState extends State<LiveTrackerScreen> {
               children: [
                 Expanded(
                   child: FilledButton.icon(
+                    style: FilledButton.styleFrom(
+                      backgroundColor: Theme.of(context).colorScheme.primary,
+                      foregroundColor: Theme.of(context).colorScheme.onPrimary,
+                      disabledBackgroundColor:
+                          Theme.of(context).colorScheme.surfaceContainerHighest,
+                      disabledForegroundColor:
+                          Theme.of(context).colorScheme.onSurfaceVariant,
+                    ),
                     onPressed: resolved.isEmpty
                         ? ((rejected || redFlag || !_canStartHouse)
                               ? null
@@ -1059,6 +1075,16 @@ class _LiveTrackerScreenState extends State<LiveTrackerScreen> {
                 const SizedBox(width: 8),
                 Expanded(
                   child: FilledButton.tonalIcon(
+                    style: FilledButton.styleFrom(
+                      backgroundColor:
+                          Theme.of(context).colorScheme.secondaryContainer,
+                      foregroundColor:
+                          Theme.of(context).colorScheme.onSecondaryContainer,
+                      disabledBackgroundColor:
+                          Theme.of(context).colorScheme.surfaceContainerHighest,
+                      disabledForegroundColor:
+                          Theme.of(context).colorScheme.onSurfaceVariant,
+                    ),
                     onPressed: resolved.isEmpty || revoked
                         ? null
                         : () => _openHouseModules(resolved),

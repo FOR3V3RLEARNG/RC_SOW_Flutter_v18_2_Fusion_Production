@@ -480,8 +480,16 @@ class RcHeader extends StatelessWidget {
               ),
               IconButton(
                 tooltip: 'Field map',
-                onPressed: () =>
-                    RcNavigator.liveTracker(context, state, mapFirst: true),
+                onPressed: () async {
+                  final result = await Navigator.of(context).push<String>(
+                    MaterialPageRoute(
+                      builder: (_) => InteractiveHouseMapScreen(state: state),
+                    ),
+                  );
+                  if (result == 'tracker' && context.mounted) {
+                    RcNavigator.liveTracker(context, state);
+                  }
+                },
                 icon: Icon(
                   state.uiIcon('nav.map', Icons.map_outlined),
                   size: RcIconSize.sm,
@@ -524,113 +532,267 @@ class RcHeader extends StatelessWidget {
   }
 }
 
-Future<void> showRcMoreMenu(BuildContext context, AppState state) async {
+Future<void> showRcMoreMenu(
+  BuildContext context,
+  AppState state,
+) async {
   final profile = state.profile!;
-  await showModalBottomSheet<void>(
+  await showGeneralDialog<void>(
     context: context,
-    showDragHandle: true,
-    isScrollControlled: true,
-    builder: (context) => FractionallySizedBox(
-      heightFactor: .72,
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(16, 0, 16, 20),
-        child: ListView(
-          children: [
-            Row(
-              children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+    barrierDismissible: true,
+    barrierLabel: 'More',
+    barrierColor: Colors.black.withValues(alpha: .14),
+    transitionDuration: state.reduceMotion
+        ? Duration.zero
+        : const Duration(milliseconds: 190),
+    pageBuilder: (context, animation, secondaryAnimation) {
+      final media = MediaQuery.of(context);
+      final menuWidth = (media.size.width - 20).clamp(286.0, 356.0).toDouble();
+      final menuHeight = (media.size.height * .62).clamp(360.0, 590.0);
+
+      void closeThen(VoidCallback action) {
+        Navigator.pop(context);
+        Future<void>.delayed(Duration.zero, action);
+      }
+
+      return Align(
+        alignment: Alignment.topRight,
+        child: SafeArea(
+          minimum: const EdgeInsets.fromLTRB(8, 64, 8, 8),
+          child: Material(
+            color: Colors.transparent,
+            child: ConstrainedBox(
+              constraints: BoxConstraints(
+                minWidth: menuWidth,
+                maxWidth: menuWidth,
+                maxHeight: menuHeight,
+              ),
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.surface,
+                  borderRadius: BorderRadius.circular(24),
+                  border: Border.all(
+                    color: Theme.of(context).colorScheme.outlineVariant,
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      blurRadius: 24,
+                      offset: const Offset(0, 10),
+                      color: Theme.of(context)
+                          .colorScheme
+                          .shadow
+                          .withValues(alpha: .15),
+                    ),
+                  ],
+                ),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(24),
+                  child: ListView(
+                    padding: const EdgeInsets.fromLTRB(10, 10, 10, 12),
+                    shrinkWrap: true,
                     children: [
-                      Text(
-                        'More',
-                        style: Theme.of(context).textTheme.titleLarge,
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(7, 5, 4, 8),
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'More quick actions',
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .titleMedium
+                                        ?.copyWith(fontWeight: FontWeight.w900),
+                                  ),
+                                  Text(
+                                    profile.role,
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .labelSmall
+                                        ?.copyWith(
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .onSurfaceVariant,
+                                        ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            IconButton(
+                              visualDensity: VisualDensity.compact,
+                              onPressed: () => Navigator.pop(context),
+                              icon: const Icon(Icons.close_rounded),
+                            ),
+                          ],
+                        ),
                       ),
-                      Text(
-                        'Secondary commands remain discoverable without crowding field navigation.',
-                        style: Theme.of(context).textTheme.bodySmall,
+                      _CompactMoreAction(
+                        icon: Icons.notifications_active_outlined,
+                        label: 'Notifications',
+                        onTap: () => closeThen(
+                          () => showNotificationCentre(context, state),
+                        ),
+                      ),
+                      _CompactMoreAction(
+                        icon: Icons.visibility_outlined,
+                        label: 'Presence / online users',
+                        onTap: () => closeThen(
+                          () => showUsersOnlinePanel(context, state),
+                        ),
+                      ),
+                      _CompactMoreAction(
+                        icon: Icons.location_searching,
+                        label: 'Live tracker',
+                        onTap: () => closeThen(
+                          () => RcNavigator.liveTracker(context, state),
+                        ),
+                      ),
+                      _CompactMoreAction(
+                        icon: Icons.storage_outlined,
+                        label: 'Production database',
+                        onTap: () => closeThen(
+                          () => Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (_) =>
+                                  ProductionDatabaseScreen(state: state),
+                            ),
+                          ),
+                        ),
+                      ),
+                      _CompactMoreAction(
+                        icon: Icons.settings_outlined,
+                        label: 'Settings',
+                        onTap: () => closeThen(
+                          () => Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (_) => SettingsScreen(state: state),
+                            ),
+                          ),
+                        ),
+                      ),
+                      if (profile.canViewAdmin) ...[
+                        const Divider(height: 16),
+                        _CompactMoreAction(
+                          icon: Icons.tune_rounded,
+                          label: 'Operations Admin',
+                          admin: true,
+                          onTap: () => closeThen(
+                            () => Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (_) =>
+                                    OperationsAdminScreen(state: state),
+                              ),
+                            ),
+                          ),
+                        ),
+                        _CompactMoreAction(
+                          icon: Icons.admin_panel_settings_outlined,
+                          label: 'Admin Control Centre',
+                          admin: true,
+                          onTap: () => closeThen(
+                            () => Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (_) => AdminScreen(state: state),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                      const Divider(height: 16),
+                      _CompactMoreAction(
+                        icon: Icons.logout_rounded,
+                        label: 'Sign out',
+                        destructive: true,
+                        onTap: () => closeThen(
+                          () => Supabase.instance.client.auth.signOut(),
+                        ),
                       ),
                     ],
                   ),
                 ),
-                IconButton(
-                  onPressed: () => Navigator.pop(context),
-                  icon: const Icon(Icons.close),
-                ),
-              ],
+              ),
             ),
-            const SizedBox(height: 12),
-            RcResponsiveGrid(
-              minTileWidth: 180,
-              children: [
-                _MoreTile(
-                  'Notification Centre',
-                  Icons.notifications_active_outlined,
-                  () {
-                    Navigator.pop(context);
-                    showNotificationCentre(context, state);
-                  },
-                ),
-                _MoreTile('Presence', Icons.visibility_outlined, () {
-                  Navigator.pop(context);
-                  showUsersOnlinePanel(context, state);
-                }),
-                _MoreTile('Live tracker', Icons.location_searching, () {
-                  Navigator.pop(context);
-                  RcNavigator.liveTracker(context, state);
-                }),
-                _MoreTile('Production database', Icons.storage_outlined, () {
-                  Navigator.pop(context);
-                  Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (_) => ProductionDatabaseScreen(state: state),
-                    ),
-                  );
-                }),
-                _MoreTile('Settings', Icons.settings_outlined, () {
-                  Navigator.pop(context);
-                  Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (_) => SettingsScreen(state: state),
-                    ),
-                  );
-                }),
-                if (profile.canViewAdmin)
-                  _MoreTile('Operations Admin', Icons.tune_rounded, () {
-                    Navigator.pop(context);
-                    Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (_) => OperationsAdminScreen(state: state),
-                      ),
-                    );
-                  }),
-                if (profile.canViewAdmin)
-                  _MoreTile(
-                    'Admin Control Centre',
-                    Icons.admin_panel_settings_outlined,
-                    () {
-                      Navigator.pop(context);
-                      Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (_) => AdminScreen(state: state),
-                        ),
-                      );
-                    },
-                  ),
-              ],
-            ),
-            const SizedBox(height: 16),
-            OutlinedButton.icon(
-              onPressed: () => Supabase.instance.client.auth.signOut(),
-              icon: const Icon(Icons.logout),
-              label: const Text('Sign out'),
-            ),
-          ],
+          ),
         ),
-      ),
-    ),
+      );
+    },
+    transitionBuilder: (_, animation, __, child) {
+      final curved = CurvedAnimation(
+        parent: animation,
+        curve: Curves.easeOutCubic,
+      );
+      return FadeTransition(
+        opacity: curved,
+        child: ScaleTransition(
+          alignment: Alignment.topRight,
+          scale: Tween<double>(begin: .96, end: 1).animate(curved),
+          child: SlideTransition(
+            position: Tween<Offset>(
+              begin: const Offset(.05, -.04),
+              end: Offset.zero,
+            ).animate(curved),
+            child: child,
+          ),
+        ),
+      );
+    },
   );
 }
+
+class _CompactMoreAction extends StatelessWidget {
+  const _CompactMoreAction({
+    required this.icon,
+    required this.label,
+    required this.onTap,
+    this.admin = false,
+    this.destructive = false,
+  });
+
+  final IconData icon;
+  final String label;
+  final VoidCallback onTap;
+  final bool admin;
+  final bool destructive;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final accent = destructive
+        ? theme.colorScheme.error
+        : admin
+            ? theme.colorScheme.secondary
+            : theme.colorScheme.primary;
+
+    return ListTile(
+      dense: true,
+      visualDensity: const VisualDensity(vertical: -2),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(17),
+      ),
+      leading: Container(
+        width: 36,
+        height: 36,
+        decoration: BoxDecoration(
+          color: accent.withValues(alpha: .10),
+          borderRadius: BorderRadius.circular(13),
+        ),
+        child: Icon(icon, size: 19, color: accent),
+      ),
+      title: Text(
+        label,
+        style: theme.textTheme.bodyMedium?.copyWith(
+          fontWeight: FontWeight.w800,
+          color: destructive ? theme.colorScheme.error : null,
+        ),
+      ),
+      trailing: const Icon(Icons.chevron_right_rounded, size: 18),
+      onTap: onTap,
+    );
+  }
+}
+
 
 class _MoreTile extends StatelessWidget {
   const _MoreTile(this.label, this.icon, this.onTap);

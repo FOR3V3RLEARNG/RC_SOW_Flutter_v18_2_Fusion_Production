@@ -2,6 +2,7 @@ import 'dart:math' as math;
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
@@ -40,14 +41,22 @@ extension RoofDrawToolX on RoofDrawTool {
 }
 
 class RoofStroke {
-  RoofStroke({required this.tool, required this.points, this.measurement = ''});
+  RoofStroke({
+    required this.tool,
+    required this.points,
+    this.measurement = '',
+    this.templateGenerated = false,
+  });
+
   final RoofDrawTool tool;
   final List<Offset> points;
   String measurement;
+  final bool templateGenerated;
 
   Map<String, dynamic> toMap() => {
     'tool': tool.name,
     'measurement': measurement,
+    'templateGenerated': templateGenerated,
     'points': points.map((p) => {'x': p.dx, 'y': p.dy}).toList(),
   };
 }
@@ -64,6 +73,13 @@ class _CanvasEndpointHit {
   final int strokeIndex;
   final int pointIndex;
   final Offset point;
+}
+
+class _ScopeHousePhoto {
+  const _ScopeHousePhoto({required this.path, required this.bytes});
+
+  final String path;
+  final Uint8List bytes;
 }
 
 class _CanvasEndpointBinding {
@@ -130,7 +146,9 @@ class _ScopeScreenState extends State<ScopeScreen>
   RoofDrawTool drawTool = RoofDrawTool.wall;
   final strokes = <RoofStroke>[];
   final redo = <RoofStroke>[];
+  final GlobalKey _roofCanvasKey = GlobalKey();
   List<Offset> current = [];
+  int? _freehandPointerId;
   int? selectedStrokeIndex;
   _CanvasDragMode? _dragMode;
   Offset? _dragAnchor;
@@ -138,6 +156,9 @@ class _ScopeScreenState extends State<ScopeScreen>
   Offset? _dragSegmentEnd;
   List<_CanvasEndpointBinding> _dragBindings = [];
   final signatures = <String, Uint8List>{};
+  final ImagePicker _housePhotoPicker = ImagePicker();
+  final List<_ScopeHousePhoto> housePhotos = [];
+  int? houseCoverPhotoIndex;
 
   static const double _canvasSnapRadius = 16;
   static const double _canvasHitRadius = 22;
@@ -148,6 +169,7 @@ class _ScopeScreenState extends State<ScopeScreen>
   String agreementTemplate = kDefaultBeneficiaryAgreementText;
   String agreementVersion = 'Default';
   String agreementSourceFile = 'Built-in default';
+  bool includeTechnicalDraftInBeneficiaryPdf = false;
 
   UserProfile get profile => widget.state.profile!;
 
@@ -300,6 +322,8 @@ class _ScopeScreenState extends State<ScopeScreen>
           ),
         ),
         const SizedBox(height: 14),
+        _housePhotosCard(),
+        const SizedBox(height: 14),
         RcExpressiveSurface(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -396,9 +420,298 @@ class _ScopeScreenState extends State<ScopeScreen>
     );
   }
 
+  Widget _housePhotosCard() {
+    final theme = Theme.of(context);
+    return RcExpressiveSurface(
+      shape: RcSurfaceShape.offset,
+      tone: Color.alphaBlend(
+        theme.colorScheme.secondary.withValues(alpha: .07),
+        theme.colorScheme.surface,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Row(
+            children: [
+              RcIconWell(
+                icon: Icons.add_a_photo_outlined,
+                color: theme.colorScheme.secondary,
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('House Photos', style: theme.textTheme.titleLarge),
+                    const SizedBox(height: 2),
+                    Text(
+                      'Capture house condition photos for this Scope. Choose one photo as the active house display image.',
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: theme.colorScheme.onSurfaceVariant,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: [
+              FilledButton.icon(
+                onPressed: () => _pickHousePhoto(ImageSource.camera),
+                icon: const Icon(Icons.photo_camera_outlined),
+                label: const Text('Take Photo'),
+              ),
+              OutlinedButton.icon(
+                onPressed: () => _pickHousePhoto(ImageSource.gallery),
+                icon: const Icon(Icons.photo_library_outlined),
+                label: const Text('Add From Device'),
+              ),
+            ],
+          ),
+          const SizedBox(height: 10),
+          if (housePhotos.isEmpty)
+            Container(
+              padding: const EdgeInsets.all(18),
+              decoration: BoxDecoration(
+                color: theme.colorScheme.surfaceContainerLow,
+                borderRadius: BorderRadius.circular(18),
+                border: Border.all(color: theme.colorScheme.outlineVariant),
+              ),
+              child: const Row(
+                children: [
+                  Icon(Icons.image_not_supported_outlined),
+                  SizedBox(width: 10),
+                  Expanded(
+                    child: Text(
+                      'No house photos yet. The first photo captured automatically becomes the display photo.',
+                    ),
+                  ),
+                ],
+              ),
+            )
+          else
+            SizedBox(
+              height: 148,
+              child: ListView.separated(
+                scrollDirection: Axis.horizontal,
+                itemCount: housePhotos.length,
+                separatorBuilder: (_, _) => const SizedBox(width: 9),
+                itemBuilder: (context, index) {
+                  final photo = housePhotos[index];
+                  final isCover = houseCoverPhotoIndex == index;
+                  return SizedBox(
+                    width: 132,
+                    child: InkWell(
+                      borderRadius: BorderRadius.circular(20),
+                      onTap: () => _setHouseCoverPhoto(index),
+                      child: Container(
+                        padding: const EdgeInsets.all(5),
+                        decoration: BoxDecoration(
+                          color: isCover
+                              ? theme.colorScheme.primaryContainer
+                              : theme.colorScheme.surfaceContainerLow,
+                          borderRadius: BorderRadius.circular(20),
+                          border: Border.all(
+                            color: isCover
+                                ? theme.colorScheme.primary
+                                : theme.colorScheme.outlineVariant,
+                            width: isCover ? 2 : 1,
+                          ),
+                        ),
+                        child: Column(
+                          children: [
+                            Expanded(
+                              child: Stack(
+                                fit: StackFit.expand,
+                                children: [
+                                  ClipRRect(
+                                    borderRadius: BorderRadius.circular(15),
+                                    child: Image.memory(
+                                      photo.bytes,
+                                      fit: BoxFit.cover,
+                                      gaplessPlayback: true,
+                                    ),
+                                  ),
+                                  if (isCover)
+                                    Positioned(
+                                      top: 6,
+                                      left: 6,
+                                      child: Container(
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 7,
+                                          vertical: 4,
+                                        ),
+                                        decoration: BoxDecoration(
+                                          color: theme.colorScheme.primary,
+                                          borderRadius: BorderRadius.circular(20),
+                                        ),
+                                        child: Text(
+                                          'DISPLAY',
+                                          style: theme.textTheme.labelSmall?.copyWith(
+                                            color: theme.colorScheme.onPrimary,
+                                            fontWeight: FontWeight.w900,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  Positioned(
+                                    top: 3,
+                                    right: 3,
+                                    child: IconButton.filledTonal(
+                                      tooltip: 'Remove photo',
+                                      visualDensity: VisualDensity.compact,
+                                      onPressed: () => _removeHousePhoto(index),
+                                      icon: const Icon(Icons.close_rounded, size: 16),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              isCover ? 'Active house cover' : 'Tap to set display',
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: theme.textTheme.labelSmall?.copyWith(
+                                fontWeight: FontWeight.w800,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _pickHousePhoto(ImageSource source) async {
+    final code = house.text.trim().toUpperCase();
+    if (code.isEmpty) {
+      _snack('Enter or select a House Code before taking house photos.');
+      return;
+    }
+
+    try {
+      final picked = await _housePhotoPicker.pickImage(
+        source: source,
+        imageQuality: 88,
+        maxWidth: 2200,
+      );
+      if (picked == null) return;
+
+      final bytes = await picked.readAsBytes();
+      if (bytes.isEmpty) {
+        _snack('The selected image was empty.');
+        return;
+      }
+
+      final rawExtension = picked.name.contains('.')
+          ? picked.name.split('.').last.toLowerCase()
+          : 'jpg';
+      final extension = const {'jpg', 'jpeg', 'png', 'webp'}.contains(rawExtension)
+          ? rawExtension
+          : 'jpg';
+
+      final path = await widget.state.repository.uploadEvidence(
+        parish: parish,
+        houseCode: code,
+        recordType: 'scopeHouse',
+        fieldKey: 'house-photo',
+        bytes: bytes,
+        extension: extension,
+      );
+
+      final becomesCover = houseCoverPhotoIndex == null;
+      setState(() {
+        housePhotos.add(_ScopeHousePhoto(path: path, bytes: bytes));
+        if (becomesCover) {
+          houseCoverPhotoIndex = housePhotos.length - 1;
+        }
+      });
+
+      final active = await _syncHouseCoverPhoto();
+      if (!mounted) return;
+      _snack(
+        becomesCover
+            ? active
+                ? 'House photo saved and set as the active house display photo.'
+                : 'House photo saved to Scope and selected as its display photo.'
+            : 'House photo saved. Tap it to make it the display photo.',
+      );
+    } catch (error) {
+      if (!mounted) return;
+      _snack('House photo could not be saved: $error');
+    }
+  }
+
+  Future<void> _setHouseCoverPhoto(int index) async {
+    if (index < 0 || index >= housePhotos.length) return;
+    setState(() => houseCoverPhotoIndex = index);
+    final active = await _syncHouseCoverPhoto();
+    if (!mounted) return;
+    _snack(
+      active
+          ? 'Active house display photo updated.'
+          : 'Display photo selected for this Scope.',
+    );
+  }
+
+  Future<void> _removeHousePhoto(int index) async {
+    if (index < 0 || index >= housePhotos.length) return;
+
+    setState(() {
+      housePhotos.removeAt(index);
+      final currentCover = houseCoverPhotoIndex;
+      if (housePhotos.isEmpty) {
+        houseCoverPhotoIndex = null;
+      } else if (currentCover == null || currentCover == index) {
+        houseCoverPhotoIndex = 0;
+      } else if (currentCover > index) {
+        houseCoverPhotoIndex = currentCover - 1;
+      }
+    });
+
+    await _syncHouseCoverPhoto();
+  }
+
+  String? get _houseCoverPhotoPath {
+    final index = houseCoverPhotoIndex;
+    if (index == null || index < 0 || index >= housePhotos.length) return null;
+    return housePhotos[index].path;
+  }
+
+  Future<bool> _syncHouseCoverPhoto() async {
+    final code = house.text.trim().toUpperCase();
+    if (code.isEmpty) return false;
+
+    try {
+      return await widget.state.repository.setHouseDisplayPhoto(
+        profile: profile,
+        houseCode: code,
+        parish: parish,
+        displayPhotoPath: _houseCoverPhotoPath,
+        photoPaths: housePhotos.map((photo) => photo.path).toList(),
+      );
+    } catch (_) {
+      return false;
+    }
+  }
+
   Widget _roofCanvas() {
     final theme = Theme.of(context);
     return ListView(
+      physics: drawTool == RoofDrawTool.freehand
+          ? const NeverScrollableScrollPhysics()
+          : null,
       padding: const EdgeInsets.fromLTRB(16, 12, 16, 110),
       children: [
         RcExpressiveSurface(
@@ -442,10 +755,64 @@ class _ScopeScreenState extends State<ScopeScreen>
                   showSelectedIcon: false,
                   onSelectionChanged: (s) => setState(() {
                     drawTool = s.first;
+                    _freehandPointerId = null;
                     current = [];
                     selectedStrokeIndex = null;
                     _clearSelectionDrag();
                   }),
+                ),
+              ),
+              const SizedBox(height: 12),
+              Row(
+                children: [
+                  Icon(
+                    Icons.roofing_rounded,
+                    size: 19,
+                    color: theme.colorScheme.primary,
+                  ),
+                  const SizedBox(width: 7),
+                  Expanded(
+                    child: Text(
+                      'Roof layout • tap to auto-place',
+                      style: theme.textTheme.titleSmall?.copyWith(
+                        fontWeight: FontWeight.w900,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 8),
+              Wrap(
+                spacing: 7,
+                runSpacing: 7,
+                children: const [
+                  'Gable',
+                  'Hip',
+                  'Shed',
+                  'Intersecting',
+                  'Pitched',
+                  'Custom',
+                ].map((type) {
+                  final selected =
+                      roofType.toLowerCase() == type.toLowerCase();
+                  return ChoiceChip(
+                    selected: selected,
+                    avatar: Icon(
+                      _roofPresetIcon(type),
+                      size: 18,
+                    ),
+                    label: Text(type),
+                    onSelected: (_) => _applyRoofPreset(type),
+                  );
+                }).toList(),
+              ),
+              const SizedBox(height: 6),
+              Text(
+                roofType == 'Custom'
+                    ? 'Custom mode keeps your existing geometry. Use the drawing tools and Select to build or adjust it.'
+                    : 'The selected roof type places a starting roof outline, ridge/hip/valley lines and drainage fall arrows. Then use Select to drag any point or segment.',
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: theme.colorScheme.onSurfaceVariant,
                 ),
               ),
               const SizedBox(height: 10),
@@ -477,19 +844,6 @@ class _ScopeScreenState extends State<ScopeScreen>
                 ],
               ),
               const SizedBox(height: 10),
-              FilledButton.tonalIcon(
-                onPressed: () => Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (_) => TechnicalRoofDraftScreen(
-                      initialMeasurements: measurements,
-                      initialRoofType: roofType,
-                    ),
-                  ),
-                ),
-                icon: const Icon(Icons.architecture_outlined),
-                label: const Text('Open Stable Technical Roof Draft'),
-              ),
-              const SizedBox(height: 10),
               AspectRatio(
                 aspectRatio: 1.25,
                 child: Container(
@@ -499,47 +853,57 @@ class _ScopeScreenState extends State<ScopeScreen>
                     border: Border.all(color: theme.colorScheme.outlineVariant),
                   ),
                   clipBehavior: Clip.antiAlias,
-                  child: GestureDetector(
+                  child: Listener(
                     behavior: HitTestBehavior.opaque,
-                    onTapUp: drawTool == RoofDrawTool.freehand
-                        ? null
-                        : drawTool == RoofDrawTool.select
-                        ? (details) => _selectAt(details.localPosition)
-                        : (details) =>
-                              _placeTechnicalPoint(details.localPosition),
-                    onPanStart: drawTool == RoofDrawTool.freehand
-                        ? (details) =>
-                              setState(() => current = [details.localPosition])
-                        : drawTool == RoofDrawTool.select
-                        ? (details) => _beginSelectDrag(details.localPosition)
+                    onPointerDown: drawTool == RoofDrawTool.freehand
+                        ? _beginFreehandPointer
                         : null,
-                    onPanUpdate: drawTool == RoofDrawTool.freehand
-                        ? (details) =>
-                              setState(() => current.add(details.localPosition))
-                        : drawTool == RoofDrawTool.select
-                        ? (details) => _updateSelectDrag(details.localPosition)
+                    onPointerMove: drawTool == RoofDrawTool.freehand
+                        ? _updateFreehandPointer
                         : null,
-                    onPanEnd: drawTool == RoofDrawTool.freehand
-                        ? (_) => _finishStroke()
-                        : drawTool == RoofDrawTool.select
-                        ? (_) => _endSelectDrag()
+                    onPointerUp: drawTool == RoofDrawTool.freehand
+                        ? _endFreehandPointer
                         : null,
-                    child: CustomPaint(
-                      painter: RoofCanvasPainter(
-                        strokes: strokes,
-                        current: current,
-                        currentTool: drawTool,
-                        selectedStrokeIndex: selectedStrokeIndex,
-                        showGrid: widget.state.showGrid,
+                    onPointerCancel: drawTool == RoofDrawTool.freehand
+                        ? _cancelFreehandPointer
+                        : null,
+                    child: GestureDetector(
+                      key: _roofCanvasKey,
+                      behavior: HitTestBehavior.opaque,
+                      onTapUp: drawTool == RoofDrawTool.freehand
+                          ? null
+                          : drawTool == RoofDrawTool.select
+                          ? (details) => _selectAt(details.localPosition)
+                          : (details) =>
+                                _placeTechnicalPoint(details.localPosition),
+                      onPanStart: drawTool == RoofDrawTool.select
+                          ? (details) =>
+                                _beginSelectDrag(details.localPosition)
+                          : null,
+                      onPanUpdate: drawTool == RoofDrawTool.select
+                          ? (details) =>
+                                _updateSelectDrag(details.localPosition)
+                          : null,
+                      onPanEnd: drawTool == RoofDrawTool.select
+                          ? (_) => _endSelectDrag()
+                          : null,
+                      child: CustomPaint(
+                        painter: RoofCanvasPainter(
+                          strokes: strokes,
+                          current: current,
+                          currentTool: drawTool,
+                          selectedStrokeIndex: selectedStrokeIndex,
+                          showGrid: widget.state.showGrid,
+                        ),
+                        child: const SizedBox.expand(),
                       ),
-                      child: const SizedBox.expand(),
                     ),
                   ),
                 ),
               ),
               const SizedBox(height: 8),
               Text(
-                'Connected drafting mode: endpoints snap to the grid and to existing vertices. Wall drawing continues from the last corner automatically. Use Select to drag a corner or a whole segment; every attached wall/ridge/hip/valley endpoint sharing that vertex moves with it, so joints stay closed.',
+                'Connected drafting mode: tap a roof layout such as Gable to auto-place a starting ridge and drainage fall. Auto geometry stays editable. Use Select to drag a corner or whole segment; attached ridge/hip/valley/drain endpoints move with connected vertices so joints stay closed.',
                 style: theme.textTheme.bodySmall?.copyWith(
                   color: theme.colorScheme.onSurfaceVariant,
                 ),
@@ -843,16 +1207,119 @@ class _ScopeScreenState extends State<ScopeScreen>
                 ),
               ),
               const SizedBox(height: 18),
+              RcExpressiveSurface(
+                shape: RcSurfaceShape.offset,
+                tone: Color.alphaBlend(
+                  theme.colorScheme.primary.withValues(alpha: .07),
+                  theme.colorScheme.surface,
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Row(
+                      children: [
+                        RcIconWell(
+                          icon: Icons.architecture_rounded,
+                          color: theme.colorScheme.primary,
+                        ),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Technical Architectural Draft',
+                                style: theme.textTheme.titleLarge,
+                              ),
+                              const SizedBox(height: 2),
+                              Text(
+                                'Plan, elevation and calculated framing geometry for the beneficiary record.',
+                                style: theme.textTheme.bodySmall?.copyWith(
+                                  color: theme.colorScheme.onSurfaceVariant,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 10),
+                    SwitchListTile.adaptive(
+                      contentPadding: EdgeInsets.zero,
+                      title: const Text(
+                        'Add technical draft to Beneficiary printout',
+                      ),
+                      subtitle: const Text(
+                        'Optional. When off, the technical drawing stays available in this Beneficiary tab but is not added to the PDF.',
+                      ),
+                      value: includeTechnicalDraftInBeneficiaryPdf,
+                      onChanged: (value) => setState(
+                        () => includeTechnicalDraftInBeneficiaryPdf = value,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    FilledButton.tonalIcon(
+                      onPressed: () => Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (_) => TechnicalRoofDraftScreen(
+                            initialMeasurements: measurements,
+                            initialRoofType: roofType,
+                          ),
+                        ),
+                      ),
+                      icon: const Icon(Icons.architecture_outlined),
+                      label: const Text('Open Technical Architectural Draft'),
+                    ),
+                    const SizedBox(height: 12),
+                    AspectRatio(
+                      aspectRatio: 1.25,
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: theme.colorScheme.surfaceContainerLowest,
+                          borderRadius: BorderRadius.circular(18),
+                          border: Border.all(
+                            color: theme.colorScheme.outlineVariant,
+                          ),
+                        ),
+                        clipBehavior: Clip.antiAlias,
+                        child: CustomPaint(
+                          painter: TechnicalRoofPainter(
+                            roofType: style,
+                            measurements: measurements,
+                            foreground: theme.colorScheme.onSurface,
+                            accent: theme.colorScheme.primary,
+                            grid: theme.colorScheme.outlineVariant,
+                          ),
+                          child: const SizedBox.expand(),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      includeTechnicalDraftInBeneficiaryPdf
+                          ? 'Included in the next Beneficiary PDF.'
+                          : 'Preview only — not currently included in the Beneficiary PDF.',
+                      style: theme.textTheme.labelMedium?.copyWith(
+                        fontWeight: FontWeight.w800,
+                        color: includeTechnicalDraftInBeneficiaryPdf
+                            ? RcColors.success
+                            : theme.colorScheme.onSurfaceVariant,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 18),
               Row(
                 children: [
                   Icon(
-                    Icons.architecture_rounded,
+                    Icons.roofing_outlined,
                     color: theme.colorScheme.primary,
                   ),
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
-                      'Red Cross Roof Construction Concept • $style',
+                      'Beneficiary Roof Concept • $style',
                       style: theme.textTheme.titleLarge,
                     ),
                   ),
@@ -860,7 +1327,7 @@ class _ScopeScreenState extends State<ScopeScreen>
               ),
               const SizedBox(height: 5),
               Text(
-                'Representative architectural illustration only — not the field Scope canvas and not site measurements.',
+                'Simple beneficiary-facing roof concept. The optional Technical Architectural Draft above contains the plan, elevation and measured geometry.',
                 style: theme.textTheme.bodySmall?.copyWith(
                   color: theme.colorScheme.onSurfaceVariant,
                 ),
@@ -1095,6 +1562,354 @@ class _ScopeScreenState extends State<ScopeScreen>
         roofType = selected.roofType!;
       }
     });
+  }
+
+  IconData _roofPresetIcon(String type) {
+    return switch (type.toLowerCase()) {
+      'gable' => Icons.roofing_rounded,
+      'hip' => Icons.change_history_rounded,
+      'shed' => Icons.signal_cellular_alt_rounded,
+      'intersecting' => Icons.call_split_rounded,
+      'pitched' => Icons.keyboard_double_arrow_up_rounded,
+      _ => Icons.polyline_rounded,
+    };
+  }
+
+  Size? _renderedRoofCanvasSize() {
+    final renderObject =
+        _roofCanvasKey.currentContext?.findRenderObject();
+    if (renderObject is! RenderBox || !renderObject.hasSize) return null;
+    return renderObject.size;
+  }
+
+  Rect _roofTemplateRect(Size size) {
+    final manualWallPoints = <Offset>[];
+    for (final stroke in strokes) {
+      if (stroke.templateGenerated ||
+          stroke.tool != RoofDrawTool.wall ||
+          stroke.points.length < 2) {
+        continue;
+      }
+      manualWallPoints.add(stroke.points.first);
+      manualWallPoints.add(stroke.points.last);
+    }
+
+    if (manualWallPoints.length >= 2) {
+      final minX = manualWallPoints
+          .map((point) => point.dx)
+          .reduce(math.min);
+      final maxX = manualWallPoints
+          .map((point) => point.dx)
+          .reduce(math.max);
+      final minY = manualWallPoints
+          .map((point) => point.dy)
+          .reduce(math.min);
+      final maxY = manualWallPoints
+          .map((point) => point.dy)
+          .reduce(math.max);
+
+      if (maxX - minX >= 80 && maxY - minY >= 60) {
+        return Rect.fromLTRB(minX, minY, maxX, maxY);
+      }
+    }
+
+    final horizontalInset = math.max(28.0, size.width * .12);
+    final verticalInset = math.max(24.0, size.height * .15);
+
+    return Rect.fromLTRB(
+      horizontalInset,
+      verticalInset,
+      math.max(horizontalInset + 120, size.width - horizontalInset),
+      math.max(verticalInset + 90, size.height - verticalInset),
+    );
+  }
+
+  RoofStroke _autoRoofStroke(
+    RoofDrawTool tool,
+    Offset start,
+    Offset end,
+    String label,
+  ) {
+    return RoofStroke(
+      tool: tool,
+      points: [_gridSnap(start), _gridSnap(end)],
+      measurement: label,
+      templateGenerated: true,
+    );
+  }
+
+  List<RoofStroke> _autoOutline(Rect rect) => [
+    _autoRoofStroke(
+      RoofDrawTool.wall,
+      rect.topLeft,
+      rect.topRight,
+      'Auto roof edge',
+    ),
+    _autoRoofStroke(
+      RoofDrawTool.wall,
+      rect.topRight,
+      rect.bottomRight,
+      'Auto roof edge',
+    ),
+    _autoRoofStroke(
+      RoofDrawTool.wall,
+      rect.bottomRight,
+      rect.bottomLeft,
+      'Auto roof edge',
+    ),
+    _autoRoofStroke(
+      RoofDrawTool.wall,
+      rect.bottomLeft,
+      rect.topLeft,
+      'Auto roof edge',
+    ),
+  ];
+
+  void _applyRoofPreset(String type) {
+    final canvasSize = _renderedRoofCanvasSize();
+
+    if (type == 'Custom') {
+      setState(() {
+        roofType = type;
+        drawTool = RoofDrawTool.select;
+        current = [];
+        selectedStrokeIndex = null;
+        _clearSelectionDrag();
+      });
+      return;
+    }
+
+    if (canvasSize == null ||
+        canvasSize.width < 120 ||
+        canvasSize.height < 90) {
+      setState(() => roofType = type);
+      _snack('Open the Roof Canvas fully, then tap $type again.');
+      return;
+    }
+
+    final rect = _roofTemplateRect(canvasSize);
+    final cx = rect.center.dx;
+    final cy = rect.center.dy;
+    final w = rect.width;
+    final h = rect.height;
+    final generated = <RoofStroke>[];
+
+    final hasManualWall = strokes.any(
+      (stroke) =>
+          !stroke.templateGenerated &&
+          stroke.tool == RoofDrawTool.wall &&
+          stroke.points.length >= 2,
+    );
+
+    if (!hasManualWall) {
+      generated.addAll(_autoOutline(rect));
+    }
+
+    if (type == 'Gable' || type == 'Pitched') {
+      final ridgeStart = Offset(rect.left + w * .18, cy);
+      final ridgeEnd = Offset(rect.right - w * .18, cy);
+
+      generated.add(
+        _autoRoofStroke(
+          RoofDrawTool.ridge,
+          ridgeStart,
+          ridgeEnd,
+          type == 'Gable' ? 'Gable ridge' : 'Main ridge',
+        ),
+      );
+
+      for (final x in [
+        rect.left + w * .32,
+        rect.left + w * .68,
+      ]) {
+        generated.add(
+          _autoRoofStroke(
+            RoofDrawTool.drain,
+            Offset(x, cy),
+            Offset(x, rect.top),
+            'Drainage fall',
+          ),
+        );
+        generated.add(
+          _autoRoofStroke(
+            RoofDrawTool.drain,
+            Offset(x, cy),
+            Offset(x, rect.bottom),
+            'Drainage fall',
+          ),
+        );
+      }
+    } else if (type == 'Hip') {
+      final ridgeStart = Offset(rect.left + w * .34, cy);
+      final ridgeEnd = Offset(rect.right - w * .34, cy);
+
+      generated.add(
+        _autoRoofStroke(
+          RoofDrawTool.ridge,
+          ridgeStart,
+          ridgeEnd,
+          'Hip roof ridge',
+        ),
+      );
+      generated.addAll([
+        _autoRoofStroke(
+          RoofDrawTool.hip,
+          ridgeStart,
+          rect.topLeft,
+          'Hip',
+        ),
+        _autoRoofStroke(
+          RoofDrawTool.hip,
+          ridgeStart,
+          rect.bottomLeft,
+          'Hip',
+        ),
+        _autoRoofStroke(
+          RoofDrawTool.hip,
+          ridgeEnd,
+          rect.topRight,
+          'Hip',
+        ),
+        _autoRoofStroke(
+          RoofDrawTool.hip,
+          ridgeEnd,
+          rect.bottomRight,
+          'Hip',
+        ),
+      ]);
+
+      generated.addAll([
+        _autoRoofStroke(
+          RoofDrawTool.drain,
+          Offset(cx, cy),
+          Offset(cx, rect.top),
+          'Drainage fall',
+        ),
+        _autoRoofStroke(
+          RoofDrawTool.drain,
+          Offset(cx, cy),
+          Offset(cx, rect.bottom),
+          'Drainage fall',
+        ),
+        _autoRoofStroke(
+          RoofDrawTool.drain,
+          ridgeStart,
+          Offset(rect.left, cy),
+          'Drainage fall',
+        ),
+        _autoRoofStroke(
+          RoofDrawTool.drain,
+          ridgeEnd,
+          Offset(rect.right, cy),
+          'Drainage fall',
+        ),
+      ]);
+    } else if (type == 'Shed') {
+      final highLeft = Offset(rect.left, rect.top + h * .18);
+      final highRight = Offset(rect.right, rect.top + h * .18);
+      final lowY = rect.bottom - h * .10;
+
+      generated.add(
+        _autoRoofStroke(
+          RoofDrawTool.ridge,
+          highLeft,
+          highRight,
+          'High roof line',
+        ),
+      );
+
+      for (final x in [
+        rect.left + w * .22,
+        rect.left + w * .50,
+        rect.left + w * .78,
+      ]) {
+        generated.add(
+          _autoRoofStroke(
+            RoofDrawTool.drain,
+            Offset(x, rect.top + h * .18),
+            Offset(x, lowY),
+            'Fall to low eave',
+          ),
+        );
+      }
+    } else if (type == 'Intersecting') {
+      final mainStart = Offset(rect.left + w * .16, cy);
+      final mainEnd = Offset(rect.right - w * .16, cy);
+      final crossX = rect.left + w * .58;
+      final crossTop = Offset(crossX, rect.top + h * .12);
+      final crossBottom = Offset(crossX, rect.bottom - h * .12);
+      final junction = Offset(crossX, cy);
+
+      generated.addAll([
+        _autoRoofStroke(
+          RoofDrawTool.ridge,
+          mainStart,
+          mainEnd,
+          'Main ridge',
+        ),
+        _autoRoofStroke(
+          RoofDrawTool.ridge,
+          crossTop,
+          crossBottom,
+          'Cross ridge',
+        ),
+        _autoRoofStroke(
+          RoofDrawTool.valley,
+          junction,
+          Offset(rect.left + w * .42, rect.top),
+          'Valley',
+        ),
+        _autoRoofStroke(
+          RoofDrawTool.valley,
+          junction,
+          Offset(rect.left + w * .42, rect.bottom),
+          'Valley',
+        ),
+        _autoRoofStroke(
+          RoofDrawTool.drain,
+          Offset(rect.left + w * .28, cy),
+          Offset(rect.left + w * .28, rect.top),
+          'Drainage fall',
+        ),
+        _autoRoofStroke(
+          RoofDrawTool.drain,
+          Offset(rect.left + w * .28, cy),
+          Offset(rect.left + w * .28, rect.bottom),
+          'Drainage fall',
+        ),
+        _autoRoofStroke(
+          RoofDrawTool.drain,
+          junction,
+          Offset(rect.right, cy),
+          'Drainage fall',
+        ),
+      ]);
+    }
+
+    setState(() {
+      roofType = type;
+
+      // Remove only the previous auto layout. Manual lines and freehand work
+      // remain untouched.
+      strokes.removeWhere((stroke) => stroke.templateGenerated);
+      strokes.addAll(generated);
+
+      drawTool = RoofDrawTool.select;
+      current = [];
+      redo.clear();
+
+      final firstRidge = strokes.indexWhere(
+        (stroke) =>
+            stroke.templateGenerated &&
+            stroke.tool == RoofDrawTool.ridge,
+      );
+      selectedStrokeIndex = firstRidge < 0 ? null : firstRidge;
+      _clearSelectionDrag();
+    });
+
+    _snack(
+      '$type roof layout placed. Ridge and drainage are selected/editable — use Select to drag points or segments.',
+    );
   }
 
   Future<void> _placeTechnicalPoint(Offset point) async {
@@ -1378,6 +2193,65 @@ class _ScopeScreenState extends State<ScopeScreen>
     _dragBindings = [];
   }
 
+  void _beginFreehandPointer(PointerDownEvent event) {
+    if (drawTool != RoofDrawTool.freehand ||
+        _freehandPointerId != null ||
+        !mounted) {
+      return;
+    }
+
+    setState(() {
+      _freehandPointerId = event.pointer;
+      current = [event.localPosition];
+      selectedStrokeIndex = null;
+      redo.clear();
+      _clearSelectionDrag();
+    });
+  }
+
+  void _updateFreehandPointer(PointerMoveEvent event) {
+    if (drawTool != RoofDrawTool.freehand ||
+        _freehandPointerId != event.pointer ||
+        current.isEmpty ||
+        !mounted) {
+      return;
+    }
+
+    final point = event.localPosition;
+    if ((point - current.last).distance < 1.25) return;
+    setState(() => current.add(point));
+  }
+
+  void _endFreehandPointer(PointerUpEvent event) {
+    if (_freehandPointerId != event.pointer || !mounted) return;
+    _commitFreehandStroke();
+  }
+
+  void _cancelFreehandPointer(PointerCancelEvent event) {
+    if (_freehandPointerId != event.pointer || !mounted) return;
+    _commitFreehandStroke();
+  }
+
+  void _commitFreehandStroke() {
+    final points = List<Offset>.of(current);
+
+    setState(() {
+      _freehandPointerId = null;
+      current = [];
+
+      if (points.length >= 2) {
+        strokes.add(
+          RoofStroke(
+            tool: RoofDrawTool.freehand,
+            points: points,
+          ),
+        );
+        selectedStrokeIndex = strokes.length - 1;
+        redo.clear();
+      }
+    });
+  }
+
   Future<void> _finishStroke() async {
     if (current.length < 2) {
       setState(() => current = []);
@@ -1466,6 +2340,8 @@ class _ScopeScreenState extends State<ScopeScreen>
     'rafterLengthFt': measurements.rafterLengthFt,
     'drawing': strokes.map((s) => s.toMap()).toList(),
     'drawingIsCustom': true,
+    'housePhotoPaths': housePhotos.map((photo) => photo.path).toList(),
+    'displayPhotoPath': _houseCoverPhotoPath,
     'beneficiarySource': selectedBeneficiary == null
         ? null
         : 'Shelter Roof Repair Assessment',
@@ -1484,6 +2360,9 @@ class _ScopeScreenState extends State<ScopeScreen>
         parish: parish,
         item: _scopeData(status),
       );
+      if (_houseCoverPhotoPath != null) {
+        await _syncHouseCoverPhoto();
+      }
       _snack(
         status == 'Draft'
             ? 'Scope draft saved.'
@@ -1567,8 +2446,58 @@ class _ScopeScreenState extends State<ScopeScreen>
             ),
           ),
           pw.SizedBox(height: 14),
+          if (includeTechnicalDraftInBeneficiaryPdf) ...[
+            pw.Text(
+              'TECHNICAL ARCHITECTURAL ROOF DRAFT • ${style.toUpperCase()}',
+              style: pw.TextStyle(
+                fontWeight: pw.FontWeight.bold,
+                fontSize: 11,
+                color: PdfColors.blue900,
+              ),
+            ),
+            pw.SizedBox(height: 4),
+            pw.Text(
+              'Optional technical plan/elevation record generated from the current Scope measurements. Verify all field dimensions before construction.',
+              style: const pw.TextStyle(fontSize: 8.5),
+            ),
+            pw.SizedBox(height: 7),
+            _pdfAgreementRoof(style),
+            pw.SizedBox(height: 7),
+            pw.TableHelper.fromTextArray(
+              border: pw.TableBorder.all(
+                color: PdfColors.grey400,
+                width: .6,
+              ),
+              cellPadding: const pw.EdgeInsets.all(5),
+              data: [
+                ['Width', '${measurements.widthFt.toStringAsFixed(2)} ft'],
+                ['Length', '${measurements.lengthFt.toStringAsFixed(2)} ft'],
+                [
+                  'Wall height',
+                  '${measurements.wallHeightFt.toStringAsFixed(2)} ft',
+                ],
+                [
+                  'Rise wall plate → ridge',
+                  '${measurements.ridgeRiseFt.toStringAsFixed(2)} ft',
+                ],
+                [
+                  'Ridge height',
+                  '${measurements.ridgeHeightFt.toStringAsFixed(2)} ft',
+                ],
+                [
+                  'Common rafter',
+                  '${measurements.rafterLengthFt.toStringAsFixed(2)} ft',
+                ],
+                [
+                  'Pitch',
+                  '${measurements.pitchRisePer12.toStringAsFixed(2)} / 12',
+                ],
+              ],
+            ),
+            pw.SizedBox(height: 12),
+          ],
           pw.Text(
-            'RED CROSS ROOF CONSTRUCTION CONCEPT • ${style.toUpperCase()}',
+            'BENEFICIARY ROOF CONCEPT • ${style.toUpperCase()}',
             style: pw.TextStyle(
               fontWeight: pw.FontWeight.bold,
               fontSize: 11,
@@ -1577,7 +2506,7 @@ class _ScopeScreenState extends State<ScopeScreen>
           ),
           pw.SizedBox(height: 4),
           pw.Text(
-            'Representative architectural illustration only. This is not the editable Scope drawing and does not display field measurements.',
+            'Simple beneficiary-facing roof concept. The optional technical draft is printed separately with the current measured geometry.',
             style: const pw.TextStyle(fontSize: 8.5),
           ),
           pw.SizedBox(height: 8),

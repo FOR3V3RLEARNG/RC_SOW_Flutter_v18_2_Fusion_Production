@@ -1717,6 +1717,14 @@ class _NotificationCentreState extends State<_NotificationCentre> {
         ),
         const SizedBox(height: 14),
         FilledButton.icon(
+          style: FilledButton.styleFrom(
+            backgroundColor: Theme.of(context).colorScheme.primary,
+            foregroundColor: Theme.of(context).colorScheme.onPrimary,
+            disabledBackgroundColor:
+                Theme.of(context).colorScheme.surfaceContainerHighest,
+            disabledForegroundColor:
+                Theme.of(context).colorScheme.onSurfaceVariant,
+          ),
           onPressed: busy ? null : _send,
           icon: const Icon(Icons.notifications_active_outlined),
           label: Text(busy ? 'Publishing…' : 'Publish Notification'),
@@ -2040,11 +2048,25 @@ class _TrackerConfigState extends State<_TrackerConfig> {
           runSpacing: 8,
           children: [
             FilledButton.icon(
+              style: FilledButton.styleFrom(
+                backgroundColor: theme.colorScheme.primary,
+                foregroundColor: theme.colorScheme.onPrimary,
+                disabledBackgroundColor:
+                    theme.colorScheme.surfaceContainerHighest,
+                disabledForegroundColor: theme.colorScheme.onSurfaceVariant,
+              ),
               onPressed: busy ? null : _sync,
               icon: const Icon(Icons.sync_rounded),
               label: Text(busy ? 'Syncing…' : 'Save & Sync API'),
             ),
             FilledButton.tonalIcon(
+              style: FilledButton.styleFrom(
+                backgroundColor: theme.colorScheme.secondaryContainer,
+                foregroundColor: theme.colorScheme.onSecondaryContainer,
+                disabledBackgroundColor:
+                    theme.colorScheme.surfaceContainerHighest,
+                disabledForegroundColor: theme.colorScheme.onSurfaceVariant,
+              ),
               onPressed: busy ? null : _save,
               icon: const Icon(Icons.save_outlined),
               label: const Text('Save Source'),
@@ -2290,11 +2312,25 @@ class _ParishMapConfigState extends State<_ParishMapConfig> {
           runSpacing: 8,
           children: [
             FilledButton.icon(
+              style: FilledButton.styleFrom(
+                backgroundColor: theme.colorScheme.primary,
+                foregroundColor: theme.colorScheme.onPrimary,
+                disabledBackgroundColor:
+                    theme.colorScheme.surfaceContainerHighest,
+                disabledForegroundColor: theme.colorScheme.onSurfaceVariant,
+              ),
               onPressed: busy ? null : _sync,
               icon: const Icon(Icons.sync_rounded),
               label: Text(busy ? 'Syncing…' : 'Save & Sync Map'),
             ),
             FilledButton.tonalIcon(
+              style: FilledButton.styleFrom(
+                backgroundColor: theme.colorScheme.secondaryContainer,
+                foregroundColor: theme.colorScheme.onSecondaryContainer,
+                disabledBackgroundColor:
+                    theme.colorScheme.surfaceContainerHighest,
+                disabledForegroundColor: theme.colorScheme.onSurfaceVariant,
+              ),
               onPressed: busy ? null : _save,
               icon: const Icon(Icons.save_outlined),
               label: const Text('Save URL'),

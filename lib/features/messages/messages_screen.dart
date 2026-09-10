@@ -7,64 +7,96 @@ import '../../models/app_models.dart';
 import '../../state/app_state.dart';
 import '../control/house_operations_control_screen.dart';
 
-Future<void> showNotificationCentre(BuildContext context, AppState state) {
+Future<void> showNotificationCentre(
+  BuildContext context,
+  AppState state,
+) {
   return showGeneralDialog<void>(
     context: context,
     barrierDismissible: true,
     barrierLabel: 'Notification Centre',
-    barrierColor: Colors.black38,
-    transitionDuration: state.reduceMotion ? Duration.zero : RcMotion.medium,
-    pageBuilder: (context, animation, secondaryAnimation) => Align(
-      alignment: Alignment.topCenter,
-      child: SafeArea(
-        child: Material(
-          color: Colors.transparent,
-          child: Container(
-            width: MediaQuery.sizeOf(
-              context,
-            ).width.clamp(0.0, 760.0).toDouble(),
-            constraints: BoxConstraints(
-              maxHeight: MediaQuery.sizeOf(context).height * .78,
-            ),
-            margin: const EdgeInsets.fromLTRB(10, 6, 10, 0),
-            decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.surface,
-              borderRadius: const BorderRadius.vertical(
-                bottom: Radius.circular(28),
-                top: Radius.circular(18),
+    barrierColor: Colors.black.withValues(alpha: .18),
+    transitionDuration: state.reduceMotion
+        ? Duration.zero
+        : const Duration(milliseconds: 220),
+    pageBuilder: (context, animation, secondaryAnimation) {
+      final media = MediaQuery.of(context);
+      final availableWidth = media.size.width - 16;
+      final shadeWidth = availableWidth.clamp(300.0, 390.0).toDouble();
+      final maxHeight = (media.size.height * .66).clamp(340.0, 620.0);
+
+      return Align(
+        alignment: Alignment.topRight,
+        child: SafeArea(
+          minimum: const EdgeInsets.fromLTRB(8, 6, 8, 8),
+          child: Material(
+            color: Colors.transparent,
+            child: ConstrainedBox(
+              constraints: BoxConstraints(
+                minWidth: shadeWidth,
+                maxWidth: shadeWidth,
+                maxHeight: maxHeight,
               ),
-              border: Border.all(
-                color: Theme.of(context).colorScheme.outlineVariant,
-              ),
-              boxShadow: const [
-                BoxShadow(
-                  blurRadius: 28,
-                  color: Color(0x26000000),
-                  offset: Offset(0, 12),
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.surface,
+                  borderRadius: BorderRadius.circular(24),
+                  border: Border.all(
+                    color: Theme.of(context).colorScheme.outlineVariant,
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      blurRadius: 24,
+                      spreadRadius: 1,
+                      color: Theme.of(context)
+                          .colorScheme
+                          .shadow
+                          .withValues(alpha: .16),
+                      offset: const Offset(0, 10),
+                    ),
+                  ],
                 ),
-              ],
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(24),
+                  child: MessagesDrawerBody(
+                    state: state,
+                    compact: true,
+                  ),
+                ),
+              ),
             ),
-            clipBehavior: Clip.antiAlias,
-            child: MessagesDrawerBody(state: state),
           ),
         ),
-      ),
-    ),
+      );
+    },
     transitionBuilder: (context, animation, secondaryAnimation, child) {
       final curved = CurvedAnimation(
         parent: animation,
         curve: Curves.easeOutCubic,
+        reverseCurve: Curves.easeInCubic,
       );
-      return SlideTransition(
-        position: Tween(
-          begin: const Offset(0, -.12),
-          end: Offset.zero,
-        ).animate(curved),
-        child: FadeTransition(opacity: curved, child: child),
+
+      return FadeTransition(
+        opacity: curved,
+        child: SlideTransition(
+          position: Tween<Offset>(
+            begin: const Offset(.06, -.08),
+            end: Offset.zero,
+          ).animate(curved),
+          child: ScaleTransition(
+            alignment: Alignment.topRight,
+            scale: Tween<double>(begin: .96, end: 1).animate(curved),
+            child: child,
+          ),
+        ),
       );
     },
   );
 }
+
+// Compact notification shade intentionally uses a small Android-style
+// right-aligned surface instead of a full-width notification panel.
+
 
 Future<void> showMessageDrawer(BuildContext context, AppState state) =>
     showNotificationCentre(context, state);
@@ -287,9 +319,12 @@ class MessagesDrawerBody extends StatefulWidget {
     super.key,
     required this.state,
     this.embedded = true,
+    this.compact = false,
   });
+
   final AppState state;
   final bool embedded;
+  final bool compact;
 
   @override
   State<MessagesDrawerBody> createState() => _MessagesDrawerBodyState();
@@ -407,54 +442,89 @@ class _MessagesDrawerBodyState extends State<MessagesDrawerBody> {
       children: [
         if (widget.embedded)
           Padding(
-            padding: const EdgeInsets.fromLTRB(18, 16, 12, 8),
+            padding: EdgeInsets.fromLTRB(
+              widget.compact ? 12 : 18,
+              widget.compact ? 10 : 16,
+              8,
+              widget.compact ? 4 : 8,
+            ),
             child: Row(
               children: [
                 Container(
-                  width: 46,
-                  height: 46,
+                  width: widget.compact ? 38 : 46,
+                  height: widget.compact ? 38 : 46,
                   decoration: BoxDecoration(
                     color: theme.colorScheme.primaryContainer,
-                    borderRadius: BorderRadius.circular(17),
+                    borderRadius: BorderRadius.circular(
+                      widget.compact ? 14 : 17,
+                    ),
                   ),
                   child: Icon(
                     Icons.notifications_active_rounded,
+                    size: widget.compact ? 20 : 24,
                     color: theme.colorScheme.onPrimaryContainer,
                   ),
                 ),
-                const SizedBox(width: 11),
+                SizedBox(width: widget.compact ? 9 : 11),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Notification Centre',
-                        style: theme.textTheme.titleLarge,
+                        widget.compact
+                            ? 'Notifications'
+                            : 'Notification Centre',
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: widget.compact
+                            ? theme.textTheme.titleMedium?.copyWith(
+                                fontWeight: FontWeight.w900,
+                              )
+                            : theme.textTheme.titleLarge,
                       ),
-                      Text(
-                        'Messages, push notices, production alerts, required actions and signatures.',
-                        style: theme.textTheme.bodySmall?.copyWith(
-                          color: theme.colorScheme.onSurfaceVariant,
+                      if (!widget.compact)
+                        Text(
+                          'Messages, push notices, production alerts, required actions and signatures.',
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color: theme.colorScheme.onSurfaceVariant,
+                          ),
+                        )
+                      else
+                        Text(
+                          'Latest activity',
+                          style: theme.textTheme.labelSmall?.copyWith(
+                            color: theme.colorScheme.onSurfaceVariant,
+                          ),
                         ),
-                      ),
                     ],
                   ),
                 ),
-                IconButton.filledTonal(
+                IconButton(
                   tooltip: 'Compose message',
+                  style: IconButton.styleFrom(
+                    foregroundColor: theme.colorScheme.onPrimaryContainer,
+                    backgroundColor: theme.colorScheme.primaryContainer,
+                  ),
+                  visualDensity: VisualDensity.compact,
                   onPressed: () => showComposeMessage(context, widget.state),
                   icon: const Icon(Icons.edit_outlined),
                 ),
                 IconButton(
                   tooltip: 'Close',
+                  visualDensity: VisualDensity.compact,
                   onPressed: () => Navigator.maybePop(context),
-                  icon: const Icon(Icons.close),
+                  icon: const Icon(Icons.close_rounded),
                 ),
               ],
             ),
           ),
         Padding(
-          padding: const EdgeInsets.fromLTRB(12, 4, 12, 9),
+          padding: EdgeInsets.fromLTRB(
+            widget.compact ? 8 : 12,
+            4,
+            widget.compact ? 8 : 12,
+            widget.compact ? 6 : 9,
+          ),
           child: SingleChildScrollView(
             scrollDirection: Axis.horizontal,
             child: Row(
@@ -534,7 +604,12 @@ class _MessagesDrawerBodyState extends State<MessagesDrawerBody> {
                 }
 
                 return ListView.separated(
-                  padding: const EdgeInsets.fromLTRB(12, 4, 12, 80),
+                  padding: EdgeInsets.fromLTRB(
+                    widget.compact ? 8 : 12,
+                    4,
+                    widget.compact ? 8 : 12,
+                    widget.compact ? 16 : 80,
+                  ),
                   itemCount: messages.length,
                   separatorBuilder: (_, _) => const SizedBox(height: 9),
                   itemBuilder: (_, index) {
@@ -621,6 +696,11 @@ class _MessagesDrawerBodyState extends State<MessagesDrawerBody> {
                                         color: RcColors.blue,
                                       ),
                                     TextButton.icon(
+                                      style: TextButton.styleFrom(
+                                        foregroundColor: visual.color,
+                                        backgroundColor:
+                                            visual.color.withValues(alpha: .08),
+                                      ),
                                       onPressed: () => _openMessage(message),
                                       icon: Icon(
                                         visual.filter == 'Signature'

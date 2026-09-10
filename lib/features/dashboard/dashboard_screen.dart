@@ -1,6 +1,9 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
 import '../../core/design_tokens.dart';
+import '../../core/navigation.dart';
 import '../../core/record_schemas.dart';
 import '../../core/product_registry.dart';
 import '../../core/rc_components.dart';
@@ -8,7 +11,10 @@ import '../../core/text_helpers.dart';
 import '../../models/app_models.dart';
 import '../../state/app_state.dart';
 import '../admin/admin_screen.dart';
+import '../admin/operations_admin_screen.dart';
+import '../beneficiaries/beneficiary_search_screen.dart';
 import '../control/control_screen.dart';
+import '../messages/messages_screen.dart';
 import '../settings/settings_screen.dart';
 import '../workforce/crew_attendance_screen.dart';
 
@@ -35,9 +41,30 @@ class _DashboardScreenState extends State<DashboardScreen> {
       widget.state.repository.houses(profile),
       widget.state.repository.productionRecords(profile),
     ]);
+
+    var messages = const <MessageRecord>[];
+    var community = const <ProductionRecord>[];
+
+    try {
+      messages = await widget.state.repository.messages(profile, limit: 20);
+    } catch (_) {
+      // Dashboard still loads if notification retrieval is temporarily unavailable.
+    }
+
+    try {
+      community = await widget.state.repository.communityRecords(
+        profile,
+        limit: 20,
+      );
+    } catch (_) {
+      // Community ticker is optional and must never block field operations.
+    }
+
     return _DashboardData(
       houses: data[0] as List<HouseRecord>,
       records: data[1] as List<ProductionRecord>,
+      messages: messages,
+      community: community,
     );
   }
 
@@ -116,9 +143,31 @@ class _DashboardScreenState extends State<DashboardScreen> {
               ),
               const SizedBox(height: 16),
               _DashboardCommandStrip(
+                profile: profile,
                 onSettings: () => Navigator.of(context).push(
                   MaterialPageRoute(
                     builder: (_) => SettingsScreen(state: widget.state),
+                  ),
+                ),
+                onNotifications: () =>
+                    showNotificationCentre(context, widget.state),
+                onBeneficiaries: () => Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (_) =>
+                        BeneficiarySearchScreen(state: widget.state),
+                  ),
+                ),
+                onLiveTracker: () =>
+                    RcNavigator.liveTracker(context, widget.state),
+                onAdmin: () => Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (_) => AdminScreen(state: widget.state),
+                  ),
+                ),
+                onOperationsAdmin: () => Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (_) =>
+                        OperationsAdminScreen(state: widget.state),
                   ),
                 ),
                 onControl: () => widget.state.selectTab(2),
@@ -280,9 +329,100 @@ class _DashboardScreenState extends State<DashboardScreen> {
 }
 
 class _DashboardData {
-  const _DashboardData({this.houses = const [], this.records = const []});
+  const _DashboardData({
+    this.houses = const [],
+    this.records = const [],
+    this.messages = const [],
+    this.community = const [],
+  });
+
   final List<HouseRecord> houses;
   final List<ProductionRecord> records;
+  final List<MessageRecord> messages;
+  final List<ProductionRecord> community;
+}
+
+class _DashboardActivity {
+  const _DashboardActivity({
+    required this.kind,
+    required this.title,
+    required this.subtitle,
+    required this.time,
+    required this.icon,
+    required this.color,
+  });
+
+  final String kind;
+  final String title;
+  final String subtitle;
+  final DateTime time;
+  final IconData icon;
+  final Color color;
+}
+
+List<_DashboardActivity> _dashboardActivity(_DashboardData data) {
+  final items = <_DashboardActivity>[];
+
+  for (final message in data.messages.take(10)) {
+    items.add(
+      _DashboardActivity(
+        kind: message.unread ? 'NEW NOTIFICATION' : 'NOTIFICATION',
+        title: message.subject,
+        subtitle:
+            '${message.category}${message.houseCode == null ? '' : ' • ${message.houseCode}'}',
+        time: message.createdAt,
+        icon: message.unread
+            ? Icons.notifications_active_rounded
+            : Icons.notifications_none_rounded,
+        color: message.priority.toLowerCase().contains('urgent')
+            ? RcColors.danger
+            : RcColors.blue,
+      ),
+    );
+  }
+
+  for (final record in data.records
+      .where((record) => record.eventType != 'communityPost')
+      .take(14)) {
+    items.add(
+      _DashboardActivity(
+        kind: 'STATUS CHANGE',
+        title: '${record.houseCode} • ${record.title}',
+        subtitle: '${record.status} • ${record.parish}',
+        time: record.updatedAt,
+        icon: record.needsAttention
+            ? Icons.warning_amber_rounded
+            : Icons.sync_alt_rounded,
+        color: record.needsAttention ? RcColors.warning : RcColors.success,
+      ),
+    );
+  }
+
+  for (final record in data.community
+      .where((record) => record.eventType == 'communityPost')
+      .take(10)) {
+    final start = DateTime.tryParse('${record.item['eventStart'] ?? ''}');
+    final upcoming = start != null && start.isAfter(DateTime.now());
+    final title = '${record.item['title'] ?? record.summary}'.trim();
+
+    items.add(
+      _DashboardActivity(
+        kind: upcoming ? 'UPCOMING' : 'COMMUNITY',
+        title: title.isEmpty ? 'Community update' : title,
+        subtitle: upcoming
+            ? '${record.parish} • ${start.toLocal()}'
+            : record.parish,
+        time: upcoming ? start : record.updatedAt,
+        icon: upcoming
+            ? Icons.event_available_rounded
+            : Icons.groups_2_outlined,
+        color: upcoming ? RcColors.purple : RcColors.teal,
+      ),
+    );
+  }
+
+  items.sort((a, b) => b.time.compareTo(a.time));
+  return items.take(18).toList();
 }
 
 class _RoleHero extends StatelessWidget {
@@ -302,6 +442,7 @@ class _RoleHero extends StatelessWidget {
     final theme = Theme.of(context);
     final closed = data.records.where((r) => r.isClosed).length;
     final progress = data.records.isEmpty ? 0.0 : closed / data.records.length;
+    final activity = _dashboardActivity(data);
     return RcExpressiveSurface(
       shape: RcSurfaceShape.hero,
       tone: theme.colorScheme.primaryContainer.withValues(alpha: .42),
@@ -335,23 +476,222 @@ class _RoleHero extends StatelessWidget {
               ),
             ],
           );
-          if (constraints.maxWidth < 560) {
+          if (constraints.maxWidth < 820) {
             return Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 Align(alignment: Alignment.centerLeft, child: text),
-                const SizedBox(height: 16),
-                RcProgressOrb(value: progress, label: 'closed', size: 105),
+                const SizedBox(height: 14),
+                _DashboardActivityTicker(items: activity),
+                const SizedBox(height: 14),
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: RcProgressOrb(
+                    value: progress,
+                    label: 'closed',
+                    size: 105,
+                  ),
+                ),
               ],
             );
           }
           return Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Expanded(child: text),
-              const SizedBox(width: 20),
-              RcProgressOrb(value: progress, label: 'closed', size: 115),
+              Expanded(flex: 5, child: text),
+              const SizedBox(width: 16),
+              SizedBox(
+                width: 330,
+                child: _DashboardActivityTicker(items: activity),
+              ),
+              const SizedBox(width: 16),
+              Align(
+                alignment: Alignment.center,
+                child: RcProgressOrb(
+                  value: progress,
+                  label: 'closed',
+                  size: 108,
+                ),
+              ),
             ],
           );
         },
+      ),
+    );
+  }
+}
+
+class _DashboardActivityTicker extends StatefulWidget {
+  const _DashboardActivityTicker({required this.items});
+  final List<_DashboardActivity> items;
+
+  @override
+  State<_DashboardActivityTicker> createState() =>
+      _DashboardActivityTickerState();
+}
+
+class _DashboardActivityTickerState
+    extends State<_DashboardActivityTicker> {
+  Timer? timer;
+  int index = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _restart();
+  }
+
+  @override
+  void didUpdateWidget(covariant _DashboardActivityTicker oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.items.length != widget.items.length) {
+      index = 0;
+      _restart();
+    }
+  }
+
+  void _restart() {
+    timer?.cancel();
+    if (widget.items.length <= 1) return;
+    timer = Timer.periodic(const Duration(seconds: 5), (_) {
+      if (!mounted || widget.items.isEmpty) return;
+      setState(() => index = (index + 1) % widget.items.length);
+    });
+  }
+
+  @override
+  void dispose() {
+    timer?.cancel();
+    super.dispose();
+  }
+
+  String _age(DateTime time) {
+    final now = DateTime.now();
+    if (time.isAfter(now)) {
+      final future = time.difference(now);
+      if (future.inDays > 0) return 'in ${future.inDays}d';
+      if (future.inHours > 0) return 'in ${future.inHours}h';
+      return 'upcoming';
+    }
+    final difference = now.difference(time);
+    if (difference.inDays > 0) return '${difference.inDays}d ago';
+    if (difference.inHours > 0) return '${difference.inHours}h ago';
+    if (difference.inMinutes > 0) return '${difference.inMinutes}m ago';
+    return 'now';
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    if (widget.items.isEmpty) {
+      return RcExpressiveSurface(
+        shape: RcSurfaceShape.offset,
+        tone: theme.colorScheme.surface.withValues(alpha: .72),
+        child: Row(
+          children: [
+            Icon(
+              Icons.check_circle_outline_rounded,
+              color: RcColors.success,
+            ),
+            const SizedBox(width: 9),
+            const Expanded(
+              child: Text('You are up to date. No recent activity to show.'),
+            ),
+          ],
+        ),
+      );
+    }
+
+    if (index >= widget.items.length) index = 0;
+    final item = widget.items[index];
+
+    return RcExpressiveSurface(
+      shape: RcSurfaceShape.offset,
+      tone: theme.colorScheme.surface.withValues(alpha: .82),
+      padding: const EdgeInsets.all(13),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Row(
+            children: [
+              Icon(
+                Icons.dynamic_feed_outlined,
+                size: 17,
+                color: theme.colorScheme.primary,
+              ),
+              const SizedBox(width: 6),
+              Expanded(
+                child: Text(
+                  'WHAT’S HAPPENING',
+                  style: theme.textTheme.labelSmall?.copyWith(
+                    fontWeight: FontWeight.w900,
+                    letterSpacing: .7,
+                  ),
+                ),
+              ),
+              Text(
+                '${index + 1}/${widget.items.length}',
+                style: theme.textTheme.labelSmall?.copyWith(
+                  color: theme.colorScheme.onSurfaceVariant,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 9),
+          AnimatedSwitcher(
+            duration: const Duration(milliseconds: 280),
+            child: Row(
+              key: ValueKey('${item.kind}-${item.title}-${item.time}'),
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  width: 38,
+                  height: 38,
+                  decoration: BoxDecoration(
+                    color: item.color.withValues(alpha: .11),
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                  child: Icon(item.icon, size: 19, color: item.color),
+                ),
+                const SizedBox(width: 9),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        item.kind,
+                        style: theme.textTheme.labelSmall?.copyWith(
+                          color: item.color,
+                          fontWeight: FontWeight.w900,
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        item.title,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: theme.textTheme.titleSmall?.copyWith(
+                          fontWeight: FontWeight.w900,
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        '${item.subtitle} • ${_age(item.time)}',
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color: theme.colorScheme.onSurfaceVariant,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -363,6 +703,7 @@ class _ProductionChainNav extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     final items = <(String, IconData)>[
       ('Scope', Icons.assignment_outlined),
       ('Plan', Icons.calendar_month_outlined),
@@ -371,38 +712,53 @@ class _ProductionChainNav extends StatelessWidget {
       ('Close-out', Icons.verified_outlined),
       ('Finance', Icons.payments_outlined),
     ];
+
     return RcExpressiveSurface(
       shape: RcSurfaceShape.pill,
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 7),
-      child: SingleChildScrollView(
-        scrollDirection: Axis.horizontal,
+      padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 7),
+      child: Semantics(
+        label: 'Project lifecycle from Scope through Finance',
         child: Row(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             for (var i = 0; i < items.length; i++) ...[
-              InkWell(
-                borderRadius: BorderRadius.circular(18),
-                onTap: () => onOpenPhase(items[i].$1),
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 9,
-                    vertical: 4,
-                  ),
-                  child: Column(
-                    children: [
-                      Icon(items[i].$2, size: RcIconSize.sm),
-                      const SizedBox(height: 4),
-                      Text(
-                        items[i].$1,
-                        style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                          fontWeight: FontWeight.w900,
+              Expanded(
+                child: InkWell(
+                  borderRadius: BorderRadius.circular(15),
+                  onTap: () => onOpenPhase(items[i].$1),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 2, vertical: 5),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          items[i].$2,
+                          size: 18,
+                          color: theme.colorScheme.primary,
                         ),
-                      ),
-                    ],
+                        const SizedBox(height: 4),
+                        FittedBox(
+                          fit: BoxFit.scaleDown,
+                          child: Text(
+                            items[i].$1,
+                            maxLines: 1,
+                            style: theme.textTheme.labelSmall?.copyWith(
+                              fontWeight: FontWeight.w900,
+                              fontSize: 10.5,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
               if (i < items.length - 1)
-                const Icon(Icons.chevron_right_rounded, size: 16),
+                Container(
+                  width: 1,
+                  margin: const EdgeInsets.symmetric(vertical: 8),
+                  color: theme.colorScheme.outlineVariant,
+                ),
             ],
           ],
         ),
@@ -413,12 +769,25 @@ class _ProductionChainNav extends StatelessWidget {
 
 class _DashboardCommandStrip extends StatelessWidget {
   const _DashboardCommandStrip({
+    required this.profile,
     required this.onSettings,
+    required this.onNotifications,
+    required this.onBeneficiaries,
+    required this.onLiveTracker,
+    required this.onAdmin,
+    required this.onOperationsAdmin,
     required this.onControl,
     required this.onHouses,
     required this.canManageCrew,
   });
+
+  final UserProfile profile;
   final VoidCallback onSettings;
+  final VoidCallback onNotifications;
+  final VoidCallback onBeneficiaries;
+  final VoidCallback onLiveTracker;
+  final VoidCallback onAdmin;
+  final VoidCallback onOperationsAdmin;
   final VoidCallback onControl;
   final VoidCallback onHouses;
   final bool canManageCrew;
@@ -431,8 +800,23 @@ class _DashboardCommandStrip extends StatelessWidget {
       runSpacing: 8,
       children: [
         ActionChip(
+          avatar: const Icon(Icons.notifications_none_rounded),
+          label: const Text('Notifications'),
+          onPressed: onNotifications,
+        ),
+        ActionChip(
+          avatar: const Icon(Icons.home_work_outlined),
+          label: const Text('Beneficiaries'),
+          onPressed: onBeneficiaries,
+        ),
+        ActionChip(
+          avatar: const Icon(Icons.location_searching),
+          label: const Text('Live Tracker'),
+          onPressed: onLiveTracker,
+        ),
+        ActionChip(
           avatar: const Icon(Icons.settings_outlined),
-          label: const Text('Settings'),
+          label: const Text('Account & Settings'),
           onPressed: onSettings,
         ),
         ActionChip(
@@ -442,6 +826,18 @@ class _DashboardCommandStrip extends StatelessWidget {
           label: Text(canManageCrew ? 'Crew Assignment' : 'My Houses'),
           onPressed: canManageCrew ? onControl : onHouses,
         ),
+        if (profile.canViewAdmin)
+          ActionChip(
+            avatar: const Icon(Icons.tune_rounded),
+            label: const Text('Operations Admin'),
+            onPressed: onOperationsAdmin,
+          ),
+        if (profile.canViewAdmin)
+          ActionChip(
+            avatar: const Icon(Icons.admin_panel_settings_outlined),
+            label: const Text('Admin Centre'),
+            onPressed: onAdmin,
+          ),
       ],
     ),
   );

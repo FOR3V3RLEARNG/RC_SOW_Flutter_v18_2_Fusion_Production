@@ -735,53 +735,62 @@ class _ProductionChain extends StatelessWidget {
       ('Close-out', Icons.verified_outlined),
       ('Finance', Icons.payments_outlined),
     ];
+
     return RcExpressiveSurface(
       shape: RcSurfaceShape.hero,
       tone: theme.colorScheme.surfaceContainerLow,
-      child: SingleChildScrollView(
-        scrollDirection: Axis.horizontal,
-        child: Row(
-          children: [
-            for (var i = 0; i < phases.length; i++) ...[
-              InkWell(
-                borderRadius: BorderRadius.circular(18),
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 8),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          for (var i = 0; i < phases.length; i++) ...[
+            Expanded(
+              child: InkWell(
+                borderRadius: BorderRadius.circular(16),
                 onTap: () => onPhase(phases[i].$1),
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 8,
-                    vertical: 6,
-                  ),
+                  padding: const EdgeInsets.symmetric(horizontal: 3, vertical: 5),
                   child: Column(
+                    mainAxisSize: MainAxisSize.min,
                     children: [
-                      CircleAvatar(
-                        radius: 20,
-                        backgroundColor: theme.colorScheme.primaryContainer,
+                      Container(
+                        width: 36,
+                        height: 36,
+                        decoration: BoxDecoration(
+                          color: theme.colorScheme.primaryContainer,
+                          shape: BoxShape.circle,
+                        ),
+                        alignment: Alignment.center,
                         child: Icon(
                           phases[i].$2,
-                          size: RcIconSize.sm,
+                          size: 18,
                           color: theme.colorScheme.onPrimaryContainer,
                         ),
                       ),
-                      const SizedBox(height: 6),
-                      Text(
-                        phases[i].$1,
-                        style: theme.textTheme.labelMedium?.copyWith(
-                          fontWeight: FontWeight.w900,
+                      const SizedBox(height: 5),
+                      FittedBox(
+                        fit: BoxFit.scaleDown,
+                        child: Text(
+                          phases[i].$1,
+                          maxLines: 1,
+                          style: theme.textTheme.labelSmall?.copyWith(
+                            fontWeight: FontWeight.w900,
+                          ),
                         ),
                       ),
                     ],
                   ),
                 ),
               ),
-              if (i < phases.length - 1)
-                Icon(
-                  Icons.arrow_forward_rounded,
-                  size: RcIconSize.xs,
-                  color: theme.colorScheme.outline,
-                ),
-            ],
+            ),
+            if (i < phases.length - 1)
+              Container(
+                width: 1,
+                margin: const EdgeInsets.symmetric(vertical: 9),
+                color: theme.colorScheme.outlineVariant,
+              ),
           ],
-        ),
+        ],
       ),
     );
   }
@@ -823,13 +832,39 @@ class _ModuleTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final color =
-        RcColors.expressivePalette[schema.icon.codePoint %
-            RcColors.expressivePalette.length];
+    final palette = switch (schema.phase) {
+      'Plan' => (
+        const Color(0xFFF3E9D6),
+        const Color(0xFF765A32),
+      ),
+      'Delivery' => (
+        const Color(0xFFF8E1D3),
+        const Color(0xFF94583E),
+      ),
+      'Quality' => (
+        const Color(0xFFE8ECD7),
+        const Color(0xFF59643F),
+      ),
+      'Close-out' => (
+        const Color(0xFFEDE3DD),
+        const Color(0xFF70584F),
+      ),
+      'Finance' => (
+        const Color(0xFFECE4EF),
+        const Color(0xFF66516E),
+      ),
+      _ => (
+        const Color(0xFFF1EBE1),
+        const Color(0xFF685E51),
+      ),
+    };
+    final tileTone = palette.$1;
+    final accent = palette.$2;
+
     return RcExpressiveSurface(
       shape: RcSurfaceShape.offset,
       tone: Color.alphaBlend(
-        color.withValues(alpha: .16),
+        tileTone.withValues(alpha: .86),
         theme.colorScheme.surface,
       ),
       onTap: onTap,
@@ -838,7 +873,7 @@ class _ModuleTile extends StatelessWidget {
         children: [
           RcIconWell(
             icon: state.uiIcon('module.${schema.eventType}', schema.icon),
-            color: color,
+            color: accent,
             size: 48,
             iconSize: RcIconSize.lg,
           ),
@@ -853,13 +888,20 @@ class _ModuleTile extends StatelessWidget {
                 Text(
                   '${schema.phase} • $count records',
                   style: theme.textTheme.bodySmall?.copyWith(
-                    color: theme.colorScheme.onSurfaceVariant,
+                    color: Color.alphaBlend(
+                      accent.withValues(alpha: .72),
+                      theme.colorScheme.onSurfaceVariant,
+                    ),
+                    fontWeight: FontWeight.w700,
                   ),
                 ),
               ],
             ),
           ),
-          const Icon(Icons.chevron_right_rounded),
+          Icon(
+            Icons.chevron_right_rounded,
+            color: accent.withValues(alpha: .78),
+          ),
         ],
       ),
     );
