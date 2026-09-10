@@ -1130,7 +1130,7 @@ class _ModuleTile extends StatelessWidget {
                 child: Icon(
                   state.uiIcon('module.${schema.eventType}', schema.icon),
                   color: _ControlWorksPalette.moduleBlue,
-                  size: 30,
+                  size: RcIconSize.lg,
                 ),
               ),
               const SizedBox(width: 16),
