@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_map/flutter_map.dart';
+import 'package:latlong2/latlong.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../core/design_tokens.dart';
 import '../../core/record_schemas.dart';
@@ -114,22 +117,10 @@ class _HousesScreenState extends State<HousesScreen> {
                       padding: const EdgeInsets.all(14),
                       child: Row(
                         children: [
-                          Container(
-                            width: 52,
-                            height: 52,
-                            decoration: BoxDecoration(
-                              color: theme.colorScheme.primaryContainer,
-                              borderRadius: const BorderRadius.only(
-                                topLeft: Radius.circular(19),
-                                topRight: Radius.circular(11),
-                                bottomLeft: Radius.circular(11),
-                                bottomRight: Radius.circular(19),
-                              ),
-                            ),
-                            child: Icon(
-                              Icons.home_work_outlined,
-                              color: theme.colorScheme.onPrimaryContainer,
-                            ),
+                          _HouseCoverPhoto(
+                            state: widget.state,
+                            path: h.displayPhotoPath,
+                            size: 52,
                           ),
                           const SizedBox(width: 12),
                           Expanded(
@@ -176,9 +167,12 @@ class _HousesScreenState extends State<HousesScreen> {
     );
   }
 
-  void _openHouse(BuildContext context, HouseRecord house) {
-    Navigator.of(context).push(
-      PageRouteBuilder<void>(
+  Future<void> _openHouse(
+    BuildContext context,
+    HouseRecord house,
+  ) async {
+    final deleted = await Navigator.of(context).push<bool>(
+      PageRouteBuilder<bool>(
         settings: RouteSettings(name: '/houses/${house.code}'),
         transitionDuration: widget.state.reduceMotion
             ? Duration.zero
@@ -196,6 +190,99 @@ class _HousesScreenState extends State<HousesScreen> {
           ),
         ),
       ),
+    );
+
+    if (deleted == true && mounted) {
+      await _refresh();
+    }
+  }
+}
+
+class _HouseCoverPhoto extends StatefulWidget {
+  const _HouseCoverPhoto({
+    required this.state,
+    required this.path,
+    required this.size,
+  });
+
+  final AppState state;
+  final String? path;
+  final double size;
+
+  @override
+  State<_HouseCoverPhoto> createState() => _HouseCoverPhotoState();
+}
+
+class _HouseCoverPhotoState extends State<_HouseCoverPhoto> {
+  late Future<String?> future;
+
+  @override
+  void initState() {
+    super.initState();
+    future = _load();
+  }
+
+  @override
+  void didUpdateWidget(covariant _HouseCoverPhoto oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.path != widget.path) future = _load();
+  }
+
+  Future<String?> _load() async {
+    final path = widget.path?.trim() ?? '';
+    if (path.isEmpty) return null;
+    try {
+      return await widget.state.repository.evidenceSignedUrl(path);
+    } catch (_) {
+      return null;
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    Widget fallback() => Container(
+      width: widget.size,
+      height: widget.size,
+      decoration: BoxDecoration(
+        color: theme.colorScheme.primaryContainer,
+        borderRadius: const BorderRadius.only(
+          topLeft: Radius.circular(19),
+          topRight: Radius.circular(11),
+          bottomLeft: Radius.circular(11),
+          bottomRight: Radius.circular(19),
+        ),
+      ),
+      child: Icon(
+        Icons.home_work_outlined,
+        color: theme.colorScheme.onPrimaryContainer,
+      ),
+    );
+
+    if (widget.path?.trim().isEmpty ?? true) return fallback();
+
+    return FutureBuilder<String?>(
+      future: future,
+      builder: (context, snapshot) {
+        final url = snapshot.data;
+        if (url == null || url.isEmpty) return fallback();
+        return ClipRRect(
+          borderRadius: const BorderRadius.only(
+            topLeft: Radius.circular(19),
+            topRight: Radius.circular(11),
+            bottomLeft: Radius.circular(11),
+            bottomRight: Radius.circular(19),
+          ),
+          child: Image.network(
+            url,
+            width: widget.size,
+            height: widget.size,
+            fit: BoxFit.cover,
+            errorBuilder: (_, _, _) => fallback(),
+          ),
+        );
+      },
     );
   }
 }
@@ -216,18 +303,151 @@ class HouseCommandScreen extends StatelessWidget {
         profile: state.profile!,
         houseCode: house.code,
       ),
+      state.repository.searchBeneficiaries(
+        state.profile!,
+        query: house.code,
+        limit: 50,
+      ),
     ]);
+
+    final beneficiaries = results[2] as List<BeneficiaryRecord>;
+    BeneficiaryRecord? beneficiaryLocation;
+    for (final candidate in beneficiaries) {
+      if (candidate.houseCode.trim().toUpperCase() ==
+          house.code.trim().toUpperCase()) {
+        beneficiaryLocation = candidate;
+        break;
+      }
+    }
+
     return _HouseCommandData(
       records: results[0] as List<ProductionRecord>,
       attendance: results[1] as List<Map<String, dynamic>>,
+      beneficiary: beneficiaryLocation,
     );
+  }
+
+  Future<void> _confirmDeleteHouse(
+    BuildContext context,
+  ) async {
+    if (!state.profile!.isAdmin) return;
+
+    final typedController = TextEditingController();
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        icon: const Icon(Icons.warning_amber_rounded),
+        title: Text('Delete ${house.code} from Active Houses?'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'This removes the activation/start record so the house no longer appears in Active Houses.',
+            ),
+            const SizedBox(height: 10),
+            const Text(
+              'Shelter beneficiary data, Scope, Control of Work, photos and other production history are preserved.',
+            ),
+            const SizedBox(height: 14),
+            Text(
+              'Type ${house.code} to confirm:',
+              style: const TextStyle(fontWeight: FontWeight.w800),
+            ),
+            const SizedBox(height: 7),
+            TextField(
+              controller: typedController,
+              autofocus: true,
+              textCapitalization: TextCapitalization.characters,
+              decoration: InputDecoration(
+                labelText: 'House code',
+                hintText: house.code,
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext, false),
+            child: const Text('Cancel'),
+          ),
+          FilledButton.icon(
+            onPressed: () {
+              final typed = typedController.text.trim().toUpperCase();
+              if (typed != house.code.trim().toUpperCase()) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('House code does not match.'),
+                  ),
+                );
+                return;
+              }
+              Navigator.pop(dialogContext, true);
+            },
+            icon: const Icon(Icons.delete_forever_outlined),
+            label: const Text('Delete Active House'),
+          ),
+        ],
+      ),
+    );
+    typedController.dispose();
+
+    if (confirmed != true || !context.mounted) return;
+
+    try {
+      await state.repository.deleteHouseStartRecord(
+        profile: state.profile!,
+        houseCode: house.code,
+      );
+      if (!context.mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            '${house.code} removed from Active Houses. Project records were preserved.',
+          ),
+        ),
+      );
+      Navigator.of(context).pop(true);
+    } catch (error) {
+      if (!context.mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('House could not be deleted: $error')),
+      );
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return Scaffold(
-      appBar: AppBar(title: Text(house.code)),
+      appBar: AppBar(
+        title: Text(house.code),
+        actions: [
+          if (state.profile!.isAdmin)
+            PopupMenuButton<String>(
+              tooltip: 'House administration',
+              icon: const Icon(Icons.more_vert_rounded),
+              onSelected: (action) async {
+                if (action == 'delete-house') {
+                  await _confirmDeleteHouse(context);
+                }
+              },
+              itemBuilder: (_) => const [
+                PopupMenuItem<String>(
+                  value: 'delete-house',
+                  child: Row(
+                    children: [
+                      Icon(Icons.delete_forever_outlined),
+                      SizedBox(width: 10),
+                      Text('Delete from Active Houses'),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+        ],
+      ),
       body: FutureBuilder<_HouseCommandData>(
         future: _load(),
         builder: (context, snap) {
@@ -261,82 +481,17 @@ class HouseCommandScreen extends StatelessWidget {
           final records = snap.data?.records ?? const <ProductionRecord>[];
           final attendance =
               snap.data?.attendance ?? const <Map<String, dynamic>>[];
+          final beneficiaryLocation = snap.data?.beneficiary;
           final open = records.where((r) => !r.isClosed).length;
           final attention = records.where((r) => r.needsAttention).length;
           return ListView(
             padding: const EdgeInsets.fromLTRB(16, 10, 16, 40),
             children: [
-              RcExpressiveSurface(
-                shape: RcSurfaceShape.hero,
-                tone: theme.colorScheme.primaryContainer.withValues(alpha: .42),
-                child: LayoutBuilder(
-                  builder: (context, constraints) {
-                    final info = Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          '${house.code} • ${house.beneficiary}',
-                          style: theme.textTheme.headlineSmall?.copyWith(
-                            fontWeight: FontWeight.w900,
-                          ),
-                        ),
-                        const SizedBox(height: 5),
-                        Text(
-                          '${house.parish}${house.cluster.isEmpty ? '' : ' • ${house.cluster}'}',
-                          style: theme.textTheme.bodyMedium,
-                        ),
-                        const SizedBox(height: 10),
-                        Wrap(
-                          spacing: 8,
-                          runSpacing: 8,
-                          children: [
-                            RcStatusPill(
-                              label: house.stage.toUpperCase(),
-                              icon: Icons.flag_outlined,
-                            ),
-                            RcStatusPill(
-                              label: '$open OPEN',
-                              color: RcColors.blue,
-                            ),
-                            RcStatusPill(
-                              label: '$attention ATTENTION',
-                              color: attention > 0
-                                  ? RcColors.warning
-                                  : RcColors.success,
-                            ),
-                          ],
-                        ),
-                      ],
-                    );
-                    if (constraints.maxWidth < 500) {
-                      return Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          info,
-                          const SizedBox(height: 16),
-                          Align(
-                            alignment: Alignment.center,
-                            child: RcProgressOrb(
-                              value: house.progress / 100,
-                              label: 'house',
-                              size: 112,
-                            ),
-                          ),
-                        ],
-                      );
-                    }
-                    return Row(
-                      children: [
-                        Expanded(child: info),
-                        RcProgressOrb(
-                          value: house.progress / 100,
-                          label: 'house',
-                          size: 116,
-                        ),
-                      ],
-                    );
-                  },
-                ),
+              _HouseLocationHero(
+                house: house,
+                beneficiary: beneficiaryLocation,
+                openRecords: open,
+                attentionRecords: attention,
               ),
               const SizedBox(height: 18),
               Text('Production chain', style: theme.textTheme.titleLarge),
@@ -498,6 +653,243 @@ class HouseCommandScreen extends StatelessWidget {
   }
 }
 
+class _HouseLocationHero extends StatelessWidget {
+  const _HouseLocationHero({
+    required this.house,
+    required this.beneficiary,
+    required this.openRecords,
+    required this.attentionRecords,
+  });
+
+  final HouseRecord house;
+  final BeneficiaryRecord? beneficiary;
+  final int openRecords;
+  final int attentionRecords;
+
+  Future<void> _openLocation() async {
+    final item = beneficiary;
+    if (item == null || !item.hasCoordinates) return;
+
+    final uri = Uri.parse(
+      item.mapsUrl ??
+          'https://www.google.com/maps/search/?api=1&query=${item.latitude},${item.longitude}',
+    );
+    await launchUrl(uri, mode: LaunchMode.externalApplication);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final item = beneficiary;
+    final hasLocation = item?.hasCoordinates == true;
+    final point = hasLocation
+        ? LatLng(item!.latitude!, item.longitude!)
+        : null;
+
+    final info = Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    '${house.code} • ${house.beneficiary}',
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: theme.textTheme.headlineSmall?.copyWith(
+                      fontWeight: FontWeight.w900,
+                      color: theme.colorScheme.onSurface,
+                    ),
+                  ),
+                  const SizedBox(height: 5),
+                  Text(
+                    '${house.parish}${house.cluster.isEmpty ? '' : ' • ${house.cluster}'}',
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      color: theme.colorScheme.onSurfaceVariant,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(width: 10),
+            RcProgressOrb(
+              value: house.progress / 100,
+              label: 'house',
+              size: 82,
+              color: house.progress >= 80
+                  ? RcColors.success
+                  : theme.colorScheme.primary,
+            ),
+          ],
+        ),
+        const SizedBox(height: 12),
+        Wrap(
+          spacing: 8,
+          runSpacing: 8,
+          children: [
+            RcStatusPill(
+              label: house.stage.toUpperCase(),
+              icon: Icons.flag_outlined,
+            ),
+            RcStatusPill(
+              label: '$openRecords OPEN',
+              color: RcColors.blue,
+            ),
+            RcStatusPill(
+              label: '$attentionRecords ATTENTION',
+              color: attentionRecords > 0
+                  ? RcColors.warning
+                  : RcColors.success,
+            ),
+            RcStatusPill(
+              label: hasLocation ? 'GPS CONNECTED' : 'NO GPS',
+              icon: hasLocation
+                  ? Icons.location_on_outlined
+                  : Icons.location_off_outlined,
+              color: hasLocation ? RcColors.success : RcColors.warning,
+            ),
+          ],
+        ),
+        if (hasLocation) ...[
+          const SizedBox(height: 10),
+          FilledButton.tonalIcon(
+            onPressed: _openLocation,
+            icon: const Icon(Icons.near_me_outlined),
+            label: const Text('Open beneficiary location'),
+          ),
+        ],
+      ],
+    );
+
+    return Semantics(
+      label: hasLocation
+          ? 'Active house ${house.code} with beneficiary map location'
+          : 'Active house ${house.code}; beneficiary GPS unavailable',
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(30),
+        child: Container(
+          constraints: const BoxConstraints(minHeight: 270),
+          decoration: BoxDecoration(
+            color: theme.colorScheme.surfaceContainer,
+            border: Border.all(color: theme.colorScheme.outlineVariant),
+          ),
+          child: Stack(
+            children: [
+              Positioned.fill(
+                child: hasLocation
+                    ? FlutterMap(
+                        options: MapOptions(
+                          initialCenter: point!,
+                          initialZoom: 17.0,
+                          interactionOptions: const InteractionOptions(
+                            flags: InteractiveFlag.none,
+                          ),
+                        ),
+                        children: [
+                          TileLayer(
+                            urlTemplate:
+                                'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                            userAgentPackageName: 'rc_sow_flutter',
+                          ),
+                          MarkerLayer(
+                            markers: [
+                              Marker(
+                                point: point,
+                                width: 74,
+                                height: 74,
+                                alignment: Alignment.center,
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    color: theme.colorScheme.primaryContainer,
+                                    shape: BoxShape.circle,
+                                    border: Border.all(
+                                      color: theme.colorScheme.primary,
+                                      width: 3,
+                                    ),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: theme.colorScheme.shadow
+                                            .withValues(alpha: .18),
+                                        blurRadius: 14,
+                                        offset: const Offset(0, 6),
+                                      ),
+                                    ],
+                                  ),
+                                  child: Icon(
+                                    Icons.home_work_rounded,
+                                    color: theme.colorScheme.primary,
+                                    size: 32,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          RichAttributionWidget(
+                            attributions: [
+                              TextSourceAttribution(
+                                'OpenStreetMap contributors',
+                                onTap: () => launchUrl(
+                                  Uri.parse(
+                                    'https://www.openstreetmap.org/copyright',
+                                  ),
+                                  mode: LaunchMode.externalApplication,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      )
+                    : Container(
+                        color: theme.colorScheme.primaryContainer.withValues(
+                          alpha: .48,
+                        ),
+                        alignment: Alignment.topRight,
+                        padding: const EdgeInsets.all(22),
+                        child: Icon(
+                          Icons.map_outlined,
+                          size: 76,
+                          color: theme.colorScheme.primary.withValues(
+                            alpha: .18,
+                          ),
+                        ),
+                      ),
+              ),
+              Positioned.fill(
+                child: IgnorePointer(
+                  child: DecoratedBox(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.bottomLeft,
+                        end: Alignment.topRight,
+                        colors: [
+                          theme.colorScheme.surface.withValues(alpha: .97),
+                          theme.colorScheme.surface.withValues(alpha: .82),
+                          theme.colorScheme.surface.withValues(alpha: .30),
+                        ],
+                        stops: const [0.0, .55, 1.0],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(18),
+                child: info,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 class _AttendanceSummary extends StatelessWidget {
   const _AttendanceSummary({required this.rows, required this.onOpen});
   final List<Map<String, dynamic>> rows;
@@ -574,9 +966,12 @@ class _HouseCommandData {
   const _HouseCommandData({
     this.records = const [],
     this.attendance = const [],
+    this.beneficiary,
   });
+
   final List<ProductionRecord> records;
   final List<Map<String, dynamic>> attendance;
+  final BeneficiaryRecord? beneficiary;
 }
 
 class _HousePipeline extends StatelessWidget {

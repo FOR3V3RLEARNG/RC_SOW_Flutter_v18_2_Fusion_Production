@@ -55,7 +55,7 @@ class RcSowRepository {
           final house = HouseRecord.fromEvent(Map<String, dynamic>.from(raw));
           byCode.putIfAbsent(house.code, () => house);
         }
-        return byCode.values.toList();
+        return _withScopeHouseCovers(byCode.values.toList(), profile);
       } catch (_) {
         // Backward-compatible fallback while the v20.3 workforce migration is being applied.
       }
@@ -73,7 +73,7 @@ class RcSowRepository {
     }
     final result = byCode.values.toList();
     if (profile.isCrew) {
-      return result.where((h) {
+      final visible = result.where((h) {
         if (h.assignedCrew.isEmpty) return false;
         return h.assignedCrew.any(
           (member) =>
@@ -81,8 +81,9 @@ class RcSowRepository {
               member.toLowerCase() == profile.displayName.toLowerCase(),
         );
       }).toList();
+      return _withScopeHouseCovers(visible, profile);
     }
-    return result;
+    return _withScopeHouseCovers(result, profile);
   }
 
   Future<List<MessageRecord>> messages(
@@ -1431,6 +1432,86 @@ class RcSowRepository {
     return (result as List? ?? const [])
         .map((e) => Map<String, dynamic>.from(e as Map))
         .toList();
+  }
+
+  Future<String> evidenceSignedUrl(
+    String path, {
+    int expiresIn = 3600,
+  }) =>
+      client.storage.from('evidence').createSignedUrl(path, expiresIn);
+
+  Future<bool> setHouseDisplayPhoto({
+    required UserProfile profile,
+    required String houseCode,
+    required String parish,
+    required String? displayPhotoPath,
+    required List<String> photoPaths,
+  }) async {
+    final code = houseCode.trim().toUpperCase();
+    final row = await houseEvent(code);
+    if (row == null) return false;
+
+    final item = Map<String, dynamic>.from(row['item'] as Map? ?? const {});
+    final id = '${row['item_id'] ?? item['id'] ?? 'house-${_safePath(code)}'}';
+    final effectiveParish =
+        '${row['parish'] ?? item['parish'] ?? parish}'.trim();
+
+    item['housePhotoPaths'] = photoPaths;
+    if (displayPhotoPath == null || displayPhotoPath.trim().isEmpty) {
+      item.remove('displayPhotoPath');
+    } else {
+      item['displayPhotoPath'] = displayPhotoPath.trim();
+    }
+    item['displayPhotoUpdatedAt'] = DateTime.now().toUtc().toIso8601String();
+
+    await _upsertEvent(
+      type: 'house',
+      id: id,
+      parish: effectiveParish.isEmpty ? profile.parish : effectiveParish,
+      houseCode: code,
+      item: item,
+    );
+    return true;
+  }
+
+  Future<List<HouseRecord>> _withScopeHouseCovers(
+    List<HouseRecord> houses,
+    UserProfile profile,
+  ) async {
+    if (houses.isEmpty ||
+        houses.every((house) => house.displayPhotoPath != null)) {
+      return houses;
+    }
+
+    try {
+      var query = client
+          .from('app_events')
+          .select('house_code,item,updated_at')
+          .eq('event_type', 'scope');
+      if (!profile.canViewAllParishes && profile.parish.isNotEmpty) {
+        query = query.eq('parish', profile.parish);
+      }
+
+      final rows = await query.order('updated_at', ascending: false).limit(1000);
+      final coverByCode = <String, String>{};
+
+      for (final raw in rows) {
+        final row = Map<String, dynamic>.from(raw);
+        final code = '${row['house_code'] ?? ''}'.trim().toUpperCase();
+        if (code.isEmpty || coverByCode.containsKey(code)) continue;
+        final item = Map<String, dynamic>.from(row['item'] as Map? ?? const {});
+        final path = '${item['displayPhotoPath'] ?? ''}'.trim();
+        if (path.isNotEmpty) coverByCode[code] = path;
+      }
+
+      return houses.map((house) {
+        if (house.displayPhotoPath != null) return house;
+        final path = coverByCode[house.code.trim().toUpperCase()];
+        return path == null ? house : house.copyWith(displayPhotoPath: path);
+      }).toList();
+    } catch (_) {
+      return houses;
+    }
   }
 
   Future<Map<String, dynamic>?> houseEvent(String houseCode) async {

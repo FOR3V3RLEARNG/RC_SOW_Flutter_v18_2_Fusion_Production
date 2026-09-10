@@ -146,6 +146,8 @@ class HouseRecord {
     required this.stage,
     required this.progress,
     this.assignedCrew = const [],
+    this.displayPhotoPath,
+    this.housePhotoPaths = const [],
     this.updatedAt,
   });
 
@@ -156,10 +158,29 @@ class HouseRecord {
   final String stage;
   final int progress;
   final List<String> assignedCrew;
+  final String? displayPhotoPath;
+  final List<String> housePhotoPaths;
   final DateTime? updatedAt;
+
+  HouseRecord copyWith({
+    String? displayPhotoPath,
+    List<String>? housePhotoPaths,
+  }) => HouseRecord(
+    code: code,
+    beneficiary: beneficiary,
+    parish: parish,
+    cluster: cluster,
+    stage: stage,
+    progress: progress,
+    assignedCrew: assignedCrew,
+    displayPhotoPath: displayPhotoPath ?? this.displayPhotoPath,
+    housePhotoPaths: housePhotoPaths ?? this.housePhotoPaths,
+    updatedAt: updatedAt,
+  );
 
   factory HouseRecord.fromEvent(Map<String, dynamic> row) {
     final item = Map<String, dynamic>.from(row['item'] as Map? ?? const {});
+    final cover = '${item['displayPhotoPath'] ?? ''}'.trim();
     return HouseRecord(
       code: '${row['house_code'] ?? item['houseCode'] ?? item['code'] ?? '—'}',
       beneficiary: '${item['beneficiary'] ?? item['beneficiaryName'] ?? '—'}',
@@ -171,6 +192,11 @@ class HouseRecord {
           .toInt(),
       assignedCrew: (item['assignedCrew'] as List? ?? const [])
           .map((e) => '$e')
+          .toList(),
+      displayPhotoPath: cover.isEmpty ? null : cover,
+      housePhotoPaths: (item['housePhotoPaths'] as List? ?? const [])
+          .map((e) => '$e')
+          .where((path) => path.trim().isNotEmpty)
           .toList(),
       updatedAt: DateTime.tryParse(
         '${row['updated_at'] ?? row['created_at'] ?? ''}',
