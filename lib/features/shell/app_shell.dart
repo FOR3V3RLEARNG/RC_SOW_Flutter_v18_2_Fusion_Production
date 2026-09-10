@@ -714,7 +714,7 @@ Future<void> showRcMoreMenu(BuildContext context, AppState state) async {
         ),
       );
     },
-    transitionBuilder: (_, animation, __, child) {
+    transitionBuilder: (_, animation, _, child) {
       final curved = CurvedAnimation(
         parent: animation,
         curve: Curves.easeOutCubic,
