@@ -7,6 +7,7 @@ import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
 
 import '../../core/app_constants.dart';
+import '../../core/beneficiary_agreement.dart';
 import '../../core/design_tokens.dart';
 import '../../core/rc_components.dart';
 import '../../models/app_models.dart';
@@ -143,6 +144,10 @@ class _ScopeScreenState extends State<ScopeScreen>
   static const double _canvasMinSegment = 8;
   static const double _canvasGrid = 20;
   BeneficiaryRecord? selectedBeneficiary;
+  String agreementTitle = kDefaultBeneficiaryAgreementTitle;
+  String agreementTemplate = kDefaultBeneficiaryAgreementText;
+  String agreementVersion = 'Default';
+  String agreementSourceFile = 'Built-in default';
 
   UserProfile get profile => widget.state.profile!;
 
@@ -154,6 +159,7 @@ class _ScopeScreenState extends State<ScopeScreen>
     tabs.addListener(() {
       if (mounted && !tabs.indexIsChanging) setState(() {});
     });
+    _loadBeneficiaryAgreement();
   }
 
   @override
@@ -655,14 +661,32 @@ class _ScopeScreenState extends State<ScopeScreen>
     return 'Gable';
   }
 
-  static const String _beneficiaryAgreementText =
-      'I acknowledge the repair work described in this agreement and permit '
-      'the Jamaica Red Cross and its authorized construction team to carry '
-      'out the stated roof repairs. I understand that the roof illustration '
-      'is a representative Red Cross construction concept for the selected '
-      'roof style. It is not the editable field Scope drawing, a measurement '
-      'record, or a substitute for final site decisions made by the '
-      'authorized technical team.';
+  Future<void> _loadBeneficiaryAgreement() async {
+    final config = await widget.state.repository.beneficiaryAgreementConfig();
+    if (!mounted || config.isEmpty) return;
+
+    setState(() {
+      agreementTitle =
+          '${config['title'] ?? kDefaultBeneficiaryAgreementTitle}'.trim();
+      agreementTemplate =
+          '${config['body'] ?? kDefaultBeneficiaryAgreementText}'.trim();
+      agreementVersion = '${config['version'] ?? 'Default'}'.trim();
+      agreementSourceFile =
+          '${config['sourceFileName'] ?? 'Admin managed'}'.trim();
+    });
+  }
+
+  String get _beneficiaryAgreementText => renderBeneficiaryAgreementTemplate(
+    agreementTemplate.isEmpty
+        ? kDefaultBeneficiaryAgreementText
+        : agreementTemplate,
+    houseCode: house.text.trim().toUpperCase(),
+    beneficiary: beneficiary.text.trim(),
+    parish: parish,
+    community: cluster.text.trim(),
+    roofType: _agreementRoofStyle,
+    repairs: repairNotes.text.trim(),
+  );
 
   Widget _printout() {
     final theme = Theme.of(context);
@@ -692,7 +716,7 @@ class _ScopeScreenState extends State<ScopeScreen>
                     ),
                     const SizedBox(height: 7),
                     Text(
-                      'BENEFICIARY REPAIR AGREEMENT',
+                      agreementTitle,
                       textAlign: TextAlign.center,
                       style: theme.textTheme.titleLarge?.copyWith(
                         color: theme.colorScheme.primary,
@@ -703,6 +727,24 @@ class _ScopeScreenState extends State<ScopeScreen>
                       'A beneficiary-facing agreement. This document is separate from the editable Scope drawing and internal measurement canvas.',
                       textAlign: TextAlign.center,
                       style: theme.textTheme.bodyMedium,
+                    ),
+                    const SizedBox(height: 8),
+                    Wrap(
+                      alignment: WrapAlignment.center,
+                      spacing: 7,
+                      runSpacing: 7,
+                      children: [
+                        RcStatusPill(
+                          label: 'AGREEMENT ${agreementVersion.toUpperCase()}',
+                          color: RcColors.blue,
+                        ),
+                        RcStatusPill(
+                          label: agreementSourceFile == 'Built-in default'
+                              ? 'DEFAULT'
+                              : 'ADMIN MANAGED',
+                          color: RcColors.success,
+                        ),
+                      ],
                     ),
                   ],
                 ),
@@ -1475,7 +1517,7 @@ class _ScopeScreenState extends State<ScopeScreen>
           pw.SizedBox(height: 4),
           pw.Center(
             child: pw.Text(
-              'BENEFICIARY REPAIR AGREEMENT',
+              agreementTitle,
               style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 19),
             ),
           ),
@@ -1484,6 +1526,13 @@ class _ScopeScreenState extends State<ScopeScreen>
             child: pw.Text(
               'Roof repair acknowledgement and representative construction concept',
               style: const pw.TextStyle(fontSize: 9.5),
+            ),
+          ),
+          pw.SizedBox(height: 5),
+          pw.Center(
+            child: pw.Text(
+              'Agreement version: $agreementVersion • Source: $agreementSourceFile',
+              style: const pw.TextStyle(fontSize: 8, color: PdfColors.grey700),
             ),
           ),
           pw.SizedBox(height: 16),

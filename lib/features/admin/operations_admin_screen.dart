@@ -3,12 +3,14 @@ import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../core/app_constants.dart';
+import '../../core/beneficiary_agreement.dart';
 import '../../core/design_tokens.dart';
 import '../../core/record_schemas.dart';
 import '../../core/ui_studio.dart';
 import '../../models/app_models.dart';
 import '../community/community_screen.dart';
 import '../../core/rc_components.dart';
+import '../../services/agreement_import_service.dart';
 import '../../services/boq_import_service.dart';
 import '../../state/app_state.dart';
 
@@ -27,7 +29,7 @@ class _OperationsAdminScreenState extends State<OperationsAdminScreen>
   @override
   void initState() {
     super.initState();
-    tabs = TabController(length: 8, vsync: this);
+    tabs = TabController(length: 9, vsync: this);
   }
 
   @override
@@ -51,6 +53,7 @@ class _OperationsAdminScreenState extends State<OperationsAdminScreen>
           isScrollable: true,
           tabs: const [
             Tab(text: 'BOQ', icon: Icon(Icons.receipt_long_outlined)),
+            Tab(text: 'Agreement', icon: Icon(Icons.handshake_outlined)),
             Tab(text: 'Authorized', icon: Icon(Icons.mark_email_read_outlined)),
             Tab(
               text: 'Interface',
@@ -71,6 +74,7 @@ class _OperationsAdminScreenState extends State<OperationsAdminScreen>
         controller: tabs,
         children: [
           _BoqTemplates(state: widget.state),
+          _BeneficiaryAgreementAdmin(state: widget.state),
           _AuthorizedAccounts(state: widget.state),
           _InterfaceConfig(state: widget.state),
           _CommunityStudio(state: widget.state),
@@ -370,6 +374,287 @@ class _BoqTemplatesState extends State<_BoqTemplates> {
           ),
         );
       },
+    );
+  }
+}
+
+class _BeneficiaryAgreementAdmin extends StatefulWidget {
+  const _BeneficiaryAgreementAdmin({required this.state});
+
+  final AppState state;
+
+  @override
+  State<_BeneficiaryAgreementAdmin> createState() =>
+      _BeneficiaryAgreementAdminState();
+}
+
+class _BeneficiaryAgreementAdminState
+    extends State<_BeneficiaryAgreementAdmin> {
+  final title = TextEditingController();
+  final version = TextEditingController();
+  final body = TextEditingController();
+
+  bool loading = true;
+  bool saving = false;
+  String sourceFileName = 'Built-in default';
+  String sourceType = 'Default';
+
+  @override
+  void initState() {
+    super.initState();
+    _load();
+  }
+
+  @override
+  void dispose() {
+    title.dispose();
+    version.dispose();
+    body.dispose();
+    super.dispose();
+  }
+
+  Future<void> _load() async {
+    setState(() => loading = true);
+    final config = await widget.state.repository.beneficiaryAgreementConfig();
+    if (!mounted) return;
+
+    title.text =
+        '${config['title'] ?? kDefaultBeneficiaryAgreementTitle}'.trim();
+    body.text = '${config['body'] ?? kDefaultBeneficiaryAgreementText}'.trim();
+    version.text = '${config['version'] ?? 'Default'}'.trim();
+    sourceFileName =
+        '${config['sourceFileName'] ?? 'Built-in default'}'.trim();
+    sourceType = '${config['sourceType'] ?? 'Default'}'.trim();
+
+    setState(() => loading = false);
+  }
+
+  Future<void> _importDocument() async {
+    final file = await FilePicker.pickFile(type: FileType.any);
+    if (file == null) return;
+
+    try {
+      final bytes = await file.readAsBytes();
+      final result = AgreementImportService.parse(bytes, file.name);
+      if (!mounted) return;
+
+      setState(() {
+        sourceFileName = file.name;
+        sourceType = result.sourceType;
+        if (result.automaticExtraction && result.text.trim().isNotEmpty) {
+          body.text = result.text.trim();
+        }
+        if (version.text.trim().isEmpty || version.text.trim() == 'Default') {
+          version.text = '1.0';
+        }
+      });
+
+      _snack(
+        result.automaticExtraction
+            ? 'Agreement text imported from ${file.name}. Review it before saving.'
+            : '${file.name} selected as the source document. Automatic text extraction is not available for this file type; paste or edit the agreement wording below.',
+      );
+    } catch (error) {
+      _snack('Agreement import failed: $error');
+    }
+  }
+
+  void _resetDefault() {
+    setState(() {
+      title.text = kDefaultBeneficiaryAgreementTitle;
+      body.text = kDefaultBeneficiaryAgreementText;
+      version.text = 'Default';
+      sourceFileName = 'Built-in default';
+      sourceType = 'Default';
+    });
+  }
+
+  Future<void> _save() async {
+    if (body.text.trim().isEmpty) {
+      _snack('Agreement wording cannot be empty.');
+      return;
+    }
+
+    setState(() => saving = true);
+    try {
+      await widget.state.repository.saveBeneficiaryAgreementConfig(
+        title: title.text.trim().isEmpty
+            ? kDefaultBeneficiaryAgreementTitle
+            : title.text.trim(),
+        body: body.text.trim(),
+        version: version.text.trim(),
+        sourceFileName: sourceFileName,
+        sourceType: sourceType,
+      );
+      if (!mounted) return;
+      _snack('Beneficiary Agreement published for all new printouts.');
+    } catch (error) {
+      if (!mounted) return;
+      _snack('Agreement could not be saved: $error');
+    } finally {
+      if (mounted) setState(() => saving = false);
+    }
+  }
+
+  void _snack(String message) {
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message)),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    if (loading) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
+    return ListView(
+      padding: const EdgeInsets.fromLTRB(16, 14, 16, 90),
+      children: [
+        RcPageHeading(
+          eyebrow: 'Beneficiary documents',
+          title: 'Agreement Template Studio',
+          subtitle:
+              'Import agreement wording from a document, edit it, version it, and publish one controlled agreement used by the Beneficiary Agreement screen and PDF.',
+          trailing: IconButton.filled(
+            tooltip: 'Import agreement document',
+            onPressed: _importDocument,
+            icon: const Icon(Icons.upload_file_rounded),
+          ),
+        ),
+        const SizedBox(height: 14),
+        RcExpressiveSurface(
+          shape: RcSurfaceShape.hero,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: [
+                  RcStatusPill(
+                    label:
+                        'VERSION ${version.text.trim().isEmpty ? '1.0' : version.text.trim()}',
+                    color: RcColors.blue,
+                  ),
+                  RcStatusPill(
+                    label: sourceType.toUpperCase(),
+                    color: RcColors.success,
+                  ),
+                ],
+              ),
+              const SizedBox(height: 12),
+              Text('Source document', style: theme.textTheme.labelLarge),
+              const SizedBox(height: 4),
+              SelectableText(
+                sourceFileName,
+                style: theme.textTheme.bodyLarge?.copyWith(
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+              const SizedBox(height: 14),
+              OutlinedButton.icon(
+                onPressed: _importDocument,
+                icon: const Icon(Icons.file_open_outlined),
+                label: const Text('Choose Excel / Word / Document'),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'Automatic extraction: XLSX, DOCX, TXT, CSV, Markdown and RTF. '
+                'For PDF or legacy document formats, select the source file then paste/edit the wording in the agreement editor.',
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: theme.colorScheme.onSurfaceVariant,
+                ),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 14),
+        RcExpressiveSurface(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              TextField(
+                controller: title,
+                decoration: const InputDecoration(labelText: 'Agreement title'),
+              ),
+              const SizedBox(height: 10),
+              TextField(
+                controller: version,
+                decoration: const InputDecoration(
+                  labelText: 'Agreement version',
+                  hintText: 'e.g. 1.0, Sept 2026, Melissa Roofing v2',
+                ),
+                onChanged: (_) => setState(() {}),
+              ),
+              const SizedBox(height: 12),
+              Text('Available smart fields', style: theme.textTheme.labelLarge),
+              const SizedBox(height: 6),
+              Wrap(
+                spacing: 6,
+                runSpacing: 6,
+                children: kBeneficiaryAgreementPlaceholders
+                    .map(
+                      (value) => ActionChip(
+                        label: Text(value),
+                        onPressed: () {
+                          final selection = body.selection;
+                          final start = selection.isValid
+                              ? selection.start
+                              : body.text.length;
+                          final end = selection.isValid
+                              ? selection.end
+                              : body.text.length;
+                          body.text = body.text.replaceRange(start, end, value);
+                          body.selection = TextSelection.collapsed(
+                            offset: start + value.length,
+                          );
+                        },
+                      ),
+                    )
+                    .toList(),
+              ),
+              const SizedBox(height: 12),
+              TextField(
+                controller: body,
+                minLines: 12,
+                maxLines: 30,
+                decoration: const InputDecoration(
+                  labelText: 'Agreement wording',
+                  alignLabelWithHint: true,
+                  helperText:
+                      'This controlled wording is shown to the beneficiary and printed in the PDF.',
+                ),
+              ),
+              const SizedBox(height: 14),
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: [
+                  OutlinedButton.icon(
+                    onPressed: _resetDefault,
+                    icon: const Icon(Icons.restart_alt_rounded),
+                    label: const Text('Restore Default'),
+                  ),
+                  FilledButton.icon(
+                    onPressed: saving ? null : _save,
+                    icon: saving
+                        ? const SizedBox.square(
+                            dimension: 18,
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          )
+                        : const Icon(Icons.publish_rounded),
+                    label: Text(saving ? 'Publishing...' : 'Publish Agreement'),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ],
     );
   }
 }

@@ -1,5 +1,5 @@
 name: rc_sow_flutter
-version: 20.5.16+223
+version: 20.5.17+224
 description: RC SOW production management system — expressive Material 3, field operations, beneficiary agreements and categorized notifications.
 publish_to: none
 
@@ -18,6 +18,7 @@ dependencies:
   printing: 5.14.3
   flame: 1.38.2
   excel: 4.0.6
+  archive: 3.6.1
   file_picker: 12.2.0
   image_picker: 1.2.3
   path_provider: 2.1.6

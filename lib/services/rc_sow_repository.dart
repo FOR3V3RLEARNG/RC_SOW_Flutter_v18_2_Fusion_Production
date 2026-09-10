@@ -1258,6 +1258,45 @@ class RcSowRepository {
     }, onConflict: 'config_key');
   }
 
+  Future<Map<String, dynamic>> beneficiaryAgreementConfig() async {
+    try {
+      final row = await client
+          .from('app_ui_config')
+          .select('config')
+          .eq('config_key', 'beneficiary-agreement-global')
+          .maybeSingle();
+      if (row == null) return const {};
+      return Map<String, dynamic>.from(row['config'] as Map? ?? const {});
+    } catch (_) {
+      return const {};
+    }
+  }
+
+  Future<void> saveBeneficiaryAgreementConfig({
+    required String title,
+    required String body,
+    required String version,
+    required String sourceFileName,
+    required String sourceType,
+  }) async {
+    if (body.trim().isEmpty) {
+      throw ArgumentError('Agreement body cannot be empty.');
+    }
+
+    await saveUiConfig(
+      configKey: 'beneficiary-agreement-global',
+      config: {
+        'title': title.trim(),
+        'body': body.trim(),
+        'version': version.trim().isEmpty ? '1.0' : version.trim(),
+        'sourceFileName': sourceFileName.trim(),
+        'sourceType': sourceType.trim(),
+        'updatedAt': DateTime.now().toUtc().toIso8601String(),
+        'updatedBy': user?.email ?? '',
+      },
+    );
+  }
+
   Future<List<Map<String, dynamic>>> boqTemplates(UserProfile profile) async {
     var query = client.from('boq_templates').select().eq('active', true);
     if (!profile.canViewAllParishes && profile.parish.isNotEmpty) {
