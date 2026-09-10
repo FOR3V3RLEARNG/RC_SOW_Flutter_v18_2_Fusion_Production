@@ -80,212 +80,239 @@ class _ControlScreenState extends State<ControlScreen> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    return RefreshIndicator(
-      onRefresh: _refresh,
-      child: FutureBuilder<List<ProductionRecord>>(
-        future: future,
-        builder: (context, snap) {
-          final records = snap.data ?? const <ProductionRecord>[];
-          final open = records.where((r) => !r.isClosed).length;
-          final attention = records.where((r) => r.needsAttention).length;
-          final completed = records.where((r) => r.isClosed).length;
-          final modules = phase == 'All'
-              ? visibleSchemas
-              : visibleSchemas.where((s) => s.phase == phase).toList();
-          return ListView(
-            padding: const EdgeInsets.fromLTRB(16, 18, 16, 124),
-            children: [
-              RcPageHeading(
-                eyebrow: 'Production management',
-                title: 'Control of Works',
-                subtitle:
-                    'Every operational record is connected to a parish, house, owner, status and evidence chain.',
-                trailing: widget.state.profile!.canExportData
-                    ? IconButton.filledTonal(
-                        tooltip: 'Export visible production table',
-                        onPressed: () => RcExportService.shareProductionTable(
-                          title: 'RC_SOW_Production',
-                          records: records,
-                        ),
-                        icon: const Icon(Icons.file_download_outlined),
-                      )
-                    : null,
-              ),
-              const SizedBox(height: 18),
-              _ProductionChain(
-                records: records,
-                onPhase: (value) => setState(() => phase = value),
-              ),
-              const SizedBox(height: 16),
-              RcResponsiveGrid(
-                minTileWidth: 170,
-                children: [
-                  _Pulse(
-                    'Open',
-                    '$open',
-                    Icons.pending_actions_outlined,
-                    theme.colorScheme.primary,
-                  ),
-                  _Pulse(
-                    'Need action',
-                    '$attention',
-                    Icons.warning_amber_rounded,
-                    attention == 0 ? RcColors.success : RcColors.warning,
-                  ),
-                  _Pulse(
-                    'Closed',
-                    '$completed',
-                    Icons.verified_outlined,
-                    RcColors.success,
-                  ),
-                  _Pulse(
-                    'Records',
-                    '${records.length}',
-                    Icons.account_tree_outlined,
-                    RcColors.purple,
-                  ),
-                ],
-              ),
-              const SizedBox(height: 16),
-              _PhaseRail(
-                selected: phase,
-                onSelected: (value) => setState(() => phase = value),
-              ),
-              const SizedBox(height: 18),
-              Row(
-                children: [
-                  Expanded(
-                    child: Text(
-                      'Production modules',
-                      style: theme.textTheme.titleLarge,
-                    ),
-                  ),
-                  if (snap.connectionState == ConnectionState.waiting)
-                    const SizedBox(
-                      width: 22,
-                      height: 22,
-                      child: CircularProgressIndicator(strokeWidth: 2.3),
-                    ),
-                ],
-              ),
-              const SizedBox(height: 10),
-              LayoutBuilder(
-                builder: (context, constraints) {
-                  final columns = constraints.maxWidth >= 1000
-                      ? 3
-                      : constraints.maxWidth >= 600
-                      ? 2
-                      : 1;
-                  return GridView.builder(
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    itemCount: modules.length,
-                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: columns,
-                      mainAxisSpacing: 11,
-                      crossAxisSpacing: 11,
-                      childAspectRatio: columns == 1 ? 3.25 : 2.25,
-                    ),
-                    itemBuilder: (_, index) {
-                      final schema = modules[index];
-                      final count = records
-                          .where((r) => r.eventType == schema.eventType)
-                          .length;
-                      return _ModuleTile(
-                        state: widget.state,
-                        schema: schema,
-                        count: count,
-                        onTap: () => _openModule(schema),
-                      );
-                    },
-                  );
-                },
-              ),
-              const SizedBox(height: 22),
-              Row(
-                children: [
-                  Expanded(
-                    child: Text(
-                      'Recent operational records',
-                      style: theme.textTheme.titleLarge,
-                    ),
-                  ),
-                  if (widget.state.profile!.isManagement)
-                    TextButton.icon(
-                      onPressed: () => Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (_) =>
-                              ProductionDatabaseScreen(state: widget.state),
+    return ColoredBox(
+      color: _ControlWorksPalette.pageBackground,
+      child: RefreshIndicator(
+        onRefresh: _refresh,
+        child: FutureBuilder<List<ProductionRecord>>(
+          future: future,
+          builder: (context, snap) {
+            final records = snap.data ?? const <ProductionRecord>[];
+            final modules = phase == 'All'
+                ? visibleSchemas
+                : visibleSchemas.where((s) => s.phase == phase).toList();
+
+            return ListView(
+              padding: const EdgeInsets.fromLTRB(24, 22, 24, 124),
+              children: [
+                _ControlWorksHeader(
+                  onNew: () => _showNewMenu(records),
+                ),
+                const SizedBox(height: 24),
+                _ProductionChain(
+                  records: records,
+                  onPhase: (value) => setState(() => phase = value),
+                ),
+                const SizedBox(height: 28),
+                _PhaseRail(
+                  selected: phase,
+                  onSelected: (value) => setState(() => phase = value),
+                ),
+                const SizedBox(height: 28),
+                Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        'Workflow modules',
+                        style: theme.textTheme.headlineSmall?.copyWith(
+                          color: _ControlWorksPalette.textPrimary,
+                          fontWeight: FontWeight.w900,
+                          letterSpacing: -.35,
                         ),
                       ),
-                      icon: const Icon(Icons.storage_outlined),
-                      label: const Text('Database view'),
                     ),
-                ],
-              ),
-              const SizedBox(height: 8),
-              if (records.isEmpty &&
-                  snap.connectionState != ConnectionState.waiting)
-                const RcExpressiveSurface(
-                  child: Text(
-                    'No production records are visible for this account yet.',
-                  ),
-                )
-              else
-                ...records
-                    .take(10)
-                    .map(
-                      (record) => Padding(
-                        padding: const EdgeInsets.only(bottom: 8),
-                        child: RcExpressiveSurface(
-                          shape: RcSurfaceShape.offset,
-                          onTap: () => _openRecord(record),
-                          child: Row(
-                            children: [
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      '${record.houseCode} • ${record.title}',
-                                      style: theme.textTheme.titleMedium,
-                                    ),
-                                    const SizedBox(height: 4),
-                                    Text(
-                                      '${record.parish} • ${record.summary.isEmpty ? 'Updated production record' : record.summary}',
-                                      maxLines: 2,
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              const SizedBox(width: 10),
-                              RcStatusPill(
-                                label: record.status.toUpperCase(),
-                                color: record.needsAttention
-                                    ? RcColors.warning
-                                    : record.isClosed
-                                    ? RcColors.success
-                                    : theme.colorScheme.primary,
-                              ),
-                            ],
+                    if (snap.connectionState == ConnectionState.waiting)
+                      const SizedBox(
+                        width: 22,
+                        height: 22,
+                        child: CircularProgressIndicator(strokeWidth: 2.3),
+                      ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+                LayoutBuilder(
+                  builder: (context, constraints) {
+                    final columns = constraints.maxWidth >= 980
+                        ? 3
+                        : constraints.maxWidth >= 540
+                        ? 2
+                        : 1;
+                    return GridView.builder(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      itemCount: modules.length,
+                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: columns,
+                        mainAxisSpacing: 16,
+                        crossAxisSpacing: 16,
+                        childAspectRatio: columns == 1 ? 3.15 : 2.03,
+                      ),
+                      itemBuilder: (_, index) {
+                        final schema = modules[index];
+                        final count = records
+                            .where((r) => r.eventType == schema.eventType)
+                            .length;
+                        return _ModuleTile(
+                          state: widget.state,
+                          schema: schema,
+                          count: count,
+                          onTap: () => _openModule(schema),
+                        );
+                      },
+                    );
+                  },
+                ),
+                const SizedBox(height: 30),
+                Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        'Recent operational records',
+                        style: theme.textTheme.titleLarge?.copyWith(
+                          color: _ControlWorksPalette.textPrimary,
+                          fontWeight: FontWeight.w900,
+                        ),
+                      ),
+                    ),
+                    if (widget.state.profile!.isManagement)
+                      TextButton.icon(
+                        onPressed: () => Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (_) =>
+                                ProductionDatabaseScreen(state: widget.state),
+                          ),
+                        ),
+                        icon: const Icon(Icons.storage_outlined),
+                        label: const Text('Database view'),
+                      ),
+                  ],
+                ),
+                const SizedBox(height: 10),
+                if (records.isEmpty &&
+                    snap.connectionState != ConnectionState.waiting)
+                  const _ReferenceEmptyState()
+                else
+                  ...records
+                      .take(10)
+                      .map(
+                        (record) => Padding(
+                          padding: const EdgeInsets.only(bottom: 10),
+                          child: _ReferenceRecordTile(
+                            record: record,
+                            onTap: () => _openRecord(record),
                           ),
                         ),
                       ),
+                if (snap.hasError) ...[
+                  const SizedBox(height: 12),
+                  RcExpressiveSurface(
+                    tone: theme.colorScheme.errorContainer,
+                    child: const Text(
+                      'Could not load production records. Pull to retry.',
                     ),
-              if (snap.hasError) ...[
-                const SizedBox(height: 12),
-                RcExpressiveSurface(
-                  tone: theme.colorScheme.errorContainer,
-                  child: const Text(
-                    'Could not load production records. Pull to retry.',
+                  ),
+                ],
+              ],
+            );
+          },
+        ),
+      ),
+    );
+  }
+
+  Future<void> _showNewMenu(List<ProductionRecord> records) async {
+    final schemas = visibleSchemas;
+    await showModalBottomSheet<void>(
+      context: context,
+      showDragHandle: true,
+      isScrollControlled: true,
+      backgroundColor: _ControlWorksPalette.surface,
+      builder: (sheetContext) {
+        return SafeArea(
+          child: ConstrainedBox(
+            constraints: BoxConstraints(
+              maxHeight: MediaQuery.sizeOf(sheetContext).height * .78,
+            ),
+            child: ListView(
+              padding: const EdgeInsets.fromLTRB(18, 4, 18, 24),
+              children: [
+                Text(
+                  'Create production record',
+                  style: Theme.of(sheetContext).textTheme.headlineSmall?.copyWith(
+                        fontWeight: FontWeight.w900,
+                        color: _ControlWorksPalette.textPrimary,
+                      ),
+                ),
+                const SizedBox(height: 6),
+                Text(
+                  'Choose the Control of Works module for the new record.',
+                  style: Theme.of(sheetContext).textTheme.bodyMedium?.copyWith(
+                        color: _ControlWorksPalette.textSecondary,
+                      ),
+                ),
+                const SizedBox(height: 14),
+                ...schemas.map(
+                  (schema) => Padding(
+                    padding: const EdgeInsets.only(bottom: 8),
+                    child: ListTile(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(18),
+                        side: const BorderSide(
+                          color: _ControlWorksPalette.border,
+                        ),
+                      ),
+                      tileColor: _ControlWorksPalette.surface,
+                      leading: Container(
+                        width: 44,
+                        height: 44,
+                        decoration: BoxDecoration(
+                          color: _ControlWorksPalette.iconWell,
+                          borderRadius: BorderRadius.circular(14),
+                        ),
+                        alignment: Alignment.center,
+                        child: Icon(
+                          widget.state.uiIcon(
+                            'module.${schema.eventType}',
+                            schema.icon,
+                          ),
+                          color: _ControlWorksPalette.moduleBlue,
+                        ),
+                      ),
+                      title: Text(
+                        schema.title,
+                        style: const TextStyle(fontWeight: FontWeight.w800),
+                      ),
+                      subtitle: Text(schema.phase),
+                      trailing: const Icon(Icons.chevron_right_rounded),
+                      onTap: () {
+                        Navigator.of(sheetContext).pop();
+                        WidgetsBinding.instance.addPostFrameCallback(
+                          (_) => _openModule(schema),
+                        );
+                      },
+                    ),
                   ),
                 ),
+                if (widget.state.profile!.canExportData) ...[
+                  const SizedBox(height: 8),
+                  const Divider(),
+                  ListTile(
+                    leading: const Icon(Icons.file_download_outlined),
+                    title: const Text('Export visible production table'),
+                    onTap: () {
+                      Navigator.of(sheetContext).pop();
+                      RcExportService.shareProductionTable(
+                        title: 'RC_SOW_Production',
+                        records: records,
+                      );
+                    },
+                  ),
+                ],
               ],
-            ],
-          );
-        },
-      ),
+            ),
+          ),
+        );
+      },
     );
   }
 
@@ -722,77 +749,250 @@ class _ProductionDatabaseScreenState extends State<ProductionDatabaseScreen> {
 
 class _ProductionChain extends StatelessWidget {
   const _ProductionChain({required this.records, required this.onPhase});
+
   final List<ProductionRecord> records;
   final ValueChanged<String> onPhase;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final phases = <(String, IconData)>[
-      ('Plan', Icons.assignment_turned_in_outlined),
-      ('Delivery', Icons.construction_outlined),
-      ('Quality', Icons.fact_check_outlined),
-      ('Close-out', Icons.verified_outlined),
-      ('Finance', Icons.payments_outlined),
-    ];
+    final open = records.where((r) => !r.isClosed).length;
+    final attention = records.where((r) => r.needsAttention).length;
+    final closed = records.where((r) => r.isClosed).length;
 
-    return RcExpressiveSurface(
-      shape: RcSurfaceShape.hero,
-      tone: theme.colorScheme.surfaceContainerLow,
-      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 8),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
+    return Container(
+      padding: const EdgeInsets.fromLTRB(28, 28, 28, 26),
+      decoration: BoxDecoration(
+        color: _ControlWorksPalette.hero,
+        borderRadius: BorderRadius.circular(30),
+        border: Border.all(color: _ControlWorksPalette.heroBorder),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          for (var i = 0; i < phases.length; i++) ...[
-            Expanded(
-              child: InkWell(
-                borderRadius: BorderRadius.circular(16),
-                onTap: () => onPhase(phases[i].$1),
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 3,
-                    vertical: 5,
+          Text(
+            'Controlled delivery chain',
+            style: theme.textTheme.headlineSmall?.copyWith(
+              color: _ControlWorksPalette.textPrimary,
+              fontWeight: FontWeight.w900,
+              letterSpacing: -.45,
+            ),
+          ),
+          const SizedBox(height: 12),
+          Text(
+            'Every field action remains traceable to a house, parish, status and production stage.',
+            style: theme.textTheme.bodyLarge?.copyWith(
+              color: _ControlWorksPalette.textSecondary,
+              height: 1.48,
+            ),
+          ),
+          const SizedBox(height: 24),
+          Wrap(
+            spacing: 10,
+            runSpacing: 10,
+            children: [
+              _StatusBadge(
+                icon: Icons.play_arrow_rounded,
+                label: '$open OPEN',
+                foreground: _ControlWorksPalette.primary,
+                background: _ControlWorksPalette.openChip,
+              ),
+              _StatusBadge(
+                icon: Icons.priority_high_rounded,
+                label: '$attention ATTENTION',
+                foreground: _ControlWorksPalette.success,
+                background: _ControlWorksPalette.successChip,
+              ),
+              _StatusBadge(
+                icon: Icons.check_rounded,
+                label: '$closed CLOSED',
+                foreground: _ControlWorksPalette.success,
+                background: _ControlWorksPalette.closedChip,
+              ),
+            ],
+          ),
+          const SizedBox(height: 24),
+          Wrap(
+            spacing: 12,
+            runSpacing: 12,
+            children: [
+              SizedBox(
+                height: 58,
+                child: FilledButton.icon(
+                  onPressed: () => onPhase('Close-out'),
+                  style: FilledButton.styleFrom(
+                    backgroundColor: _ControlWorksPalette.primary,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(horizontal: 24),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(18),
+                    ),
                   ),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Container(
-                        width: 36,
-                        height: 36,
-                        decoration: BoxDecoration(
-                          color: theme.colorScheme.primaryContainer,
-                          shape: BoxShape.circle,
-                        ),
-                        alignment: Alignment.center,
-                        child: Icon(
-                          phases[i].$2,
-                          size: 18,
-                          color: theme.colorScheme.onPrimaryContainer,
-                        ),
-                      ),
-                      const SizedBox(height: 5),
-                      FittedBox(
-                        fit: BoxFit.scaleDown,
-                        child: Text(
-                          phases[i].$1,
-                          maxLines: 1,
-                          style: theme.textTheme.labelSmall?.copyWith(
-                            fontWeight: FontWeight.w900,
-                          ),
-                        ),
-                      ),
-                    ],
+                  icon: const Icon(Icons.verified_outlined, size: 22),
+                  label: const Text(
+                    'Completion',
+                    style: TextStyle(
+                      fontWeight: FontWeight.w900,
+                      fontSize: 16,
+                    ),
                   ),
                 ),
               ),
-            ),
-            if (i < phases.length - 1)
-              Container(
-                width: 1,
-                margin: const EdgeInsets.symmetric(vertical: 9),
-                color: theme.colorScheme.outlineVariant,
+              SizedBox(
+                height: 58,
+                child: OutlinedButton.icon(
+                  onPressed: () => onPhase('Finance'),
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: _ControlWorksPalette.primary,
+                    backgroundColor: _ControlWorksPalette.hero,
+                    side: const BorderSide(
+                      color: _ControlWorksPalette.paymentBorder,
+                    ),
+                    padding: const EdgeInsets.symmetric(horizontal: 24),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(18),
+                    ),
+                  ),
+                  icon: const Icon(Icons.payments_outlined, size: 22),
+                  label: const Text(
+                    'Payment',
+                    style: TextStyle(
+                      fontWeight: FontWeight.w900,
+                      fontSize: 16,
+                    ),
+                  ),
+                ),
               ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _ControlWorksHeader extends StatelessWidget {
+  const _ControlWorksHeader({required this.onNew});
+
+  final VoidCallback onNew;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final heading = Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'PRODUCTION MANAGEMENT',
+              style: theme.textTheme.labelLarge?.copyWith(
+                color: _ControlWorksPalette.primary,
+                fontWeight: FontWeight.w900,
+                letterSpacing: 1.35,
+              ),
+            ),
+            const SizedBox(height: 12),
+            Text(
+              'Control of Works',
+              style: theme.textTheme.displaySmall?.copyWith(
+                color: _ControlWorksPalette.textPrimary,
+                fontWeight: FontWeight.w900,
+                height: .98,
+                letterSpacing: -1.0,
+              ),
+            ),
+            const SizedBox(height: 12),
+            Text(
+              'Plan, execute, inspect, close and pay without breaking the evidence chain.',
+              style: theme.textTheme.bodyLarge?.copyWith(
+                color: _ControlWorksPalette.textSecondary,
+                height: 1.5,
+              ),
+            ),
           ],
+        );
+
+        final newButton = SizedBox(
+          height: 58,
+          child: FilledButton.icon(
+            onPressed: onNew,
+            style: FilledButton.styleFrom(
+              backgroundColor: _ControlWorksPalette.newButton,
+              foregroundColor: _ControlWorksPalette.textPrimary,
+              padding: const EdgeInsets.symmetric(horizontal: 22),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20),
+              ),
+            ),
+            icon: const Icon(Icons.add_rounded),
+            label: const Text(
+              'New',
+              style: TextStyle(fontWeight: FontWeight.w900, fontSize: 16),
+            ),
+          ),
+        );
+
+        if (constraints.maxWidth < 520) {
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Align(alignment: Alignment.centerRight, child: newButton),
+              const SizedBox(height: 8),
+              heading,
+            ],
+          );
+        }
+
+        return Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Expanded(child: heading),
+            const SizedBox(width: 18),
+            newButton,
+          ],
+        );
+      },
+    );
+  }
+}
+
+class _StatusBadge extends StatelessWidget {
+  const _StatusBadge({
+    required this.icon,
+    required this.label,
+    required this.foreground,
+    required this.background,
+  });
+
+  final IconData icon;
+  final String label;
+  final Color foreground;
+  final Color background;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 39,
+      padding: const EdgeInsets.symmetric(horizontal: 15),
+      decoration: BoxDecoration(
+        color: background,
+        borderRadius: BorderRadius.circular(999),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, color: foreground, size: 18),
+          const SizedBox(width: 7),
+          Text(
+            label,
+            style: TextStyle(
+              color: foreground,
+              fontWeight: FontWeight.w900,
+              letterSpacing: .2,
+              fontSize: 13,
+            ),
+          ),
         ],
       ),
     );
@@ -801,20 +1001,89 @@ class _ProductionChain extends StatelessWidget {
 
 class _PhaseRail extends StatelessWidget {
   const _PhaseRail({required this.selected, required this.onSelected});
+
   final String selected;
   final ValueChanged<String> onSelected;
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      child: SegmentedButton<String>(
-        segments: _ControlScreenState.phases
-            .map((p) => ButtonSegment(value: p, label: Text(p)))
-            .toList(),
-        selected: {selected},
-        showSelectedIcon: false,
-        onSelectionChanged: (selection) => onSelected(selection.first),
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final width = constraints.maxWidth < 600 ? 600.0 : constraints.maxWidth;
+        return SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: SizedBox(
+            width: width,
+            height: 52,
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                color: _ControlWorksPalette.surface,
+                borderRadius: BorderRadius.circular(28),
+                border: Border.all(color: _ControlWorksPalette.border),
+              ),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(28),
+                child: Row(
+                  children: [
+                    for (var i = 0;
+                        i < _ControlScreenState.phases.length;
+                        i++) ...[
+                      Expanded(
+                        child: _PhaseTab(
+                          label: _ControlScreenState.phases[i],
+                          selected: selected == _ControlScreenState.phases[i],
+                          onTap: () =>
+                              onSelected(_ControlScreenState.phases[i]),
+                        ),
+                      ),
+                      if (i < _ControlScreenState.phases.length - 1)
+                        const VerticalDivider(
+                          width: 1,
+                          thickness: 1,
+                          color: _ControlWorksPalette.border,
+                        ),
+                    ],
+                  ],
+                ),
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+}
+
+class _PhaseTab extends StatelessWidget {
+  const _PhaseTab({
+    required this.label,
+    required this.selected,
+    required this.onTap,
+  });
+
+  final String label;
+  final bool selected;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: selected
+          ? _ControlWorksPalette.selectedTab
+          : _ControlWorksPalette.surface,
+      child: InkWell(
+        onTap: onTap,
+        child: Center(
+          child: Text(
+            label,
+            maxLines: 1,
+            style: TextStyle(
+              color: _ControlWorksPalette.textPrimary,
+              fontWeight: selected ? FontWeight.w900 : FontWeight.w800,
+              fontSize: 14,
+            ),
+          ),
+        ),
       ),
     );
   }
@@ -827,6 +1096,7 @@ class _ModuleTile extends StatelessWidget {
     required this.count,
     required this.onTap,
   });
+
   final AppState state;
   final RcRecordSchema schema;
   final int count;
@@ -835,59 +1105,184 @@ class _ModuleTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final palette = switch (schema.phase) {
-      'Plan' => (const Color(0xFFF3E9D6), const Color(0xFF765A32)),
-      'Delivery' => (const Color(0xFFF8E1D3), const Color(0xFF94583E)),
-      'Quality' => (const Color(0xFFE8ECD7), const Color(0xFF59643F)),
-      'Close-out' => (const Color(0xFFEDE3DD), const Color(0xFF70584F)),
-      'Finance' => (const Color(0xFFECE4EF), const Color(0xFF66516E)),
-      _ => (const Color(0xFFF1EBE1), const Color(0xFF685E51)),
-    };
-    final tileTone = palette.$1;
-    final accent = palette.$2;
+    final description = schema.description.isEmpty
+        ? 'Structured ${schema.phase.toLowerCase()} production record.'
+        : schema.description;
 
-    return RcExpressiveSurface(
-      shape: RcSurfaceShape.offset,
-      tone: Color.alphaBlend(
-        tileTone.withValues(alpha: .86),
-        theme.colorScheme.surface,
-      ),
-      onTap: onTap,
-      semanticLabel: schema.title,
-      child: Row(
-        children: [
-          RcIconWell(
-            icon: state.uiIcon('module.${schema.eventType}', schema.icon),
-            color: accent,
-            size: 48,
-            iconSize: RcIconSize.lg,
+    return Material(
+      color: _ControlWorksPalette.surface,
+      borderRadius: BorderRadius.circular(26),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(26),
+        child: Container(
+          padding: const EdgeInsets.fromLTRB(22, 20, 18, 20),
+          decoration: BoxDecoration(
+            color: Colors.transparent,
+            borderRadius: BorderRadius.circular(26),
+            border: Border.all(color: _ControlWorksPalette.cardBorder),
           ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(schema.title, style: theme.textTheme.titleMedium),
-                const SizedBox(height: 3),
-                Text(
-                  '${schema.phase} • $count records',
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    color: Color.alphaBlend(
-                      accent.withValues(alpha: .72),
-                      theme.colorScheme.onSurfaceVariant,
-                    ),
-                    fontWeight: FontWeight.w700,
-                  ),
+          child: Row(
+            children: [
+              Container(
+                width: 58,
+                height: 58,
+                decoration: BoxDecoration(
+                  color: _ControlWorksPalette.iconWell,
+                  borderRadius: BorderRadius.circular(16),
                 ),
-              ],
-            ),
+                alignment: Alignment.center,
+                child: Icon(
+                  state.uiIcon('module.${schema.eventType}', schema.icon),
+                  color: _ControlWorksPalette.moduleBlue,
+                  size: 30,
+                ),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      schema.title,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        color: _ControlWorksPalette.textPrimary,
+                        fontWeight: FontWeight.w900,
+                        height: 1.1,
+                      ),
+                    ),
+                    const SizedBox(height: 7),
+                    Text(
+                      description,
+                      maxLines: 3,
+                      overflow: TextOverflow.ellipsis,
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: _ControlWorksPalette.textSecondary,
+                        height: 1.35,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 10),
+              SizedBox(
+                width: 58,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      '$count',
+                      style: theme.textTheme.headlineSmall?.copyWith(
+                        color: _ControlWorksPalette.textPrimary,
+                        fontWeight: FontWeight.w900,
+                      ),
+                    ),
+                    const Text(
+                      'records',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        color: _ControlWorksPalette.textSecondary,
+                        fontWeight: FontWeight.w700,
+                        fontSize: 12,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ),
-          Icon(
-            Icons.chevron_right_rounded,
-            color: accent.withValues(alpha: .78),
+        ),
+      ),
+    );
+  }
+}
+
+class _ReferenceRecordTile extends StatelessWidget {
+  const _ReferenceRecordTile({
+    required this.record,
+    required this.onTap,
+  });
+
+  final ProductionRecord record;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final statusColor = record.needsAttention
+        ? RcColors.warning
+        : record.isClosed
+        ? RcColors.success
+        : _ControlWorksPalette.primary;
+
+    return Material(
+      color: _ControlWorksPalette.surface,
+      borderRadius: BorderRadius.circular(22),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(22),
+        child: Container(
+          padding: const EdgeInsets.all(18),
+          decoration: BoxDecoration(
+            border: Border.all(color: _ControlWorksPalette.cardBorder),
+            borderRadius: BorderRadius.circular(22),
           ),
-        ],
+          child: Row(
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      '${record.houseCode} • ${record.title}',
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        color: _ControlWorksPalette.textPrimary,
+                        fontWeight: FontWeight.w900,
+                      ),
+                    ),
+                    const SizedBox(height: 5),
+                    Text(
+                      '${record.parish} • ${record.summary.isEmpty ? 'Updated production record' : record.summary}',
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        color: _ControlWorksPalette.textSecondary,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 10),
+              RcStatusPill(
+                label: record.status.toUpperCase(),
+                color: statusColor,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _ReferenceEmptyState extends StatelessWidget {
+  const _ReferenceEmptyState();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: _ControlWorksPalette.surface,
+        borderRadius: BorderRadius.circular(22),
+        border: Border.all(color: _ControlWorksPalette.cardBorder),
+      ),
+      child: const Text(
+        'No production records are visible for this account yet.',
+        style: TextStyle(color: _ControlWorksPalette.textSecondary),
       ),
     );
   }
@@ -895,6 +1290,7 @@ class _ModuleTile extends StatelessWidget {
 
 class _Pulse extends StatelessWidget {
   const _Pulse(this.label, this.value, this.icon, this.color);
+
   final String label;
   final String value;
   final IconData icon;
@@ -917,19 +1313,41 @@ class _Pulse extends StatelessWidget {
           Text(
             value,
             style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-              color: onColor,
-              fontWeight: FontWeight.w900,
-            ),
+                  color: onColor,
+                  fontWeight: FontWeight.w900,
+                ),
           ),
           Text(
             label,
             style: Theme.of(context).textTheme.labelLarge?.copyWith(
-              color: onColor,
-              fontWeight: FontWeight.w900,
-            ),
+                  color: onColor,
+                  fontWeight: FontWeight.w900,
+                ),
           ),
         ],
       ),
     );
   }
 }
+
+abstract final class _ControlWorksPalette {
+  static const pageBackground = Color(0xFFF4F7FC);
+  static const surface = Color(0xFFFFFFFF);
+  static const hero = Color(0xFFF9EBEB);
+  static const heroBorder = Color(0xFFF1DCDD);
+  static const primary = Color(0xFFC91F2C);
+  static const textPrimary = Color(0xFF241B1C);
+  static const textSecondary = Color(0xFF665B5D);
+  static const newButton = Color(0xFFFEDBD9);
+  static const selectedTab = Color(0xFFFEDBD9);
+  static const border = Color(0xFFDDE1E8);
+  static const cardBorder = Color(0xFFE2E5EA);
+  static const iconWell = Color(0xFFEEF4FF);
+  static const moduleBlue = Color(0xFF2D69C4);
+  static const openChip = Color(0xFFF8D9DC);
+  static const successChip = Color(0xFFE6EFEA);
+  static const closedChip = Color(0xFFE8F1EC);
+  static const success = Color(0xFF2E7A60);
+  static const paymentBorder = Color(0xFFE7C7CA);
+}
+
