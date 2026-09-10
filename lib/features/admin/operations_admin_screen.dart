@@ -418,12 +418,11 @@ class _BeneficiaryAgreementAdminState
     final config = await widget.state.repository.beneficiaryAgreementConfig();
     if (!mounted) return;
 
-    title.text =
-        '${config['title'] ?? kDefaultBeneficiaryAgreementTitle}'.trim();
+    title.text = '${config['title'] ?? kDefaultBeneficiaryAgreementTitle}'
+        .trim();
     body.text = '${config['body'] ?? kDefaultBeneficiaryAgreementText}'.trim();
     version.text = '${config['version'] ?? 'Default'}'.trim();
-    sourceFileName =
-        '${config['sourceFileName'] ?? 'Built-in default'}'.trim();
+    sourceFileName = '${config['sourceFileName'] ?? 'Built-in default'}'.trim();
     sourceType = '${config['sourceType'] ?? 'Default'}'.trim();
 
     setState(() => loading = false);
@@ -498,9 +497,9 @@ class _BeneficiaryAgreementAdminState
 
   void _snack(String message) {
     if (!mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(message)),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(message)));
   }
 
   @override

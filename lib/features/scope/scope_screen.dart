@@ -666,13 +666,13 @@ class _ScopeScreenState extends State<ScopeScreen>
     if (!mounted || config.isEmpty) return;
 
     setState(() {
-      agreementTitle =
-          '${config['title'] ?? kDefaultBeneficiaryAgreementTitle}'.trim();
+      agreementTitle = '${config['title'] ?? kDefaultBeneficiaryAgreementTitle}'
+          .trim();
       agreementTemplate =
           '${config['body'] ?? kDefaultBeneficiaryAgreementText}'.trim();
       agreementVersion = '${config['version'] ?? 'Default'}'.trim();
-      agreementSourceFile =
-          '${config['sourceFileName'] ?? 'Admin managed'}'.trim();
+      agreementSourceFile = '${config['sourceFileName'] ?? 'Admin managed'}'
+          .trim();
     });
   }
 

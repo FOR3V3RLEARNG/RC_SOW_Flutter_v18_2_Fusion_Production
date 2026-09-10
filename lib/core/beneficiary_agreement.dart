@@ -1,5 +1,4 @@
-const String kDefaultBeneficiaryAgreementTitle =
-    'BENEFICIARY REPAIR AGREEMENT';
+const String kDefaultBeneficiaryAgreementTitle = 'BENEFICIARY REPAIR AGREEMENT';
 
 const String kDefaultBeneficiaryAgreementText =
     'I acknowledge the repair work described in this agreement and permit '

@@ -84,7 +84,9 @@ class AgreementImportService {
 
     final result = sections.join('\n\n').trim();
     if (result.isEmpty) {
-      throw const FormatException('No agreement text was found in the Excel file.');
+      throw const FormatException(
+        'No agreement text was found in the Excel file.',
+      );
     }
     return result;
   }
@@ -99,7 +101,9 @@ class AgreementImportService {
       }
     }
     if (document == null) {
-      throw const FormatException('This DOCX does not contain word/document.xml.');
+      throw const FormatException(
+        'This DOCX does not contain word/document.xml.',
+      );
     }
 
     final raw = document.content;
@@ -121,7 +125,9 @@ class AgreementImportService {
 
     final result = _cleanLines(xml);
     if (result.isEmpty) {
-      throw const FormatException('No readable agreement text was found in the DOCX.');
+      throw const FormatException(
+        'No readable agreement text was found in the DOCX.',
+      );
     }
     return result;
   }
