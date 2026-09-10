@@ -143,9 +143,10 @@ checks: list[tuple[str, bool]] = [
         ".from('app_events')\n          .delete()" not in read(ROOT / "lib/services/rc_sow_repository.dart"),
     ),
     (
-        "Gmail message body is decoded in-app",
-        contains("lib/services/rc_sow_repository.dart", "_gmailBodyText")
-        and contains("lib/features/gmail/gmail_screen.dart", "bodyText"),
+        "Dedicated Gmail UI remains removed",
+        not (ROOT / "lib/features/gmail/gmail_screen.dart").exists()
+        and "GmailScreen" not in lib_text
+        and "gmail_screen.dart" not in lib_text,
     ),
     (
         "Community Board is read-only outside Admin",
