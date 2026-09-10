@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 import '../features/admin/admin_screen.dart';
-import '../features/gmail/gmail_screen.dart';
 import '../features/live/live_tracker_screen.dart';
 import '../features/messages/messages_screen.dart';
 import '../features/settings/settings_screen.dart';
@@ -88,8 +87,4 @@ abstract final class RcNavigator {
       Navigator.of(
         context,
       ).push(route(AdminScreen(state: state), name: '/admin'));
-  static Future<void> gmail(BuildContext context, AppState state) =>
-      Navigator.of(
-        context,
-      ).push(route(GmailScreen(state: state), name: '/gmail'));
 }

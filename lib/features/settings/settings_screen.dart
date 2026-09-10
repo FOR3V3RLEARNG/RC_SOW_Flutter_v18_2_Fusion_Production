@@ -5,7 +5,6 @@ import '../../core/app_constants.dart';
 import '../../core/rc_components.dart';
 import '../../state/app_state.dart';
 import '../admin/admin_screen.dart';
-import '../gmail/gmail_screen.dart';
 
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key, required this.state});
@@ -142,25 +141,6 @@ class SettingsScreen extends StatelessWidget {
                 onChanged: (v) {
                   if (v != null) state.setSetting('measurementUnit', v);
                 },
-              ),
-            ],
-          ),
-          _Section(
-            title: 'Communication',
-            icon: Icons.forum_outlined,
-            children: [
-              ListTile(
-                leading: const Icon(Icons.mail_outline),
-                title: const Text('Gmail inside RC SOW'),
-                subtitle: Text(
-                  state.repository.googleProviderToken == null
-                      ? 'Reconnect Google to grant Gmail read/send permission.'
-                      : 'Google token available for this session.',
-                ),
-                trailing: const Icon(Icons.chevron_right),
-                onTap: () => Navigator.of(context).push(
-                  MaterialPageRoute(builder: (_) => GmailScreen(state: state)),
-                ),
               ),
             ],
           ),

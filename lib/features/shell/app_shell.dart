@@ -17,7 +17,6 @@ import '../control/control_screen.dart';
 import '../control/house_operations_control_screen.dart';
 import '../live/interactive_house_map_screen.dart';
 import '../dashboard/dashboard_screen.dart';
-import '../gmail/gmail_screen.dart';
 import '../houses/houses_screen.dart';
 import '../messages/messages_screen.dart';
 import '../scope/scope_screen.dart';
@@ -575,14 +574,6 @@ Future<void> showRcMoreMenu(BuildContext context, AppState state) async {
                 _MoreTile('Presence', Icons.visibility_outlined, () {
                   Navigator.pop(context);
                   showUsersOnlinePanel(context, state);
-                }),
-                _MoreTile('Gmail', Icons.mail_outline, () {
-                  Navigator.pop(context);
-                  Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (_) => GmailScreen(state: state),
-                    ),
-                  );
                 }),
                 _MoreTile('Live tracker', Icons.location_searching, () {
                   Navigator.pop(context);
