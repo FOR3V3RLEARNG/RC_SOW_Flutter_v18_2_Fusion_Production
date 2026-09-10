@@ -1417,9 +1417,7 @@ class _LiveTrackerScreenState extends State<LiveTrackerScreen> {
     Map<String, dynamic> row,
     _TrackerMilestone milestone,
   ) async {
-    final picked = await FilePicker.platform.pickFiles(
-      allowMultiple: false,
-      withData: true,
+    final file = await FilePicker.pickFile(
       type: FileType.custom,
       allowedExtensions: const [
         'pdf',
@@ -1434,11 +1432,10 @@ class _LiveTrackerScreenState extends State<LiveTrackerScreen> {
         'webp',
       ],
     );
-    if (picked == null || picked.files.isEmpty) return;
+    if (file == null) return;
 
-    final file = picked.files.single;
-    final bytes = file.bytes;
-    if (bytes == null || bytes.isEmpty) {
+    final bytes = await file.readAsBytes();
+    if (bytes.isEmpty) {
       _trackerSnack('The selected document could not be read.');
       return;
     }

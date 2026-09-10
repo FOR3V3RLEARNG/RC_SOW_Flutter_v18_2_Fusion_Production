@@ -779,6 +779,7 @@ class _CompactMoreAction extends StatelessWidget {
   }
 }
 
+// ignore: unused_element
 class _MoreTile extends StatelessWidget {
   const _MoreTile(this.label, this.icon, this.onTap);
   final String label;

@@ -2216,6 +2216,7 @@ class _ScopeScreenState extends State<ScopeScreen>
     });
   }
 
+  // ignore: unused_element
   Future<void> _finishStroke() async {
     if (current.length < 2) {
       setState(() => current = []);
