@@ -1,0 +1,380 @@
+name: RC SOW Cloud Factory
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+      - 'fusion/**'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: rc-sow-cloud-factory-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  FLUTTER_VERSION: '3.44.7'
+
+jobs:
+  cloud-production:
+    name: Repair Test Build Package
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: stable
+          cache: true
+
+      - name: Setup Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.13'
+
+      - name: Resolve dependencies
+        run: flutter pub get
+
+      # ============================================================
+      # GitHub-side compatibility repair
+      # ============================================================
+
+      - name: RC SOW cloud auto repair
+        if: github.event_name != 'pull_request'
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+
+          changed = []
+
+          # ---------------------------------------------------------
+          # file_picker 12.x migration
+          # ---------------------------------------------------------
+
+          path = Path("lib/features/live/live_tracker_screen.dart")
+
+          if path.exists():
+              text = path.read_text()
+
+              old = """    final picked = await FilePicker.platform.pickFiles(
+                allowMultiple: false,
+                withData: true,
+                type: FileType.custom,
+                allowedExtensions: const [
+                  'pdf',
+                  'doc',
+                  'docx',
+                  'xls',
+                  'xlsx',
+                  'csv',
+                  'jpg',
+                  'jpeg',
+                  'png',
+                  'webp',
+                ],
+              );
+              if (picked == null || picked.files.isEmpty) return;
+
+              final file = picked.files.single;
+              final bytes = file.bytes;
+              if (bytes == null || bytes.isEmpty) {
+          """
+
+              new = """    final file = await FilePicker.pickFile(
+                type: FileType.custom,
+                allowedExtensions: const [
+                  'pdf',
+                  'doc',
+                  'docx',
+                  'xls',
+                  'xlsx',
+                  'csv',
+                  'jpg',
+                  'jpeg',
+                  'png',
+                  'webp',
+                ],
+              );
+              if (file == null) return;
+
+              final bytes = await file.readAsBytes();
+              if (bytes.isEmpty) {
+          """
+
+              if old in text:
+                  text = text.replace(old, new, 1)
+                  path.write_text(text)
+                  changed.append(str(path))
+                  print("FIXED file_picker v12 API")
+
+          # ---------------------------------------------------------
+          # Retained roof helper
+          # ---------------------------------------------------------
+
+          path = Path("lib/features/scope/scope_screen.dart")
+
+          if path.exists():
+              text = path.read_text()
+
+              target = "  Future<void> _finishStroke() async {"
+              replacement = (
+                  "  // ignore: unused_element\n"
+                  "  Future<void> _finishStroke() async {"
+              )
+
+              if target in text and replacement not in text:
+                  text = text.replace(target, replacement, 1)
+                  path.write_text(text)
+                  changed.append(str(path))
+                  print("FIXED _finishStroke analyzer warning")
+
+          # ---------------------------------------------------------
+          # Reserved MoreTile
+          # ---------------------------------------------------------
+
+          path = Path("lib/features/shell/app_shell.dart")
+
+          if path.exists():
+              text = path.read_text()
+
+              if (
+                  "class _MoreTile" in text
+                  and "// ignore: unused_element\nclass _MoreTile" not in text
+              ):
+                  text = re.sub(
+                      r"(?m)^class _MoreTile",
+                      "// ignore: unused_element\nclass _MoreTile",
+                      text,
+                      count=1,
+                  )
+                  path.write_text(text)
+                  changed.append(str(path))
+                  print("FIXED _MoreTile analyzer warning")
+
+          print("Cloud repair changed:", sorted(set(changed)))
+          PY
+
+          # Standard Dart fixes also run in GitHub.
+          dart fix --apply || true
+          dart format .
+
+          git diff --check
+
+      # ============================================================
+      # Push GitHub repairs back to branch
+      # ============================================================
+
+      - name: Commit cloud repairs
+        if: github.event_name != 'pull_request'
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          if git diff --quiet -- lib test; then
+            echo "No source repair commit required."
+            exit 0
+          fi
+
+          git config user.name "github-actions[bot]"
+          git config user.email \
+            "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git add -u -- lib test
+
+          git commit -m \
+            "chore(ci): GitHub cloud compatibility repair"
+
+          for ATTEMPT in 1 2 3; do
+            git pull --rebase origin "${GITHUB_REF_NAME}"
+
+            if git push origin "HEAD:${GITHUB_REF_NAME}"; then
+              echo "Cloud repairs pushed."
+              exit 0
+            fi
+
+            echo "Push race detected. Retry ${ATTEMPT}/3..."
+            sleep 3
+          done
+
+          echo "Unable to push cloud repair after retries."
+          exit 1
+
+      # ============================================================
+      # Android
+      # ============================================================
+
+      - name: Bootstrap Android
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          if [ ! -d android ]; then
+            flutter create . \
+              --platforms=android \
+              --org org.jamaicaredcross \
+              --project-name rc_sow_flutter \
+              --empty \
+              --no-pub
+          fi
+
+          chmod +x scripts/patch_android.sh
+          ./scripts/patch_android.sh
+
+      - name: Resolve final dependency graph
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          mkdir -p cloud_logs
+
+          flutter pub get
+
+          flutter pub deps --style=compact \
+            | tee cloud_logs/dependencies.txt
+
+          flutter pub outdated \
+            | tee cloud_logs/outdated.txt || true
+
+      # ============================================================
+      # Generated assets
+      # ============================================================
+
+      - name: Generate launcher icon
+        run: dart run flutter_launcher_icons
+
+      - name: Verify splash
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          test -s \
+            android/app/src/main/res/drawable/launch_background.xml
+
+          test -s \
+            android/app/src/main/res/values-v31/styles.xml
+
+          grep -q \
+            'rc_splash_background' \
+            android/app/src/main/res/values/colors.xml
+
+          grep -q \
+            'windowSplashScreenAnimatedIcon' \
+            android/app/src/main/res/values-v31/styles.xml
+
+      # ============================================================
+      # Quality gates
+      # ============================================================
+
+      - name: Strict formatting gate
+        run: |
+          dart format \
+            --output=none \
+            --set-exit-if-changed .
+
+      - name: Flutter Analyze
+        shell: bash
+        run: |
+          set -o pipefail
+
+          flutter analyze \
+            | tee cloud_logs/flutter-analyze.txt
+
+      - name: Unit Widget Tests
+        shell: bash
+        run: |
+          set -o pipefail
+
+          flutter test --coverage \
+            | tee cloud_logs/flutter-test.txt
+
+      - name: Production contract checks
+        shell: bash
+        run: |
+          set -o pipefail
+
+          python3 scripts/ci/verify_production_contracts.py \
+            | tee cloud_logs/production-contracts.txt
+
+      # ============================================================
+      # Production builds
+      # ============================================================
+
+      - name: Build universal APK
+        run: flutter build apk --release
+
+      - name: Build split APKs
+        run: flutter build apk --release --split-per-abi
+
+      - name: Build Android App Bundle
+        run: flutter build appbundle --release
+
+      # ============================================================
+      # Package outputs
+      # ============================================================
+
+      - name: Package cloud production artifacts
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          mkdir -p cloud_output
+
+          cp \
+            build/app/outputs/flutter-apk/app-release.apk \
+            cloud_output/RC-SOW-universal-release.apk
+
+          find build/app/outputs/flutter-apk \
+            -name 'app-*-release.apk' \
+            -exec cp {} cloud_output/ \;
+
+          cp \
+            build/app/outputs/bundle/release/app-release.aab \
+            cloud_output/RC-SOW-release.aab
+
+          (
+            cd cloud_output
+            sha256sum * > SHA256SUMS.txt
+          )
+
+          {
+            echo "RC SOW Cloud Factory"
+            echo "run=${GITHUB_RUN_NUMBER}"
+            echo "sha=${GITHUB_SHA}"
+            echo "branch=${GITHUB_REF_NAME}"
+            echo "flutter=${FLUTTER_VERSION}"
+            date -u
+          } > cloud_output/BUILD_INFO.txt
+
+          ls -lh cloud_output
+
+      - name: Upload APK AAB
+        uses: actions/upload-artifact@v6
+        with:
+          name: rc-sow-cloud-production-${{ github.run_number }}
+          path: cloud_output/
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Upload validation logs
+        if: always()
+        uses: actions/upload-artifact@v6
+        with:
+          name: rc-sow-cloud-validation-${{ github.run_number }}
+          path: |
+            cloud_logs/
+            coverage/
+          if-no-files-found: warn
+          retention-days: 14
