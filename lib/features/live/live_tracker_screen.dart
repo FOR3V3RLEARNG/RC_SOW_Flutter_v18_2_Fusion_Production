@@ -1027,10 +1027,7 @@ class _LiveTrackerScreenState extends State<LiveTrackerScreen> {
                     onTap: () => _openMilestoneActions(row, milestone),
                   ),
                 if (redFlag)
-                  const RcStatusPill(
-                    label: 'RED FLAG',
-                    color: RcColors.danger,
-                  ),
+                  const RcStatusPill(label: 'RED FLAG', color: RcColors.danger),
               ],
             ),
             if (date.isNotEmpty) ...[
@@ -1154,9 +1151,7 @@ class _LiveTrackerScreenState extends State<LiveTrackerScreen> {
   bool get _canRejectHouse => _canEditTracker;
 
   String _trackerCode(Map<String, dynamic> row) =>
-      '${row['trackerHouseCode'] ?? row['houseId'] ?? ''}'
-          .trim()
-          .toUpperCase();
+      '${row['trackerHouseCode'] ?? row['houseId'] ?? ''}'.trim().toUpperCase();
 
   String _resolvedCode(Map<String, dynamic> row) =>
       '${row['resolvedHouseCode'] ?? ''}'.trim().toUpperCase();
@@ -1171,10 +1166,7 @@ class _LiveTrackerScreenState extends State<LiveTrackerScreen> {
     return value is Map ? Map<String, dynamic>.from(value) : const {};
   }
 
-  bool _milestoneDone(
-    Map<String, dynamic> row,
-    _TrackerMilestone milestone,
-  ) {
+  bool _milestoneDone(Map<String, dynamic> row, _TrackerMilestone milestone) {
     final override = _milestoneOverride(row, milestone.key);
     if (override.containsKey('done')) return override['done'] == true;
     return row[milestone.sourceKey] == true;
@@ -1334,16 +1326,13 @@ class _LiveTrackerScreenState extends State<LiveTrackerScreen> {
 
     final houses = await widget.state.repository.houses(profile);
     final house = houses
-        .where(
-          (candidate) =>
-              candidate.code.trim().toUpperCase() == resolved,
-        )
+        .where((candidate) => candidate.code.trim().toUpperCase() == resolved)
         .firstOrNull;
     if (!mounted || house == null) return;
 
-    final visible = RcProductRegistry.visibleSchemas(profile)
-        .where((schema) => schema.eventType == milestone.eventType)
-        .firstOrNull;
+    final visible = RcProductRegistry.visibleSchemas(
+      profile,
+    ).where((schema) => schema.eventType == milestone.eventType).firstOrNull;
 
     if (visible == null) {
       await _openHouse(resolved);
@@ -1595,8 +1584,7 @@ class _LiveTrackerScreenState extends State<LiveTrackerScreen> {
                 subtitle: const Text(
                   'If direct write-back is unavailable, the change remains queued in RC SOW.',
                 ),
-                onChanged: (value) =>
-                    setDialogState(() => syncExcel = value),
+                onChanged: (value) => setDialogState(() => syncExcel = value),
               ),
             ],
           ),
@@ -1610,9 +1598,7 @@ class _LiveTrackerScreenState extends State<LiveTrackerScreen> {
                 if (rejected && reason.text.trim().isEmpty) return;
                 Navigator.pop(dialogContext, true);
               },
-              icon: Icon(
-                rejected ? Icons.block_outlined : Icons.undo_rounded,
-              ),
+              icon: Icon(rejected ? Icons.block_outlined : Icons.undo_rounded),
               label: Text(rejected ? 'Reject house' : 'Reinstate house'),
             ),
           ],
@@ -1659,9 +1645,9 @@ class _LiveTrackerScreenState extends State<LiveTrackerScreen> {
 
   void _trackerSnack(String message) {
     if (!mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(message)),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(message)));
   }
 
   Widget _storage(_TrackerData data) {
@@ -1966,10 +1952,7 @@ class _TrackerMilestoneChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final suffix = [
-      if (hasDocument) 'DOC',
-      if (pendingSync) 'SYNC',
-    ];
+    final suffix = [if (hasDocument) 'DOC', if (pendingSync) 'SYNC'];
 
     return ActionChip(
       avatar: Icon(

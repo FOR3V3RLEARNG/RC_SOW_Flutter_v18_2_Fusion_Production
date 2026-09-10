@@ -32,9 +32,7 @@ class LiveTrackerOperationsService {
     final byTracker = <String, Map<String, dynamic>>{};
     for (final raw in rows) {
       final row = Map<String, dynamic>.from(raw);
-      final item = Map<String, dynamic>.from(
-        row['item'] as Map? ?? const {},
-      );
+      final item = Map<String, dynamic>.from(row['item'] as Map? ?? const {});
       final trackerCode =
           '${item['trackerHouseCode'] ?? row['house_code'] ?? ''}'
               .trim()
@@ -205,14 +203,16 @@ class LiveTrackerOperationsService {
         '${_safePath(parish)}/${_safePath(houseCode)}/live-tracker/'
         '${_safePath(milestoneKey)}/${DateTime.now().microsecondsSinceEpoch}_$safeName';
 
-    await client.storage.from('evidence').uploadBinary(
-      path,
-      bytes,
-      fileOptions: FileOptions(
-        upsert: false,
-        contentType: _mimeType(fileName),
-      ),
-    );
+    await client.storage
+        .from('evidence')
+        .uploadBinary(
+          path,
+          bytes,
+          fileOptions: FileOptions(
+            upsert: false,
+            contentType: _mimeType(fileName),
+          ),
+        );
     return path;
   }
 
