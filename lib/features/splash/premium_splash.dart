@@ -164,13 +164,109 @@ class HouseRepairGame extends FlameGame {
     super.render(canvas);
     final w = size.x;
     final h = size.y;
+    // SUNNY HORIZON SPLASH V1
+    // Bright, positive recovery atmosphere: clear sky, golden horizon,
+    // warm sunlight and soft green Jamaican landscape.
     final bg = Paint()
       ..shader = const LinearGradient(
-        begin: Alignment.topLeft,
-        end: Alignment.bottomRight,
-        colors: [Color(0xFFF3F7FB), Color(0xFFFFF4F4), Color(0xFFEAF1F7)],
+        begin: Alignment.topCenter,
+        end: Alignment.bottomCenter,
+        stops: [0.0, .38, .63, 1.0],
+        colors: [
+          Color(0xFF66BFF4),
+          Color(0xFFBFE8FF),
+          Color(0xFFFFE6A7),
+          Color(0xFFFFF8E8),
+        ],
       ).createShader(Rect.fromLTWH(0, 0, w, h));
     canvas.drawRect(Rect.fromLTWH(0, 0, w, h), bg);
+
+    final horizonY = h * .56;
+    final sunCenter = Offset(w * .78, h * .24);
+    final sunRadius = math.min(w, h) * .075;
+
+    final sunGlow = Paint()
+      ..shader = const RadialGradient(
+        stops: [0.0, .34, 1.0],
+        colors: [
+          Color(0xFFFFF8C7),
+          Color(0xAAFFD86B),
+          Color(0x00FFD86B),
+        ],
+      ).createShader(
+        Rect.fromCircle(center: sunCenter, radius: sunRadius * 3.2),
+      );
+    canvas.drawCircle(sunCenter, sunRadius * 3.2, sunGlow);
+
+    final rayPaint = Paint()
+      ..color = const Color(0xFFFFE28A).withValues(alpha: .38)
+      ..strokeWidth = 3
+      ..strokeCap = StrokeCap.round;
+    for (var i = 0; i < 14; i++) {
+      final angle = i * (math.pi * 2 / 14);
+      final start = Offset(
+        sunCenter.dx + math.cos(angle) * sunRadius * 1.4,
+        sunCenter.dy + math.sin(angle) * sunRadius * 1.4,
+      );
+      final end = Offset(
+        sunCenter.dx + math.cos(angle) * sunRadius * 2.0,
+        sunCenter.dy + math.sin(angle) * sunRadius * 2.0,
+      );
+      canvas.drawLine(start, end, rayPaint);
+    }
+    canvas.drawCircle(
+      sunCenter,
+      sunRadius,
+      Paint()..color = const Color(0xFFFFD85E),
+    );
+
+    final cloud = Paint()..color = Colors.white.withValues(alpha: .68);
+    canvas.drawOval(
+      Rect.fromCenter(
+        center: Offset(w * .19, h * .19),
+        width: w * .20,
+        height: h * .038,
+      ),
+      cloud,
+    );
+    canvas.drawOval(
+      Rect.fromCenter(
+        center: Offset(w * .27, h * .175),
+        width: w * .13,
+        height: h * .032,
+      ),
+      cloud,
+    );
+    canvas.drawOval(
+      Rect.fromCenter(
+        center: Offset(w * .58, h * .30),
+        width: w * .15,
+        height: h * .027,
+      ),
+      Paint()..color = Colors.white.withValues(alpha: .48),
+    );
+
+    final distantHills = Path()
+      ..moveTo(0, horizonY + 16)
+      ..quadraticBezierTo(w * .18, horizonY - 34, w * .39, horizonY + 5)
+      ..quadraticBezierTo(w * .61, horizonY - 24, w * .78, horizonY + 10)
+      ..quadraticBezierTo(w * .90, horizonY - 12, w, horizonY + 8)
+      ..lineTo(w, h)
+      ..lineTo(0, h)
+      ..close();
+    canvas.drawPath(distantHills, Paint()..color = const Color(0xFFB9D98C));
+
+    final nearHills = Path()
+      ..moveTo(0, h * .70)
+      ..quadraticBezierTo(w * .20, h * .63, w * .43, h * .70)
+      ..quadraticBezierTo(w * .68, h * .62, w, h * .71)
+      ..lineTo(w, h)
+      ..lineTo(0, h)
+      ..close();
+    canvas.drawPath(
+      nearHills,
+      Paint()..color = const Color(0xFFDDEABF).withValues(alpha: .92),
+    );
 
     final center = Offset(w * .5, h * .43);
     final houseW = math.min(w * .68, 390.0);
@@ -267,7 +363,14 @@ class HouseRepairGame extends FlameGame {
       final sheetPaint = Paint()
         ..shader =
             const LinearGradient(
-              colors: [Color(0xFFB6C4D3), Color(0xFFF5F8FB), Color(0xFFCDD8E4)],
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [
+                RcColors.brandDeep,
+                RcColors.brand,
+                Color(0xFFF0525D),
+                RcColors.brandDeep,
+              ],
             ).createShader(
               Rect.fromLTRB(left - 24, ridge.dy, right + 24, wallTop + 8),
             );
@@ -275,7 +378,7 @@ class HouseRepairGame extends FlameGame {
       canvas.drawPath(rightRoof, sheetPaint);
 
       final ribs = Paint()
-        ..color = Colors.white.withValues(alpha: .66)
+        ..color = const Color(0xFFFFDADD).withValues(alpha: .72)
         ..strokeWidth = 1.5;
       for (var i = 1; i < 9; i++) {
         final f = i / 9;
@@ -290,7 +393,7 @@ class HouseRepairGame extends FlameGame {
     final finishStage = stage(2.05, 2.75);
     if (finishStage > 0) {
       final fascia = Paint()
-        ..color = const Color(0xFF774A2A).withValues(alpha: finishStage)
+        ..color = RcColors.brandDeep.withValues(alpha: finishStage)
         ..strokeWidth = 10
         ..strokeCap = StrokeCap.square;
       canvas.drawLine(
@@ -324,7 +427,7 @@ class HouseRepairGame extends FlameGame {
       canvas.drawCircle(
         ridge,
         7,
-        Paint()..color = const Color(0xFFE5EBF2).withValues(alpha: finishStage),
+        Paint()..color = const Color(0xFFFFD8DC).withValues(alpha: finishStage),
       );
     }
 
@@ -343,40 +446,30 @@ class HouseRepairGame extends FlameGame {
       canvas.restore();
     }
 
-    // Thick construction dust briefly blankets the roof while work happens.
-    if (!reduceMotion && elapsed > .52 && elapsed < 2.62) {
-      final dustStrength = math.sin(stage(.52, 2.62) * math.pi).clamp(0.0, 1.0);
-      for (var i = 0; i < 30; i++) {
-        final angle = i * .91 + elapsed * (.25 + (i % 4) * .04);
-        final drift = 30 + (i % 7) * 12.0;
+    // Soft warm construction particles keep the repair action visible
+    // without darkening the optimistic sunrise scene.
+    if (!reduceMotion && elapsed > .62 && elapsed < 2.42) {
+      final dustStrength = math.sin(stage(.62, 2.42) * math.pi).clamp(0.0, 1.0);
+      for (var i = 0; i < 18; i++) {
+        final angle = i * .91 + elapsed * (.22 + (i % 4) * .03);
+        final drift = 26 + (i % 6) * 10.0;
         final x =
             center.dx +
             math.sin(angle) * drift +
-            math.sin(elapsed * 1.8 + i) * 28;
+            math.sin(elapsed * 1.6 + i) * 24;
         final y =
             ridge.dy +
-            28 +
-            ((i * 23 + elapsed * 42) % (wallTop - ridge.dy + 55));
-        final radius = 9.0 + (i % 5) * 3.2;
+            26 +
+            ((i * 23 + elapsed * 38) % (wallTop - ridge.dy + 48));
+        final radius = 6.0 + (i % 4) * 2.2;
         final dust = Paint()
           ..color = Color.lerp(
-            const Color(0xFFB8A58F),
-            const Color(0xFFD5DBE0),
+            const Color(0xFFFFDFA1),
+            const Color(0xFFFFF3D0),
             (i % 4) / 4,
-          )!.withValues(alpha: .13 + .15 * dustStrength);
+          )!.withValues(alpha: .07 + .08 * dustStrength);
         canvas.drawCircle(Offset(x, y), radius, dust);
       }
-      canvas.drawOval(
-        Rect.fromCenter(
-          center: Offset(center.dx, ridge.dy + 65),
-          width: houseW * 1.04,
-          height: houseH * .74,
-        ),
-        Paint()
-          ..color = const Color(
-            0xFFCABBAA,
-          ).withValues(alpha: .09 + .11 * dustStrength),
-      );
     }
 
     final shine = stage(2.75, 3.45);
