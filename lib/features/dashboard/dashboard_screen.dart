@@ -166,8 +166,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 ),
                 onOperationsAdmin: () => Navigator.of(context).push(
                   MaterialPageRoute(
-                    builder: (_) =>
-                        OperationsAdminScreen(state: widget.state),
+                    builder: (_) => OperationsAdminScreen(state: widget.state),
                   ),
                 ),
                 onControl: () => widget.state.selectTab(2),
@@ -381,9 +380,10 @@ List<_DashboardActivity> _dashboardActivity(_DashboardData data) {
     );
   }
 
-  for (final record in data.records
-      .where((record) => record.eventType != 'communityPost')
-      .take(14)) {
+  for (final record
+      in data.records
+          .where((record) => record.eventType != 'communityPost')
+          .take(14)) {
     items.add(
       _DashboardActivity(
         kind: 'STATUS CHANGE',
@@ -398,9 +398,10 @@ List<_DashboardActivity> _dashboardActivity(_DashboardData data) {
     );
   }
 
-  for (final record in data.community
-      .where((record) => record.eventType == 'communityPost')
-      .take(10)) {
+  for (final record
+      in data.community
+          .where((record) => record.eventType == 'communityPost')
+          .take(10)) {
     final start = DateTime.tryParse('${record.item['eventStart'] ?? ''}');
     final upcoming = start != null && start.isAfter(DateTime.now());
     final title = '${record.item['title'] ?? record.summary}'.trim();
@@ -530,8 +531,7 @@ class _DashboardActivityTicker extends StatefulWidget {
       _DashboardActivityTickerState();
 }
 
-class _DashboardActivityTickerState
-    extends State<_DashboardActivityTicker> {
+class _DashboardActivityTickerState extends State<_DashboardActivityTicker> {
   Timer? timer;
   int index = 0;
 
@@ -590,10 +590,7 @@ class _DashboardActivityTickerState
         tone: theme.colorScheme.surface.withValues(alpha: .72),
         child: Row(
           children: [
-            Icon(
-              Icons.check_circle_outline_rounded,
-              color: RcColors.success,
-            ),
+            Icon(Icons.check_circle_outline_rounded, color: RcColors.success),
             const SizedBox(width: 9),
             const Expanded(
               child: Text('You are up to date. No recent activity to show.'),
@@ -727,7 +724,10 @@ class _ProductionChainNav extends StatelessWidget {
                   borderRadius: BorderRadius.circular(15),
                   onTap: () => onOpenPhase(items[i].$1),
                   child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 2, vertical: 5),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 2,
+                      vertical: 5,
+                    ),
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [

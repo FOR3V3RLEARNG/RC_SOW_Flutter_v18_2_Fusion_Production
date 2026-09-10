@@ -7,10 +7,7 @@ import '../../models/app_models.dart';
 import '../../state/app_state.dart';
 import '../control/house_operations_control_screen.dart';
 
-Future<void> showNotificationCentre(
-  BuildContext context,
-  AppState state,
-) {
+Future<void> showNotificationCentre(BuildContext context, AppState state) {
   return showGeneralDialog<void>(
     context: context,
     barrierDismissible: true,
@@ -48,20 +45,16 @@ Future<void> showNotificationCentre(
                     BoxShadow(
                       blurRadius: 24,
                       spreadRadius: 1,
-                      color: Theme.of(context)
-                          .colorScheme
-                          .shadow
-                          .withValues(alpha: .16),
+                      color: Theme.of(
+                        context,
+                      ).colorScheme.shadow.withValues(alpha: .16),
                       offset: const Offset(0, 10),
                     ),
                   ],
                 ),
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(24),
-                  child: MessagesDrawerBody(
-                    state: state,
-                    compact: true,
-                  ),
+                  child: MessagesDrawerBody(state: state, compact: true),
                 ),
               ),
             ),
@@ -96,7 +89,6 @@ Future<void> showNotificationCentre(
 
 // Compact notification shade intentionally uses a small Android-style
 // right-aligned surface instead of a full-width notification panel.
-
 
 Future<void> showMessageDrawer(BuildContext context, AppState state) =>
     showNotificationCentre(context, state);
@@ -698,8 +690,8 @@ class _MessagesDrawerBodyState extends State<MessagesDrawerBody> {
                                     TextButton.icon(
                                       style: TextButton.styleFrom(
                                         foregroundColor: visual.color,
-                                        backgroundColor:
-                                            visual.color.withValues(alpha: .08),
+                                        backgroundColor: visual.color
+                                            .withValues(alpha: .08),
                                       ),
                                       onPressed: () => _openMessage(message),
                                       icon: Icon(

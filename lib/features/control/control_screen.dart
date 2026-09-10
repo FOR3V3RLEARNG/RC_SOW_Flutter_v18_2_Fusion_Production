@@ -749,7 +749,10 @@ class _ProductionChain extends StatelessWidget {
                 borderRadius: BorderRadius.circular(16),
                 onTap: () => onPhase(phases[i].$1),
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 3, vertical: 5),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 3,
+                    vertical: 5,
+                  ),
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
@@ -833,30 +836,12 @@ class _ModuleTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final palette = switch (schema.phase) {
-      'Plan' => (
-        const Color(0xFFF3E9D6),
-        const Color(0xFF765A32),
-      ),
-      'Delivery' => (
-        const Color(0xFFF8E1D3),
-        const Color(0xFF94583E),
-      ),
-      'Quality' => (
-        const Color(0xFFE8ECD7),
-        const Color(0xFF59643F),
-      ),
-      'Close-out' => (
-        const Color(0xFFEDE3DD),
-        const Color(0xFF70584F),
-      ),
-      'Finance' => (
-        const Color(0xFFECE4EF),
-        const Color(0xFF66516E),
-      ),
-      _ => (
-        const Color(0xFFF1EBE1),
-        const Color(0xFF685E51),
-      ),
+      'Plan' => (const Color(0xFFF3E9D6), const Color(0xFF765A32)),
+      'Delivery' => (const Color(0xFFF8E1D3), const Color(0xFF94583E)),
+      'Quality' => (const Color(0xFFE8ECD7), const Color(0xFF59643F)),
+      'Close-out' => (const Color(0xFFEDE3DD), const Color(0xFF70584F)),
+      'Finance' => (const Color(0xFFECE4EF), const Color(0xFF66516E)),
+      _ => (const Color(0xFFF1EBE1), const Color(0xFF685E51)),
     };
     final tileTone = palette.$1;
     final accent = palette.$2;

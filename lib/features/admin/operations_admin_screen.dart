@@ -1720,10 +1720,12 @@ class _NotificationCentreState extends State<_NotificationCentre> {
           style: FilledButton.styleFrom(
             backgroundColor: Theme.of(context).colorScheme.primary,
             foregroundColor: Theme.of(context).colorScheme.onPrimary,
-            disabledBackgroundColor:
-                Theme.of(context).colorScheme.surfaceContainerHighest,
-            disabledForegroundColor:
-                Theme.of(context).colorScheme.onSurfaceVariant,
+            disabledBackgroundColor: Theme.of(
+              context,
+            ).colorScheme.surfaceContainerHighest,
+            disabledForegroundColor: Theme.of(
+              context,
+            ).colorScheme.onSurfaceVariant,
           ),
           onPressed: busy ? null : _send,
           icon: const Icon(Icons.notifications_active_outlined),

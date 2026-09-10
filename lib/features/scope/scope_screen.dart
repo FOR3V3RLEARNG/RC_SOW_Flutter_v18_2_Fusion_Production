@@ -547,14 +547,18 @@ class _ScopeScreenState extends State<ScopeScreen>
                                         ),
                                         decoration: BoxDecoration(
                                           color: theme.colorScheme.primary,
-                                          borderRadius: BorderRadius.circular(20),
+                                          borderRadius: BorderRadius.circular(
+                                            20,
+                                          ),
                                         ),
                                         child: Text(
                                           'DISPLAY',
-                                          style: theme.textTheme.labelSmall?.copyWith(
-                                            color: theme.colorScheme.onPrimary,
-                                            fontWeight: FontWeight.w900,
-                                          ),
+                                          style: theme.textTheme.labelSmall
+                                              ?.copyWith(
+                                                color:
+                                                    theme.colorScheme.onPrimary,
+                                                fontWeight: FontWeight.w900,
+                                              ),
                                         ),
                                       ),
                                     ),
@@ -565,7 +569,10 @@ class _ScopeScreenState extends State<ScopeScreen>
                                       tooltip: 'Remove photo',
                                       visualDensity: VisualDensity.compact,
                                       onPressed: () => _removeHousePhoto(index),
-                                      icon: const Icon(Icons.close_rounded, size: 16),
+                                      icon: const Icon(
+                                        Icons.close_rounded,
+                                        size: 16,
+                                      ),
                                     ),
                                   ),
                                 ],
@@ -573,7 +580,9 @@ class _ScopeScreenState extends State<ScopeScreen>
                             ),
                             const SizedBox(height: 4),
                             Text(
-                              isCover ? 'Active house cover' : 'Tap to set display',
+                              isCover
+                                  ? 'Active house cover'
+                                  : 'Tap to set display',
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                               style: theme.textTheme.labelSmall?.copyWith(
@@ -617,7 +626,8 @@ class _ScopeScreenState extends State<ScopeScreen>
       final rawExtension = picked.name.contains('.')
           ? picked.name.split('.').last.toLowerCase()
           : 'jpg';
-      final extension = const {'jpg', 'jpeg', 'png', 'webp'}.contains(rawExtension)
+      final extension =
+          const {'jpg', 'jpeg', 'png', 'webp'}.contains(rawExtension)
           ? rawExtension
           : 'jpg';
 
@@ -643,8 +653,8 @@ class _ScopeScreenState extends State<ScopeScreen>
       _snack(
         becomesCover
             ? active
-                ? 'House photo saved and set as the active house display photo.'
-                : 'House photo saved to Scope and selected as its display photo.'
+                  ? 'House photo saved and set as the active house display photo.'
+                  : 'House photo saved to Scope and selected as its display photo.'
             : 'House photo saved. Tap it to make it the display photo.',
       );
     } catch (error) {
@@ -785,26 +795,24 @@ class _ScopeScreenState extends State<ScopeScreen>
               Wrap(
                 spacing: 7,
                 runSpacing: 7,
-                children: const [
-                  'Gable',
-                  'Hip',
-                  'Shed',
-                  'Intersecting',
-                  'Pitched',
-                  'Custom',
-                ].map((type) {
-                  final selected =
-                      roofType.toLowerCase() == type.toLowerCase();
-                  return ChoiceChip(
-                    selected: selected,
-                    avatar: Icon(
-                      _roofPresetIcon(type),
-                      size: 18,
-                    ),
-                    label: Text(type),
-                    onSelected: (_) => _applyRoofPreset(type),
-                  );
-                }).toList(),
+                children:
+                    const [
+                      'Gable',
+                      'Hip',
+                      'Shed',
+                      'Intersecting',
+                      'Pitched',
+                      'Custom',
+                    ].map((type) {
+                      final selected =
+                          roofType.toLowerCase() == type.toLowerCase();
+                      return ChoiceChip(
+                        selected: selected,
+                        avatar: Icon(_roofPresetIcon(type), size: 18),
+                        label: Text(type),
+                        onSelected: (_) => _applyRoofPreset(type),
+                      );
+                    }).toList(),
               ),
               const SizedBox(height: 6),
               Text(
@@ -877,8 +885,7 @@ class _ScopeScreenState extends State<ScopeScreen>
                           : (details) =>
                                 _placeTechnicalPoint(details.localPosition),
                       onPanStart: drawTool == RoofDrawTool.select
-                          ? (details) =>
-                                _beginSelectDrag(details.localPosition)
+                          ? (details) => _beginSelectDrag(details.localPosition)
                           : null,
                       onPanUpdate: drawTool == RoofDrawTool.select
                           ? (details) =>
@@ -1576,8 +1583,7 @@ class _ScopeScreenState extends State<ScopeScreen>
   }
 
   Size? _renderedRoofCanvasSize() {
-    final renderObject =
-        _roofCanvasKey.currentContext?.findRenderObject();
+    final renderObject = _roofCanvasKey.currentContext?.findRenderObject();
     if (renderObject is! RenderBox || !renderObject.hasSize) return null;
     return renderObject.size;
   }
@@ -1595,18 +1601,10 @@ class _ScopeScreenState extends State<ScopeScreen>
     }
 
     if (manualWallPoints.length >= 2) {
-      final minX = manualWallPoints
-          .map((point) => point.dx)
-          .reduce(math.min);
-      final maxX = manualWallPoints
-          .map((point) => point.dx)
-          .reduce(math.max);
-      final minY = manualWallPoints
-          .map((point) => point.dy)
-          .reduce(math.min);
-      final maxY = manualWallPoints
-          .map((point) => point.dy)
-          .reduce(math.max);
+      final minX = manualWallPoints.map((point) => point.dx).reduce(math.min);
+      final maxX = manualWallPoints.map((point) => point.dx).reduce(math.max);
+      final minY = manualWallPoints.map((point) => point.dy).reduce(math.min);
+      final maxY = manualWallPoints.map((point) => point.dy).reduce(math.max);
 
       if (maxX - minX >= 80 && maxY - minY >= 60) {
         return Rect.fromLTRB(minX, minY, maxX, maxY);
@@ -1718,10 +1716,7 @@ class _ScopeScreenState extends State<ScopeScreen>
         ),
       );
 
-      for (final x in [
-        rect.left + w * .32,
-        rect.left + w * .68,
-      ]) {
+      for (final x in [rect.left + w * .32, rect.left + w * .68]) {
         generated.add(
           _autoRoofStroke(
             RoofDrawTool.drain,
@@ -1752,30 +1747,10 @@ class _ScopeScreenState extends State<ScopeScreen>
         ),
       );
       generated.addAll([
-        _autoRoofStroke(
-          RoofDrawTool.hip,
-          ridgeStart,
-          rect.topLeft,
-          'Hip',
-        ),
-        _autoRoofStroke(
-          RoofDrawTool.hip,
-          ridgeStart,
-          rect.bottomLeft,
-          'Hip',
-        ),
-        _autoRoofStroke(
-          RoofDrawTool.hip,
-          ridgeEnd,
-          rect.topRight,
-          'Hip',
-        ),
-        _autoRoofStroke(
-          RoofDrawTool.hip,
-          ridgeEnd,
-          rect.bottomRight,
-          'Hip',
-        ),
+        _autoRoofStroke(RoofDrawTool.hip, ridgeStart, rect.topLeft, 'Hip'),
+        _autoRoofStroke(RoofDrawTool.hip, ridgeStart, rect.bottomLeft, 'Hip'),
+        _autoRoofStroke(RoofDrawTool.hip, ridgeEnd, rect.topRight, 'Hip'),
+        _autoRoofStroke(RoofDrawTool.hip, ridgeEnd, rect.bottomRight, 'Hip'),
       ]);
 
       generated.addAll([
@@ -1841,12 +1816,7 @@ class _ScopeScreenState extends State<ScopeScreen>
       final junction = Offset(crossX, cy);
 
       generated.addAll([
-        _autoRoofStroke(
-          RoofDrawTool.ridge,
-          mainStart,
-          mainEnd,
-          'Main ridge',
-        ),
+        _autoRoofStroke(RoofDrawTool.ridge, mainStart, mainEnd, 'Main ridge'),
         _autoRoofStroke(
           RoofDrawTool.ridge,
           crossTop,
@@ -1900,8 +1870,7 @@ class _ScopeScreenState extends State<ScopeScreen>
 
       final firstRidge = strokes.indexWhere(
         (stroke) =>
-            stroke.templateGenerated &&
-            stroke.tool == RoofDrawTool.ridge,
+            stroke.templateGenerated && stroke.tool == RoofDrawTool.ridge,
       );
       selectedStrokeIndex = firstRidge < 0 ? null : firstRidge;
       _clearSelectionDrag();
@@ -2240,12 +2209,7 @@ class _ScopeScreenState extends State<ScopeScreen>
       current = [];
 
       if (points.length >= 2) {
-        strokes.add(
-          RoofStroke(
-            tool: RoofDrawTool.freehand,
-            points: points,
-          ),
-        );
+        strokes.add(RoofStroke(tool: RoofDrawTool.freehand, points: points));
         selectedStrokeIndex = strokes.length - 1;
         redo.clear();
       }
@@ -2464,10 +2428,7 @@ class _ScopeScreenState extends State<ScopeScreen>
             _pdfAgreementRoof(style),
             pw.SizedBox(height: 7),
             pw.TableHelper.fromTextArray(
-              border: pw.TableBorder.all(
-                color: PdfColors.grey400,
-                width: .6,
-              ),
+              border: pw.TableBorder.all(color: PdfColors.grey400, width: .6),
               cellPadding: const pw.EdgeInsets.all(5),
               data: [
                 ['Width', '${measurements.widthFt.toStringAsFixed(2)} ft'],

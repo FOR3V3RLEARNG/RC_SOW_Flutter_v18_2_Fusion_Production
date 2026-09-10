@@ -1048,10 +1048,12 @@ class _LiveTrackerScreenState extends State<LiveTrackerScreen> {
                     style: FilledButton.styleFrom(
                       backgroundColor: Theme.of(context).colorScheme.primary,
                       foregroundColor: Theme.of(context).colorScheme.onPrimary,
-                      disabledBackgroundColor:
-                          Theme.of(context).colorScheme.surfaceContainerHighest,
-                      disabledForegroundColor:
-                          Theme.of(context).colorScheme.onSurfaceVariant,
+                      disabledBackgroundColor: Theme.of(
+                        context,
+                      ).colorScheme.surfaceContainerHighest,
+                      disabledForegroundColor: Theme.of(
+                        context,
+                      ).colorScheme.onSurfaceVariant,
                     ),
                     onPressed: resolved.isEmpty
                         ? ((rejected || redFlag || !_canStartHouse)
@@ -1076,14 +1078,18 @@ class _LiveTrackerScreenState extends State<LiveTrackerScreen> {
                 Expanded(
                   child: FilledButton.tonalIcon(
                     style: FilledButton.styleFrom(
-                      backgroundColor:
-                          Theme.of(context).colorScheme.secondaryContainer,
-                      foregroundColor:
-                          Theme.of(context).colorScheme.onSecondaryContainer,
-                      disabledBackgroundColor:
-                          Theme.of(context).colorScheme.surfaceContainerHighest,
-                      disabledForegroundColor:
-                          Theme.of(context).colorScheme.onSurfaceVariant,
+                      backgroundColor: Theme.of(
+                        context,
+                      ).colorScheme.secondaryContainer,
+                      foregroundColor: Theme.of(
+                        context,
+                      ).colorScheme.onSecondaryContainer,
+                      disabledBackgroundColor: Theme.of(
+                        context,
+                      ).colorScheme.surfaceContainerHighest,
+                      disabledForegroundColor: Theme.of(
+                        context,
+                      ).colorScheme.onSurfaceVariant,
                     ),
                     onPressed: resolved.isEmpty || revoked
                         ? null

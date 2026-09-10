@@ -532,10 +532,7 @@ class RcHeader extends StatelessWidget {
   }
 }
 
-Future<void> showRcMoreMenu(
-  BuildContext context,
-  AppState state,
-) async {
+Future<void> showRcMoreMenu(BuildContext context, AppState state) async {
   final profile = state.profile!;
   await showGeneralDialog<void>(
     context: context,
@@ -578,10 +575,9 @@ Future<void> showRcMoreMenu(
                     BoxShadow(
                       blurRadius: 24,
                       offset: const Offset(0, 10),
-                      color: Theme.of(context)
-                          .colorScheme
-                          .shadow
-                          .withValues(alpha: .15),
+                      color: Theme.of(
+                        context,
+                      ).colorScheme.shadow.withValues(alpha: .15),
                     ),
                   ],
                 ),
@@ -612,9 +608,9 @@ Future<void> showRcMoreMenu(
                                         .textTheme
                                         .labelSmall
                                         ?.copyWith(
-                                          color: Theme.of(context)
-                                              .colorScheme
-                                              .onSurfaceVariant,
+                                          color: Theme.of(
+                                            context,
+                                          ).colorScheme.onSurfaceVariant,
                                         ),
                                   ),
                                 ],
@@ -762,15 +758,13 @@ class _CompactMoreAction extends StatelessWidget {
     final accent = destructive
         ? theme.colorScheme.error
         : admin
-            ? theme.colorScheme.secondary
-            : theme.colorScheme.primary;
+        ? theme.colorScheme.secondary
+        : theme.colorScheme.primary;
 
     return ListTile(
       dense: true,
       visualDensity: const VisualDensity(vertical: -2),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(17),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(17)),
       leading: Container(
         width: 36,
         height: 36,
@@ -792,7 +786,6 @@ class _CompactMoreAction extends StatelessWidget {
     );
   }
 }
-
 
 class _MoreTile extends StatelessWidget {
   const _MoreTile(this.label, this.icon, this.onTap);
